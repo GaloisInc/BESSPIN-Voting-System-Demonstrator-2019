@@ -1,6 +1,3 @@
-[submodule "FreeRTOS-mirror"]
-	path = FreeRTOS-mirror
-	url = git@gitlab-ext.galois.com:ssith/FreeRTOS-mirror.git
 [submodule "gfe"]
 	path = gfe
 	url = git@gitlab-ext.galois.com:ssith/gfe.git
