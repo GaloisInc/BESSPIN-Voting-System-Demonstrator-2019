@@ -2,9 +2,10 @@
 
 ## Global Config
 
-* Feed Timeout (seconds)
-* Eject Timeout (seconds)
-* Cast Timeout (seconds)
+* Feed Timeout (seconds) - Time allowed for paper to feed past the scanner
+* Eject Timeout (seconds) - Time allowed for paper to eject
+* Cast Timeout (seconds) - Time allowed for paper to finish feededing into BB 
+    when ```cast_ballot()``` is called 
 
 ## Devices
 
