@@ -1,0 +1,3 @@
+[submodule "gfe"]
+	path = gfe
+	url = git@gitlab-ext.galois.com:ssith/gfe.git

@@ -43,8 +43,13 @@ high-assurance systems spanning hardware, firmware, and software.
 More detailed and low-level specifications of BVS are written in
 several different formal languages:
 
-- [Coq]
-- [Cryptol]
+- [Coq] The logical framework (LF) we use writing and reasoning about
+  formal models.
 
+- [Cryptol] A DSL for specifying and reasoning about bit-level
+  algorithms, particularly cryptographic algorithms and protocols.
 
+- [FreeRTOS]: Contains code to be run on the Smart Ballot Box.
 
+- [GFE]: Contains bitstreams to be uploaded on the FPGAs and nix shell
+  scripts for setting up the build environment.
