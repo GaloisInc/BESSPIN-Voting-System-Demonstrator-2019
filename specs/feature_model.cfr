@@ -14,6 +14,7 @@ abstract display
   tft ?
   lcd ?
   rgb ?
+  backlight ?
   xor technology
     eink
     epaper
@@ -44,18 +45,20 @@ abstract paper_detect_switch
 
 abstract button
   button_color: color
+  illuminated ?
 
 smart_ballot_box
-  right_motor: motor
-  left_motor: motor
+  motor: motor
   display: display
-  [ lcd && monochrome ]
+  [ lcd && backlight && color && rgb ]
+  [ color_count = 16777216 ]
+  [ characters_width = 16 && characters_height = 2 ]
   scanner: barcode_scanner
   [ twoD ]
   early_switch: paper_detect_switch
   late_switch: paper_detect_switch
   cast_button: button
-  [ black ]
+  [ green ]
   spoil_button: button
-  [ black ]
+  [ red ]
   
