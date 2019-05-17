@@ -1,0 +1,80 @@
+Smart Ballot Box Security
+subsystem Security
+  indexing
+    owner: Joe Kiniry <kiniry@freeandfair.us>
+    contributors: Rod Chapman <rod.chapman@freeandfair.us> 
+      Dragan Stosic <dragan.stosic@freeandfair.us> 
+      Dan Zimmerman <dmz@freeandfair.us>
+      Joey Dodds <jdodds@freeandfair.us> 
+    design: 4 hrs
+    implementation: 40 hrs
+    assurance: 80 hrs
+    complexity: medium
+    risk: low
+// @note kiniry Some of this subsystem is reusing the domain model we have written in our 
+// R&D on high-assurance cryptography (hacrypto and libvcrypt).
+
+component Log Entry inherit String // Refine to JSONValue or CSVValue?
+component Log
+  May I have an empty log?
+  A log is an often persistent sequence of events recorded about a given system.
+  What kind of entries can this log contain?
+  Export the log to the following target!
+  Save this entry to the log!
+component Secure Log inherit Log
+  A secure log is a log that has evidence that specific security properties hold.
+  What kind of data integrity does this log have?
+  What kind of provenance does this log have?
+  What kind of confidentiality does this log have?
+  What kind of authentication and access control does this log have?
+  What non-repudiation properties does this log have?
+  May I have a log created conforming to the following security properties?
+  Must stipulate what kinds of events are permitted in the log.
+
+component Secure System Log inherit Secure Log
+  Must contain only system events.
+component System Event inherit Log Entry
+  Must only describe a system-level event related to hardware state changes.
+
+component Secure Application Log inherit Secure Log
+  Must only contain application entries of a specified kind.
+component Application Entry inherit Log Entry
+  May I have a new entry that contains the following data?
+
+component AES Key inherit Cryptographic Key
+  Must be kept secret from unauthenticated entities.
+component Symmetric Encryption
+  What is the ciphertext produced by encrypting this plaintext with that key?
+  What is the plaintext produced by decrypting this ciphertext with that key?
+component AES inherit Symmetric Encryption
+  The NIST-standardized AES cryptographic algorithm.
+  What is your key size?
+component SHA
+  The NIST-standardized SHA-2 cryptographic hash algorithm.
+  What is your digest size?
+  What is the hash of this value?
+component Asymmetric Encryption
+  A public key-based cryptographic encryption algorithm.
+  What is the ciphertext corresponding to this plaintext using this public key?
+  What is the plaintext corresponding to this ciphertext using this private key?
+
+component HSM
+  A Hardware Security Module bundles together a set of cryptographic constructs and
+  provides access to them via a secure API.
+component BVS HSM
+  The HSM for the BESSPIN Voting System.
+  Must contain a symmetric cipher.
+  Must contain a hash function.
+  Must contain a random number generator.
+component BSV HSM 2019
+  The HSM for the DEF CON 2019 demonstrator.
+  Must contain a hardware AES implementation.
+  Must contain a SHA-2 implementation.
+  Must contain a RNG implementation.
+component BSV HSM 2020
+  The HSM for the DEF CON 2020 demonstrator.
+  Must contain a hardware AES implementation.
+  Must contain a hardware SHA-2 implementation.
+  Must contain a hardware RNG implementation.
+
+

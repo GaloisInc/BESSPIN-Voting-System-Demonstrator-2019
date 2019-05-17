@@ -1,0 +1,23 @@
+Cryptographic Protocol
+subsystem Cryptographic Protocol
+  indexing
+    owner: Joey Dodds <jdodds@galois.com> 
+    contributors: Luke Myers <lmyers@galois.com> 
+      Daniel Wagner <dmwit@galois.com> 
+      Joe Kiniry <kiniry@freeandfair.us>
+      Dragan Stosic <dragan.stosic@freeandfair.us>
+      Rod Chapman <rod.chapman@freeandfair.us>
+      TBD2
+component Protocol
+  Communications protocol between the BMD and the SBB. Messages are all from BMD to SBB via the ballot 
+component BMD Entity
+  Responsible for encrypting ballots so that the SBB can decrypt them and know the time that they were encrypted 
+  Set the clock!
+  What is the encryption of this ballot at this time?
+  Print the encrypted ballot!
+  
+component SBB Entity
+  Processes encrypted ballots
+  Has this encrypted ballot timed out?
+  What is the decryption of this ballot?
+

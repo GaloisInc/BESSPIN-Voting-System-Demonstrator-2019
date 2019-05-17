@@ -1,0 +1,7 @@
+DEF CON Communications
+subsystem Polling Place Summary
+  indexing
+    owner: Jason Graalum
+component Team Summary
+  What are the slides summarizing this team’s SSITH R&D?
+

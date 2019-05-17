@@ -1,0 +1,12 @@
+Election Reporting
+subsystem Election Reporting
+  indexing
+    owner: Jason Graalum
+component Election Status
+  How many votes have been cast?
+  What is the current outcome of the election?
+component Hacking Status
+  How many attacks has this polling place witnessed?
+  How many attacks have been successful and undetected?
+  How many attacks have been detected and thwarted?
+

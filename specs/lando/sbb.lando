@@ -1,0 +1,24 @@
+Smart Ballot Box
+subsystem Smart Ballot Box
+  The software, firmware, and hardware that make up the BSV smart ballot box.
+  indexing
+    owner: Michal Podhradsky <mpodhradsky@galois.com>
+    contributors: Haneef Mubarak <hmubarak@galois.com>
+      Parker Southwick <psouthwick@galois.com>
+      Steven Osborn <steven@freeandfair.us>
+    potential contributors: Daniel M., Alexander B.
+
+component Smart Ballot Box API
+  The top-level API that wraps all hardware functionality of the BVS GFE.  Note that
+  many of these features essentially delegate to one or more underlying features of
+  components of the BVS hardware.  The remaining features are queries on the
+  feature model of the BVS hardware product.
+  Feed motor?
+  Display?
+  Barcode scanner?
+  Early paper detect switch?
+  Late paper detect switch?
+  Cast button?
+  Spoil button?
+  This ballot id is a legal ballot for that many seconds!
+
