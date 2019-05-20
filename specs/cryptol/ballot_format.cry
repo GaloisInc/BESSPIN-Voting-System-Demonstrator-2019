@@ -1,0 +1,14 @@
+// a number of contests where a unique candidtate is selected for each contest
+
+// we have a number nct of contests (0,1,...,nct-1) with ncd candidates per contest.
+// given a contest, a selection for candidate i, 0 <= i < ncd, is represented as "i:[width (ncd-1)]"
+// a ballot is a vector of size nct where each entry is a bitvector of length "width (ncd-1)"
+// selection b ct == cd if and only if candidate cd is selected in contest ct
+// there must be at least 2 candidates (and, of course, everything is finite)
+selection : {nct, ncd} (fin nct, fin ncd, nct >= 1, ncd >= 2) => [nct][width (ncd-1)] -> [nct] -> [width (ncd-1)]
+selection b ct = (b@ct)
+
+// a ballot is valid when each selection is a number between 0 and (ncd-1) included
+is_valid : {nct, ncd} (fin nct, fin ncd, nct >= 1, ncd >= 2) => [nct][width (ncd-1)] -> Bit
+is_valid b = [b@i < ncd | i <- [0..(ncd-1)]:[ncd][(width ncd)-1]]
+

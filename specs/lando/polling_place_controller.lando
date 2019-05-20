@@ -4,5 +4,5 @@ subsystem Controller
     owner: TBD2
 component Ballot Manager
   Spoil this ballot card!
-    Is this ballot card legitimate?
+  Is this ballot card legitimate?
 
