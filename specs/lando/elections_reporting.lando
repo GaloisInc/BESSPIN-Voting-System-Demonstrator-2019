@@ -10,3 +10,8 @@ component Hacking Status
   How many attacks have been successful and undetected?
   How many attacks have been detected and thwarted?
 
+scenarios
+  Report vote tally
+    Display results!
+    Pull results!
+    

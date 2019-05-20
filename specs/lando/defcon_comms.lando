@@ -4,4 +4,10 @@ subsystem Polling Place Summary
     owner: Jason Graalum
 component Team Summary
   What are the slides summarizing this team’s SSITH R&D?
-
+component Issues Summary
+  What are the git issues describing successful system attacks?
+  What are the git issues describing failing system attacks?
+  What are the git issues describing known system status, knowledge and/or errors?
+component SSITH Summary
+  What are the slides summarizing the DARAP SSITH Program?
+  
