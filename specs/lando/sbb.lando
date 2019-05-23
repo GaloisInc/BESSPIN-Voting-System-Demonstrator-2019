@@ -13,12 +13,5 @@ component Smart Ballot Box API
   many of these features essentially delegate to one or more underlying features of
   components of the BVS hardware.  The remaining features are queries on the
   feature model of the BVS hardware product.
-  Feed motor?
-  Display?
-  Barcode scanner?
-  Early paper detect switch?
-  Late paper detect switch?
-  Cast button?
-  Spoil button?
-  This ballot id is a legal ballot for that many seconds!
-
+  Perform Tally!
+  Is barcode valid?

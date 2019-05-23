@@ -6,44 +6,22 @@ subsystem Smart Ballot Box Hardware
       Parker Southwick <psouthwick@galois.com>
       Michal Podhradsky <mpodhradsky@galois.com>
 
+component Ballot Box
+  Deposit ballot!
+component Barcode Scanner
+  Has a valid barcode?
+  What is the barcode?
+component LEDButton
+  Pressed?
+  Light On!
+  Light Off!
 component Motor
   Forward!
   Backward!
   Stop!
 component LCD Display
   Display this text!
-  Clear the screen!
-component RGB Backlight
-  Turn on the backlight!
-  Turn off the backlight!
-  Change the backlight color!
-component RGB LCD Display inherit LCD Display, RGB Backlight
-component Network
-  Is the link up?
-  Is the link configured with an IP address?
-  Send this packet to that address and that port!
-  Listen for any data at this port!
-  Do you have any new data?
-  Give me the received data!
-component SDCard
-  Is the card inserted?
-  How much free space is available?
-  Erase this card!
-component Barcode Scanner
-  Has a valid barcode?
-  What is the barcode?
-component Paper Detect
+component Paper Sensor
   Paper detected?
-component LEDButton
-  Pressed?
-  Light On!
-  Light Off!
-component System Clock
-  Ticks?
-component Timer
-  Running?
-  Expired?
-  Reset!
-component CallbackTimer inherit Timer
-  Fire in X ticks!
+
 
