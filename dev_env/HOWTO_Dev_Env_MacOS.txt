@@ -1,0 +1,48 @@
+Starting Point
+--------------
+
+1. I Started with clean install of MacOS 10.14.5, running in a VM under Parallels.
+
+BASICS
+------
+
+2. Install Homebrew
+
+OPAM
+----
+
+3. Install and initalize opam
+
+   brew install opam
+   opam init  (respond 'y' and 'y' to two questions)
+
+Frama-C
+-------
+
+4. Install Frama-C using opam
+5. Check Frama-C realy is version 18.0 (Argon)
+
+CLANG
+-----
+
+6. Clang is installed by default on MacOS, in /usr/bin/clang
+
+
+Clang-Format
+------------
+
+7. brew install clang-format
+
+LLVM-Link
+---------
+
+Currently, I cannot find a package or binary release of llvm-link for
+MacOS. This impacts the "make bytecode" target, which in turn, is needed
+for verification using SAW. TBD.
+
+
+MILESTONE 1
+-----------
+
+This set of tools should be enough to reproduce the Frama-C analyses
+of the SHAVE application software.
