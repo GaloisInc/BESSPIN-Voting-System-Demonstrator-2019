@@ -46,3 +46,18 @@ MILESTONE 1
 
 This set of tools should be enough to reproduce the Frama-C analyses
 of the SHAVE application software.
+
+COQ
+---
+
+Even if not usign Coq for formal proofs, it is needed to build the BESSPIN Book.
+
+9. opam install coq
+   opam install coqide
+
+GFE and RISC-V Tools
+--------------------
+
+Presently, the GCC RISC-V cross-compiler can only be built on a case-SENSITIVE filesystem, such as ext4.
+
+By default, Apple's APFS is case INSENSITIVE, so the build of GCC for RISC-V is not currently possible on MacOS without a disk (re-)format or a new disk.

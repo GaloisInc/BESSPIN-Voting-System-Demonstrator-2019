@@ -55,6 +55,79 @@ This set of tools should be enough to reproduce the Frama-C analyses
 of the SHAVE application software.
 
 
+COQ
+---
+
+Even if not usign Coq for formal proofs, it is needed to build the BESSPIN Book.
+
+9. opam install coq
+   opam install coqide
+
+GFE and RISC-V Tools
+--------------------
+
+Initially, we are using GCC to cross-compile C to RISC-V ISA on the P1
+
+Later, the project will switch to using LLVM and as when the SSITH TA-1 Teams produce their specific LLVM variants.
+
+
+GCC for RISC-V must be built from source.
+
+# dependent packages required to build GCC
+sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
+
+# The RISC-V GCC build only works on case-sensitive filesystems, so this
+# needs to be done on (say) an ext4 filesystem, NOT on a drive which
+# is shared with the underlying VM host (e.g. MacOS). We therefore
+# do this build in $HOME on Linux
+cd $HOME
+mkdir BESSPIN
+cd BESSPIN
+
+git clone https://github.com/riscv/riscv-gnu-toolchain.git
+
+cd riscv-gnu-toolchain
+git submodule update --init --recursive
+
+# Create and name installation dir
+mkdir $HOME/riscv
+export RISCV_INSTALL=$HOME/riscv
+
+# Configure and build for 32-bit P1 CPU only for now
+./configure --prefix=$RISCV_INSTALL --with-arch=rv32gc --with-abi=ilp32
+make
+
+# Configure and build local fork of RISC-V Tools
+cd $HOME/BESSPIN
+git clone git@gitlab-ext.galois.com:ssith/gfe.git
+export GFE_REPO=$HOME/BESSPIN/gfe
+export RISCV=$GFE_REPO/riscv-tools
+cd gfe
+./init_submodules.sh
+cd riscv-tools
+./build.sh
+
+#THEN modify $HOME/.profile to add:
+
+export RISCV_INSTALL=$HOME/riscv
+export RISCV=$HOME/riscv
+PATH=$HOME/riscv/bin:$PATH
+export PATH
+
+
+Test RISCV Tools and GCC
+------------------------
+
+Log out and back in again to let the changes above take effect.
+
+"cd" to voting-system/FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
+
+Do a "make all"
+
+This should use riscv32-unknown-elf-gcc to build and link "main_blinky.elf"
+successfully.
+
+
 
 TO DO
 =====
@@ -63,6 +136,4 @@ This not covered by this HOWTO (yet...)
 
 1. Extra provers for Frama-C: cvc4, z3, yices
 
-2. Compilers for target development (RISC-V tools etc.)
-
-3. SAW
+2. SAW
