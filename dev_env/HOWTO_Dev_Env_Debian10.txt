@@ -133,7 +133,7 @@ Z3 4.7.1
 
 Z3 (precisely version 4.7.1) is a pre-requisite for Cryptol.
 
-Download the package for x86-debian-8.10 from https://github.com/Z3Prover/z3/releases
+Download the package for x64-debian-8.10 from https://github.com/Z3Prover/z3/releases
 Extract the ZIP file and move the extracted directory to $HOME/tools
 
 Edit $HOME/.profile to add $HOME/tools/z3*/bin to your PATH
@@ -144,7 +144,7 @@ Yices 2.6.1
 
 Another pre-requisute for Cryptol
 
-NOTE: do NOT try to use "apt-get" to install from SRI's repository - it doesn't 
+NOTE: do NOT try to use "apt-get" to install from SRI's repository - it doesn't
 seem to work with Debian Buster.
 
 Download the binary .tar.gz from yices.csl.sri.com
