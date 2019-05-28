@@ -186,6 +186,10 @@ TO DO
 
 This not covered by this HOWTO (yet...)
 
-1. Extra provers for Frama-C: cvc4, z3, yices
+1. Extra provers for Frama-C: cvc4
 
-2. SAW
+2. cBON and other lando/BON tooling.
+
+3. Document preparation tools - latex, pandoc etc.
+
+
