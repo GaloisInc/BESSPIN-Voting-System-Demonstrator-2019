@@ -4,8 +4,6 @@ bool hash_is_equal(LogEntry *le1, LogEntry *le2) {
     return (le1 -> hash == le2 -> hash)? true : false;
 }
 
-static char* _filename = "log1.dat";
-
 int write_entry(LogEntry *le) {
     FILE *_f;
     _f = fopen (_filename, "a");

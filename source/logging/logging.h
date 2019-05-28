@@ -11,7 +11,7 @@ typedef struct _LogEntry {
     char msg[MESSAGE_MAX_LENGTH];
    } LogEntry;
 
-
+static char* _filename = "test_log.dat";
 
 /*@
   predicate valid_le(LogEntry *le) =
