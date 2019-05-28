@@ -39,5 +39,11 @@ typedef struct _LogEntry {
 // check if hash is equal 
 bool hash_is_equal(LogEntry *le1, LogEntry *le2);
 
+
+/*@
+ requires valid_le(le);
+ requires valid_filename: valid_read_string(_filename);
+ requires \separated(&__fc_p_fopen,le);
+@*/
 // write an entry into log file.
 int write_entry(LogEntry *le);
