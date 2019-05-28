@@ -12,6 +12,7 @@ typedef struct _LogEntry {
    } LogEntry;
 
 
+
 /*@
   predicate valid_le(LogEntry *le) =
     \valid_read(le) &&
@@ -35,5 +36,8 @@ typedef struct _LogEntry {
         assumes !hash_equal(le1, le2);
         ensures !\result;
 @*/
+// check if hash is equal 
 bool hash_is_equal(LogEntry *le1, LogEntry *le2);
 
+// write an entry into log file.
+int write_entry(LogEntry *le);
