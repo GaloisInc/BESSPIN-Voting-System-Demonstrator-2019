@@ -61,3 +61,43 @@ GFE and RISC-V Tools
 Presently, the GCC RISC-V cross-compiler can only be built on a case-SENSITIVE filesystem, such as ext4.
 
 By default, Apple's APFS is case INSENSITIVE, so the build of GCC for RISC-V is not currently possible on MacOS without a disk (re-)format or a new disk.
+
+Z3 4.7.1
+--------
+
+Z3 (precisely version 4.7.1) is a pre-requisite for Cryptol.
+
+Download the package for x64-osx-10.11.6 from https://github.com/Z3Prover/z3/releases
+Extract the ZIP file and move the extracted directory to $HOME/tools
+
+Edit $HOME/.bash_profile to add $HOME/tools/z3*/bin to your PATH
+
+Yices 2.6.1
+-----------
+
+Another pre-requisute for Cryptol
+
+Relase 2.6.1 is required, but is available on HomeBrew, so:
+
+ brew install yices2
+
+Cryptol 2.7.0
+-------------
+
+Grab the tarball of Cryptol 2.7.0 for OSX-64 from https://github.com/GaloisInc/cryptol/releases/tag/2.7.0
+
+Decompress the untar the tarball, and move the resulting directory to $HOME/tools
+
+Edit $HOME/.bash_profile to add $HOME/tools/cryptol*/bin to your PATH
+
+SAW
+---
+
+We use a nightly build of SAW. The current version to use is
+  saw-0.3-2019-05-27-OSX-64.tar.gz
+from https://saw.galois.com/builds/nightly/
+
+Download, decompress and untar that file.
+Move the resulting directory to $HOME/tools
+
+Add $HOME/tools/saw*/bin to your PATH

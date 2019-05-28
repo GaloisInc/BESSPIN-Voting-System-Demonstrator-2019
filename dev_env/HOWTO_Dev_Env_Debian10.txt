@@ -128,6 +128,58 @@ This should use riscv32-unknown-elf-gcc to build and link "main_blinky.elf"
 successfully.
 
 
+Z3 4.7.1
+--------
+
+Z3 (precisely version 4.7.1) is a pre-requisite for Cryptol.
+
+Download the package for x64-debian-8.10 from https://github.com/Z3Prover/z3/releases
+Extract the ZIP file and move the extracted directory to $HOME/tools
+
+Edit $HOME/.profile to add $HOME/tools/z3*/bin to your PATH
+
+
+Yices 2.6.1
+-----------
+
+Another pre-requisute for Cryptol
+
+NOTE: do NOT try to use "apt-get" to install from SRI's repository - it doesn't
+seem to work with Debian Buster.
+
+Download the binary .tar.gz from yices.csl.sri.com
+Unpack and move the resulting directory to $HOME/tools
+
+Add $HOME/tools/yices-2.6.1/bin to your PATH
+
+
+Cryptol 2.7.0
+-------------
+
+NOTE: do NOT install the standard Debian cryptol package using apt-get - this appears to be out of date.  Instead:
+
+First, a legacy library is needed, so
+
+  sudo apt install libtinfo5
+
+Grab the tarball of Cryptol 2.7.0 for Ubuntu14.04 from https://github.com/GaloisInc/cryptol/releases/tag/2.7.0
+Decompress the untar the tarball, and move the resulting directory to $HOME/tools
+
+Edit $HOME/.profile to add $HOME/tools/cryptol*/bin to your PATH
+
+
+SAW
+---
+
+We use a nightly build of SAW. The current version to use is
+  saw-0.3-2019-05-27-Ubuntu14.04-64.tar.gz
+from https://saw.galois.com/builds/nightly/
+
+Download, decompress and untar that file.
+Move the resulting directory to $HOME/tools
+
+Add $HOME/tools/saw*/bin to your PATH
+
 
 TO DO
 =====
