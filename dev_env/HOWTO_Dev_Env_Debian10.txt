@@ -63,69 +63,6 @@ Even if not usign Coq for formal proofs, it is needed to build the BESSPIN Book.
 9. opam install coq
    opam install coqide
 
-GFE and RISC-V Tools
---------------------
-
-Initially, we are using GCC to cross-compile C to RISC-V ISA on the P1
-
-Later, the project will switch to using LLVM and as when the SSITH TA-1 Teams produce their specific LLVM variants.
-
-
-GCC for RISC-V must be built from source.
-
-# dependent packages required to build GCC
-sudo apt-get install autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev
-
-# The RISC-V GCC build only works on case-sensitive filesystems, so this
-# needs to be done on (say) an ext4 filesystem, NOT on a drive which
-# is shared with the underlying VM host (e.g. MacOS). We therefore
-# do this build in $HOME on Linux
-cd $HOME
-mkdir BESSPIN
-cd BESSPIN
-
-git clone https://github.com/riscv/riscv-gnu-toolchain.git
-
-cd riscv-gnu-toolchain
-git submodule update --init --recursive
-
-# Create and name installation dir
-mkdir $HOME/riscv
-export RISCV_INSTALL=$HOME/riscv
-
-# Configure and build for 32-bit P1 CPU only for now
-./configure --prefix=$RISCV_INSTALL --with-arch=rv32gc --with-abi=ilp32
-make
-
-# Configure and build local fork of RISC-V Tools
-cd $HOME/BESSPIN
-git clone git@gitlab-ext.galois.com:ssith/gfe.git
-export GFE_REPO=$HOME/BESSPIN/gfe
-export RISCV=$GFE_REPO/riscv-tools
-cd gfe
-./init_submodules.sh
-cd riscv-tools
-./build.sh
-
-#THEN modify $HOME/.profile to add:
-
-export RISCV_INSTALL=$HOME/riscv
-export RISCV=$HOME/riscv
-PATH=$HOME/riscv/bin:$PATH
-export PATH
-
-
-Test RISCV Tools and GCC
-------------------------
-
-Log out and back in again to let the changes above take effect.
-
-"cd" to voting-system/FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
-
-Do a "make all"
-
-This should use riscv32-unknown-elf-gcc to build and link "main_blinky.elf"
-successfully.
 
 
 Z3 4.7.1
@@ -181,6 +118,76 @@ Move the resulting directory to $HOME/tools
 Add $HOME/tools/saw*/bin to your PATH
 
 
+NIX
+---
+
+sudo sysctl kernel.unprivileged_userns_clone=1
+curl https://nixos.org/nix/install | sh
+. $HOME/.nix-profile/etc/profile.d/nix.sh
+
+
+
+GFE and BESSPIN Tooling
+-----------------------
+
+Building the GFE toolset needs to happen on a native Linux filesystem (not one shared with MacOS, for example), then we need to clone the GFE repo locally first.
+
+cd $HOME
+mkdir BESSPIN
+cd BESSPIN
+git clone git@gitlab-ext.galois.com:ssith/gfe.git
+cd gfe
+./init_submodules.sh
+
+# Switch to the "develop" branch of the GFE repo
+git checkout develop
+git submodule update --init tool-suite
+cd tool-suite
+git checkout develop
+sudo sysctl kernel.unprivileged_userns_clone=1
+nix-shell
+
+# Warning - this takes about 3 hours to build and install the first time you run it...
+# and that's on a quad-core MacBook Pro...
+
+
+Test RISCV Tools and GCC
+------------------------
+
+Log out and back in again to let the changes above take effect.
+
+"cd" to voting-system/FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
+
+then do
+
+nix-shell
+make all
+
+
+This should use riscv32-unknown-elf-gcc to build and link "main_blinky.elf"
+successfully.
+
+CROSS-CHECK - content of $HOME/.profile
+---------------------------------------
+
+The final section of my $HOME/.profile now looks like this:
+
+# opam configuration
+test -r /home/rchapman/.opam/opam-init/init.sh && . /home/rchapman/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
+
+PATH=$HOME/tools/yices-2.6.1/bin:$PATH
+PATH=$HOME/tools/z3-4.7.1-x64-debian-8.10/bin:$PATH
+PATH=$HOME/tools/cryptol-2.7.0-Ubuntu14.04-64/bin:$PATH
+PATH=$HOME/tools/saw-0.3-2019-05-27-Ubuntu14.04-64/bin:$PATH
+export PATH
+
+if [ -e /home/rchapman/.nix-profile/etc/profile.d/nix.sh ]; then . /home/rchapman/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
+
+
+Yours should look similar.
+
+
+
 TO DO
 =====
 
@@ -191,5 +198,3 @@ This not covered by this HOWTO (yet...)
 2. cBON and other lando/BON tooling.
 
 3. Document preparation tools - latex, pandoc etc.
-
-
