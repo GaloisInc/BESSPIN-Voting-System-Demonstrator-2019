@@ -16,3 +16,5 @@ is_valid b = all (\x -> True) [b@i <= `(ncd-1) | i <- [0..(nct-1)]]
 // selection b ct == cd if and only if candidate cd is selected in contest ct
 selection : {nct, ncd} ballot_constraint nct ncd => ballot nct ncd -> [width (nct-1)] -> [width (ncd-1)]
 selection b ct = (b@ct)
+
+// TODO: do we want to represent a ballot as an array of booleans instead?
