@@ -56,7 +56,6 @@ bool hash_is_equal(LogEntry *le1, LogEntry *le2);
 int write_entry(LogEntry *le);
 
 /*@
-// assignement still in unknown state ?
    assigns fileName, *abstract_region;
    assigns _filename;
    ensures val == fileName;
