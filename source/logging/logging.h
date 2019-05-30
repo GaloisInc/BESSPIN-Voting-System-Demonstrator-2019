@@ -1,20 +1,28 @@
 #include <stdbool.h>
 #include <stdio.h>
-#include"__fc_builtin.h"
 #include <stdlib.h>
-#include"__fc_string_axiomatic.h"
-#define MESSAGE_MAX_LENGTH 256
-
+#define MESSAGE_MAX_LENGTH (256)
+#define FILE_NAME "test_log.dat"
 
 typedef struct _LogEntry {
     unsigned int hash;
     char msg[MESSAGE_MAX_LENGTH];
    } LogEntry;
 
-static char* _filename = "test_log.dat";
+static const char* _filename = FILE_NAME;
+
+//@ ghost const char* fileName=FILE_NAME;
+
+/*@ axiomatic AbstractRegion {
+    
+    logic char* abstract_region;
+    axiom internal_state: abstract_region == _filename;
+    axiom addr_separate: \separated(_filename,abstract_region);
+ }
+@*/
 
 /*@
-  predicate valid_le(LogEntry *le) =
+  predicate valid_le(LogEntry *le) = 
     \valid_read(le) &&
     \valid_read(((char*)(le -> msg))+(0 .. MESSAGE_MAX_LENGTH -1));
 
@@ -35,15 +43,23 @@ static char* _filename = "test_log.dat";
    behavior hash_non_equal:
         assumes !hash_equal(le1, le2);
         ensures !\result;
+   complete behaviors;
+   disjoint behaviors;
 @*/
-// check if hash is equal 
 bool hash_is_equal(LogEntry *le1, LogEntry *le2);
 
 
 /*@
- requires valid_le(le);
- requires valid_filename: valid_read_string(_filename);
- requires \separated(&__fc_p_fopen,le);
+   requires valid_le(le);
+   requires valid_read_string(fileName);
+   ensures result_ok_or_error: \result == 0 || \result == -1;
 @*/
-// write an entry into log file.
 int write_entry(LogEntry *le);
+
+/*@
+   requires \valid(val);
+// assignement still in unknown state ?
+//   assigns *fileName, *abstract_region;
+   ensures val == fileName;
+@*/
+void set_log_file(char* val);

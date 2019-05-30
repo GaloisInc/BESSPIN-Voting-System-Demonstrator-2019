@@ -1,0 +1,14 @@
+(* ---------------------------------------------------------- *)
+(* --- Axiomatic 'MemCmp'                                 --- *)
+(* ---------------------------------------------------------- *)
+
+logic L_memcmp : (addr,int) farray,(addr,int) farray,addr,addr,int -> int
+
+axiom Q_memcmp_zero:
+  forall s1_0,s2_0 : addr.
+  forall Mchar_0,Mchar_1 : (addr,int) farray.
+  forall n : int.
+  (forall i : int. (0 <= i) -> (i < n) ->
+   (Mchar_1[shift_sint8(s1_0, i)] = Mchar_0[shift_sint8(s2_0, i)])) <->
+    (L_memcmp(Mchar_0, Mchar_1, s1_0, s2_0, n) = 0)
+

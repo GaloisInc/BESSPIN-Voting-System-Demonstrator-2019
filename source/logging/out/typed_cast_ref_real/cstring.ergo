@@ -1,0 +1,19 @@
+(* ---------------------------------------------------------- *)
+(* --- String Literals                                    --- *)
+(* ---------------------------------------------------------- *)
+
+logic Str_1 : int
+
+logic Lit_F1B0 : int farray
+
+axiom Q_Str_1_base: Str_1 < 0
+
+axiom Q_Str_1_region: region(Str_1) = (-61872)
+
+axiom Q_Str_1_linked: forall t : int farray. linked(t) -> (t[Str_1] = 2)
+
+axiom Q_Str_1_literal:
+  forall mchar_0 : (addr,int) farray.
+  forall i : int.
+  sconst(mchar_0) -> (mchar_0[shift_sint8(global(Str_1), i)] = Lit_F1B0[i])
+

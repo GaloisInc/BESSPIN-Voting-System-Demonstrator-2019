@@ -1,0 +1,19 @@
+(* ---------------------------------------------------------- *)
+(* --- Instance of 'Pre-condition 'valid_filename' in 'fopen'' in 'write_entry' at initialization of '_f' (file logging.c, line 16)
+ --- *)
+(* ---------------------------------------------------------- *)
+
+goal write_entry_call_fopen_pre_valid_filename:
+  forall t : int farray.
+  forall t_1 : (addr,int) farray.
+  forall a_2,a_1,a : addr.
+  (region(a.base) <= 0) ->
+  (region(a_1.base) <= 0) ->
+  (region(a_2.base) <= 0) ->
+  linked(t) ->
+  sconst(t_1) ->
+  P_valid_le(t, a) ->
+  valid_rw(t, a_2, 1) ->
+  P_valid_read_string(t, t_1, a_2) ->
+  P_valid_read_string(t, t_1, a_1)
+

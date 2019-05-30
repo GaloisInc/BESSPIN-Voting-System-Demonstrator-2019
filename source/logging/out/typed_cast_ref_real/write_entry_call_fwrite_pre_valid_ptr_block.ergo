@@ -1,0 +1,23 @@
+(* ---------------------------------------------------------- *)
+(* --- Instance of 'Pre-condition 'valid_ptr_block' in 'fwrite'' in 'write_entry' at call 'fwrite' (file logging.c, line 21)
+ --- *)
+(* ---------------------------------------------------------- *)
+
+goal write_entry_call_fwrite_pre_valid_ptr_block:
+  forall t : int farray.
+  forall t_1 : (addr,int) farray.
+  forall a_3,a_2,a_1,a : addr.
+  (null <> a_3) ->
+  (region(a.base) <= 0) ->
+  (region(a_1.base) <= 0) ->
+  (region(a_2.base) <= 0) ->
+  linked(t) ->
+  sconst(t_1) ->
+  P_valid_le(t, a) ->
+  valid_rw(t, a_2, 1) ->
+  P_valid_read_string(t, t_1, a_1) ->
+  P_valid_read_string(t, t_1, a_2) ->
+  P_valid_read_string(t, t_1, shift_sint8(global(Str_1), 0)) ->
+  included(a_3, 2, shift___fc_FILE(global(G___fc_fopen_213), 0), 32) ->
+  valid_rd(t, shift_sint8(a, 0), 260)
+

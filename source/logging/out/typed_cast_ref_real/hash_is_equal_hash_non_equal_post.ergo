@@ -1,0 +1,26 @@
+(* ---------------------------------------------------------- *)
+(* --- Post-condition for 'hash_non_equal' (file logging.h, line 44) in 'hash_is_equal' --- *)
+(* ---------------------------------------------------------- *)
+
+goal hash_is_equal_hash_non_equal_post:
+  forall i : int.
+  forall t : int farray.
+  forall t_1 : (addr,int) farray.
+  forall a_1,a : addr.
+  let a_2 = shiftfield_F8__LogEntry_hash(a) : addr in
+  let x = t_1[a_2] : int in
+  let a_3 = shiftfield_F8__LogEntry_hash(a_1) : addr in
+  let x_1 = t_1[a_3] : int in
+  (region(a.base) <= 0) ->
+  (region(a_1.base) <= 0) ->
+  linked(t) ->
+  is_sint32(i) ->
+  P_valid_input(t, a_1, a) ->
+  (not P_hash_equal(t_1, a_1, a)) ->
+  is_uint32(x) ->
+  is_uint32(x_1) ->
+  valid_rd(t, a_2, 1) ->
+  valid_rd(t, a_3, 1) ->
+  (((x_1 <> x) -> (i = 0)) and ((x_1 = x) -> (i = 1))) ->
+  (i = 0)
+
