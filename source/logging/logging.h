@@ -17,7 +17,6 @@ static const char* _filename = FILE_NAME;
     
     logic char* abstract_region;
     axiom internal_state: abstract_region == _filename;
-    axiom addr_separate: \separated(_filename,abstract_region);
  }
 @*/
 
@@ -57,9 +56,9 @@ bool hash_is_equal(LogEntry *le1, LogEntry *le2);
 int write_entry(LogEntry *le);
 
 /*@
-   requires \valid(val);
 // assignement still in unknown state ?
-//   assigns *fileName, *abstract_region;
+   assigns fileName, *abstract_region;
+   assigns _filename;
    ensures val == fileName;
 @*/
 void set_log_file(char* val);
