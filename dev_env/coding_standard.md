@@ -18,6 +18,17 @@ Frama-C/ACSL modules will be coded in the common intersection of the language su
 
 As far as possible, code will comply with the Barr Group's Embedded C Coding Standard, unless any such rule contradicts the requirements of Frama-C usage. See [Barr Standard](https://barrgroup.com/Embedded-Systems/Books/Embedded-C-Coding-Standard) for more details.
 
+## Primitive Types
+
+The known-width primitive types in C99, defined in <stdint.h> should be used in prefernce to the implementation-defined types of earlier standard. For example, use "int32_t" rather than "int".
+
+## CheriABI compatibility
+
+This section will expand to cover coding rules that are required for comatibility with the Cambridge team's CheriABI and modified LLVM.
+
+1. Do not cast pointers.
+2. If you absolutely must cast a pointer to an integer type, then you must cast to "intptr_r", defined in C99's <stdint.h>
+
 ## Style and Formatting
 
 Code should be formatted with the `clang-format` tool with standard options defined by the project's `.clang-format` file.
