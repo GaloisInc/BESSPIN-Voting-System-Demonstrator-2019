@@ -93,11 +93,12 @@ Edit $HOME/.bash_profile to add $HOME/tools/cryptol*/bin to your PATH
 SAW
 ---
 
-We use a nightly build of SAW. The current version to use is
-  saw-0.3-2019-05-27-OSX-64.tar.gz
-from https://saw.galois.com/builds/nightly/
+The current version to use is
+  saw-0.3-OSX-64.tar.gz
+from https://github.com/GaloisInc/saw-script/releases
 
 Download, decompress and untar that file.
 Move the resulting directory to $HOME/tools
 
-Add $HOME/tools/saw*/bin to your PATH
+Add $HOME/tools/saw-0.3-OSX-64/bin to your PATH
+

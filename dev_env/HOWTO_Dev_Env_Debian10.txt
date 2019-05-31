@@ -108,14 +108,14 @@ Edit $HOME/.profile to add $HOME/tools/cryptol*/bin to your PATH
 SAW
 ---
 
-We use a nightly build of SAW. The current version to use is
-  saw-0.3-2019-05-27-Ubuntu14.04-64.tar.gz
-from https://saw.galois.com/builds/nightly/
+The current version to use is
+  saw-0.3-Ubuntu14.04-64.tar.gz
+from https://github.com/GaloisInc/saw-script/releases
 
 Download, decompress and untar that file.
 Move the resulting directory to $HOME/tools
 
-Add $HOME/tools/saw*/bin to your PATH
+Add $HOME/tools/saw-0.3-Ubuntu14.04-64/bin to your PATH
 
 
 NIX
@@ -178,7 +178,7 @@ test -r /home/rchapman/.opam/opam-init/init.sh && . /home/rchapman/.opam/opam-in
 PATH=$HOME/tools/yices-2.6.1/bin:$PATH
 PATH=$HOME/tools/z3-4.7.1-x64-debian-8.10/bin:$PATH
 PATH=$HOME/tools/cryptol-2.7.0-Ubuntu14.04-64/bin:$PATH
-PATH=$HOME/tools/saw-0.3-2019-05-27-Ubuntu14.04-64/bin:$PATH
+PATH=$HOME/tools/saw-0.3-Ubuntu14.04-64/bin:$PATH
 export PATH
 
 if [ -e /home/rchapman/.nix-profile/etc/profile.d/nix.sh ]; then . /home/rchapman/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer
