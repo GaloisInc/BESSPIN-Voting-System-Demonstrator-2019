@@ -1,10 +1,10 @@
 Smart Ballot Box Hardware
 subsystem Smart Ballot Box Hardware
   indexing
-    owner: Steven Osborn <steven@freeandfair.us>
+    owner: Michal Podhradsky <mpodhradsky@galois.com>
     contributors: Haneef Mubarak <hmubarak@galois.com>
       Parker Southwick <psouthwick@galois.com>
-      Michal Podhradsky <mpodhradsky@galois.com>
+      Steven Osborn <steven@freeandfair.us>
 
 component Ballot Box
   Deposit ballot!
