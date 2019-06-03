@@ -1,4 +1,4 @@
-(* Frama-C journal generated at 00:12 the 03/06/2019 *)
+(* Frama-C journal generated at 23:54 the 03/06/2019 *)
 
 exception Unreachable
 exception Exception of string
@@ -6,7 +6,12 @@ exception Exception of string
 [@@@ warning "-26"]
 
 (* Run the user commands *)
-let run () = ()
+let run () =
+  Project.clear
+    ~selection:(State_selection.singleton (State.get "-kernel-msg-key"))
+    ~project:(Project.from_unique_name "default")
+    ();
+  ()
 
 (* Main *)
 let main () =
