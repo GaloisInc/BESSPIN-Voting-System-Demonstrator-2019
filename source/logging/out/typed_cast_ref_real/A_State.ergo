@@ -1,8 +1,0 @@
-(* ---------------------------------------------------------- *)
-(* --- Axiomatic 'State'                                  --- *)
-(* ---------------------------------------------------------- *)
-
-axiom Q_internal_state:
-  forall filename_0 : addr.
-  L_abstract_region = filename_0
-
