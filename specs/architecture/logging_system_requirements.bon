@@ -45,7 +45,7 @@ description
 requirement
   "ASIM_ENCRYPT"
 description
-"Provides A public key-based cryptographic encryption algorithm\
+"Provide/use? a public key-based cryptographic encryption algorithm\
  Asymmetric Encryption."
 
 requirement
