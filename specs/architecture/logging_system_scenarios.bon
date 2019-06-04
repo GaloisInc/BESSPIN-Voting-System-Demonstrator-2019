@@ -59,11 +59,11 @@ scenario
      description
       "Open a log file, grab the current entry, extract the message, calculate hash using \
        hashchain algorithm then create a log entry structure and close the log file. 
-       Save corresponding status into system log file saying that the first log entry has been craeted successfully.\
+       Save corresponding status into system log file saying that the first log entry has been created successfully.\
        Open a log file,read the next entry, create a log entry structure, \
        and close log file.Save corresponding status into system log file saying that the second log entry \
        has been craeted successfully. 
-       From the first log entry  extraxt the hash as well as from the second log entry. Compare hashes.
+       From the first log entry  extract the hash as well as from the second log entry. Compare hashes.
        If hashes are equal save corresponding status into system log file , 
        loop over the log file comparing the current entry and the next one.
        At the end of the loop save status saying that operation hashes-check passed successfully \
@@ -95,12 +95,12 @@ scenario
 scenario
    "ABNORMAL OPERATION determining the root entry of the hashchain failed." -- ABNORMAL
    description
-    "Determining the root of the hashchain failed. Save corresponding status into system log file."
+    "Determining the root of the hashchain failed. Save corresponding status into system error file."
 
 scenario
    "ABNORMAL OPERATION invalid root entry." -- ABNORMAL
    description
-    "Invalid content and structure of the root log entry. Save corresponding status into system log file."
+    "Invalid content and structure of the root log entry. Save corresponding status into system error file."
 
 scenario
   "ABNORMAL OPERATION failed to create log entry structure because of invalid content of message." -- ABNORMAL
@@ -165,7 +165,7 @@ description
   "Make sure that test mode is selected and test, system error and threat log files are empty. \
   Create root entry with dummy message and add the root entry in the test log file. 
    Run the hashchain algorithm and fill-up the test log file with several entries.
-   where hash code hardcoded to 0  and corresponding messages are dummy.
+   where the hash code is hardcoded and equal to 0  and corresponding messages are dummy.
    Run the hashchain log-check and make sure corrsponding messages exists in the system log file.
    Expectable result is that there is no entries neither in the threat log file nor in the system error file."
 end
@@ -177,7 +177,7 @@ description
   "Make sure that test mode is selected and test, system error and threat log files are empty. \
   Create root entry with dummy message and add the root entry in the test log file. 
    Run the hashchain algorithm and fill-up the test log file with several entries 
-   where hash code hardcoded to 0  and corresponding messages are dummy messages.
+   where the hash code is  hardcoded to 0  and corresponding messages are dummy messages.
    Update any hash in the test log file with value equal 1.
    Run the hashchain log-check and make sure that there is an entry in the threat log \
    file and corresponding one in the system error file."
@@ -190,7 +190,7 @@ description
   "Make sure that test mode is selected and test, system error and threat log files are empty. \
   Create root entry with dummy message and add the root entry in the test log file. 
    Run the hashchain algorithm and fill-up the test log file with several entries 
-   where hash code hardcoded to 0  and corresponding messages are dummy messages.
+   where the hash code is hardcoded to 0  and corresponding messages are dummy messages.
    Update any entry message in the test log file by changing the symbol/ letter.
    Run the hashchain log-check and make sure that there is an entry in the threat log \
    file and corresponding one in the system error file."
