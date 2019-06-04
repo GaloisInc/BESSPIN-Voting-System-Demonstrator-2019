@@ -22,24 +22,24 @@ Frama-C
 4. Install Frama-C using opam
 5. Check Frama-C realy is version 18.0 (Argon)
 
-CLANG
------
+LLVM (including clang)
+----------------------
 
-6. Clang is installed by default on MacOS, in /usr/bin/clang
+6. We install llvm/clang using HomeBrew, since it includes llvm-link which is
+   needed for SAW. This overrides Apple's default install of clang.
+
+   brew install llvm
+
+Add /usr/local/opt/llvm/bin to the FRONT of your PATH.
+
+(This is important so that HomeBrew's LLVM and tools are found before
+ Apple's installation which is in /usr/local/bin)
 
 
 Clang-Format
 ------------
 
 7. brew install clang-format
-
-LLVM-Link
----------
-
-Currently, I cannot find a package or binary release of llvm-link for
-MacOS. This impacts the "make bytecode" target, which in turn, is needed
-for verification using SAW. TBD.
-
 
 MILESTONE 1
 -----------
@@ -137,4 +137,3 @@ nix-shell
 
 # This fails in the build of csmith-2.4.0 for some unknown reason.
 # Resolution of these problems is TBD.
-
