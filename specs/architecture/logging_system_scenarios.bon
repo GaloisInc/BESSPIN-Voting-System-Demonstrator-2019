@@ -1,0 +1,198 @@
+scenario_chart LOGGING-APPLICATION_SCENARIOS
+-- normal
+explanation
+  "The top-level scenarios of the logging_system demonstration application."
+scenario
+  "NORMAL OPERATION check that system log file exist and empty." -- NORMAL
+  description
+  "The system log file exist and is empty. Save corrsponding status to system log file."
+
+scenario
+  "NORMAL OPERATION check that system error log file exist and empty." -- NORMAL
+  description
+  "The system error log file exist and is empty. Save corrsponding status to system log file."
+
+scenario
+  "NORMAL OPERATION check that threat error log file exist and empty." -- NORMAL
+  description
+  "The threat log file exist and is empty. Save corrsponding status to system log file."
+
+scenario
+  "NORMAL OPERATION" -- NORMAL
+  description
+  "Accept the message, caluclate the hash code, transform message \
+    into log entry and save message to the log file. Retrieve entries and do the \
+    hashchain check."
+scenario
+   "NORMAL OPERATION determining the root entry of the hashchain" -- NORMAL
+   description
+    "Determining the root of the hashchain, which is what gives  a provenance guarantee about the hash. \
+     The AES key and an HMAC are used in order to generate the base log entry (and thus intial log) \
+     by signing a known, predetermined initial entry (such as a power-on and post-measured boot event) \
+     thus guaranteeing authentication of the log and its integrity. Save corresponding status into system log file."
+
+
+scenario
+  "NORMAL OPERATION failed to create log entry structure because message \
+   is not arriving in defined time slot and hashchain  passed successfully" -- NORMAL
+description
+  "Message  is not available in expected time slot. 
+  Trigger the hashchain algorithm and write corresponding status in the system log file. "
+end
+
+scenario
+  "NORMAL OPERATION -calculating hash of the arrived message " -- NORMAL"
+     description
+     "When message arrived from the SBB, get the last entry from the log file,
+       transform it to log entry structure, then by using SHA-2 or  SHA-256, calculate a new hash \
+       from the message and hash extracted from the log entry. Create a new log entry structure \
+       and proceed to the log file. Note that whole content of the message should be considered.
+       Save corresponding status into system log file."
+
+scenario
+  "NORMAL OPERATION -save log entry to the log file " -- NORMAL"
+     description
+      "Open log file, write log entry and close log file. Save corresponding status into system log file." 
+
+scenario
+  "NORMAL OPERATION -compare hashes - hashchain algorithm " -- NORMAL"
+     description
+      "Open a log file, grab the current entry, extract the message, calculate hash using \
+       hashchain algorithm then create a log entry structure and close the log file. 
+       Save corresponding status into system log file saying that the first log entry has been craeted successfully.\
+       Open a log file,read the next entry, create a log entry structure, \
+       and close log file.Save corresponding status into system log file saying that the second log entry \
+       has been craeted successfully. 
+       From the first log entry  extraxt the hash as well as from the second log entry. Compare hashes.
+       If hashes are equal save corresponding status into system log file , 
+       loop over the log file comparing the current entry and the next one.
+       At the end of the loop save status saying that operation hashes-check passed successfully \
+       into the system log file." 
+
+
+
+scenario_chart APPLICATION_ABNORMAL_TRACES
+-- abnormal
+explanation
+  "Abnormal execution traces of the log file demonstration \
+ \ application."
+
+scenario
+  "ABNORMAL OPERATION check that system log file exist and empty." -- ABNORMAL
+  description
+  "The system log file does not exist. Handle corresponding status?"
+
+scenario
+  "ABNORMAL OPERATION check that system error log file exist and empty." -- ABNORMAL
+  description
+  "The system error log file does not exist. Handle corresponding status?"
+
+scenario
+  "ABNORMAL OPERATION check that threat error log file exist and empty." -- ABNORMAL
+  description
+  "The threat log file does not exist. Handle corresponding status?"
+
+scenario
+   "ABNORMAL OPERATION determining the root entry of the hashchain failed." -- ABNORMAL
+   description
+    "Determining the root of the hashchain failed. Save corresponding status into system log file."
+
+scenario
+   "ABNORMAL OPERATION invalid root entry." -- ABNORMAL
+   description
+    "Invalid content and structure of the root log entry. Save corresponding status into system log file."
+
+scenario
+  "ABNORMAL OPERATION failed to create log entry structure because of invalid content of message." -- ABNORMAL
+description
+  "Attempting to create log entry structure failed. The return status saying \
+  that the message is not valid should be written in the system error log file. "
+end
+
+scenario
+  "ABNORMAL OPERATION failed to create log entry structure because of invalid length of message." -- ABNORMAL
+description
+  "Attempting to create log entry structure failed. The return status saying \
+  that the message length is not valid should be written in the system error log file. "
+end
+
+scenario
+  "ABNORMAL OPERATION failed to create log entry structure because of invalid structure of message." -- ABNORMAL
+description
+  "Attempting to create log entry structure failed. The return status saying \
+  that the message has  invalid structure  should be written in the system error log file. "
+end
+
+scenario
+  "ABNORMAL OPERATION failed to create log entry structure because message \
+   is not arriving in defined time slot and hashchain didn't passed successfully." -- ABNORMAL
+description
+  "Message  is not available in expected time slot. 
+  Trigger the hashchain algorithm and save corresponding status in the system error log file \
+   and the threat log file."
+end
+
+scenario
+  "ABNORMAL OPERATION failed to open a log file." -- ABNORMAL
+description
+  "Attempting to open a log file results in a failure. Save corresponding status \
+  in the system error log file."
+end
+
+scenario
+  "ABNORMAL OPERATION failed to write in the log file." -- ABNORMAL
+description
+  "Attempting to write in the log file results in a failure. save corresponding status 
+  in the system error log file."
+end
+
+scenario
+  "ABNORMAL OPERATION hashes check failed." -- ABNORMAL
+description
+  " Attempting to compare two hashes results in a failure. Send the status saying \
+    that operation hashes-check failed and write in the system error log file. The malicious 
+    entry and corresponding message should be written in the threat log file."
+
+
+scenario_chart APPLICATION_NORMAL_TEST_TRACES
+-- normal
+explanation
+  "The primary normal execution traces of the logging system demonstration \
+ \ application when in test mode."
+scenario
+  "Check the normal path of voting logging system by test log file." -- NORMAL
+description
+  "Make sure that test mode is selected and test, system error and threat log files are empty. \
+  Create root entry with dummy message and add the root entry in the test log file. 
+   Run the hashchain algorithm and fill-up the test log file with several entries.
+   where hash code hardcoded to 0  and corresponding messages are dummy.
+   Run the hashchain log-check and make sure corrsponding messages exists in the system log file.
+   Expectable result is that there is no entries neither in the threat log file nor in the system error file."
+end
+
+scenario
+  "Check voting logging system application by updateing the hash in an entry \
+   of the test log file." -- NORMAL
+description
+  "Make sure that test mode is selected and test, system error and threat log files are empty. \
+  Create root entry with dummy message and add the root entry in the test log file. 
+   Run the hashchain algorithm and fill-up the test log file with several entries 
+   where hash code hardcoded to 0  and corresponding messages are dummy messages.
+   Update any hash in the test log file with value equal 1.
+   Run the hashchain log-check and make sure that there is an entry in the threat log \
+   file and corresponding one in the system error file."
+end
+
+scenario
+  "Check voting logging system application by the updateing any symbol/letter in the message \
+   of an entry in the test log file." -- NORMAL
+description
+  "Make sure that test mode is selected and test, system error and threat log files are empty. \
+  Create root entry with dummy message and add the root entry in the test log file. 
+   Run the hashchain algorithm and fill-up the test log file with several entries 
+   where hash code hardcoded to 0  and corresponding messages are dummy messages.
+   Update any entry message in the test log file by changing the symbol/ letter.
+   Run the hashchain log-check and make sure that there is an entry in the threat log \
+   file and corresponding one in the system error file."
+end
+
