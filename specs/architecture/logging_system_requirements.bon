@@ -1,0 +1,80 @@
+requirements_chart BEHAVIORAL_REQUIREMENTS
+mandatory
+-- A configured logging_system  must...
+
+requirement
+  "SEC_SYSTEM_LOG"
+description
+  "Support read/write opeartion in the secure system log file."
+
+requirement
+  "SEC_APP_LOG"
+description
+  "Support read/write opeartion in the secure application log file."
+
+requirement
+  "ERROR_LOG"
+description
+  "Support read/write opeartion in the error log file."
+
+requirement
+  "ATTACK_LOG"
+description
+  "Support read/write opeartion in the attack log file."
+
+requirement
+  "AES"
+description
+  "Use the AES-128 cipher for both encrypting \
+   and decrypting message data in the log entry 
+   by applying the NIST-standardized AES cryptographic algorithm."
+
+requirement
+  "AES_KEPT_SECRET"
+description
+  "Should provide medium/place for the AES \
+   because chiper must be kept secret from unauthenticated entities."
+
+requirement
+  "SHA"
+description
+  "Use the SHA256 hash algorithm fixed size 256-bit \
+   (32-byte)for the hash in the log entry
+   by applying the NIST-standardized SHA-2 cryptographic hash algorithm."
+
+requirement
+  "ASIM_ENCRYPT"
+description
+"Provides A public key-based cryptographic encryption algorithm\
+ Asymmetric Encryption."
+
+requirement
+ "ROOT_HASH_CHAIN"
+description
+ "Should determine the root of the hash-chain and generate the base log entry."
+
+requirement
+  "HASH_CHAIN"
+description
+  "Should provide hash-chain algorithm for storing and retrieving log entries.
+
+requirement
+  "EXPORT_LOG"
+description
+  "Should export the log to the desired target."
+
+
+requirements_chart BEHAVIORAL_REQUIREMENTS_UNDER_TEST
+mandatory
+-- A configured logging_system  must...
+
+requirement
+  "API_ENABLED_DURING_DEBUG"
+description
+  "have a test API only when the system is compiled in test mode"
+
+requirement
+  "TEST_MODE_GUARDS"
+description
+  "only permit calls into the test API when the system is in test mode"
+end

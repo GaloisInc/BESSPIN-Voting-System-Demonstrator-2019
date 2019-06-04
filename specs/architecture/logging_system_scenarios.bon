@@ -18,6 +18,11 @@ scenario
   "The threat log file exist and is empty. Save corrsponding status to system log file."
 
 scenario
+  "NORMAL OPERATION check that application log file exist and empty." -- NORMAL
+  description
+  "The application log file exist and is empty. Save corrsponding status to system log file."
+
+scenario
   "NORMAL OPERATION" -- NORMAL
   description
   "Accept the message, caluclate the hash code, transform message \
@@ -91,6 +96,11 @@ scenario
   "ABNORMAL OPERATION check that threat error log file exist and empty." -- ABNORMAL
   description
   "The threat log file does not exist. Handle corresponding status?"
+
+scenario
+  "ABNORMAL OPERATION check that application log file exist and empty." -- ABNORMAL
+  description
+  "The application log file does not exist. Handle corresponding status?"
 
 scenario
    "ABNORMAL OPERATION determining the root entry of the hashchain failed." -- ABNORMAL

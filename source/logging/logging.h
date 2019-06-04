@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define MESSAGE_MAX_LENGTH (256)
 #define _SUCCESS  1
@@ -8,8 +9,9 @@
 #define _IO_ERROR -2
 
 /** component LogEntry */
+
 typedef struct _LogEntry {
-    unsigned int hash;
+    uint8_t sha256_hash[32];
     char msg[MESSAGE_MAX_LENGTH];
    } LogEntry;
 
@@ -63,7 +65,7 @@ typedef struct _LogEntry {
 int save_entry_to_log(LogEntry *le, char *_logname, char *_mode);
 
 /**component Log: Read entry from the log!*/
-int read_entry_from_the_log(char * _logname, int len); 
+uint8_t read_entry_from_the_log(char * _logname, int len); 
 
 /*@
    requires valid_log_entries(le1, le2);
