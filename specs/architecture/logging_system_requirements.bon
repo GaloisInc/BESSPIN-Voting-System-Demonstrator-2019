@@ -32,7 +32,7 @@ description
 requirement
   "AES_KEPT_SECRET"
 description
-  "Should provide medium/place for the AES \
+  "Should take/fetch the AES from HSM-Hardware Security Module \
    because chiper must be kept secret from unauthenticated entities."
 
 requirement
