@@ -12,16 +12,6 @@ requirement
 description
   "Support read/write opeartion in the secure application log file."
 
-requirement
-  "ERROR_LOG"
-description
-  "Support read/write opeartion in the error log file."
-
-requirement
-  "ATTACK_LOG"
-description
-  "Support read/write opeartion in the attack log file."
-
 requirement  
   "AES_KEPT_SECRET"
 description
@@ -37,7 +27,8 @@ description
 requirement
   "SEC_APP_LOG_ENTRY"
 description
-  "Create secure appliaction log entry."
+  "Create log entry containing SHA256 (32-byte) hash \
+    and AES-128 (16-byte) the message."
 
 requirement
  "ROOT_HASH_CHAIN"
@@ -50,11 +41,6 @@ requirement
 description
   "Should provide hash-chain algorithm for storing and retrieving log entries.
 
-requirement
-  "ASIM_ENCRYPT"
-description
-"Provide/use? a public key-based cryptographic encryption algorithm\
- Asymmetric Encryption."
 
 requirement
   "EXPORT_LOG"
