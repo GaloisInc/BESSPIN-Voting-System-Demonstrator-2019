@@ -1,0 +1,34 @@
+# We don't need cache yet
+#cache:
+#  key: ${CI_COMMIT_REF_SLUG}
+#  paths:
+#    - TODO
+
+#-----------------------------------------------------------------------------#
+#
+# General startup commands
+#
+#-----------------------------------------------------------------------------#
+before_script:
+    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan gitlab-ext.galois.com >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - export USER=gitlab-runner
+
+#-----------------------------------------------------------------------------#
+#
+# Dummuy test
+#
+#-----------------------------------------------------------------------------#
+dummy:
+  script:
+    - echo "Hello there"
+  tags: ["voting-system"]
+  only:
+    - master
+  except:
+    - schedules
