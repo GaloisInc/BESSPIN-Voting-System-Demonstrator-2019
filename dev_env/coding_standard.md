@@ -6,9 +6,9 @@ As far as is possible, this document refers to pre-defined standards that are fr
 
 ## Module languages and identification
 
-The code shall be organized into modules, each of which has a ".h" and a corresponding ".c" file.
+The code shall be organized into modules, each of which has a `.h` and a corresponding `.c` file.
 
-Additionally, all modules will identify if they are to be coded in Frama-C/ACSL. Note - it is possible for a module to have a .h file coded in Frama-C/ACSL, while its .c file is "normal" C99 file, such as a device driver which exports a Frama-C compatible API to its clients.
+Additionally, each modules will identify if it is to be coded in Frama-C/ACSL. Note: it is possible for a module to have a .h file coded in Frama-C/ACSL, while its .c file is a "normal" C99 file, such as a device driver that exports a Frama-C compatible API to its clients.
 
 ### C Source Code Verification Tool
 
@@ -30,14 +30,14 @@ As far as reasonable, source code comments will comply with:
 
 ## Primitive Types
 
-The known-width primitive types in C99, defined in <stdint.h> should be used in preference to the implementation-defined types of earlier standard. For example, use "int32_t" rather than "int".
+The known-width primitive types in C99, defined in `<stdint.h>`, should be used in preference to the implementation-defined types of earlier standards. For example, use `int32_t` rather than `int`.
 
 ## CheriABI compatibility
 
 This section will expand to cover coding rules that are required for compatibility with the Cambridge team's CheriABI and modified LLVM.
 
 1. Do not cast pointers.
-2. If you absolutely must cast a pointer to an integer type, then you must cast to "intptr_r", defined in C99's <stdint.h>
+2. If you absolutely must cast a pointer to an integer type, then you must cast to `intptr_r`, defined in C99's `<stdint.h>`.
 
 ## Style and Formatting
 
@@ -53,10 +53,7 @@ All code shall compile (through either GCC or LLVM) with no warning messages res
 
 The size and complexity of code modules will be measured using the `Sloc` measure reported by the Frama-C "Metrics" plug-in.  Code size can also be measured with the `sloccount` and `cloc` tools, both of which are available via Homebrew or otherwise.
 
-The following guidelines should be attended to with regards to code size and complexity:
+The following guidelines should be attended to with regard to code size and complexity:
  - functions should have fewer than 20 NCSS (Non-Commenting Source Statements), and
- - functions should have a cyclometric code complexity of no greater than 4.
-
-
-
+ - functions should have a McCabe cyclomatic complexity of no greater than 5.
 
