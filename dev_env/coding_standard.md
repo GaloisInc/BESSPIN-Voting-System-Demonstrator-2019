@@ -47,7 +47,7 @@ As a starting point, the formatting style will be based on the standard LLVM sty
 
 ## Compiler warnings
 
-All code shall compile (through either GCC or LLVM) with no warning messages resulting with all standard warning messages enabled. Particular compiler options will be set and maintained in the project's Makefile.
+With all standard warning messages enabled, all code shall compile (through either GCC or LLVM) with no warning messages. Particular compiler options will be set and maintained in the project's Makefile.
 
 ## Code measurements
 
