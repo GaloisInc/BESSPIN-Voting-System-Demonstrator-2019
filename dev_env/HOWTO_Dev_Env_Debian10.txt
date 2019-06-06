@@ -13,6 +13,8 @@ Basics
 
    su to "root"
    apt-get install emacs
+   apt-get install gitk
+   apt-get install git-gui
    add user "rchapman" to group "sudo" in /etc/group
    Reboot
 
