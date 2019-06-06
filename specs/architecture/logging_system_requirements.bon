@@ -5,12 +5,12 @@ mandatory
 requirement
   "SEC_SYSTEM_LOG"
 description
-  "Support read/write opeartion in the secure system log file."
+  "Support check/read/write opeartion for the secure system log file."
 
 requirement
   "SEC_APP_LOG"
 description
-  "Support read/write opeartion in the secure application log file."
+  "Support check/read/write opeartion for the secure application log file."
 
 requirement  
   "AES_KEPT_SECRET"
@@ -34,12 +34,14 @@ requirement
  "ROOT_HASH_CHAIN"
 description
  "Should determine the root of the hash-chain and generate the base log entry.
-  Use AES key and an HMAC in order to generate the base log entry."
+  Use AES key and an HMAC in order to generate the base log entry.
+  TBD"
 
 requirement
   "HASH_CHAIN"
 description
-  "Should provide hash-chain algorithm for storing and retrieving log entries.
+  "Should provide hash-chain algorithm for storing and retrieving log entries
+   TBD."
 
 
 requirement
