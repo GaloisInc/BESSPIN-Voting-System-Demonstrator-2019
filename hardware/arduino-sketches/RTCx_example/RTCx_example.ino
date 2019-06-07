@@ -70,7 +70,7 @@ void setup(void)
 		// rtc.setCalibration(-127);
 	}
 
-	rtc.setSQW(RTCx::freq4096Hz);
+	rtc.setSQW(RTCx::freq32768Hz);
 }
 
 
