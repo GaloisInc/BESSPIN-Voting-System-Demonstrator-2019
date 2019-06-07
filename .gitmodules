@@ -1,0 +1,6 @@
+[submodule "FreeRTOS-mirror"]
+	path = FreeRTOS-mirror
+	url = git@gitlab-ext.galois.com:ssith/FreeRTOS-mirror.git
+[submodule "tool-suite"]
+	path = tool-suite
+	url = git@gitlab-ext.galois.com:ssith/tool-suite.git
