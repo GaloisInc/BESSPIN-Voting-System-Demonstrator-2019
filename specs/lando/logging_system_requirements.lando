@@ -59,7 +59,11 @@ description
 
 requirement EXPORT_LOG
 description
-  Should export the log to the desired target.
+  Should export log to desired device.
+
+requirement IMPORT_LOG
+description
+  Should import log from desired device.
 
 subsystem logging_test_system
   indexing
