@@ -26,7 +26,7 @@ before_script:
 #-----------------------------------------------------------------------------#
 SBB-Bottom:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix 'cd source/sbb; TARGET=bottom make;`
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'cd source/sbb; export TARGET=bottom; make; make clean;'
   tags: ["voting-system"]
   only:
     - master
@@ -35,7 +35,7 @@ SBB-Bottom:
 
 SBB-FreeRTOS:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix 'cd source/sbb; TARGET=freertos make;`
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'cd source/sbb; export TARGET=freertos; make; make clean;'
   tags: ["voting-system"]
   only:
     - master
@@ -44,7 +44,7 @@ SBB-FreeRTOS:
 
 SBB-Verification:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix 'cd source/sbb; TARGET=verification make;`
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'cd source/sbb; export TARGET=verification; make; make clean;'
   tags: ["voting-system"]
   only:
     - master
