@@ -3,77 +3,35 @@ Smart Ballot Box Logging
 indexing
     owner: Dragan Stosic <dragan.stosic@freeandfair.us>
 
-requirement SEC_SYSTEM_LOG
+requirement write sec_system_log
   description 
-    Support check/read/write opeartion for the secure system log file.
+    Support write opeartion for the secure system log file.
 
-requirement SEC_SYSTEM_LOG_SPEC
-  description
-    Provide formal model for the secure system log file.
-
-requirement SEC_APP_LOG
+requirement write_sec_app_log
 description
-  Support check/read/write opeartion for the secure application log file.
+  Support write opeartion for the secure application log file.
 
-requirement SEC_APP_LOG_SPEC
+requirement log_entry
 description
-  Provide formal model for the secure application log file.
+  Support log entry.
 
-requirement LOG_ENTRY
-description
-  Support log entry containing SHA256 (32-byte) hash and AES-128  the message.
-
-requirement LOG_ENTRY_SPEC
-description
-  Provide formal model for the log entry.
-
-requirement SEC_LOG_ENTRY
-description
-  Support secure log entry containing SHA256 (32-byte) hash and AES-128  the message.
-
-requirement SEC_LOG_ENTRY_SPEC
-description
-  Provide formal model for the secure log entry.
-
-requirement SEC_LOG_ENTRY_HST
+requirement hsc_state_change
 description
   Support all hardware state changes by the secure log entry.
 
-requirement SEC_APP_LOG_ENTRY
-description
-  Support secure application log entry containing SHA256 (32-byte) hash and AES-128 the message.
-
-requirement AES_KEPT_SECRET
+requirement fetch_aes
 description
   Fetch the AES from HSM-Hardware Security Module or some other place TBD.
 
-requirement ROOT_HASH_CHAIN
+requirement determine_root_hash
 description
  Should determine the root of the hash-chain and generate the base log entry.
   Use AES key and an HMAC in order to generate the base log entry TBD.
 
-requirement HASH_CHAIN
-description
-  Should reuse hash-chain algorithm for storing and retrieving log entries TBD.
-
-
-requirement EXPORT_LOG
+requirement export_log
 description
   Should export log to desired device.
 
-requirement IMPORT_LOG
+requirement import_log
 description
   Should import log from desired device.
-
-subsystem logging_test_system
-  indexing
-    owner: Dragan Stosic <dragan.stosic@freeandfair.us>
-
-requirement API_ENABLED_DURING_DEBUG
-description
-  Have a test cases when the system is switched in the test mode.
-
-requirement TEST_MODE_GUARDS
-description
-  Only permit calls into the test API when the system is in test mode.
-
