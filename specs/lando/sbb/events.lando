@@ -1,0 +1,121 @@
+event 
+    Standby
+description
+    Initial state. The ballot box is ready and waiting for a paper to be inserted
+
+event
+    Motor forward
+description
+    Move motor forward, to feed paper inside the ballot box
+
+event
+    Motor stop
+description
+    Stop moving the motor.
+
+event
+    Motor back
+description
+    Move motor back, to feed paper out of the ballot box
+
+event
+    Paper detected
+description
+    No paper sensor detects a paper.
+    A sheet of paper is inserted into the paper feeder and is detected
+    by the paper sensor 1
+
+event
+    Paper inserted
+description
+    Paper sensor 1 detects a paper, paper sensor 2 does not.
+    A sheet of paper was detected by the paper sensor 2.
+
+event
+    Paper accepted
+description
+    Paper sensor 1 and 2 detect a paper. Paper sensor 1 is released,
+    then paper sensor 2 is released. The paper is deposited inside the ballot box.
+
+event
+    Paper returned
+description
+    Paper sensor 1 and 2 detect a paper. Paper sensor 2 is released,
+    then paper sensor 1 is released. The paper is assumed to be removed from
+    the feeder tray.
+
+
+event
+    Paper sensor 1 engaged
+description
+    Paper sensor 1 detects paper
+
+event
+    Paper sensor 1 released
+description
+    Paper sensor 1 detects no paper
+
+event
+    Paper sensor 2 engaged
+description
+    Paper sensor 2 detects paper
+
+event
+    Paper sensor 2 released
+description
+    Paper sensor 2 detects no paper
+
+event
+    DisplayText
+description
+    A text is diplayed on the LCD display
+
+event
+    Cast Button is pressed
+description
+    Cast Button is released. Cast Button is pressed
+
+event
+    Cast Button is released
+description
+    Cast Button is pressed. Cast Button is released
+
+event
+    Spoil Button is pressed
+description
+    Spoil Button is released. Spoil Button is pressed
+
+event
+    Spoil Button is released
+description
+    Spoil Button is pressed. Spoil Button is released
+
+event
+    Cast Light is On
+description
+    Cast Light is turned on
+
+event
+    Cast Light is Off
+description
+    Cast Light is turned off
+
+event
+    Spoil Light is On
+description
+    Spoil Light is turned on
+
+event
+    Spoil Light is Off
+description
+    Spoil Light is turned off
+
+event
+    Barcode is scanned
+description
+    A barcode is scanned
+
+event
+    Tally performed
+description
+    A tally of votes was performed

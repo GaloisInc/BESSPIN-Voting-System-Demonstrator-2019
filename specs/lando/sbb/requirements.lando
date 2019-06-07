@@ -1,0 +1,22 @@
+requirement
+    Reject invalid ballots
+description
+    All ballots with invalid or non-existent barcode are rejected
+
+requirement
+    Recognize valid ballots
+description
+    All ballots with a valid barcode are recognized, and the user is let to decide
+    whether to cast or spoil the given ballot
+
+requirement
+    User can accept a valid ballot
+description
+    The user can decide to accept a valid ballot. In such case, the ballot is 
+    deposited into the ballot box.
+
+requirement
+    User can spoil a valid ballot
+description
+    The user can decide to spoil a valid ballot. In such case, the ballot is
+    rejected and returned to the user.

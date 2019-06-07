@@ -1,0 +1,16 @@
+all subsystems and/or components have 
+    identified owners and contributors
+        owner: Michal Podhradsky <mpodhradsky@galois.com>
+        contributors: Haneef Mubarak <hmubarak@galois.com>
+        Parker Southwick <psouthwick@galois.com>
+        Steven Osborn <steven@freeandfair.us>
+        potential contributors: Daniel M., Alexander B.
+    effort estimates for design, implementation, and assurance work
+        design/implementation: 1 week
+        assurance: 1 week
+    complexity estimates (low, medium, high)
+        medium
+    risk levels (low, medium, high)
+        medium
+    mandatory dependencies elucidated
+        N/A
