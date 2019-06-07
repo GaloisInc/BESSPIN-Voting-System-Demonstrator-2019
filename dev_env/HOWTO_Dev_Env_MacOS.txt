@@ -28,13 +28,17 @@ LLVM (including clang)
 6. We install llvm/clang using HomeBrew, since it includes llvm-link which is
    needed for SAW. This overrides Apple's default install of clang.
 
-   brew install llvm
+   6.1  brew install llvm
 
-Add /usr/local/opt/llvm/bin to the FRONT of your PATH.
+   6.2  Add /usr/local/opt/llvm/bin to the FRONT of your PATH.
 
-(This is important so that HomeBrew's LLVM and tools are found before
- Apple's installation which is in /usr/local/bin)
+       (This is important so that HomeBrew's LLVM and tools are found before
+         Apple's installation which is in /usr/local/bin)
 
+   6.3  Install standard C headers..
+
+       open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+       Follow the installation instructions
 
 Clang-Format
 ------------
