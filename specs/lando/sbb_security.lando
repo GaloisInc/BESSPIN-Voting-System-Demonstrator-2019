@@ -76,8 +76,8 @@ component Application Entry inherit Log Entry
   May I have a new entry that contains the following data?
 
 events Logging
-event initialize system log.
-event initialize application log.
+event sytem_log_init Initialize system log.
+event application_log_init Initialize application log.
 event system_log Log event E to the system log.
 event application_log Log the event E to the application log.
 event log_export Export log L to device D.
