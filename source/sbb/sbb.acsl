@@ -27,8 +27,21 @@ bool motor_backward;
 typedef enum { INIT, STOP } sbb_state
 sbb_state state;
 
-#endif
+// @design kiniry Note that when the SBB is powered on, a ballot paper
+// may be inside of the device.  We cannot make assumptions about
+// initial button state as they may get physically stuck or someone
+// can hold them down during reset.
+
+/*@
+  predicate lights_off = !cast_button_light && !spoil_button_light;
+  predicate buttons_up = !cast_button && !spoil_button;
+  predicate motor_running = motor_forward || motor_backward;
+  predicate initial_state = lights_off && !motor_on && state == INIT;
+@*/
+
+//@ global invariant oneway_motor: !(motor_forward && motor_backward);
+//@ global invariant start_state: \at(initial_state, Init);
 
 #endif
 
-
+#endif
