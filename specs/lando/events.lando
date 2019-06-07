@@ -1,0 +1,21 @@
+event_chart BMD__EVENTS
+explanation
+    "Events triggering software behavior on the ballot marking device (bmd) under deployment."
+event "power on"
+involves Power Button
+event "power off"
+involves Power Button
+event "load election configuration"
+involves Initializer, Ballot Selection Interface
+event "display wait for ballot style indicator screen"
+invovles Initializer
+event "select candidates"
+involves Ballot Seection Interface
+event "next race"
+involves Ballot Selection Interface
+event "review selections"
+involves Ballot Selection Interface
+event "print ballot"
+involves Ballot Selection Interface, Random Number Generator, Ballot Encryptor, Encoder, Printer
+event "log ballot"
+invovles Logger

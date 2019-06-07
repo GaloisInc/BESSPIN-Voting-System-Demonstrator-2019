@@ -3,12 +3,24 @@ subsystem Ballot Marking Device
   indexing
     owner: Luke Myers <lmyers@galois.com> 
       Dragan Stosic <dragan.stosic@freeandfair.us>
-component Ballot Encryption
-  What is the encryption of this ballot and nonce?
+component Power Button
+  Turn on the bmd!
+  Turn off the bmd!
+component Initializer
+  Start Ballot Selection Interface!
+  Connect to printer!
+component Ballot Selection Interface
+  Load election configuration!
+  What are the voter's selections?
 component Random Number Generator
-  May I have a nonce?
+  May I have the last most recently generated nonce?
+  Generate a new nonce!
+component Ballot Encryptor
+  What is the encryption of this ballot and nonce?
+component Encoder
+  What is the barcode encoding for this ballot and timestamp?
 component Printer
-  What is the barcode encoding for this ballot?
   Print this ballot!
   Print this receipt!
-
+component Logger
+  Log this ballot encoding!
