@@ -17,6 +17,32 @@ subsystem Security
 // have written in our R&D on high-assurance cryptography (hacrypto
 // and libvcrypt).
 
+scenarios Smart Ballot Box Security
+scenario Normal Log Activities  Initialize a secure log, write N entries into that log, check that the log is well-formed, verify that it is secure, export it to a device.
+scenario Validation Violation  Create a well-formed log, write it to a device, illegally modify it outside of the context of the security subsystem implementation to violate a well-formedness property, import the log, ensure that it fails well-formedness checking.
+scenario Verification Violation  Create a well-formed log, write it to a device, illegally modify it outside of the context of the security subsystem implementation to violate a security property, import the log, ensure that it fails verification.
+scenario Benchmark Log Measure how long it takes to perform a predictable set of write operations on a log.
+scenario Benchmark Log Validity Measure how long it takes to perform a validation of a log of a known size.
+scenario Benchmark Log Verification Measure how long it takes to perform a verification of a log of a known size.
+scenario Measure Log Storage Use Perform a normal log activities and measure the amount of space used by the log file in persistent store.
+
+requirements Smart Ballot Box Security
+SysLog Every event at the system level must be logged to the system log.
+SysEvents Calling any feature in the security subsystem is a system event.
+EventSecurityProperties The security properties of every system and application 
+event are specified in the system event cryptographic protocol and are denoted and 
+checked at the code-level via source annotations.
+ApplicationLog Every event at the application level must be logged to the application log.
+
+SecureLogAppendOnly The good guys can detect if any events have been deleted from a secure log (by either adversaries or the good guys).
+SecureLogAuthenticity Adversaries cannot forge events and add them to a secure log.
+SecureLogImmutable The good guys can detect any modifications to an event in a secure log (either by an adversary or the good guys).
+SecureLogPrivate Adversaries cannot learn anything about any single event given the content of a secure log. (Learning the number of events is okay.)
+SecureLogComplete The good guys can recover all events in a secure log.
+// @design Daniel Wagner Ideally we'd like to demonstrate to third parties (not just the good guys) that the secure log is append-only and authentic, but that would probably require some asymmetric crypto that we don't currently plan to implement.
+Smart Ballot Box Reliability The smart ballot box can be turned off and on at any time with no harm to the ongoing election.
+
+
 // The Security subsystem contains two subsystems, `Logging` and
 // `Crypto`.
 

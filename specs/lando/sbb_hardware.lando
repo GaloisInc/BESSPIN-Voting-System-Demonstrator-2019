@@ -23,6 +23,25 @@ component LCD Display
 component Paper Sensor
   Paper detected?
 
+requirements Smart Ballot Box
+MotorsInvariant It is impossible for the motors to turn in opposite directions.
+MotorsConsistent If one motor is enabled in a given direction, the other motor is too.
+
+scenarios Smart Ballot Box Hardware
+scenario Opening Polling Place The Smart Ballot Box is turned on, time synced to Ballot Marking Device.
+scenario Spoil Ballot Card The voter presses the spoil button indicating that they wish to spoil the ballot card and the ballot card is spoiled.
+scenario Cast Ballot Card The voter presses the cast button indicating that they wish to cast the ballot card and the ballot card is cast.
+scenario Spoil Ballot Card Display “spoiling ballot...”, eject the ballot card, display “Stamp your spoiled ballot.”, display decrypted vote.
+scenario Cast Ballot Card Display “casting ballot…”, deposit the ballot card, display “Ballot cast.”.
+scenario Pre-Election Setup of Smart Ballot Box The supervisor of elections installs in the smart ballot box the election configuration.
+scenario Paper-Jammed Display “paper jammed, remove the paper”, wait for the paper to be removed.
+scenario Invalid Ballot Inserted Display “Invalid ballot.”, eject the ballot card.
+scenario Detect Too Many Ballots Inserted Display “invalid number of ballots”, eject ballot, alert coordinators.
+scenario Election-day Setup of Smart Ballot Box The smart ballot box is turned on and its state is summarized.
+scenario Smart Ballot Box Self-Check When powered on, the smart ballot box displays the current version number of its software, the current time, and a summary of its state.
+scenario Close Polling Place The smart ballot box is turned off.
+scenario Export Election Data The supervisor of elections removes the SD card.
+
 events Smart Ballot Box Hardware
 event motors_actuated The motors are actuated in direction D.
 event motors_off The motors are turned off.
