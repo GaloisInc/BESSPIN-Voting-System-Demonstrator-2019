@@ -2,70 +2,90 @@
 #include <stdio.h>
 #include <string.h>
 
-
 // Text defines
-char * insert_ballot_text = "Insert ballot.";
-char * barcode_detected_text = "Barcode detected.";
-char * cast_or_spoil_text = "Cast or Spoil?";
-char * casting_ballot_text = "Casting ballot.";
-char * spoiling_ballot_text = "Spoiling ballot.";
-char * not_a_valid_barcode_text = "Not a valid barcode!";
-char * no_barcode_text = "No barcode detected!";
-char * remove_ballot_text = "Remove ballot!";
+char *insert_ballot_text = "Insert ballot.";
+char *barcode_detected_text = "Barcode detected.";
+char *cast_or_spoil_text = "Cast or Spoil?";
+char *casting_ballot_text = "Casting ballot.";
+char *spoiling_ballot_text = "Spoiling ballot.";
+char *not_a_valid_barcode_text = "Not a valid barcode!";
+char *no_barcode_text = "No barcode detected!";
+char *remove_ballot_text = "Remove ballot!";
 
-void ballot_box_main_loop(void) {
+void ballot_box_main_loop(void)
+{
     char this_barcode[BARCODE_MAX_LENGTH] = {0};
     // Init happens before calling main()
-    for (;;) {
+    for (;;)
+    {
         go_to_standby();
-        if (ballot_detected()) {
+        if (ballot_detected())
+        {
             ballot_detect_timeout_reset();
-            while (!ballot_inserted() && !ballot_detect_timeout_expired()) {
+            while (!ballot_inserted() && !ballot_detect_timeout_expired())
+            {
                 move_motor_forward();
             }
             stop_motor();
 
+            if (has_a_barcode())
+            {
+                display_this_text(barcode_detected_text,
+                                  strlen(barcode_detected_text));
+                what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
 
-            if (has_a_barcode()) {
-                display_this_text(barcode_detected_text,strlen(barcode_detected_text));
-                what_is_the_barcode(this_barcode,BARCODE_MAX_LENGTH);
-                
-                if (is_barcode_valid(this_barcode,BARCODE_MAX_LENGTH)) {
-                    display_this_text(cast_or_spoil_text,strlen(cast_or_spoil_text));
+                if (is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH))
+                {
+                    display_this_text(cast_or_spoil_text,
+                                      strlen(cast_or_spoil_text));
                     cast_button_light_on();
                     spoil_button_light_on();
                     cast_or_spoil_timeout_reset();
 
-                    while (!cast_or_spoil_timeout_expired() 
-                        && !is_cast_button_pressed()
-                        && !is_spoil_button_pressed()) {
-                            ;;
-                        }
-                    if (is_cast_button_pressed()) {
+                    while (!cast_or_spoil_timeout_expired() &&
+                           !is_cast_button_pressed() &&
+                           !is_spoil_button_pressed())
+                    {
+                        ;
+                        ;
+                    }
+                    if (is_cast_button_pressed())
+                    {
                         spoil_button_light_off();
-                        display_this_text(casting_ballot_text,strlen(casting_ballot_text));
+                        display_this_text(casting_ballot_text,
+                                          strlen(casting_ballot_text));
                         cast_ballot();
                         cast_button_light_off();
-                        continue; // directly to Standby 
-                    } else {
+                        continue; // directly to Standby
+                    }
+                    else
+                    {
                         cast_button_light_off();
                         spoil_button_light_off();
                         // ->  spoil ballot
                     }
-                } else  {
-                    display_this_text(not_a_valid_barcode_text,strlen(not_a_valid_barcode_text));
+                }
+                else
+                {
+                    display_this_text(not_a_valid_barcode_text,
+                                      strlen(not_a_valid_barcode_text));
                     // ->  spoil ballot
                 }
-            } else {// if has_a_barcode
-                display_this_text(no_barcode_text,strlen(no_barcode_text));
+            }
+            else
+            { // if has_a_barcode
+                display_this_text(no_barcode_text, strlen(no_barcode_text));
                 // -> spoil ballot
             }
-            display_this_text(spoiling_ballot_text,strlen(spoiling_ballot_text));
+            display_this_text(spoiling_ballot_text,
+                              strlen(spoiling_ballot_text));
             spoil_ballot();
-            display_this_text(remove_ballot_text,strlen(remove_ballot_text));
-            while (!ballot_spoiled()) {
-                ;;
+            display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+            while (!ballot_spoiled())
+            {
+                ;
+                ;
             }
         } // if ballot_detected
-    } // loop iteration
+    }     // loop iteration
 }

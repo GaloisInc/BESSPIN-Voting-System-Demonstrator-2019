@@ -11,14 +11,14 @@
 
 // Aux
 #define BARCODE_MAX_LENGTH 16
-extern char * insert_ballot_text;
-extern char * barcode_detected_text;
-extern char * cast_or_spoil_text;
-extern char * casting_ballot_text;
-extern char * spoiling_ballot_text;
-extern char * not_a_valid_barcode_text;
-extern char * no_barcode_text;
-extern char * remove_ballot_text;
+extern char *insert_ballot_text;
+extern char *barcode_detected_text;
+extern char *cast_or_spoil_text;
+extern char *casting_ballot_text;
+extern char *spoiling_ballot_text;
+extern char *not_a_valid_barcode_text;
+extern char *no_barcode_text;
+extern char *remove_ballot_text;
 
 /**
  * Initialize peripherals
@@ -34,7 +34,7 @@ void perform_tally(void);
  * Is barcode valid?
  * Check validity of the given barcode string
  */
-bool is_barcode_valid(char * str, uint8_t len);
+bool is_barcode_valid(char *str, uint8_t len);
 
 /**
  * Is Cast button pressed?
@@ -120,7 +120,7 @@ bool ballot_inserted(void);
  * Spoil ballot!
  */
 void spoil_ballot(void);
-  
+
 /**
  * Cast ballot!
  */
