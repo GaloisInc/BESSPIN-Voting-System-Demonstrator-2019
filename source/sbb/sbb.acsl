@@ -1,0 +1,34 @@
+/**
+ * Smart Ballot Box ACSL specification
+ * @refine sbb.lando
+ */
+
+#ifndef __SBB_API_ACSL__
+#define __SBB_API_ACSL__
+
+#include "sbb_t.h"
+
+// @design Frama-C does not support model variables, so we break the
+// abstraction barrier and characterize model state using concrete
+// implementation variables that are conditionally compiled.
+
+#ifdef SPEC_DEBUG
+
+bool has_barcode;
+barcode current_barcode;
+bool cast_button;
+bool spoil_button;
+bool cast_button_light;
+bool spoil_button;
+bool motor_on;
+bool motor_forward;
+bool motor_backward;
+// @todo kiniry State names must be extracted from ASMs.
+typedef enum { INIT, STOP } sbb_state
+sbb_state state;
+
+#endif
+
+#endif
+
+

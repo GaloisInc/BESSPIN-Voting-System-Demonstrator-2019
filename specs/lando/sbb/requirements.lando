@@ -1,22 +1,19 @@
-requirement
-    Reject invalid ballots
-description
-    All ballots with invalid or non-existent barcode are rejected
+requirements SBB
 
-requirement
-    Recognize valid ballots
-description
-    All ballots with a valid barcode are recognized, and the user is let to decide
-    whether to cast or spoil the given ballot
+Reject invalid ballots.
+All ballots with invalid or non-existent barcode are rejected.
 
-requirement
-    User can accept a valid ballot
-description
-    The user can decide to accept a valid ballot. In such case, the ballot is 
-    deposited into the ballot box.
+Recognize valid ballots.
+All ballots with a valid barcode are recognized, and the user is let
+to decide whether to cast or spoil the given ballot
 
-requirement
-    User can spoil a valid ballot
-description
-    The user can decide to spoil a valid ballot. In such case, the ballot is
-    rejected and returned to the user.
+User can accept a valid ballot.
+The user can decide to accept a valid ballot. In such case, the ballot
+is deposited into the ballot box.
+
+User can spoil a valid ballot.
+The user can decide to spoil a valid ballot. In such case, the ballot
+is rejected and returned to the user.
+
+Barcodes have limited information density.
+The maximum length of a barcode is 16 bytes, which is 128 bits.

@@ -8,17 +8,26 @@ subsystem Smart Ballot Box
       Steven Osborn <steven@freeandfair.us>
     potential contributors: Daniel M., Alexander B.
 
+// @todo kiniry This top-level system specification should either
+// import all of the related specifications in this directory, or
+// explain how they are all inter-dependent.
+
 component Smart Ballot Box API
   The top-level API that is independent on the hardware and the type of the ballot box.
   Perform Tally!
-  Is barcode valid?
+  Is this barcode valid?
+
+component Barcode
+  How long is this barcode?
+  Is this barcode valid?
+  What is the maximum number of bits this barcode can encode?
 
 component Ballot Box
   A low-level API for a specific ballot box and its hardware.
   Deposit ballot!
   Reject ballot!
   Has a barcode?
-  What is the barcode?
+  What is the barcode of the currently held ballot?
   Is Cast Button Pressed?
   Is Spoil Button Pressed?
   Is Cast Button Released?

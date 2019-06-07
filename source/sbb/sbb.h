@@ -9,8 +9,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Subsystem includes
+#include "sbb_t.h"
+
 // Aux
-#define BARCODE_MAX_LENGTH 16
 extern char *insert_ballot_text;
 extern char *barcode_detected_text;
 extern char *cast_or_spoil_text;
@@ -34,7 +36,7 @@ void perform_tally(void);
  * Is barcode valid?
  * Check validity of the given barcode string
  */
-bool is_barcode_valid(char *str, uint8_t len);
+bool is_barcode_valid(barcode the_barcode, barcode_length its_length);
 
 /**
  * Is Cast button pressed?
@@ -59,12 +61,12 @@ void just_received_barcode(void);
 /**
  * Set barcode to this value
  */
-void set_received_barcode(char *str, uint8_t len);
+void set_received_barcode(barcode the_barcode, barcode_length its_length);
 
 /**
  * What is the barcode?
  */
-void what_is_the_barcode(char *str, uint8_t len);
+void what_is_the_barcode(barcode the_barcode, barcode_length its_length);
 
 /**
  * Spoil Button Light On!
@@ -104,7 +106,7 @@ void stop_motor(void);
 /**
  * Display this text!
  */
-void display_this_text(char *str, uint8_t len);
+void display_this_text(char *the_string_to_display, uint8_t its_length);
 
 /**
  * Ballot detected?

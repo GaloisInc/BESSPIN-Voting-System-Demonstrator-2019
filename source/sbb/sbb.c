@@ -3,7 +3,7 @@
  * @refine sbb.lando
  */
 
-#include "sbb.h"
+// General includes
 #include <stdio.h>
 #include <string.h>
 
@@ -11,6 +11,9 @@
 #include "FreeRTOS.h"
 #include "semphr.h"
 #include "task.h"
+
+// Subsystem includes
+#include "sbb.h"
 
 #include "gpio.h"
 #include "serLcd.h"
