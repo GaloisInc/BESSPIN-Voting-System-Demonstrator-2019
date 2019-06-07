@@ -21,12 +21,30 @@ before_script:
 
 #-----------------------------------------------------------------------------#
 #
-# Dummuy test
+# Smart ballot box
 #
 #-----------------------------------------------------------------------------#
-dummy:
+SBB-Bottom:
   script:
-    - echo "Hello there"
+    - nix-shell tool-suite/nix/dev/gfe.nix 'cd source/sbb; TARGET=bottom make;`
+  tags: ["voting-system"]
+  only:
+    - master
+  except:
+    - schedules
+
+SBB-FreeRTOS:
+  script:
+    - nix-shell tool-suite/nix/dev/gfe.nix 'cd source/sbb; TARGET=freertos make;`
+  tags: ["voting-system"]
+  only:
+    - master
+  except:
+    - schedules
+
+SBB-Verification:
+  script:
+    - nix-shell tool-suite/nix/dev/gfe.nix 'cd source/sbb; TARGET=verification make;`
   tags: ["voting-system"]
   only:
     - master
