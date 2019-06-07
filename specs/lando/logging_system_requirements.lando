@@ -7,17 +7,33 @@ requirement SEC_SYSTEM_LOG
   description 
     Support check/read/write opeartion for the secure system log file.
 
+requirement SEC_SYSTEM_LOG_SPEC
+  description
+    Provide formal model for the secure system log file.
+
 requirement SEC_APP_LOG
 description
   Support check/read/write opeartion for the secure application log file.
+
+requirement SEC_APP_LOG_SPEC
+description
+  Provide formal model for the secure application log file.
 
 requirement LOG_ENTRY
 description
   Support log entry containing SHA256 (32-byte) hash and AES-128  the message.
 
+requirement LOG_ENTRY_SPEC
+description
+  Provide formal model for the log entry.
+
 requirement SEC_LOG_ENTRY
 description
   Support secure log entry containing SHA256 (32-byte) hash and AES-128  the message.
+
+requirement SEC_LOG_ENTRY_SPEC
+description
+  Provide formal model for the secure log entry.
 
 requirement SEC_LOG_ENTRY_HST
 description
