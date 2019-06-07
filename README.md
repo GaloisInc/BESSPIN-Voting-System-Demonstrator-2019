@@ -1,6 +1,7 @@
-% The BESSPIN Voting System
-% Galois and Free & Fair
-% May 2019
+[![pipeline status](https://gitlab-ext.galois.com/ssith/voting-system/badges/master/pipeline.svg)](https://gitlab-ext.galois.com/ssith/voting-system/commits/master)
+
+# The BESSPIN Voting System
+## Galois and Free & Fair, May 2019
 
 # Overview
 

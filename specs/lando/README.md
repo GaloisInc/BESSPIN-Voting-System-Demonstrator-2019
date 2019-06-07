@@ -1,6 +1,6 @@
 # The Lando specification of the BESSPIN Voting System
 
-##Mandatory Outcomes and Artifacts per Subsystem
+## Mandatory Outcomes and Artifacts per Subsystem
 * a rich LANDO specification of a subsystem includes(not necessarily in order of execution):
    * a complete domain model
       * all necessary concepts, their descriptions, all features (queries and commands), and constraints
