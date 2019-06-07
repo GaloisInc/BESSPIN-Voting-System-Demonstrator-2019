@@ -20,6 +20,12 @@ This top-level `README.md` summarizes the project and walks the reader
 through the aforementioned artifacts in order to understand, port, and
 modify the BVS.
 
+This repository also contains submodules for dependencies that we
+manage in other git repositories, such as the FreeRTOS port to RISC-V.
+In order to update those submodules, remember to either clone the
+repository using the `--recursive` switch or use the `git submodule
+update --init --recursive` command to update submodules.
+
 # Technologies
 
 Insofar as the BVS must run on both COTS hardware as well as SSITH
