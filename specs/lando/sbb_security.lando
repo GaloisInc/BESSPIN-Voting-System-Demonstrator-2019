@@ -1,4 +1,8 @@
+# Smart Ballot Box Security
+
 subsystem Security
+// @design kiniry The security of the SBB is focused on the system and
+// application logs and their security properties.
   indexing
     owner: Joe Kiniry <kiniry@freeandfair.us>
     contributors: Rod Chapman <rod.chapman@freeandfair.us> 
@@ -17,4 +21,10 @@ subsystem Security
 
 subsystem Logging
 subsystem Crypto
+
+requirements Security
+
+scenarios Security
+
+events Security
 
