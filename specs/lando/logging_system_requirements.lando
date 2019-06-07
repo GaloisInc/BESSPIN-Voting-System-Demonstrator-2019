@@ -1,6 +1,6 @@
-Smart Ballot Box Security
-subsystem logging_system
-  indexing
+Logging System 
+Smart Ballot Box Logging
+indexing
     owner: Dragan Stosic <dragan.stosic@freeandfair.us>
 
 requirement SEC_SYSTEM_LOG
