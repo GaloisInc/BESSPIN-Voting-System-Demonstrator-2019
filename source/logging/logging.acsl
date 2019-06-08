@@ -1,0 +1,10 @@
+/**
+ * Smart Ballot Box ACSL specification
+ * @refine sbb_security.lando
+ */
+
+#ifndef __LOGGING_API_ACSL__
+#define __LOGGING_API_ACSL__
+
+#include "logging_t.h"
+
