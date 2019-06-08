@@ -1,0 +1,16 @@
+subsystem Logging
+// application logs and their security properties.
+  indexing
+    owner: Dragan Stosic <dragan.stosic@freeandfair.us>
+    contributors: Rod Chapman <rod.chapman@freeandfair.us> 
+      Dan Zimmerman <dmz@freeandfair.us>
+   effort estimates for design, implementation, and assurance work
+        design/implementation: 1 week
+        assurance: 1 week
+    complexity estimates (low, medium, high)
+        medium
+    risk levels (low, medium, high)
+        medium
+    mandatory dependencies elucidated
+        N/A
+

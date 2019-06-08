@@ -1,0 +1,11 @@
+events Logging
+
+event sytem_log_init Initialize system log.
+event application_log_init Initialize application log.
+event system_log Log event E to the system log.
+event application_log Log the event E to the application log.
+event log_export Export log L to device D.
+event log_import Import log L from device D.
+event validate_log Verify that log L is well-formed wrt correctness properties in its configuration.
+event verify_log Verify that log L is secure wrt the security properties in its configuration.
+
