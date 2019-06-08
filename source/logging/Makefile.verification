@@ -1,0 +1,131 @@
+# Verification Build system for the BVS application
+# Rod Chapman
+
+# All phony targets in this Makefile.
+
+.PHONY: all software_main
+.PHONY: typecheck typecheck-software-bottom typecheck-software-simulation typecheck-gen typecheck-software-rte-gen typecheck-software-asm-gen
+.PHONY: wp wp-software
+.PHONY: wp-verbose-report wp-verbose-report-software
+.PHONY: wp-all-provers wp-all-provers-software
+.PHONY: metrics metrics-software
+.PHONY: value value-software
+.PHONY: gui gui-software
+.PHONY: ide verify bytecode
+.PHONY: rte rte-software
+.PHONY: bytecode saw
+.PHONY: clean
+
+# All binaries necessary to run rules.
+# Assume clang is on PATH, but llvm-link needs special handing on Linux
+CLANG := clang
+HOST  := $(shell uname -s)
+ifeq (${HOST},Linux)
+    LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+else
+    # Assumed to be Host = Darwin
+    LLVM_LINK := llvm-link
+endif
+
+
+FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V -D__riscv_xlen=32"
+
+# These lists will grow as the software is developed and modules are added.
+SOFTWARE_SPECS := sbb.h
+
+# FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL subset and are intended for verification
+# with the Frama-C plugins
+FRAMA_C_SOURCES := sbb_main.c
+
+# SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) sbb.c
+
+# Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
+MAIN_ENTRY_POINT := ballot_box_main_loop
+
+# Assume we only want to run SAW on Frama-C code, so...
+BC_OBJS  = $(FRAMA_C_SOURCES:.c=.bc)
+LL_OBJS  = $(FRAMA_C_SOURCES:.c=.ll)
+
+all: verify ide 
+
+ide: TAGS metrics
+
+verify: typecheck value wp wp-verbose-report # saw
+
+# Typechecking code and specifications.
+
+typecheck: $(FRAMA_C_SOURCES)
+	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
+
+# WP reasoning.
+
+wp:
+	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp -wp-rte $(FRAMA_C_SOURCES)
+
+wp-verbose-report:
+	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp-verbose 0 $(FRAMA_C_SOURCES) -then -report
+
+# Metrics anlaysis
+# @todo Automatically analyze SLOC and CC to identify violations.
+metrics:
+	mkdir -p metrics
+	frama-c -c11 -metrics -metrics-by-function $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES) > \
+          metrics/software_metrics.txt
+
+# Value analysis
+# NOT WORKING YET SINCE NEEDS A MAIN ENTRY POINY
+value:
+	frama-c -c11 -val -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES) -slevel 16 -plevel 256
+
+# Frama-C GUI
+
+gui:
+	frama-c-gui -lib-entry -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
+
+# Generate LLVM bytecode
+
+%.bc: %.c $(SOFTWARE_SPECS)
+	mkdir -p bytecode;
+	$(CLANG) -emit-llvm -c -o $@ $<
+
+%.ll: %.c $(SOFTWARE_SPECS)
+	mkdir -p bytecode;
+	$(CLANG) -emit-llvm -S -c -o $@ $<
+
+bytecode/all.bc: $(BC_OBJS)
+	$(LLVM_LINK) -o=bytecode/all.bc $^
+	rm -f $^
+	
+bytecode/all.ll: $(LL_OBJS)
+	mv $(LL_OBJS) bytecode
+
+bytecode: bytecode/all.bc bytecode/all.ll
+
+# Perform verification with SAW
+# TBD
+#saw: bytecode/all.bc $(SOFTWARE).saw
+#	saw $(SOFTWARE).saw
+
+TAGS:	$(SOFTWARE_SOURCES)
+	etags --declarations $(SOFTWARE_SOURCES)
+
+# Clean up the build
+clean:
+	rm -f *~
+	rm -f *.o *.bc
+	rm -f *_annot[0-9].c *_annot.c
+	rm -f *.gch
+	rm -f Requirements Dependencies
+	rm -f $(SOFTWARE)_main $(SOFTWARE)_main-$(BIN_SUFFIX) $(SOFTWARE)_bottom
+	rm -f $(SOFTWARE)*-debug-*
+	rm -f TAGS
+	rm -rf .frama-c
+	rm -f *_metrics.txt *_metrics.html
+	rm -f *_rte.c
+	rm -f *.map
+	rm -rf *.dSYM
+	rm -f *.log
+	rm -f *x86 *riscv
+	rm -rf metrics
+
