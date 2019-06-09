@@ -35,13 +35,13 @@ SOFTWARE_SPECS := logging.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL subset and are intended for verification
 # with the Frama-C plugins
-FRAMA_C_SOURCES := logging_main.c
+#FRAMA_C_SOURCES := logging_main.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
 SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) logging.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
-MAIN_ENTRY_POINT := ballot_box_main_loop
+#MAIN_ENTRY_POINT := to be defined
 
 # Assume we only want to run SAW on Frama-C code, so...
 BC_OBJS  = $(FRAMA_C_SOURCES:.c=.bc)
@@ -76,7 +76,7 @@ metrics:
 # Value analysis
 # NOT WORKING YET SINCE NEEDS A MAIN ENTRY POINY
 value:
-	frama-c -c11 -val -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES) -slevel 16 -plevel 256
+#	frama-c -c11 -val -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES) -slevel 16 -plevel 256
 
 # Frama-C GUI
 
