@@ -31,14 +31,14 @@ endif
 FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V -D__riscv_xlen=32"
 
 # These lists will grow as the software is developed and modules are added.
-SOFTWARE_SPECS := sbb.h
+SOFTWARE_SPECS := logging.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL subset and are intended for verification
 # with the Frama-C plugins
-FRAMA_C_SOURCES := sbb_main.c
+FRAMA_C_SOURCES := logging_main.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) sbb.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) logging.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 MAIN_ENTRY_POINT := ballot_box_main_loop
