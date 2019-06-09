@@ -22,61 +22,81 @@ extern char *not_a_valid_barcode_text;
 extern char *no_barcode_text;
 extern char *remove_ballot_text;
 
-/**
- * Initialize peripherals
- */
 void initialize(void);
 
-void perform_tabulation(void);
-
+//@ assigns \nothing;
 bool is_barcode_valid(barcode the_barcode, barcode_length its_length);
 
+//@ assigns \nothing;
 bool is_cast_button_pressed(void);
 
+//@ assigns \nothing;
 bool is_spoil_button_pressed(void);
 
+//@ assigns \nothing;
 bool has_a_barcode(void);
 
+//@ assigns \nothing;
 void just_received_barcode(void);
 
+//@ assigns \nothing;
 void set_received_barcode(barcode the_barcode, barcode_length its_length);
 
+//@ assigns \nothing;
 void what_is_the_barcode(barcode the_barcode, barcode_length its_length);
 
+//@ assigns \nothing;
 void spoil_button_light_on(void);
 
+//@ assigns \nothing;
 void spoil_button_light_off(void);
 
+//@ assigns \nothing;
 void cast_button_light_on(void);
 
+//@ assigns \nothing;
 void cast_button_light_off(void);
 
+//@ assigns \nothing;
 void move_motor_forward(void);
 
+//@ assigns \nothing;
 void move_motor_back(void);
 
+//@ assigns \nothing;
 void stop_motor(void);
 
+//@ assigns \nothing;
 void display_this_text(char *the_string_to_display, uint8_t its_length);
 
+//@ assigns \nothing;
 bool ballot_detected(void);
 
+//@ assigns \nothing;
 bool ballot_inserted(void);
 
+//@ assigns \nothing;
 void spoil_ballot(void);
 
+//@ assigns \nothing;
 void cast_ballot(void);
 
+//@ assigns \nothing;
 bool ballot_spoiled(void);
 
+//@ assigns \nothing;
 void go_to_standby(void);
 
+//@ assigns \nothing;
 void ballot_detect_timeout_reset(void);
 
+//@ assigns \nothing;
 bool ballot_detect_timeout_expired(void);
 
+//@ assigns \nothing;
 void cast_or_spoil_timeout_reset(void);
 
+//@ assigns \nothing;
 bool cast_or_spoil_timeout_expired(void);
 
 /**
