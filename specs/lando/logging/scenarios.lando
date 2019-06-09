@@ -29,12 +29,12 @@ description
 scenarion
   Append system event -- NORMAL
 description
-   Log system event into secure system log entry.
+   Log system event into secure system log file.
 
 scenarion
   Append  application entry -- NORMAL
 description
-   Log application entry into secure application log entry.
+   Log application entry into secure application log file.
 
 scenario
   Verify secure system log file
@@ -62,10 +62,10 @@ scenario
 scenario
  Import secure system log file
  description 
- Import secure system log file to device.
+ Import secure system log file from device.
 
 scenario
  Import secure application log file
  description 
- Import secure application log file to device.
+ Import secure application log file from device.
 
