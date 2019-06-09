@@ -17,13 +17,13 @@ subsystem Logging
 scenario
    Initialize secure system log file -- NORMAL
 description
-   Wait for corresponding message from SBB. Receive message and initialize 
+   Receive message from SBB and initialize 
    secure system log file. 
 
 scenario
    Initialize secure application log file -- NORMAL
 description
-   Wait for corresponding message from SBB. Receive message and initialize 
+   Receive message from SBB and initialize 
    secure application log file.
 
 scenarion
