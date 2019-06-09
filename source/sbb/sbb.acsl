@@ -8,40 +8,44 @@
 
 #include "sbb_t.h"
 
-// @design Frama-C does not support model variables, so we break the
-// abstraction barrier and characterize model state using concrete
-// implementation variables that are conditionally compiled.
+// @spec kiniry What follows is an algebraic description of the SBB hardware.
 
-#ifdef SPEC_DEBUG
-
-bool has_barcode;
-barcode current_barcode;
-bool cast_button;
-bool spoil_button;
-bool cast_button_light;
-bool spoil_button;
-bool motor_on;
-bool motor_forward;
-bool motor_backward;
-// @todo kiniry State names must be extracted from ASMs.
-typedef enum { INIT, STOP } sbb_state
-sbb_state state;
+/*@ axiomatic button {
+  @   type button = down | up;
+  @ }
+  @ axiomatic light {
+  @   type light = lit | dark;
+  @ }
+  @ axiomatic barcode_present {
+  @   type has_barcode = yes | no;
+  @ }
+  @ axiomatic motor {
+  @   type motor = forward | backward | off;
+  @ }
+  @ axiomatic SBB_hardware {
+  @   type cast_button = button;
+  @   type spoil_button = button;
+  @   type cast_button_light = light;
+  @   type spoil_button_light = light;
+  @   type paper_feed_motor = motor;
+  @   logic boolean lights_off(cast_button_light cbl, spoil_button_light sbl) =
+  @     cbl == dark && sbl == dark;
+  @   logic boolean buttons_up(cast_button cb, spoil_button sb) =
+  @     cb == up && sb == up;
+  @   logic boolean motor_running(motor m) = m != off;
+  @ }
+*/
 
 // @design kiniry Note that when the SBB is powered on, a ballot paper
 // may be inside of the device.  We cannot make assumptions about
 // initial button state as they may get physically stuck or someone
 // can hold them down during reset.
 
-/*@
-  predicate lights_off = !cast_button_light && !spoil_button_light;
-  predicate buttons_up = !cast_button && !spoil_button;
-  predicate motor_running = motor_forward || motor_backward;
-  predicate initial_state = lights_off && !motor_on && state == INIT;
-@*/
-
-//@ global invariant oneway_motor: !(motor_forward && motor_backward);
-//@ global invariant start_state: \at(initial_state, Init);
-
-#endif
+/*@ global invariant buttons_initial_state:
+  @   \forall cast_button_light cbl, spoil_button_light sbl;
+  @   \at(lights_off(cbl, sbl), Init);
+  @ global invariant motor_initial_state: \forall motor m;
+  @   \at(!motor_running(m), Init);
+*/
 
 #endif

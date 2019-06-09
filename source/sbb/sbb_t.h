@@ -20,4 +20,8 @@ typedef uint8_t barcode_length;
 // @review kiniry Should we introduce a string type?
 typedef char* string;
 
+// @todo kiniry State names must be extracted from ASMs.
+typedef enum { INIT, STOP } sbb_state;
+sbb_state state;
+
 #endif
