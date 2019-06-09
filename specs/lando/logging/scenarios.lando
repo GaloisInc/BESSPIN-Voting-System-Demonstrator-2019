@@ -1,0 +1,71 @@
+subsystem Logging
+// logging scenarios
+  indexing
+    owner: Dragan Stosic <dragan.stosic@freeandfair.us>
+    contributors: Rod Chapman <rod.chapman@freeandfair.us>
+      Dan Zimmerman <dmz@freeandfair.us>
+   effort estimates for design, implementation, and assurance work
+        design/implementation: 1 week
+        assurance: 1 week
+    complexity estimates (low, medium, high)
+        medium
+    risk levels (low, medium, high)
+        medium
+    mandatory dependencies elucidated
+        N/Ai
+
+scenario
+   Initialize secure system log file -- NORMAL
+description
+   Wait for corresponding message from SBB. Receive message and initialize 
+   secure system log file. 
+
+scenario
+   Initialize secure application log file -- NORMAL
+description
+   Wait for corresponding message from SBB. Receive message and initialize 
+   secure application log file.
+
+scenarion
+  Append system event -- NORMAL
+description
+   Log system event into secure system log entry.
+
+scenarion
+  Append  application entry -- NORMAL
+description
+   Log application entry into secure application log entry.
+
+scenario
+  Verify secure system log file
+description 
+ Verify that secure system log file is well-formed wrt correctness properties in its configuration.
+ Verify that secure system log file is secure wrt the security properties in its configuration.
+
+scenario
+   Verify secure application log file
+description
+  Verify that secure application log file is well-formed wrt correctness properties in its configuration.
+  Verify that secure  application log file is secure wrt the security properties in its configuration.
+
+scenario
+ Export secure system log file
+ description 
+ Export secure system log file to device.
+
+scenario
+ Export secure application log file
+ description 
+ Export secure application log file to device.
+
+
+scenario
+ Import secure system log file
+ description 
+ Import secure system log file to device.
+
+scenario
+ Import secure application log file
+ description 
+ Import secure application log file to device.
+
