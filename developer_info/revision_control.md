@@ -18,7 +18,7 @@ The BESSPIN Voting System project uses Git for revision control. Currently, we a
    you haven't already). Remove any `wip` label and add the `ready for review`
    label.
 6. Typically, at least one _other_ person must review any changes to the `master`
-   branch and approve it via the GitHub PR interface comments. A
+   branch and approve it via the GitLab PR interface comments. A
    _reviewer_ should check that all necessary comments are addressed.
 7. Before it can be merged, you will generally have to `rebase` your
    branch on to the `master` branch in order to preserve a clean commit
