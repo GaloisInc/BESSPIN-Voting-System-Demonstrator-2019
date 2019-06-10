@@ -28,7 +28,19 @@ else
 endif
 
 
-FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V -D__riscv_xlen=32"
+FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
+FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
+
+INCLUDES = \
+	-I. \
+	-I$(FREERTOS_DEMO_DIR) \
+	-I$(FREERTOS_SOURCE_DIR)/include \
+	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
+	-I$(FREERTOS_DEMO_DIR)/demo \
+	-I$(FREERTOS_DEMO_DIR)/bsp \
+	-I$(FREERTOS_DEMO_DIR)/devices
+
+FRAMA_C_INCLUDES=-cpp-extra-args="$(INCLUDES) -D__riscv_xlen=32"
 
 # These lists will grow as the software is developed and modules are added.
 SOFTWARE_SPECS := sbb.h
@@ -73,15 +85,33 @@ metrics:
 	frama-c -c11 -metrics -metrics-by-function $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES) > \
           metrics/software_metrics.txt
 
-# Value analysis
-# NOT WORKING YET SINCE NEEDS A MAIN ENTRY POINY
+
+# Enhanced Value (EVA) analysis
+
+# Analytical depth options for EVA. To be revised for Frama-C v19
+EVA_DEPTH_OPTIONS = -slevel 16 -plevel 256
+
+EVA_RESULTS  = $(FRAMA_C_SOURCES:.c=.evar)
+$(EVA_RESULTS) : $(FRAMA_C_SOURCES) $(SOFTWARE_SPECS)
+
+# To get EVA results for a single unit X.c, do
+#  make -f Makefile.verification X.evar
+#
+# Note: EVA needs a main entry point function, so we always append sbb_main.c no matter what...
+%.evar: %.c $(SOFTWARE_SPECS)
+	frama-c -c11 -eva -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(EVA_DEPTH_OPTIONS) $< sbb_main.c >$@
+
+# EVA Analysis of all modules
 value:
-	frama-c -c11 -val -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES) -slevel 16 -plevel 256
+	frama-c -c11 -eva -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(EVA_DEPTH_OPTIONS) $(FRAMA_C_SOURCES)
+
+
 
 # Frama-C GUI
-
 gui:
 	frama-c-gui -lib-entry -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
+
+
 
 # Generate LLVM bytecode
 
