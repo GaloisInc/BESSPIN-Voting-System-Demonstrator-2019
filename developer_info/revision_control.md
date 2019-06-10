@@ -18,7 +18,7 @@ The BESSPIN Voting System project uses Git for revision control. Currently, we a
    you haven't already). Remove any `wip` label and add the `ready for review`
    label.
 6. Typically, at least one _other_ person must review any changes to the `master`
-   branch and approve it via the GitLab PR interface comments. A
+   branch and approve it via the GitLab MR interface comments. A
    _reviewer_ should check that all necessary comments are addressed.
 7. Before it can be merged, you will generally have to `rebase` your
    branch on to the `master` branch in order to preserve a clean commit
@@ -36,10 +36,10 @@ The BESSPIN Voting System project uses Git for revision control. Currently, we a
    [The Dark Side of the Force Push - Will Anderson](http://willi.am/blog/2014/08/12/the-dark-side-of-the-force-push/)
    and [--force considered harmful; understanding git's --force-with-lease - Atlassian Developers](https://developer.atlassian.com/blog/2015/04/force-with-lease/)
 9. Once it has been rebased, a _reviewer_ with merge permissions can merge 
-   the PR using the GitLab "Merge" button, _without_ selecting "Squash commits".
+   the MR using the GitLab "Merge" button, _without_ selecting "Squash commits".
    This will introduce an _unsigned_ merge commit, but
    preserve the signatures, if any, on the actual branch's commits. 
-10. Finally, the PR submitter, not the reviewer, should delete the merged
+10. Finally, the MR submitter, not the reviewer, should delete the merged
    branch from both their local repository and GitLab. If more work is to be done
    continuing from the branch, a new branch should be created.
 
@@ -56,8 +56,8 @@ The BESSPIN Voting System project uses Git for revision control. Currently, we a
   with the amendment that on this project, we have adopted the
   convention of ending the subject line with a period.
 - Keep your topic branches small to facilitate review.
-- Before merging someone else's PR, make sure other reviewers'
-  comments are resolved, and that the PR author considers the PR ready
+- Before merging someone else's MR, make sure other reviewers'
+  comments are resolved, and that the MR author considers the MR ready
   to merge.
 - For security-sensitive code, ensure your changes have received an
   in-depth review, preferably from multiple reviewers.
