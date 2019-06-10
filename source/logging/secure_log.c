@@ -8,5 +8,4 @@
 #include <string.h>
 
 // Subsystem includes
-#include "logging.h"
-
+#include "secure_log.h"

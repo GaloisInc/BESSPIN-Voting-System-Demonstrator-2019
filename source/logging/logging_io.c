@@ -7,6 +7,4 @@
 #include <stdio.h>
 #include <string.h>
 
-// Subsystem includes
-#include "logging.h"
-
+#include "logging_io.h"
