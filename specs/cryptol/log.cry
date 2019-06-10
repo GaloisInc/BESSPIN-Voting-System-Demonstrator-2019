@@ -1,0 +1,68 @@
+module Log where
+
+parameter
+    type HashSizeBytes : #
+
+    type constraint fin HashSizeBytes
+
+    hash : {n} (fin n) => [n][8] -> [HashSizeBytes][8]
+
+    hmac : {msgSizeBytes, keySizeBytes} (fin msgSizeBytes, fin keySizeBytes) =>
+        [keySizeBytes][8] ->
+        [msgSizeBytes][8] ->
+        [HashSizeBytes][8]
+
+type Log sizeBytes = {
+    message : [sizeBytes][8],
+    msgHash : [HashSizeBytes][8]
+}
+
+type LogFile maxSizeBites msgs = [msgs](Log maxSizeBites)
+
+//Message will be something from secure boot, not identified yet
+initialLogEntry : {msgSize, keySize, resultSize}
+                (fin msgSize, fin keySize, msgSize <= resultSize) =>
+    [keySize][8] -> [msgSize][8] -> Log resultSize
+initialLogEntry key msg = { message = (msg # zero), msgHash = hmac key msg}
+
+getLastHash : {sizeBytes, msgs} (fin msgs) => LogFile sizeBytes msgs -> [HashSizeBytes][8]
+getLastHash logs = (logs ! 0).msgHash
+
+updateLog : {msgSize, maxMsgSize, msgs}
+    (fin msgSize, msgSize <= maxMsgSize, fin msgs, fin maxMsgSize) =>
+    (LogFile maxMsgSize msgs) ->
+    [msgSize][8] ->
+    LogFile maxMsgSize (msgs + 1)
+updateLog log msg = log # [newEntry] where
+    paddedMsg = msg # zero
+    previousHash = getLastHash log
+    newEntry = {message = paddedMsg, msgHash = hash (paddedMsg # previousHash)}
+
+validFirstEntry : {msgSizeBytes, keySizeBytes}
+    (fin msgSizeBytes, fin keySizeBytes) =>
+    Log msgSizeBytes ->
+    [keySizeBytes][8] ->
+    Bit
+property validFirstEntry log key = log.msgHash == hmac key log.message
+
+validLogEntry : {msgSizeBytes}
+    (fin msgSizeBytes) =>
+    Log msgSizeBytes ->
+    [HashSizeBytes][8] ->
+    Bit
+property validLogEntry log prevHash =
+    log.msgHash == hash (log.message # prevHash)
+
+validLogFile : {maxMsgSize, keySize, msgs}
+    (fin maxMsgSize, fin keySize, fin msgs) =>
+    LogFile maxMsgSize msgs ->
+    [keySize][8] ->
+    Bit
+property validLogFile logFile key =
+    `msgs == (0 : [width msgs]) \/
+    (foldResult ! 0 where
+        foldResult = [validFirstEntry (logFile @ 0) key] #
+                        [prevValid /\ validLogEntry log (prevLog.msgHash)
+                            | log <- logFile
+                            | prevLog <- [zero] # logFile
+                            | prevValid <- foldResult])
