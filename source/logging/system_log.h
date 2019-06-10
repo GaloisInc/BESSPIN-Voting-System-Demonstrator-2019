@@ -8,6 +8,6 @@
 // General includes
 
 // Subsystem includes
-#include "secure_log.h"
+#include "secure_system_logging_t.h"
 
 #endif /* __SYSTEM_LOG__ */
