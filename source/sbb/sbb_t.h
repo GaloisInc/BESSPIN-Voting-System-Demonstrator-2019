@@ -27,29 +27,45 @@ typedef char* string;
 // distinct.  This means that ordering of declaration matters, so
 // please do not re-order these typedefs.
 
-typedef enum { UNKNOWN_CARD_STATE,
-               CARD_READY } sd_card_state;
-typedef enum { INITIALIZED=CARD_READY+1,
+typedef enum { UNKNOWN_SD_CARD_STATE,
+               SD_CARD_READY } sd_card_state;
+typedef enum { INITIALIZED = SD_CARD_READY+1,
                RUNNING,
                STOPPED } timer_state;
-typedef enum { MOTORS_OFF,
+typedef enum { MOTORS_OFF = STOPPED+1,
                MOTORS_TURNING_FORWARD,
                MOTORS_TURNING_BACKWARD} motor_state;
-typedef enum { INITIALIZATION,
+typedef enum { INITIALIZATION = MOTORS_TURNING_BACKWARD+1,
                INITIALIZED_DISPLAY,
                SHOWING_TEXT } display_state;
-typedef enum { EARLY_PAPER_DETECTED,
+typedef enum { EARLY_PAPER_DETECTED = SHOWING_TEXT+1,
                LATE_PAPER_DETECTED,
                EARLY_AND_LATE_DETECTED } paper_detect_state;
-typedef enum { ALL_BUTTONS_UP,
+typedef enum { ALL_BUTTONS_UP=EARLY_AND_LATE_DETECTED+1,
                SPOIL_BUTTON_DOWN,
-               CAST_BUTTON_DOWN } cast_spoil_state;
-typedef enum { BARCODE_NOT_PRESENT,
+               CAST_BUTTON_DOWN } buttons_state;
+typedef enum { BARCODE_NOT_PRESENT = CAST_BUTTON_DOWN+1,
                BARCODE_PRESENT_AND_RECORDED } barcode_scanner_state;
 // @design kiniry START and STOP are the top-level (superposed) start
 // and stop state for all ASMs.
-typedef enum { START, STOP } background_state;
+typedef enum { START = BARCODE_PRESENT_AND_RECORDED+1,
+               STOP } start_stop_state;
 
-// sbb_state state;
+// @design kiniry This is the record type that encodes the full
+// top-level set of states for the SBB.  Note that a C record type for
+// fields F, G encodes the tuple type (F, G) which is equivalent to
+// the product type F x G.
+typedef struct SBB_states {
+  sd_card_state C;
+  timer_state T;
+  motor_state M;
+  display_state D;
+  paper_detect_state P;
+  buttons_state B;
+  start_stop_state S;
+} SBB_state;
+
+// @design kiniry Here is the explicit encoding of the SBB state.
+SBB_state the_state;
 
 #endif
