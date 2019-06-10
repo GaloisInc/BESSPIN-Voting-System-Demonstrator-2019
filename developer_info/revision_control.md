@@ -7,14 +7,14 @@ This document defines the revision control practices to be used on the BESSPIN V
 The BESSPIN Voting System project uses Git for revision control. Currently, we are using Galois's externally-accessible GitLab server for hosting and code review. The development workflow is as follows:
 
 1. Locally, pull the latest changes on the `master` branch of the
-   upstream repo, hosted on GitHub.
+   upstream repository.
 2. Check out a new topic branch based on the above changes.
 3. Commit changes to your local branch.
 4. For the sake of visibility, you may open a work-in-progress Pull
    Request from your branch to `master`. If you do, add the `wip`
    label.
 5. When you are ready to merge to `master`, make sure your branch has
-   been pushed to the remote repository and open a Pull Request (if
+   been pushed to the upstream repository and open a Pull Request (if
    you haven't already). Remove any `wip` label and add the `ready for review`
    label.
 6. Typically, at least one _other_ person must review any changes to the `master`
