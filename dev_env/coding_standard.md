@@ -18,6 +18,12 @@ Frama-C/ACSL modules will be coded in the common intersection of the language su
 
 C modules will be coded in the intersection of the aforementioned Frama-C language subset (if said code is to be verified with any Frama-C plug-in) and the C language subset supported by our pinned version of SAW.
 
+## Mixing Frama-C and C99 code
+
+A Frama-C module can only #include a header file if that header file is also Frama-C, complying with the language subset implied above and containing appropriate ACSL contracts.
+
+Example: Predefined FreeRTOS modules, such as ff.h, as _not_ Frama-C compatible (and probably never will be) and therefore cannot be included and called directly from Frama-C code. To call such units, a "thick binding" module must be created that provides a Frama-C friendly API onto the underlying module.
+
 ## Coding Rules
 
 As far as possible, code will comply with:
@@ -56,4 +62,3 @@ The size and complexity of code modules will be measured using the `Sloc` measur
 The following guidelines should be attended to with regard to code size and complexity:
  - functions should have fewer than 20 NCSS (Non-Commenting Source Statements), and
  - functions should have a McCabe cyclomatic complexity of no greater than 5.
-
