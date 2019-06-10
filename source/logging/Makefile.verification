@@ -43,17 +43,17 @@ INCLUDES = \
 FRAMA_C_INCLUDES=-cpp-extra-args="$(INCLUDES) -D__riscv_xlen=32"
 
 # These lists will grow as the software is developed and modules are added.
-SOFTWARE_SPECS := logging.h
+SOFTWARE_SPECS := log.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL subset and are intended for verification
 # with the Frama-C plugins
-#FRAMA_C_SOURCES := logging_main.c
+#FRAMA_C_SOURCES := log_main.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) logging.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) log.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
-# MAIN_ENTRY_POINT := logging_main_loop
+# MAIN_ENTRY_POINT := log_main_loop
 
 # Assume we only want to run SAW on Frama-C code, so...
 BC_OBJS  = $(FRAMA_C_SOURCES:.c=.bc)

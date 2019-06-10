@@ -1,10 +1,10 @@
 /**
  * Smart Ballot Logging Types
- * @refine logging.lando
+ * @refine log.lando
  */
 
-#ifndef __LOGGING_T__
-#define __LOGGING_T__
+#ifndef __LOG_T__
+#define __LOG_T__
 
 #include <stddef.h>
 #include <stdbool.h>

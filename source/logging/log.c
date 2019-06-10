@@ -1,10 +1,12 @@
 /**
  * Smart Ballot Box API
- * @refine logging.lando
+ * @refine log.lando
  */
 
 // General includes
 #include <stdio.h>
 #include <string.h>
 
-#include "logging_io.h"
+// Subsystem includes
+#include "log.h"
+

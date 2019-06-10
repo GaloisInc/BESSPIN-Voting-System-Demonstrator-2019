@@ -1,5 +1,5 @@
 subsystem Logging
-// logging events
+// log events
   indexing
     owner: Dragan Stosic <dragan.stosic@freeandfair.us>
     contributors: Rod Chapman <rod.chapman@freeandfair.us>

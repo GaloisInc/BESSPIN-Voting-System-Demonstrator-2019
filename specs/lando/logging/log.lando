@@ -1,5 +1,5 @@
 subsystem Logging
-// logging components and behavior
+// log components and behavior
   indexing
     owner: Dragan Stosic <dragan.stosic@freeandfair.us>
     contributors: Rod Chapman <rod.chapman@freeandfair.us>

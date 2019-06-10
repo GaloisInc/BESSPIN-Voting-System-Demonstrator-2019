@@ -1,12 +1,12 @@
 /**
  * Smart Ballot Box ACSL specification
- * @refine sbb_security.lando
+ * @refine log.lando
  */
 
-#ifndef __LOGGING_API_ACSL__
-#define __LOGGING_API_ACSL__
+#ifndef __LOG_API_ACSL__
+#define __LOG_API_ACSL__
 
-#include "logging_t.h"
+#include "log_t.h"
 
 // @design Frama-C does not support model variables, so we break the
 // abstraction barrier and characterize model state using concrete

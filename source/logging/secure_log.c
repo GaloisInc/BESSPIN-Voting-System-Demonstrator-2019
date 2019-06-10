@@ -1,6 +1,6 @@
 /**
  * Smart Ballot Box API
- * @refine logging.lando
+ * @refine log.lando
  */
 
 // General includes
