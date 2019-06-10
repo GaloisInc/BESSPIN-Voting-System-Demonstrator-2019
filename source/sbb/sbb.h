@@ -13,6 +13,7 @@
 #include "sbb_t.h"
 
 // Aux
+// @review kiniry Aren't these consts?
 extern char *insert_ballot_text;
 extern char *barcode_detected_text;
 extern char *cast_or_spoil_text;
@@ -24,6 +25,7 @@ extern char *remove_ballot_text;
 
 void initialize(void);
 
+// requires \valid(the_barcode + (0..its_length));
 //@ assigns \nothing;
 bool is_barcode_valid(barcode the_barcode, barcode_length its_length);
 
@@ -39,14 +41,17 @@ bool has_a_barcode(void);
 //@ assigns \nothing;
 void just_received_barcode(void);
 
+// requires \valid(the_barcode + (0..its_length));
 //@ assigns \nothing;
 void set_received_barcode(barcode the_barcode, barcode_length its_length);
 
+// requires \valid(the_barcode + (0..its_length));
 //@ assigns \nothing;
 void what_is_the_barcode(barcode the_barcode, barcode_length its_length);
 
 //@ assigns \nothing;
 void spoil_button_light_on(void);
+
 
 //@ assigns \nothing;
 void spoil_button_light_off(void);
@@ -66,6 +71,7 @@ void move_motor_back(void);
 //@ assigns \nothing;
 void stop_motor(void);
 
+// requires \valid(the_string_to_display + (0..its_length));
 //@ assigns \nothing;
 void display_this_text(char *the_string_to_display, uint8_t its_length);
 
