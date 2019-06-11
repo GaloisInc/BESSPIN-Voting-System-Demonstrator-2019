@@ -67,7 +67,7 @@
   @     (cbl == lit) <==> (sbl == lit);
   @*/
 
-xo/*@ global invariant Motor_enabled_condition:
+/*@ global invariant Motor_enabled_condition:
   @   \forall motor m, paper_present p;
   @      (m != off) <==> (p != none);
   @*/
