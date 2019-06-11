@@ -11,6 +11,7 @@
 
 // Subsystem includes
 #include "sbb_t.h"
+#include "sbb.acsl"
 
 // Aux
 // @review kiniry Aren't these consts?
@@ -32,6 +33,24 @@ extern SBB_state the_state;
 // memory regions are distinct.
 typedef bool firmware_state;
 extern firmware_state the_firmware_state;
+
+// @spec abakst Specifications needed for for hardware, related to the above
+//       I think we probably want some ghost uint8 array
+//       to model these reads/writes
+extern uint8_t gpio_mem[8];
+// Motor defines
+#define MOTOR_0 4
+#define MOTOR_1 5
+
+/*@ assigns \nothing; */
+uint8_t gpio_read(uint8_t i);
+
+/*@ assigns gpio_mem[i]; */
+void    gpio_write(uint8_t i);
+
+/*@ assigns gpio_mem[i]; */
+void    gpio_clear(uint8_t i);
+
 
 // @design kiniry I am presuming that this function must be called
 // prior to any other function and guarantees that all devices are put
@@ -63,7 +82,7 @@ void initialize(void);
   @ requires the_state.P == EARLY_AND_LATE_DETECTED;
   @ assigns \nothing;
 */
-bool is_barcode_valid(barcode the_barcode, barcode_length its_length);
+bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.B == CAST_BUTTON_DOWN);
@@ -93,7 +112,7 @@ bool has_a_barcode(void);
 // ensures (* the model barcode is written to the_barcode *)
 // @design kiniry Should this function return the number of bytes in
 // the resulting barcode?
-void what_is_the_barcode(barcode the_barcode, barcode_length its_length);
+void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
 // @review kiniry We have no ASM for button light states.
 /*@ assigns the_state.button_illumination;
@@ -116,17 +135,23 @@ void cast_button_light_on(void);
 */
 void cast_button_light_off(void);
 
-/*@ assigns the_state.M;
+/*@ assigns the_state.M,
+            gpio_mem[MOTOR_0],
+            gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_TURNING_FORWARD;
 */
 void move_motor_forward(void);
 
-/*@ assigns the_state.M;
+/*@ assigns the_state.M,
+            gpio_mem[MOTOR_0],
+            gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_TURNING_BACKWARD;
 */
 void move_motor_back(void);
 
-/*@ assigns the_state.M;
+/*@ assigns the_state.M,
+            gpio_mem[MOTOR_0],
+            gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_OFF;
 */
 void stop_motor(void);
@@ -134,18 +159,20 @@ void stop_motor(void);
 // @design kiniry What is the memory map for the display?  We should
 // be able to specify, both at the model and code level, what is on
 // the display.
-/*@ requires \valid_read(the_string_to_display + (0..its_length));
+
+/*@ requires \valid_read(str+(0..len));
   @ assigns the_state.D;
   @ ensures the_state.D == SHOWING_TEXT;
 */
-void display_this_text(char* the_string_to_display, uint8_t its_length);
+void display_this_text(char* str, uint8_t len);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.P == EARLY_PAPER_DETECTED);
 */
 bool ballot_detected(void);
 
-/*@ assigns \nothing;
+/*@ requires (the_state.P == EARLY_PAPER_DETECTED);
+  @ assigns \nothing;
   @ ensures \result == (the_state.P == EARLY_AND_LATE_DETECTED);
 */
 bool ballot_inserted(void);

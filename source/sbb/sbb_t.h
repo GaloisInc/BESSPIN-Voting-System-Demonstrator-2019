@@ -12,13 +12,13 @@
 
 #define BARCODE_MAX_LENGTH 16
 
-typedef char* barcode;
+typedef char* barcode_t;
 // @todo kiniry Add a pure helper function for relating
 // BARCODE_MAX_LENGTH to all uses of the pair (barcode,
 // barcode_length).
-typedef uint8_t barcode_length;
+typedef uint8_t barcode_length_t;
 // @review kiniry Should we introduce a string type?
-typedef char* string;
+typedef char* string_t;
 
 // @todo kiniry State names must be extracted from ASMs.
 

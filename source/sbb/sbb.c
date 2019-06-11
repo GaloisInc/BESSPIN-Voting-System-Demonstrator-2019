@@ -14,14 +14,9 @@
 
 // Subsystem includes
 #include "sbb.h"
-
 // BESSPIN Voting System devices
 #include "gpio.h"
 #include "serLcd.h"
-
-// Motor defines
-#define MOTOR_0 4
-#define MOTOR_1 5
 
 // Timeouts
 #define BALLOT_DETECT_TIMEOUT_MS 6000
@@ -44,6 +39,7 @@ bool barcode_present = false;
 char barcode[BARCODE_MAX_LENGTH] = {0};
 SemaphoreHandle_t barcode_mutex;
 
+
 void initialize(void) {
   gpio_set_as_input(BUTTON_CAST_IN);
   gpio_set_as_input(BUTTON_SPOIL_IN);
@@ -58,30 +54,36 @@ void initialize(void) {
   DevicesInitialized: return;  
 }
 
-/*@ global invariant Button_lighting_conditions_power_on:
-  @   \forall cast_button_light cbl, spoil_button_light sbl;
-  @     \at(lights_off(cbl, sbl), DevicesInitialized);
-  @*/
+/* global invariant Button_lighting_conditions_power_on:
+     \forall cast_button_light cbl, spoil_button_light sbl;
+       \at(lights_off(cbl, sbl), DevicesInitialized);
+  */
 
-/*@ global invariant Paper_ejected_on_power_on:
-  @   \forall paper_present p; \at(p == none, DevicesInitialized);
-  @*/
+/* global invariant Paper_ejected_on_power_on:
+     \forall paper_present p; \at(p == none, DevicesInitialized);
+  */
 
-/*@ global invariant Motor_initial_state:
-  @   \forall motor m; \at(!motor_running(m), DevicesInitialized);
-  @*/
+/* global invariant Motor_initial_state:
+     \forall motor m; \at(!motor_running(m), DevicesInitialized);
+  */
 
 void perform_tabulation(void) { printf("Performing tabulation!\r\n"); }
 
-bool is_barcode_valid(barcode the_barcode, barcode_length its_length) {
-  (void)str;
-  (void)len;
+bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
+  (void)the_barcode;
+  (void)its_length;
   return true;
 }
 
-bool is_cast_button_pressed(void) { return gpio_read(BUTTON_CAST_IN); }
+bool is_cast_button_pressed(void) {
+  return gpio_read(BUTTON_CAST_IN);
+}
 
-bool is_spoil_button_pressed(void) { return gpio_read(BUTTON_SPOIL_IN); }
+bool is_spoil_button_pressed(void) {
+  bool pressed = gpio_read(BUTTON_CAST_IN);
+  the_state.B  = pressed ? SPOIL_BUTTON_DOWN : the_state.B;
+  return pressed;
+}
 
 void just_received_barcode(void) {
   if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
@@ -90,7 +92,7 @@ void just_received_barcode(void) {
   }
 }
 
-void set_received_barcode(barcode the_barcode, barcode_length its_length) {
+void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
   configASSERT(its_length <= BARCODE_MAX_LENGTH);
   if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
     memcpy(barcode, the_barcode, its_length);
@@ -107,7 +109,7 @@ bool has_a_barcode(void) {
   return val;
 }
 
-void what_is_the_barcode(barcode the_barcode, barcode_length its_length) {
+void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length) {
   configASSERT(its_length <= BARCODE_MAX_LENGTH);
   if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
     memcpy(the_barcode, barcode, its_length);
@@ -126,23 +128,30 @@ void cast_button_light_off(void) { gpio_clear(BUTTON_CAST_LED); }
 void move_motor_forward(void) {
   gpio_write(MOTOR_0);
   gpio_clear(MOTOR_1);
+  the_state.M = MOTORS_TURNING_FORWARD;
 }
 
 void move_motor_back(void) {
   gpio_clear(MOTOR_0);
   gpio_write(MOTOR_1);
+  the_state.M = MOTORS_TURNING_BACKWARD;
 }
 
 void stop_motor(void) {
   gpio_clear(MOTOR_0);
   gpio_clear(MOTOR_1);
+  the_state.M = MOTORS_OFF;
 }
 
-void display_this_text(char *str, uint8_t len) { serLcdPrintf(str, len); }
+void display_this_text(char *str, uint8_t len) {
+  serLcdPrintf(str, len);
+}
 
 bool ballot_detected(void) { return gpio_read(PAPER_SENSOR_IN); }
 
-bool ballot_inserted(void) { return gpio_read(PAPER_SENSOR_OUT); }
+bool ballot_inserted(void) {
+  return gpio_read(PAPER_SENSOR_OUT);
+}
 
 void spoil_ballot(void) {
   move_motor_back();
