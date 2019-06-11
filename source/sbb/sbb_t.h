@@ -48,9 +48,17 @@ typedef enum { ALL_BUTTONS_UP=EARLY_AND_LATE_DETECTED+1,
                CAST_BUTTON_DOWN } buttons_state;
 typedef enum { BARCODE_NOT_PRESENT = CAST_BUTTON_DOWN+1,
                BARCODE_PRESENT_AND_RECORDED } barcode_scanner_state;
+typedef enum { WAIT_FOR_BALLOT = BARCODE_PRESENT_AND_RECORDED+1,
+               FEED_BALLOT,
+               BARCODE_DETECTED,
+               BARCODE_VALIDATED,
+               CAST,
+               SPOIL,
+               WAIT_FOR_SPOIL,
+             } logic_state;
 // @design kiniry START and STOP are the top-level (superposed) start
 // and stop state for all ASMs.
-typedef enum { START = BARCODE_PRESENT_AND_RECORDED+1,
+typedef enum { START = WAIT_FOR_SPOIL+1,
                INNER,
                STOP } start_stop_state;
 
@@ -67,6 +75,7 @@ typedef struct SBB_states {
   buttons_state B;
   barcode_scanner_state BS;
   start_stop_state S;
+  logic_state L;
   // @design kiniry We encode button illumination state with a 2 bit
   // wide struct bitfield.  This encoding will help test our clang and
   // secure complication of such an out-of-the-ordinary C construct.
