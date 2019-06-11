@@ -52,10 +52,15 @@ extern firmware_state the_firmware_state;
 /*@ assigns the_firmware_state;
 */
 // @todo Should immediately transition to `go_to_standby()`.
+// @assurance kiniry The implementation of `initialize` must have a
+// the C label `DevicesInitialized` on its final statement.
 void initialize(void);
 
-// @review kiniry ...for the election.
+// @review kiniry Needs a postcondition that states that the currently
+// held ballot is a legal ballot for the election, as soon as the crypto
+// spec is ready for use.
 /*@ requires \valid(the_barcode + (0..its_length));
+  @ requires the_state.P == EARLY_AND_LATE_DETECTED;
   @ assigns \nothing;
 */
 bool is_barcode_valid(barcode the_barcode, barcode_length its_length);

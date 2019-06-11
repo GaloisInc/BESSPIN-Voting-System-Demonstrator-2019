@@ -8,7 +8,10 @@
 
 #include "sbb_t.h"
 
-// @spec kiniry What follows is an algebraic description of the SBB hardware.
+// @spec kiniry What follows is an algebraic description of the SBB
+// hardware.  The predicates in `SBB_hardware` are used to define the
+// refinement relation between the axiomatic model and the concrete
+// implementation of the ASM.
 
 /*@ axiomatic button {
   @   type button = down | up;
@@ -18,6 +21,9 @@
   @ }
   @ axiomatic barcode_present {
   @   type has_barcode = yes | no;
+  @ }
+  @ axiomatic paper_detect {
+  @   type paper_present = early | late | none;
   @ }
   @ axiomatic motor {
   @   type motor = forward | backward | off;
@@ -35,7 +41,7 @@
   @   predicate buttons_up(cast_button cb, spoil_button sb, SBB_state S) =
   @     (cb == up && sb == up) <==> (S.B == ALL_BUTTONS_UP);
   @   predicate motor_running(motor m, SBB_state S) =
-        (m != off) <==> (S.M.MOTORS_TURNING_FORWARD);
+  @     (m != off) <==> (S.M == MOTORS_TURNING_FORWARD);
   @ }
 */
 
@@ -43,13 +49,27 @@
 // may be inside of the device.  We cannot make assumptions about
 // initial button state as they may get physically stuck or someone
 // can hold them down during reset.  This spec is currently not quite
-// right because it will only hold after `initialize()` is called.
+// right because it will only hold after `initialize` is called.
 
-/*  global invariant buttons_initial_state:
+// @design kiniry The spec has been refined so that `initialize` calls
+// `go_to_standby` which guarantees that the paper path is clear.
+
+// @assurance kiniry Recall that the `Init` state holds just after all
+// static initialization is complete.
+
+// @todo kiniry We do not yet have a model for the barcode, so this
+// invariant is currently elided.
+//  global invariant Button_lighting_conditions_ballot:
+//    cast_button_light_on() <==> is_barcode_valid(..);
+
+/*@ global invariant Button_lighting_conditions_jointness:
   @   \forall cast_button_light cbl, spoil_button_light sbl;
-  @   \at(lights_off(cbl, sbl), Init);
-  @ global invariant motor_initial_state: \forall motor m;
-  @   \at(!motor_running(m), Init);
-*/
+  @     (cbl == lit) <==> (sbl == lit);
+  @*/
+
+xo/*@ global invariant Motor_enabled_condition:
+  @   \forall motor m, paper_present p;
+  @      (m != off) <==> (p != none);
+  @*/
 
 #endif

@@ -17,3 +17,22 @@ is rejected and returned to the user.
 
 Barcodes have limited information density.
 The maximum length of a barcode is 16 bytes, which is 128 bits.
+
+Button lighting conditions: ballot.
+Cast and spoil buttons are only lit when a ballot is present.
+
+Button lighting conditions: jointness.
+Cast and spoil buttons are either both lit, or are both dark.
+
+Button lighting conditions: power on.
+Cast and spoil buttons are both dark after a power on/reset.
+
+Paper ejected on power on.
+After SBB is powered on and initalized, if there is paper present in
+the paper feeder, it is ejected.
+
+Motor initial state.
+After the SBB is powered on and initialized, its motor is off.
+
+Motor enabled condition.
+The motor is only enabled when paper is present and detected.

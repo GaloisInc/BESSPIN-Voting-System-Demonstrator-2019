@@ -55,7 +55,21 @@ void initialize(void) {
   gpio_set_as_output(BUTTON_SPOIL_LED);
   
   barcode_mutex = xSemaphoreCreateMutex();
+  DevicesInitialized: return;  
 }
+
+/*@ global invariant Button_lighting_conditions_power_on:
+  @   \forall cast_button_light cbl, spoil_button_light sbl;
+  @     \at(lights_off(cbl, sbl), DevicesInitialized);
+  @*/
+
+/*@ global invariant Paper_ejected_on_power_on:
+  @   \forall paper_present p; \at(p == none, DevicesInitialized);
+  @*/
+
+/*@ global invariant Motor_initial_state:
+  @   \forall motor m; \at(!motor_running(m), DevicesInitialized);
+  @*/
 
 void perform_tabulation(void) { printf("Performing tabulation!\r\n"); }
 
