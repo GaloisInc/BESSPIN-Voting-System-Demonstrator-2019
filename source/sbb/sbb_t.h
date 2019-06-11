@@ -38,7 +38,9 @@ typedef enum { MOTORS_OFF = STOPPED+1,
 typedef enum { INITIALIZATION = MOTORS_TURNING_BACKWARD+1,
                INITIALIZED_DISPLAY,
                SHOWING_TEXT } display_state;
-typedef enum { EARLY_PAPER_DETECTED = SHOWING_TEXT+1,
+// @review kiniry We are missing a NO_PAPER_DETECTED state.
+typedef enum { NO_PAPER_DETECTED = SHOWING_TEXT+1,
+               EARLY_PAPER_DETECTED,
                LATE_PAPER_DETECTED,
                EARLY_AND_LATE_DETECTED } paper_detect_state;
 typedef enum { ALL_BUTTONS_UP=EARLY_AND_LATE_DETECTED+1,
@@ -49,6 +51,7 @@ typedef enum { BARCODE_NOT_PRESENT = CAST_BUTTON_DOWN+1,
 // @design kiniry START and STOP are the top-level (superposed) start
 // and stop state for all ASMs.
 typedef enum { START = BARCODE_PRESENT_AND_RECORDED+1,
+               INNER,
                STOP } start_stop_state;
 
 // @design kiniry This is the record type that encodes the full
@@ -62,10 +65,16 @@ typedef struct SBB_states {
   display_state D;
   paper_detect_state P;
   buttons_state B;
+  barcode_scanner_state BS;
   start_stop_state S;
+  // @design kiniry We encode button illumination state with a 2 bit
+  // wide struct bitfield.  This encoding will help test our clang and
+  // secure complication of such an out-of-the-ordinary C construct.
+  uint8_t button_illumination: 2;
 } SBB_state;
 
-// @design kiniry Here is the explicit encoding of the SBB state.
-SBB_state the_state;
+#define cast_button_lit(s) (s.button_illumination & 0x0)
+#define spoil_button_lit(s) (s.button_illumination & 0x1)
+#define no_buttons_lit(s) !(cast_button_lit(s) || spoil_button_lit(s))
 
 #endif

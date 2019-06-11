@@ -39,7 +39,8 @@
 // @design kiniry Note that when the SBB is powered on, a ballot paper
 // may be inside of the device.  We cannot make assumptions about
 // initial button state as they may get physically stuck or someone
-// can hold them down during reset.
+// can hold them down during reset.  This spec is currently not quite
+// right because it will only hold after `initialize()` is called.
 
 /*@ global invariant buttons_initial_state:
   @   \forall cast_button_light cbl, spoil_button_light sbl;

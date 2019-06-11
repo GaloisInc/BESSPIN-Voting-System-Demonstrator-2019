@@ -21,13 +21,17 @@ char *not_a_valid_barcode_text = "Not a valid barcode!";
 char *no_barcode_text = "No barcode detected!";
 char *remove_ballot_text = "Remove ballot!";
 
+// @design kiniry Here is the explicit encoding of the SBB state.
+SBB_state the_state = { .S = START };
+
+// @todo kiniry This is a placeholder state representation so that we
+// can talk about the state of memory-mapped firmware.
+firmware_state the_firmware_state;
+
 // This main loop for the SBB never terminates until the system is
 // turned off.
 // @assurance kiniry Note that, for a non-trivial terminates clause,
 // we must prove that the function actually does terminate.
-/*@ terminates \false;
-    ensures \false;
-*/
 void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
   // Init happens before calling main()
