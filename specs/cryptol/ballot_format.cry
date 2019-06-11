@@ -11,11 +11,26 @@ type constraint ballot_constraint nct ncd = (fin nct, fin ncd, nct >= 1, ncd >= 
 
 // a ballot is valid when each selection is a number between 0 and (ncd-1) included
 is_valid : {nct, ncd} ballot_constraint nct ncd => ballot nct ncd -> Bit
-is_valid b = all (\x -> True) [b@i <= `(ncd-1) | i <- [0..(nct-1)]]
+is_valid b = all (\x -> x <= `(ncd-1)) [b@i | i <- [0..(nct-1)]]
 
-// `selection b ct == cd` if and only if candidate `cd` is selected in contest `ct`
+// given a valid ballot, selection b ct == cd if and only if candidate cd is selected in contest ct
 selection : {nct, ncd} ballot_constraint nct ncd => ballot nct ncd -> [width (nct-1)] -> [width (ncd-1)]
 selection b ct = (b@ct)
 
-// @todo all do we want to represent a ballot as an array of booleans instead?
-// @todo jdodds add some properties to validate this theory
+// TODO: do we want to represent a ballot as an array of booleans instead?
+// that is what ballot_2 specifies:
+
+type ballot_2 nct ncd = [nct][ncd] // one bit per candidate
+
+// a ballot is valid if and only if there is exactly one choice per contest
+is_valid_2 : {nct, ncd} ballot_constraint nct ncd => ballot nct ncd -> Bit
+is_valid_2 b = all valid b
+  where valid x = x != zero /\ x && (x-1) == 0
+
+// given a valid ballot, selection_2 b ct == cd if and only if candidate cd is selected in contest ct
+selection_2 : {nct, ncd} ballot_constraint nct ncd => ballot nct ncd -> [width (nct-1)] -> [width (ncd-1)]
+selection_2 b ct = (last xs).1
+  where xs = [(False, 0)] # [
+    if stop then (stop,cd) else (if (b@ct@i) then (True, i) else (False,0))
+    | i <- [0..ncd-1]
+    | (stop,cd) <- xs ]
