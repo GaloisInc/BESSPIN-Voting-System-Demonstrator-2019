@@ -1,71 +1,82 @@
-subsystem Logging
-// log scenarios
-  indexing
-    owner: Dragan Stosic <dragan.stosic@freeandfair.us>
-    contributors: Rod Chapman <rod.chapman@freeandfair.us>
-      Dan Zimmerman <dmz@freeandfair.us>
-   effort estimates for design, implementation, and assurance work
-        design/implementation: 1 week
-        assurance: 1 week
-    complexity estimates (low, medium, high)
-        medium
-    risk levels (low, medium, high)
-        medium
-    mandatory dependencies elucidated
-        N/Ai
+scenarios Logging
 
-scenario
-   Initialize secure system log file -- NORMAL
-description
-   Receive message from SBB and initialize 
-   secure system log file. 
+// initialization
 
-scenario
-   Initialize secure application log file -- NORMAL
-description
-   Receive message from SBB and initialize 
-   secure application log file.
+Initialize a secure log. // NORMAL
+Create a new, empty secure log file.
 
-scenarion
-  Append system event -- NORMAL
-description
-   Log system event into secure system log file.
+// @refines Initialize a secure log.
+Initialize a secure system log. // NORMAL
+Create a new, empty system log file in the SD card filesystem.
 
-scenarion
-  Append  application entry -- NORMAL
-description
-   Log application entry into secure application log file.
+// @refines Initialize a secure log.
+Initialize a secure application log. // NORMAL
+Create a new, empty application log file in the SD card filesystem.
 
-scenario
-  Verify secure system log file
-description 
- Verify that secure system log file is well-formed wrt correctness properties in its configuration.
- Verify that secure system log file is secure wrt the security properties in its configuration.
+// writes
 
-scenario
-   Verify secure application log file
-description
-  Verify that secure application log file is well-formed wrt correctness properties in its configuration.
-  Verify that secure  application log file is secure wrt the security properties in its configuration.
+Append an event. // NORMAL
+Log event E into a log file L.
 
-scenario
- Export secure system log file
- description 
- Export secure system log file to device.
+// @refines Append an event.
+Append a secure system event. // NORMAL
+Log a system event into a system log file.
 
-scenario
- Export secure application log file
- description 
- Export secure application log file to device.
+Append a secure application event. // NORMAL
+Log an application event into an application log file.
 
+// correctness
 
-scenario
- Import secure system log file
- description 
- Import secure system log file from device.
+Verify the well-formedness of a secure log file. // NORMAL
+Verify that a secure log file L is well-formed wrt correctness
+properties P in its specification.
 
-scenario
- Import secure application log file
- description 
- Import secure application log file from device.
+// @refines Verify the well-formedness of a secure log file.
+Verify the well-formedness of a secure system log file. // NORMAL
+Verify that a system log file is well-formed wrt the SBB's correctness
+properties.
+
+// @refines Verify the well-formedness of a secure log file.
+Verify the well-formedness of a secure  application log file. // NORMAL
+Verify that an application log file is well-formed wrt the SBB's
+correctness properties.
+
+// security
+
+Verify the security of a secure log file. // NORMAL
+Verify that a secure log file L is secure wrt the security properties
+P in its configuration.
+
+// @refines Verify the security of a secure log file.
+Verify the security of a secure system log file. // NORMAL
+Verify that a secure system log file is secure wrt the SBB's security
+properties.
+
+Verify the security of a secure application log file. // NORMAL
+Verify that a secure application log file is secure wrt the SBB's
+security properties.
+
+// I/O
+
+Export a secure log file.
+Export a secure system log file L to a device D.
+
+// @refines Export a secure log file.
+Export a secure system log file.
+Export a secure system log file L to the Reporting component.
+
+// @refines Export a secure log file.
+Export a secure application log file.
+Export a secure application log file L to the Reporting component.
+
+Import a secure log file L.
+Import a secure log file L from device D.
+
+// @refines Import a secure log file L.
+Import a secure system log file.
+Import a secure system log file L from the SD card filesystem.
+
+// @refines Import a secure log file L.
+Import a secure application log file.
+Import a secure application log file L from the SD card filesystem.
 

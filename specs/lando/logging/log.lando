@@ -1,29 +1,18 @@
 subsystem Logging
-// log components and behavior
-  indexing
-    owner: Dragan Stosic <dragan.stosic@freeandfair.us>
-    contributors: Rod Chapman <rod.chapman@freeandfair.us>
-      Dan Zimmerman <dmz@freeandfair.us>
-   effort estimates for design, implementation, and assurance work
-        design/implementation: 1 week
-        assurance: 1 week
-    complexity estimates (low, medium, high)
-        medium
-    risk levels (low, medium, high)
-        medium
-    mandatory dependencies elucidated
-        N/A
 
 component Log Entry inherit String // Refine to JSONValue or CSVValue?
+  A structured set of linear data that is to be written to a log.
   Is the same log entry?
   Is it valid log entry?
 
 component Log
+  A log is an (often persistent) sequence of events recorded about a
+  given system.
   May I have an empty log?
-  A log is an often persistent sequence of events recorded about a given system.
   What kind of entries can this log contain?
   Export the log to the following target!
   Save this entry to the log!
+  Is this log verifiable wrt its well-formedness properties?
 
 component Secure Log inherit Log
   A secure log is a log that has evidence that specific security properties hold.
@@ -33,6 +22,7 @@ component Secure Log inherit Log
   What kind of authentication and access control does this log have?
   What non-repudiation properties does this log have?
   May I have a log created conforming to the following security properties?
+  Is this secure log verifiable wrt its security properties?
   Must stipulate what kinds of events are permitted in the log.
 
 component Secure System Log inherit Secure Log

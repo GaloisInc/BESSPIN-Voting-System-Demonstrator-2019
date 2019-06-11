@@ -1,57 +1,43 @@
-subsystem Logging
-// log requirements.
-  indexing
-    owner: Dragan Stosic <dragan.stosic@freeandfair.us>
-    contributors: Rod Chapman <rod.chapman@freeandfair.us> 
-      Dan Zimmerman <dmz@freeandfair.us>
-   effort estimates for design, implementation, and assurance work
-        design/implementation: 1 week
-        assurance: 1 week
-    complexity estimates (low, medium, high)
-        medium
-    risk levels (low, medium, high)
-        medium
-    mandatory dependencies elucidated
-        N/A
+requirements Logging
 
-requirement create_sec_system_log
-  description 
-    Create secure system log file.
+all_hardware_events_logged.
+Every hardware event that triggers a state change is logged to the
+system secure log.
 
-requirement save_sec_system_log
-  description 
-    Support save opeartion for the secure system log file.
+voting_events_logged.
+Every voting system event that triggers a state change is logged to
+the application secure log.
 
-requirement create_sec_app_log
-  description
-    Create secure application log file.
+secure_log_integrity.
+Every secure log must have cryptographic integrity in order to
+guarantee that undetectable tampering is impossible.
 
-requirement save_sec_app_log
-  description
-    Support save opeartion for the secure application log file.
+secure_log_provenance.
+Every secure log must have cryptographic provenance in order to
+guarantee that the only principle that could have initialized that
+secure log is the measured (via secure boot) running system.
 
-requirement log_entry
-  description
-    Create log entry.
+secure_log_count.
+Multiple, concurrent secure logs on the same device must be supported.
 
-requirement hsc_state_change
-  description
-    Support all hardware state changes by the secure log entry.
+secure_logs_on_boot.
+On system boot or reset, secure logs cryptographic properties must be
+checked prior to any use.
 
-requirement fetch_aes
-  description
-    Fetch the AES from HSM-Hardware Security Module or some other place TBD.
+secure_log_crypto_assurance_dependencies.
+All cryptographic operations used by secure logging must have formal
+assurance available, or assumptions stated, for correctness and
+information leakage.
 
-requirement determine_root_hash
-  description
-    Should determine the root of the hash-chain and generate the base log entry.
-    Use AES key and an HMAC in order to generate the base log entry TBD.
+secure_log_crypto_hardware.
+If a cryptographic operation is available in hardware, it must be used.
 
-requirement export_log
-  description
-    Should export log to device.
+secure_log_crypto_keys.
+If a cryptographic key is ever accessible via software, its
+information leakage specification must be formally stated for secure
+CPU designers to understand and protect.
 
-requirement import_log
-  description
-    Should import log from device.
+secure_log_AES_reuse.
+If we use AES for both encryption (e.g., of voter choices) and HMAC
+(e.g., for provenance), we must use two different keys.
 

@@ -1,27 +1,27 @@
-subsystem Logging
-// log events
-  indexing
-    owner: Dragan Stosic <dragan.stosic@freeandfair.us>
-    contributors: Rod Chapman <rod.chapman@freeandfair.us>
-      Dan Zimmerman <dmz@freeandfair.us>
-   effort estimates for design, implementation, and assurance work
-        design/implementation: 1 week
-        assurance: 1 week
-    complexity estimates (low, medium, high)
-        medium
-    risk levels (low, medium, high)
-        medium
-    mandatory dependencies elucidated
-        N/A
-
 events Logging
 
-event sytem_log_init Initialize system log.
-event application_log_init Initialize application log.
-event system_log Log event E to the system log.
-event application_log Log the event E to the application log.
-event log_export Export log L to device D.
-event log_import Import log L from device D.
-event validate_log Verify that log L is well-formed wrt correctness properties in its configuration.
-event verify_log Verify that log L is secure wrt the security properties in its configuration.
+system_log_init.
+Initialize a secure system log.
 
+application_log_init.
+Initialize a secure application log.
+
+log_system_event_to_system_log.
+Log event E to the secure system log.
+
+log_application_event_to_application_log.
+Log the event E to the secure application log.
+
+export_log_to_device.
+Export secure log L to device D.
+
+import_log_from_device.
+Import secure log L from device D.
+
+validate_log.
+Validate that secure log L is well-formed wrt structural correctness
+properties in its configuration.
+
+verify_log.
+Verify that secure log L is secure wrt the security properties in its
+configuration.
