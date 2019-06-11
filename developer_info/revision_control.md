@@ -35,19 +35,21 @@ The BESSPIN Voting System project uses Git for revision control. Currently, we a
    For more details, see
    [The Dark Side of the Force Push - Will Anderson](http://willi.am/blog/2014/08/12/the-dark-side-of-the-force-push/)
    and [--force considered harmful; understanding git's --force-with-lease - Atlassian Developers](https://developer.atlassian.com/blog/2015/04/force-with-lease/)
-9. Once it has been rebased, a _reviewer_ with merge permissions can merge 
-   the MR using the GitLab "Merge" button, _without_ selecting "Squash commits".
+9. Once it has been rebased, a _reviewer_ with merge permissions can merge
+   the MR using the GitLab "Merge" button, with the "Delete source branch"
+   checkbox _checked_ and the "Squash commits" checkbox _not checked_.
    This will introduce an _unsigned_ merge commit, but
-   preserve the signatures, if any, on the actual branch's commits. 
-10. Finally, the MR submitter, not the reviewer, should delete the merged
-   branch from both their local repository and GitLab. If more work is to be done
-   continuing from the branch, a new branch should be created.
+   preserve the signatures, if any, on the actual branch's commits, and
+   will delete the branch once it is merged.
+10. If, for some reason, the "Delete source branch" checkbox was not checked,
+   the reviewer that merges the branch should manually delete the branch
+   after the merge.
 
 **Guidelines:**
 
 - Do not commit directly to `master`.
 - To support bisecting, do not merge WIP commits that break the build.
-  On topic branches, squash commits as needed before merging, but only 
+  On topic branches, squash commits as needed before merging, but only
   to reduce excessive small commits; the development history of topic branches
   should be preserved as much as is reasonable. Use your judgement.
 - Write short, useful commit messages with a consistent style. Follow
@@ -68,6 +70,3 @@ The BESSPIN Voting System project uses Git for revision control. Currently, we a
   formatters, test runners, and other static analysis tools. Configure
   your editor to use them, and when feasible, integrate them into the
   upstream continuous integration checks.
-
-
-
