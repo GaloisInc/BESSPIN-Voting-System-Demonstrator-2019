@@ -28,11 +28,14 @@
   @   type cast_button_light = light;
   @   type spoil_button_light = light;
   @   type paper_feed_motor = motor;
-  @   logic boolean lights_off(cast_button_light cbl, spoil_button_light sbl) =
-  @     cbl == dark && sbl == dark;
-  @   logic boolean buttons_up(cast_button cb, spoil_button sb) =
-  @     cb == up && sb == up;
-  @   logic boolean motor_running(motor m) = m != off;
+  @   predicate lights_off(cast_button_light cbl,
+  @                        spoil_button_light sbl,
+  @                        SBB_state S) =
+  @     (cbl == dark && sbl == dark) <==> no_buttons_lit(S);
+  @   predicate buttons_up(cast_button cb, spoil_button sb, SBB_state S) =
+  @     (cb == up && sb == up) <==> (S.B == ALL_BUTTONS_UP);
+  @   predicate motor_running(motor m, SBB_state S) =
+        (m != off) <==> (S.M.MOTORS_TURNING_FORWARD);
   @ }
 */
 
@@ -42,7 +45,7 @@
 // can hold them down during reset.  This spec is currently not quite
 // right because it will only hold after `initialize()` is called.
 
-/*@ global invariant buttons_initial_state:
+/*  global invariant buttons_initial_state:
   @   \forall cast_button_light cbl, spoil_button_light sbl;
   @   \at(lights_off(cbl, sbl), Init);
   @ global invariant motor_initial_state: \forall motor m;
