@@ -8,18 +8,14 @@
 
 #include "log_t.h"
 
-// @design Frama-C does not support model variables, so we break the
-// abstraction barrier and characterize model state using concrete
-// implementation variables that are conditionally compiled.
+// @spec kiniry What follows is an algebraic description of the
+// logging subsystem.
 
-#ifdef SPEC_DEBUG
-
-// Is it valid log entry? - from logging.lando
-/*@
-  predicate is_valid_log_entry(log_entry *le) =
-            \valid_read(((uint_8 *)le) + (0 .. sizeof(le) -1));
-@*/
-
+/*@ axiomatic log {
+  @   type entry = nil | something;
+  @   type List<entry>;
+  @ }
+  @*/
 
 #endif
 

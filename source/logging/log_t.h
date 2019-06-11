@@ -12,6 +12,9 @@
 
 #define LOG_ENTRY_LENGTH 256
 
-typedef uint8_t log_entry[LOG_ENTRY_LENGTH];
+typedef char* log_name;
+typedef FILE* log;
+typedef FILE* log_io_stream;
+typedef char log_entry[LOG_ENTRY_LENGTH];
 
 #endif

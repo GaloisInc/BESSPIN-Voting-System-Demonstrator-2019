@@ -8,10 +8,11 @@ component Log Entry inherit String // Refine to JSONValue or CSVValue?
 component Log
   A log is an (often persistent) sequence of events recorded about a
   given system.
-  May I have an empty log?
+  Create an empty log!
   What kind of entries can this log contain?
-  Export the log to the following target!
   Save this entry to the log!
+  Export this log to the following target!
+  Import this log!
   Is this log verifiable wrt its well-formedness properties?
 
 component Secure Log inherit Log
