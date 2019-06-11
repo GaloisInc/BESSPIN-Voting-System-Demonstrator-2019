@@ -104,7 +104,7 @@ void ballot_box_main_loop(void) {
 
     case CAST:
       cast_ballot();
-      the_state.L = WAIT_FOR_BALLOT;
+      the_state.L = STANDBY;
       break;
 
     case SPOIL:
@@ -117,7 +117,7 @@ void ballot_box_main_loop(void) {
 
     case WAIT_FOR_SPOIL:
       if ( ballot_spoiled() ) {
-        the_state.L = WAIT_FOR_BALLOT;
+        the_state.L = STANDBY;
       }
       break;
 
