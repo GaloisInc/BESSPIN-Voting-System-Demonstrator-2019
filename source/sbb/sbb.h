@@ -42,11 +42,12 @@ extern firmware_state the_firmware_state;
 // them here, something like
 //   \separated(sd_card_dd_state, time_dd_state, etc.);
 
-// @design kiniry All of these functions that are commands have the
-// same frame axiom, as they state that they update the_state of the
-// system, which is the model state for the SBB ASM.  They must
-// also explicitly state which mem-mapped state they modify in the
-// implementation itself for compositional reasoning to be sound.
+// @design kiniry All of these functions that are commands have a
+// tight frame axiom, as they state exactly what part of `the_state`
+// of the system is update, which is the model state for the SBB ASM.
+// They must also explicitly state which mem-mapped state they modify
+// in the implementation itself for compositional reasoning to be
+// sound.
 
 /*@ assigns the_firmware_state;
 */
