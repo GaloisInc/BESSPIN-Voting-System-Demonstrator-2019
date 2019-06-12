@@ -38,7 +38,6 @@ void ballot_box_main_loop(void) {
 
   initialize();
   for(;;) {
-    // Set initial states
     switch ( the_state.L ) {
 
     case STANDBY:
@@ -76,13 +75,14 @@ void ballot_box_main_loop(void) {
                         strlen(barcode_detected_text));
       what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
       if ( is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH) ) {
+        // Prompt the user for a decision
         cast_button_light_on();
         spoil_button_light_on();
         cast_or_spoil_timeout_reset();
-
         display_this_text(cast_or_spoil_text,
                           strlen(cast_or_spoil_text));
-        the_state.L = BARCODE_VALIDATED;
+        // Go to the waiting state
+        the_state.L = WAIT_FOR_DECISION;
       } else {
         display_this_text(not_a_valid_barcode_text,
                           strlen(not_a_valid_barcode_text));
@@ -90,23 +90,21 @@ void ballot_box_main_loop(void) {
       }
       break;
 
-    case BARCODE_VALIDATED:
-      if (    cast_or_spoil_timeout_expired()
-           || is_cast_button_pressed()
-           || is_spoil_button_pressed() ) {
+    case WAIT_FOR_DECISION:
+      if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
-        if ( is_cast_button_pressed() ) {
-          display_this_text(casting_ballot_text,
-                            strlen(casting_ballot_text));
-          the_state.L = CAST;
-        } else {
-          the_state.L = SPOIL;
-        }
+        the_state.L = ERROR;
+      } else if ( is_cast_button_pressed() ) {
+        the_state.L = CAST;
+      } else if ( is_cast_button_pressed() ) {
+        the_state.L = SPOIL;
       }
       break;
 
     case CAST:
+      display_this_text(casting_ballot_text,
+                        strlen(casting_ballot_text));
       cast_ballot();
       the_state.L = STANDBY;
       break;
@@ -116,16 +114,11 @@ void ballot_box_main_loop(void) {
                         strlen(spoiling_ballot_text));
       spoil_ballot();
       display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-      the_state.L = WAIT_FOR_SPOIL;
-      break;
-
-    case WAIT_FOR_SPOIL:
-      if ( ballot_spoiled() ) {
-        the_state.L = STANDBY;
-      }
+      the_state.L = STANDBY;
       break;
 
     case ERROR:
+      // abakst I think this needs a timeout & then head to an abort state?
       if ( ballot_inserted() || ballot_detected() ) {
         move_motor_back();
       } else {

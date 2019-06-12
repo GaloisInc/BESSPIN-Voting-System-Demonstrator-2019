@@ -52,15 +52,14 @@ typedef enum { STANDBY = BARCODE_PRESENT_AND_RECORDED+1,
                WAIT_FOR_BALLOT,
                FEED_BALLOT,
                BARCODE_DETECTED,
-               BARCODE_VALIDATED,
+               WAIT_FOR_DECISION,
                CAST,
                SPOIL,
                ERROR,
-               WAIT_FOR_SPOIL,
              } logic_state;
 // @design kiniry START and STOP are the top-level (superposed) start
 // and stop state for all ASMs.
-typedef enum { START = WAIT_FOR_SPOIL+1,
+typedef enum { START = ERROR+1,
                INNER,
                STOP } start_stop_state;
 
