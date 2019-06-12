@@ -1,0 +1,15 @@
+# Makefile for Building the "bottom" variant of the logging subsystem.
+
+.PHONY: bottom bottom_clean
+
+# Assume clang is on PATH, but needs some special setup on Darwin to override
+# Apple's clang and use the HomeBrew one instead...
+export CC := clang
+
+# Build the bottom target
+all:
+	$(CC) -I. -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1 -I../../FreeRTOS-mirror/FreeRTOS/Source/include -I../../FreeRTOS-mirror/FreeRTOS/Source/portable/GCC/RISC-V -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/demo -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/bsp -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/devices -D__riscv_xlen=32 log_main.c log_bottom.c secure_log_bottom.c -o secure_log_bottom.elf
+	rm -f *.o
+
+clean:
+	rm secure_log_bottom.elf
