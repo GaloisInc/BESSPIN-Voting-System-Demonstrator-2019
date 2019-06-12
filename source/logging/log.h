@@ -23,7 +23,9 @@
 log create_log(const log_name the_log_name);
 
 /*@
-  @ requires \valid(a_log_entry);
+  @ requires \valid_read(a_log_entry);
+  @ requires \valid(the_log);
+  @	
 @*/
 void write_entry(const log the_log, const log_entry a_log_entry);
 
@@ -34,6 +36,9 @@ bool verify_log_entry_well_formedness(const log_entry a_log_entry);
 
 void export_log(const log the_log, log_io_stream a_target);
 
+/*@
+  @ requires valid_string(the_log_name);
+@*/
 log import_log(const log the_log_name);
 
 bool verify_log_well_formedness(const log the_log);
