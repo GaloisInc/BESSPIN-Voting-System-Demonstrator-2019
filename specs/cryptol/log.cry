@@ -6,6 +6,10 @@ parameter
         For our use it is expected we will use SHA256 and
         this will be instantiated as 256
     */
+
+    //RCC SHA256 returns 256 _bits_, which is 32 bytes, so I think
+    //RCC that HashSizeBytes = 32, not 256
+
     type HashSizeBytes : #
 
     /**
@@ -82,6 +86,15 @@ validFirstEntry : {msgSizeBytes, keySizeBytes}
     [keySizeBytes][8] ->
     Bit
 property validFirstEntry log key = log.msgHash == hmac key log.message
+
+//RCC I think this is wrong. We are comparing log.msgHash with hmac key log.message
+//RCC   log.msgHash was created above in initialLogEntry as "hmac key msg" where
+//RCC     msg is the UNPADDED original message.
+//RCC BUT
+//RCC   log.message is PADDED, so this doesn't look right to me.
+//RCC I think we should change initialLogEntry so that the hmac is computed from
+//RCC message AFTER the padding has been appended, since there's no way to
+//RCC reliably remove the padding from a message
 
 /**
     Check to see if a log entry is valid given the previous hash
