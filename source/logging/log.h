@@ -22,7 +22,7 @@
 @*/
 log create_log(const log_name the_log_name);
 
-/*@ requires \valid_read(a_log_entry);
+/*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH -1));
   @ requires \valid(the_log);
   @ requires \separated(the_log, a_log_entry);
 @*/

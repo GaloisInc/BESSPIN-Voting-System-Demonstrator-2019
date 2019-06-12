@@ -73,10 +73,6 @@ secure_log create_secure_log(const secure_log_name the_secure_log_name,
   //     Why not close it at the end of each operation? Does this grant more integrity on failure?
   
 }
-
-
-
-
 void write_entry_to_secure_log(const secure_log the_secure_log,
                                const log_entry a_log_entry) {
   // @example kiniry I wrote this example sketch implementation while
