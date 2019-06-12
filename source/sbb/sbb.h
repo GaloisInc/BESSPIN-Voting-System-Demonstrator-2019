@@ -135,16 +135,20 @@ void cast_button_light_on(void);
 */
 void cast_button_light_off(void);
 
-/*@ assigns the_state.M,
-            gpio_mem[MOTOR_0],
-            gpio_mem[MOTOR_1];
+/*@ requires the_state.M == MOTORS_TURNING_FORWARD ||
+  @          the_state.M == MOTORS_OFF;
+  @ assigns the_state.M,
+  @         gpio_mem[MOTOR_0],
+  @         gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_TURNING_FORWARD;
 */
 void move_motor_forward(void);
 
-/*@ assigns the_state.M,
-            gpio_mem[MOTOR_0],
-            gpio_mem[MOTOR_1];
+/*@ requires the_state.M == MOTORS_TURNING_BACKWARD ||
+  @          the_state.M == MOTORS_OFF;
+  @ assigns the_state.M,
+  @         gpio_mem[MOTOR_0],
+  @         gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_TURNING_BACKWARD;
 */
 void move_motor_back(void);

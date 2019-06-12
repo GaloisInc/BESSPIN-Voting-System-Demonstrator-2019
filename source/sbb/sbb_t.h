@@ -67,6 +67,10 @@ typedef enum { START = ERROR+1,
 // top-level set of states for the SBB.  Note that a C record type for
 // fields F, G encodes the tuple type (F, G) which is equivalent to
 // the product type F x G.
+// @design kiniry Note that we would normally specify this as a model
+// variable of this datatype, but Frama-C does not yet suppport model
+// variables.  If we did have model variables, we would only have a
+// concrete instance of this type for the SBB hardware emulator build.
 typedef struct SBB_states {
   sd_card_state C;
   timer_state T;
