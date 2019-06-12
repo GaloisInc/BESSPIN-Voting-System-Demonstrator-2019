@@ -30,12 +30,6 @@
   @ \forall  log_entry l_entry, Log log_list1,log_list2;
   @ append(cons(l_entry,log_list1),log_list2) == cons(l_entry,append(log_list1,log_list2));
   @
-  @
-  @ predicate valid_log_entry(log_entry *l_entry) =
-  @  \valid_read(l_entry) &&
-  @  \valid_read(((char*)l_entry)+(0 .. LOG_ENTRY_LENGTH -1));
   @}
-  @*/
-
-
+@*/
 #endif

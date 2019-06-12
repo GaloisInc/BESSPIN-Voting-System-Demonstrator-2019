@@ -13,26 +13,24 @@
 #include "log_t.h"
 #include "log.acsl"
 
-// here
-// here
-
 // @design kiniry In this API should logs be referred to via filenames
 // or file pointers?
 // @dragan log should be referred via file pointers
+
 /*@
   @ requires valid_string(the_log_name);
 @*/
 log create_log(const log_name the_log_name);
 
 /*@
-  @ requires valid_log_entry(a_log_entry);
+  @ requires \valid(a_log_entry);
 @*/
-void write_entry(const log the_log, const log_entry *a_log_entry);
+void write_entry(const log the_log, const log_entry a_log_entry);
 
 /*@
-  @ requires valid_log_entry(a_log_entry);
+  @ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH -1));
 @*/
-bool verify_log_entry_well_formedness(const log_entry *a_log_entry);
+bool verify_log_entry_well_formedness(const log_entry a_log_entry);
 
 void export_log(const log the_log, log_io_stream a_target);
 
