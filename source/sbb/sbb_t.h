@@ -55,6 +55,7 @@ typedef enum { STANDBY = BARCODE_PRESENT_AND_RECORDED+1,
                BARCODE_VALIDATED,
                CAST,
                SPOIL,
+               ERROR,
                WAIT_FOR_SPOIL,
              } logic_state;
 // @design kiniry START and STOP are the top-level (superposed) start

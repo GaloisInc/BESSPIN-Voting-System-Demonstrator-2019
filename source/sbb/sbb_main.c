@@ -35,6 +35,8 @@ firmware_state the_firmware_state;
 */
 void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
+
+  initialize();
   for(;;) {
     // Set initial states
     switch ( the_state.L ) {
@@ -63,7 +65,7 @@ void ballot_box_main_loop(void) {
           the_state.L = BARCODE_DETECTED;
         } else {
           display_this_text(no_barcode_text, strlen(no_barcode_text));
-          the_state.L = SPOIL;
+          the_state.L = ERROR;
         }
       }
       break;
@@ -84,7 +86,7 @@ void ballot_box_main_loop(void) {
       } else {
         display_this_text(not_a_valid_barcode_text,
                           strlen(not_a_valid_barcode_text));
-        the_state.L = SPOIL;
+        the_state.L = ERROR;
       }
       break;
 
@@ -122,6 +124,13 @@ void ballot_box_main_loop(void) {
         the_state.L = STANDBY;
       }
       break;
+
+    case ERROR:
+      if ( ballot_inserted() || ballot_detected() ) {
+        move_motor_back();
+      } else {
+        the_state.L = STANDBY;
+      }
 
       //default:
       //assert(false);
