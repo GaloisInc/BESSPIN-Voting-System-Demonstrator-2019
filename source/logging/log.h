@@ -37,7 +37,7 @@ bool verify_log_entry_well_formedness(const log_entry a_log_entry);
 void export_log(const log the_log, log_io_stream a_target);
 
 /*@
-  @ requires valid_string(the_log_name);
+  @ requires \valid(the_log_name);
 @*/
 log import_log(const log the_log_name);
 
