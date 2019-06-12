@@ -43,7 +43,28 @@
   @   predicate motor_running(motor m, SBB_state S) =
   @     (m != off) <==> (S.M == MOTORS_TURNING_FORWARD);
   @ }
-*/
+  @ axiomatic SBB_motor_ASM {
+  @   predicate motor_ASM_transition(SBB_state preS,
+  @                                  SBB_event E,
+  @                                  SBB_state postS) =
+  @     ((E == MOTOR_OFF_E) ==>
+  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_OFF) ||
+  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) &&
+  @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_OFF)) &&
+  @     ((E == MOTOR_FORWARD_E) ==>
+  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_FORWARD) ||
+  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_TURNING_FORWARD)) &&
+  @     ((E == MOTOR_BACKWARD_E) ==>
+  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_BACKWARD) ||
+  @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_TURNING_BACKWARD));
+  @ }
+  @ axiomatic SBB_ASM {
+  @   predicate ASM_transition(SBB_state preS,
+  @                            SBB_event E,
+  @                            SBB_state postS) =
+  @     motor_ASM_transition(preS, E, postS);
+  @ }
+  @*/
 
 // @design kiniry Note that when the SBB is powered on, a ballot paper
 // may be inside of the device.  We cannot make assumptions about

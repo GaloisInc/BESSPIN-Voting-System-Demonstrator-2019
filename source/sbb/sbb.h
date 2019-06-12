@@ -34,10 +34,11 @@ extern SBB_state the_state;
 typedef bool firmware_state;
 extern firmware_state the_firmware_state;
 
-// @spec abakst Specifications needed for for hardware, related to the above
-//       I think we probably want some ghost uint8 array
-//       to model these reads/writes
+// @spec abakst Specifications needed for for hardware, related to the
+// above I think we probably want some ghost `uint8_t` array to model
+// these reads/writes.
 extern uint8_t gpio_mem[8];
+
 // Motor defines
 #define MOTOR_0 4
 #define MOTOR_1 5
@@ -150,7 +151,8 @@ void move_motor_forward(void);
   @         gpio_mem[MOTOR_0],
   @         gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_TURNING_BACKWARD;
-*/
+  @ ensures ASM_transition(\old(the_state), MOTOR_BACKWARD_E, the_state);
+  @*/
 void move_motor_back(void);
 
 /*@ assigns the_state.M,

@@ -63,6 +63,12 @@ typedef enum { START = ERROR+1,
                INNER,
                STOP } start_stop_state;
 
+// @design kiniry The following defines all events that can trigger an
+// ASM state change in the SBB.
+typedef enum { MOTOR_OFF_E = STOP+1,
+               MOTOR_FORWARD_E,
+               MOTOR_BACKWARD_E } SBB_event;
+
 // @design kiniry This is the record type that encodes the full
 // top-level set of states for the SBB.  Note that a C record type for
 // fields F, G encodes the tuple type (F, G) which is equivalent to
