@@ -22,10 +22,9 @@
 @*/
 log create_log(const log_name the_log_name);
 
-/*@
-  @ requires \valid_read(a_log_entry);
+/*@ requires \valid_read(a_log_entry);
   @ requires \valid(the_log);
-  @	
+  @ requires \separated(the_log, a_log_entry);
 @*/
 void write_entry(const log the_log, const log_entry a_log_entry);
 
