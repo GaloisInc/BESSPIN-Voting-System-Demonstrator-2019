@@ -3,5 +3,7 @@
 
 #include "secure_log_t.h"
 
-typedef secure_log_entry secure_system_log_entry;
+typedef struct secure_system_log_entries {
+  // fields whose total length is exactly 256 bytes
+} secure_system_log_entry;
 #endif

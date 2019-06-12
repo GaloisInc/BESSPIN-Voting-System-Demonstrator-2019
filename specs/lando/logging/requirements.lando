@@ -41,3 +41,9 @@ secure_log_AES_reuse.
 If we use AES for both encryption (e.g., of voter choices) and HMAC
 (e.g., for provenance), we must use two different keys.
 
+all_log_entries_are_timestamped.
+Every log entry is prefixed by a timestamp.
+
+secure_log_security_properties.
+All SBB secure logs must be hashchained using SHA2-256 and
+authenticated using AES-CBC.

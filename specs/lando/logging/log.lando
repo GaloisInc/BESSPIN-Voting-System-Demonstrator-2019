@@ -2,15 +2,18 @@ subsystem Logging
 
 component Log Entry inherit String // Refine to JSONValue or CSVValue?
   A structured set of linear data that is to be written to a log.
-  Is the same log entry?
-  Is it valid log entry?
+  Are these two log entries equal?
+  Is this log entry verifiable wrt its well-formeded properties?
+
+component Secure Log Entry inherit Log Entry
+  Is this secure log entry verifiable wrt its security properties?
 
 component Log
   A log is an (often persistent) sequence of events recorded about a
   given system.
   Create an empty log!
   What kind of entries can this log contain?
-  Save this entry to the log!
+  Write this entry to the log!
   Export this log to the following target!
   Import this log!
   Is this log verifiable wrt its well-formedness properties?
