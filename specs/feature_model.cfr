@@ -1,0 +1,64 @@
+abstract motor
+  xor driver
+    continuous
+    stepper
+
+enum color = red | orange | yellow | green | blue | purple | white | black
+
+abstract display
+  xor color_type
+    monochrome
+    full_color
+  touchscreen ?
+  oled ?
+  tft ?
+  lcd ?
+  rgb ?
+  backlight ?
+  xor technology
+    eink
+    epaper
+    hdmi
+  // size is expressed in inches
+  size: integer
+  [ 0 < size ]
+  characters_width: integer
+  characters_height: integer
+  [ 0 < characters_width ]
+  [ 0 < characters_height ]
+  pixel_width: integer
+  pixel_height: integer
+  [ 0 < pixel_width ]
+  [ 0 < pixel_height ]
+  color_count: integer
+  [ monochrome => 1 = color_count ]
+  [ full_color => 0 < color_count ]
+  foreground_color: color
+  background_color: color
+
+abstract xor barcode_scanner
+  oneD
+  twoD
+  QR
+    
+abstract paper_detect_switch
+
+abstract button
+  button_color: color
+  illuminated ?
+
+smart_ballot_box
+  motor: motor
+  display: display
+  [ lcd && backlight && color && rgb ]
+  [ color_count = 16777216 ]
+  [ characters_width = 16 && characters_height = 2 ]
+  scanner: barcode_scanner
+  [ twoD ]
+  early_switch: paper_detect_switch
+  late_switch: paper_detect_switch
+  cast_button: button
+  [ green ]
+  spoil_button: button
+  [ red ]
+  
