@@ -4,8 +4,6 @@
  */
 
 // General includes
-#include <stdio.h>
-#include <string.h>
 #include <assert.h>
 
 // Subsystem includes
