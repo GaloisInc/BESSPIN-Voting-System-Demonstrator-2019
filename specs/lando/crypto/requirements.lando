@@ -1,0 +1,9 @@
+requirements Crypto
+
+Two AES keys.
+If we are both encrypting using AES and using AES-CBC or an AES for
+HMAC, we must use two different keys for these two operations.
+
+AES key secrecy.
+All AES keys are secret and must not be leaked to any untrusted entity.
+
