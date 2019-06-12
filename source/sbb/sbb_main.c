@@ -131,6 +131,7 @@ void ballot_box_main_loop(void) {
       } else {
         the_state.L = STANDBY;
       }
+      break;
 
       //default:
       //assert(false);
