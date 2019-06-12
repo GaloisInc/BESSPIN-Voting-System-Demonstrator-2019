@@ -13,11 +13,11 @@ log create_log(const log_name the_log_name) {
   return NULL;
 }
 
-void write_entry(const log the_log, const log_entry a_log_entry) {
+void write_entry(const log the_log, const log_entry* a_log_entry) {
   return;
 }
 
-bool verify_log_entry_well_formedness(const log_entry a_log_entry) {
+bool verify_log_entry_well_formedness(const log_entry *a_log_entry) {
   return false;
 }
 
