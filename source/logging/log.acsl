@@ -8,15 +8,16 @@
 
 #include "log_t.h"
 
-// @spec kiniry What follows is an algebraic description of the
-// logging subsystem.
+// @spec kiniry An algebraic specification of logs should be added
+// here, much like we have in `sbb.acsl`, complementing that which is
+// found in `secure_log.acsl`.  This specification should be type
+// isomorphic to, and behaviorally equivalent to, that which is
+// specified by Joey in the Cryptol spec of secure logging.
 
-/*@ axiomatic log {
-  @   type entry = nil | something;
-  @   type List<entry>;
+/*  axiomatic log {
+  @   type log_entry = nil | something;
+  @   type log = List<log_entry>;
   @ }
   @*/
-
-#endif
 
 #endif
