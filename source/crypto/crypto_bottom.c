@@ -4,6 +4,7 @@
  */
 
 // General includes
+#include <assert.h>
 
 // Subsystem includes
 #include "crypto.h"
