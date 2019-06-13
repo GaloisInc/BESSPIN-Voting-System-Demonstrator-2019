@@ -41,7 +41,7 @@
   @   predicate buttons_up(cast_button cb, spoil_button sb, SBB_state S) =
   @     (cb == up && sb == up) <==> (S.B == ALL_BUTTONS_UP);
   @   predicate motor_running(motor m, SBB_state S) =
-  @     (m != off) <==> (S.M == MOTORS_TURNING_FORWARD);
+  @     (m != off) <==> (S.M == MOTORS_TURNING_FORWARD || S.M == MOTORS_TURNING_BACKWARD);
   @ }
   @ axiomatic SBB_sd_card_ASM {
   @   predicate sd_card_ASM_transition(SBB_state preS,
