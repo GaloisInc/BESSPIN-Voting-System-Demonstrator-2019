@@ -6,8 +6,9 @@ int main(void)
   
   Log_IO_Initialize();
 
-  create_log (&my_log, "newlog.txt");
+  create_log (&my_log, "test1log.txt");
   
+  Log_IO_Close (&my_log);
 }
 
 

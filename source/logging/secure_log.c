@@ -81,19 +81,27 @@ void create_secure_log(Log_Handle *secure_log,
   //    that if not directly supported by ff.h
   //   What if the file create fails?
   //   What is the file write fails?
-  //
-  // RCC I don't acually like the idea of leaving the file handle open all the time.
-  //     Why not close it at the end of each operation? Does this grant more integrity on failure?
   
 }
 
 void write_entry_to_secure_log(const secure_log the_secure_log,
                                const log_entry a_log_entry) {
-  // @example kiniry I wrote this example sketch implementation while
-  // talking to Dragan about type refinement in C and the relationship
-  // between the features of secure log and log.
-     write_entry(the_secure_log, a_log_entry);
-  // digest d = hash(the_last_digest, a_log_entry);
-  // write(d, the_secure_log);
+
+  // 0. Assume a_log_entry is already padded with zeroes
+  
+  // 1. Introduce a local (static, file-scope) variable previos_hash. Set it above in
+  //    create_secure_log for the first time.
+  
+  // 2. Form the hash value from the message and previous_hash as per the Cryptol spec.
+
+  // 3. Save the new hash to previous_hash
+
+  // 4. Write the log_entry message to the_secure_log
+
+  // 5. Write the hash block
+
+  // 6. Sync the file.
+
+  return;
 }
 

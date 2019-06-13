@@ -20,22 +20,24 @@ Log_FS_Result Log_IO_Create_New (Log_Handle *stream, // OUT
 {
   Log_Handle *local_stream_ptr;
 
-  printf ("w\n");
-
   // POSIX fopen allocates for us, unlike FreeRTOS there the caller passed in a
   // pointer to memory that it has allocated. This is rather ugly.
-  local_stream_ptr = fopen (name, "a");
+  local_stream_ptr = fopen (name, "w");
   if (local_stream_ptr == NULL)
     {
-    printf ("x\n");
-    return LOG_FS_ERROR;
+      printf ("fopen() failed\n");
+      return LOG_FS_ERROR;
     }
   else
     {
-       printf ("y\n");
-     
-       *stream = *local_stream_ptr;
-       printf ("z\n");
+      printf ("sizeof(FILE) is %lu\n", sizeof(FILE));
+      
+      // RCC - this is dodgy - possibly undefined behaviour to attempt to
+      // copy a FILE struct like this.  
+
+      printf ("Copying the FILE structure\n");
+      memcpy (stream, local_stream_ptr, sizeof(FILE));
+      printf ("Done copying\n");
     }
   
   return LOG_FS_OK;
@@ -81,9 +83,8 @@ Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
   printf ("Goinf for the second write\n");
   written += fwrite (&the_entry.the_digest[0], 1, SHA256_DIGEST_LENGTH_BYTES, stream);
 
-  printf ("S %zu\n", written);
+  printf ("Bytes written is %zu\n", written);
 
-  
   if (written == (LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES))
     {
       return LOG_FS_OK;
