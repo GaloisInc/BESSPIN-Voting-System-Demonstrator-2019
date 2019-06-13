@@ -1,0 +1,44 @@
+module BallotWireFormat where
+
+import Base64 (encodeBase64, decodeBase64, padWith, Base64)
+
+// Ballot encoding
+
+parameter
+  type time : #
+  type seq  : #
+  type constraint (fin time, fin seq)
+
+type Ballot contests maxPositions
+  = { time     : [time],
+      number   : [seq],
+      contests : [contests][maxPositions] }
+
+encodeBallot :
+  {contests, maxPositions} (fin contests, fin maxPositions) =>
+  Ballot contests maxPositions ->
+  Base64 ((seq + time + contests * maxPositions) /^ 8)
+encodeBallot ballot =
+  encodeBase64 (groupBy`{each=8} (padWith`{mod=8} zero ballotBits))
+  where
+    ballotBits = ballot.number # ballot.time # join ballot.contests
+
+decodeBallot :
+  {contests, maxPositions} (fin contests, fin maxPositions) =>
+  Base64 ((seq + time + contests * maxPositions) /^ 8) ->
+  Ballot contests maxPositions
+decodeBallot chars =
+  if padding == zero
+  then { number = number, time = time, contests = split (contests) }
+  else error "Non-zero padding in ballot encoding"
+  where
+    number # time # contests # padding =
+      join (decodeBase64`{(seq + time + contests * maxPositions) /^ 8} chars)
+
+// Proofs that ballot encoding is correct
+
+ballot_roundtrip :
+  {contests, maxPositions} (fin contests, fin maxPositions) =>
+  Ballot contests maxPositions -> Bool
+property ballot_roundtrip ballot =
+  decodeBallot (encodeBallot ballot) == ballot
