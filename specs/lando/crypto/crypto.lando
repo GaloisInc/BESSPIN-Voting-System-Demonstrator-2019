@@ -1,0 +1,66 @@
+subsystem Crypto
+
+// cryptographic protocol and its entities
+
+component Protocol
+  Communications protocol between the BMD and the SBB.
+  Messages are all from BMD to SBB via the ballot.
+  
+component BMD Entity
+  The entity responsible for encrypting ballots so that the SBB can
+  decrypt them and know the time that they were encrypted.
+  Set the clock!
+  What is the encryption of this ballot at this time?
+  Print the encrypted ballot!
+  
+component SBB Entity
+  Processes encrypted ballots.
+  Has this encrypted ballot timed out?
+  What is the decryption of this ballot?
+
+// underlying cryptographic algorithms
+
+component AES Key inherit Cryptographic Key
+  Must be kept secret from unauthenticated entities.
+component Symmetric Encryption
+  What is the ciphertext produced by encrypting this plaintext with that key?
+  What is the plaintext produced by decrypting this ciphertext with that key?
+component AES inherit Symmetric Encryption
+  The NIST-standardized AES cryptographic algorithm.
+  What is your key size?
+component AES-CBC inherit AES
+  Performs AES operations in CBC mode.
+component Hash
+  What is your digest size?
+  What is the hash of this value?
+component SHA2 inherit Hash
+  The NIST-standardized SHA-2 cryptographic hash algorithm.
+component SHA2-256 inherit SHA2
+  The digest size is 256.
+component HMAC
+  A key-based or hash-based message authentication code.
+  What is the HMAC of this data using this key?
+component Asymmetric Encryption
+  A public key-based cryptographic encryption algorithm.
+  What is the ciphertext corresponding to this plaintext using this public key?
+  What is the plaintext corresponding to this ciphertext using this private key?
+
+component HSM
+  A Hardware Security Module (HSM) bundles together a set of
+  cryptographic constructs and provides access to them via a secure
+  API.
+component BVS HSM
+  The HSM for the BESSPIN Voting System.
+  Must contain a symmetric cipher.
+  Must contain a hash function.
+  Must contain a random number generator.
+component BSV HSM 2019
+  The HSM for the DEF CON 2019 demonstrator.
+  Must contain a hardware AES implementation.
+  May contain a SHA2 implementation.
+  May contain a RNG implementation.
+component BSV HSM 2020
+  The HSM for the DEF CON 2020 demonstrator.
+  Must contain a hardware AES implementation.
+  Must contain a hardware SHA2 implementation.
+  Must contain a hardware RNG implementation.

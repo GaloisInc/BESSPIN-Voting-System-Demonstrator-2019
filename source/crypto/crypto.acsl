@@ -1,0 +1,20 @@
+/**
+ * SBB Crypto ACSL specification
+ * @refine crypto.lando
+ */
+
+#ifndef __CRYPTO_API_ACSL__
+#define __CRYPTO_API_ACSL__
+
+#include "crypto_t.h"
+
+// @spec kiniry An algebraic specification of crypto should be added
+// here, much like we have in `sbb.acsl`.
+
+/*  axiomatic crypto {
+  @ type plaintext;
+  @ type ciphertext;
+  @ axiom symmetric: \forall plaintext pt, ciphertext ct; decrypt(encrypt(pt)) == pt;
+  @ }
+  @*/
+#endif
