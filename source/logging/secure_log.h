@@ -19,6 +19,7 @@
 // @design kiniry We should probably write `the_policy` into the log's
 // root block and authenticate it or, more likely, its first block
 // after the authenticated zeroed root block.
+
 secure_log create_secure_log(const secure_log_name the_secure_log_name,
                              const log_entry a_log_entry_type,
                              const secure_log_security_policy the_policy);
