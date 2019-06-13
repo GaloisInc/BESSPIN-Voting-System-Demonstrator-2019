@@ -1,4 +1,15 @@
 requirements BEHAVIORAL_REQUIREMENTS
 mandatory
 requirement 
+    "TEST_QR_CODE"
+description
+    "The voting system must include the ability to verify that any encoded version or images of voter selections on a ballot are created correctly."
+requirement
+    "VERIFY_ACTIVATION"
+description
+    "Scanners and ballot marking devices must include a means of verifying that they have been correctly activated and are functioning properly."
+requirement
+    "ENTER_VOTING_MODE"
+description
+    "Scanners and ballot marking devices must provide designated functions for entering voting mode."
 end BEHAVIORAL_REQUIREMENTS
