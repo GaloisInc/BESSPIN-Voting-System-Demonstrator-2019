@@ -10,6 +10,7 @@
 #define __HSM_T__
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define AES256_KEY_LENGTH_BITS 256
 #define AES256_KEY_LENGTH_BYTES (AES256_KEY_LENGTH_BITS / 8)
