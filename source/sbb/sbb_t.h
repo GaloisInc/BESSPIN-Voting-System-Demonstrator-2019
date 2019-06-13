@@ -72,6 +72,8 @@ typedef enum { //motor_ASM
                //sd_card_ASM
                CARD_PRESENT_E,
                ERASE_CARD_E,
+               //barcode
+               INTERNAL_BARCODE_E,
                //cast_spoil_ASM
                SPOIL_E,
                CAST_E,

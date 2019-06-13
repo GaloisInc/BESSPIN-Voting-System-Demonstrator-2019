@@ -52,6 +52,14 @@
   @      ((E == ERASE_CARD_E) ==>
   @        (preS.M == SD_CARD_READY && postS.M == SD_CARD_READY));
   @ }
+  @ axiomatic SBB_barcode_scanner_ASM {
+  @   predicate barcode_ASM_transition(SBB_state preS,
+  @                                  SBB_event E,
+  @                                  SBB_state postS) =
+  @     (E == INTERNAL_BARCODE_E) ==>
+  @      ((preS.M == BARCODE_NOT_PRESENT && postS.M == BARCODE_PRESENT_AND_RECORDED) ||
+  @       (preS.M == BARCODE_PRESENT_AND_RECORDED && postS.M == BARCODE_NOT_PRESENT));
+  @ }
   @ axiomatic SBB_motor_ASM {
   @   predicate motor_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
@@ -82,7 +90,11 @@
   @   predicate ASM_transition(SBB_state preS,
   @                            SBB_event E,
   @                            SBB_state postS) =
-  @     motor_ASM_transition(preS, E, postS);
+  @     motor_ASM_transition(preS, E, postS)      ||
+  @     cast_spoil_ASM_transition(preS, E, postS) ||
+  @     barcode_ASM_transition(preS, E, postS)    ||
+  @     sd_card_ASM_transition(preS, E, postS)
+  @     ;
   @ }
   @*/
 
