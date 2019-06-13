@@ -58,6 +58,17 @@
   @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_BACKWARD) ||
   @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_TURNING_BACKWARD));
   @ }
+  @ axiomatic SBB_cast_spoil_ASM {
+  @  predicate cast_spoil_ASM_transition(SBB_state preS,
+  @                                      SBB_event E,
+  @                                      SBB_state postS) =
+  @    ((E == SPOIL_E) ==>
+  @     (preS.M == ALL_BUTTONS_UP) && (postS.M == SPOIL_BUTTON_DOWN)) &&
+  @    ((E == CAST_E)  ==>
+  @     (preS.M == ALL_BUTTONS_UP) && (postS.M == CAST_BUTTON_DOWN)) &&
+  @    ((E == INTERNAL_CAST_SPOIL_E)  ==>
+  @     ((preS.M == SPOIL_BUTTON_DOWN || preS.M == CAST_BUTTON_DOWN) && (postS.M == ALL_BUTTONS_UP)))
+  @ }
   @ axiomatic SBB_ASM {
   @   predicate ASM_transition(SBB_state preS,
   @                            SBB_event E,
