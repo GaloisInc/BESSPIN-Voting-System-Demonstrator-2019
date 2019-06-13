@@ -33,7 +33,7 @@ SBB-Bottom:
 
 SBB-FreeRTOS:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'cd source/sbb; export TARGET=freertos; make; make clean;'
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'cd source/sbb; export TARGET=freertos; make'
   tags: ["voting-system"]
   artifacts:
     name: "$CI_JOB_NAME-$CI_COMMIT_REF_NAME"
