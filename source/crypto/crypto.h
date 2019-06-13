@@ -28,13 +28,13 @@ void decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext);
 
 /*@ requires \valid(the_message);
   @ requires \valid(the_digest + (0..SHA_DIGEST_SIZE-1));
-  @ assigns the_digest[0..SHA_DIGEST_SIZE];
+  @ assigns the_digest[0..SHA_DIGEST_SIZE-1];
   @*/
 void hash(message the_message, digest the_digest);
 
 /*@ requires \valid(the_message);
   @ requires \valid(the_digest + (0..SHA_DIGEST_SIZE-1));
-  @ assigns the_digest[0..SHA_DIGEST_SIZE];
+  @ assigns the_digest[0..SHA_DIGEST_SIZE-1];
   @*/
 void hmac(message the_message, digest the_digest);
 
