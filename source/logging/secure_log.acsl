@@ -18,37 +18,6 @@
   @   type secure_log_entry = base_block | hashchained_block;
   @   type secure_log = List<secure_log_entry>;
   @*/
-/*@
-  @ predicate is_integrity(integrity i)=
-  @   no_integrity==i || hashchain_sha2_256 == i || hashchain_sha3_256 ==i;
-  @ 
-@*/
-
-/*@
-  @ predicate is_confidentiality(confidentiality c)=
-  @   no_confidentiality ==c || all_plaintext == c || all_ciphertext ==c; 
-@*/
-
-/*@
-  @ predicate is_provenance( provenance p) = 
-  @   no_provenance  == p;
-@*/
-
-/*@
-  @ predicate is_authentication( authentication a) =
-  @   no_authentication == a || aes_cbc == a || hmac_sha2_256 == a || rsa_1025 == a;
-@*/
-
-/*@
-  @ predicate is_access_control ( access_control ac) = 
-  @   no_access_control == ac ||  userid == ac;
-@*/
-
-/*@
-  @ predicate is_non_repudiation ( non_repudiation nr) =
-  @   no_non_repudiation == nr;
-@*/
-
 
 #endif
 
