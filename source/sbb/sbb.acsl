@@ -43,6 +43,15 @@
   @   predicate motor_running(motor m, SBB_state S) =
   @     (m != off) <==> (S.M == MOTORS_TURNING_FORWARD);
   @ }
+  @ axiomatic SBB_sd_card_ASM {
+  @   predicate sd_card_ASM_transition(SBB_state preS,
+  @                                    SBB_event E,
+  @                                    SBB_state postS) =
+  @      ((E == CARD_PRESENT_E) ==>
+  @        (preS.M == UNKNOWN_SD_CARD_STATE && postS.M == SD_CARD_READY)) &&
+  @      ((E == ERASE_CARD_E) ==>
+  @        (preS.M == SD_CARD_READY && postS.M == SD_CARD_READY));
+  @ }
   @ axiomatic SBB_motor_ASM {
   @   predicate motor_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
@@ -67,7 +76,7 @@
   @    ((E == CAST_E)  ==>
   @     (preS.M == ALL_BUTTONS_UP) && (postS.M == CAST_BUTTON_DOWN)) &&
   @    ((E == INTERNAL_CAST_SPOIL_E)  ==>
-  @     ((preS.M == SPOIL_BUTTON_DOWN || preS.M == CAST_BUTTON_DOWN) && (postS.M == ALL_BUTTONS_UP)))
+  @     ((preS.M == SPOIL_BUTTON_DOWN || preS.M == CAST_BUTTON_DOWN) && (postS.M == ALL_BUTTONS_UP)));
   @ }
   @ axiomatic SBB_ASM {
   @   predicate ASM_transition(SBB_state preS,

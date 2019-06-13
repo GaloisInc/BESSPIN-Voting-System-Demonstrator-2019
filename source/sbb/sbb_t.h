@@ -69,6 +69,9 @@ typedef enum { //motor_ASM
                MOTOR_OFF_E = STOP+1,
                MOTOR_FORWARD_E,
                MOTOR_BACKWARD_E,
+               //sd_card_ASM
+               CARD_PRESENT_E,
+               ERASE_CARD_E,
                //cast_spoil_ASM
                SPOIL_E,
                CAST_E,
