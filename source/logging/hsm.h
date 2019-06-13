@@ -30,7 +30,7 @@ typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
 void hmac (const aes256_key key,     // IN
 	   const char       msg[],   // IN
 	   const size_t     msg_size,       // IN
-           sha256_digest    *const digest); // OUT
+           uint8_t          *const digest); // OUT
 
 /*@
     requires \valid_read (msg + (0 .. msg_size - 1));

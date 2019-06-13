@@ -32,7 +32,7 @@ static secure_log_entry initial_log_entry(const aes256_key key, // IN
   // done by the caller.
 
   // 2. Form "hmac key msg"
-  hmac (key, msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest);
+  hmac (key, msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0]);
 
   // 3. Copy the msg data
   /*@
