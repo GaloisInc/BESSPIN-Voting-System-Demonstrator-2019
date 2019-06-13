@@ -26,16 +26,16 @@ void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext);
   @*/
 void decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext);
 
-/*@ requires \valid(the_message);
+/*@ requires \valid(the_message + (0..the_message_size));
   @ requires \valid(the_digest + (0..SHA_DIGEST_SIZE-1));
   @ assigns the_digest[0..SHA_DIGEST_SIZE-1];
   @*/
-void hash(message the_message, digest the_digest);
+void hash(message the_message, uint32_t the_message_size, digest the_digest);
 
-/*@ requires \valid(the_message);
+/*@ requires \valid(the_message + (0..the_message_size));
   @ requires \valid(the_digest + (0..SHA_DIGEST_SIZE-1));
   @ assigns the_digest[0..SHA_DIGEST_SIZE-1];
   @*/
-void hmac(message the_message, digest the_digest);
+void hmac(message the_message, uint32_t the_message_size, digest the_digest);
 
 #endif
