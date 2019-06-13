@@ -9,6 +9,10 @@
 #include "secure_log.h"
 #include "hsm.h"
 
+// Local constants
+
+const aes256_key test_key = { 0 };
+
 // Local functions
 
 // Refines Cryptol initialLogEntry
@@ -48,19 +52,28 @@ static secure_log_entry initial_log_entry(const aes256_key key, // IN
 
 // Exported functions
 
-secure_log create_secure_log(const secure_log_name the_secure_log_name,
-                             const log_entry a_log_entry_type,
-                             const secure_log_security_policy* the_policy)
+void create_secure_log(Log_Handle *secure_log,
+                       const secure_log_name the_secure_log_name,
+                       const log_entry a_log_entry_type,
+                       const secure_log_security_policy the_policy)
 {
-
+  Log_FS_Result create_result, write_result, sync_result;
+  secure_log_entry initial_entry;
+  
   // Initial/Draft pseudo-code by RCC
 
   // 1. Create new file, open for writing only.
+  create_result = Log_IO_Create_New (secure_log, the_secure_log_name);
+  
   // 2. call initial_log_entry above to create the first block
+  initial_entry = initial_log_entry (test_key, a_log_entry_type);
+  
   // 3. Write that new block to the file.
+  write_result = Log_IO_Write_Entry (secure_log, initial_entry);
+  
   // 4. sync the file.
-  // 5. return the file handle as result
-
+  sync_result = Log_IO_Sync (secure_log);
+  
   // TBDs - what about error cases?
   //   What if the file already exists? Perhaps a pre-condition here that it doesn't
   //    already exist, so up to the caller to spot that and do the right thing...

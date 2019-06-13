@@ -20,8 +20,10 @@
 
 /*@
   @ requires valid_string(the_log_name);
+  @ requires \valid(log);
 @*/
-log create_log(const log_name the_log_name);
+void create_log(Log_Handle *log,
+		const log_name the_log_name);
 
 /*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH -1));
   @ requires \valid(the_log);

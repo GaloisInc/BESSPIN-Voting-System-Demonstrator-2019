@@ -23,12 +23,15 @@ typedef log_io_stream secure_log_io_stream;
 // @design kiniry We should probably write `the_policy` into the log's
 // root block and authenticate it or, more likely, its first block
 // after the authenticated zeroed root block.
+
 /*@
+  @ requires \valid(secure_log);
   @ requires \valid_read(a_log_entry_type + (0 .. LOG_ENTRY_LENGTH -1));
-  @*/
-secure_log create_secure_log(const secure_log_name the_secure_log_name,
-                             const log_entry a_log_entry_type,
-                             const secure_log_security_policy* the_policy);
+@*/
+void create_secure_log(Log_Handle *secure_log,
+                       const secure_log_name the_secure_log_name,
+                       const log_entry a_log_entry_type,
+                       const secure_log_security_policy the_policy);
 
 /*@
   @ requires \valid_read(((char*)a_secure_log_name) + (0 .. LOG_ENTRY_LENGTH -1));

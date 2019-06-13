@@ -74,20 +74,3 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 /* reads the last entry (i.e. most recently written to the end of the file) */
 secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
