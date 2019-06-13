@@ -12,9 +12,9 @@
 
 // All sizes in bits.
 
-const uint32_t AES_BLOCK_SIZE  = 256;
-const uint32_t AES_KEY_SIZE    = 256;
-const uint32_t SHA_DIGEST_SIZE = 256;
+extern const uint32_t AES_BLOCK_SIZE;
+extern const uint32_t AES_KEY_SIZE; 
+extern const uint32_t SHA_DIGEST_SIZE;
 
 typedef uint8_t* block;
 typedef block plaintext_block;

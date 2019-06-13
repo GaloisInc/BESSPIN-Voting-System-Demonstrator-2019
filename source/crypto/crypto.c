@@ -8,6 +8,11 @@
 // Subsystem includes
 #include "crypto.h"
 
+// constant declarations for the crypto subsystem
+const uint32_t AES_BLOCK_SIZE  = 256;
+const uint32_t AES_KEY_SIZE    = 256;
+const uint32_t SHA_DIGEST_SIZE = 256;
+
 void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext) {
   return;
 }
