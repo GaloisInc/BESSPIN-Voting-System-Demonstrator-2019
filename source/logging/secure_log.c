@@ -50,7 +50,7 @@ static secure_log_entry initial_log_entry(const aes256_key key, // IN
 
 secure_log create_secure_log(const secure_log_name the_secure_log_name,
                              const log_entry a_log_entry_type,
-                             const secure_log_security_policy the_policy)
+                             const secure_log_security_policy* the_policy)
 {
 
   // Initial/Draft pseudo-code by RCC

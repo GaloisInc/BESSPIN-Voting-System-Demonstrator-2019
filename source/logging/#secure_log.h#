@@ -12,10 +12,6 @@
 #include "secure_log_t.h"
 #include "secure_log.acsl"
 
-typedef log_name secure_log_name;
-typedef log secure_log;
-typedef log_io_stream secure_log_io_stream;
-
 // @spec kiniry These functions need ACSL specifications, based upon
 // an axiomatic spec of logs in `secure_log.acsl` that algebraically
 // matches that which was specified by Joey in Cryptol.
@@ -27,8 +23,9 @@ typedef log_io_stream secure_log_io_stream;
   @ requires \valid_read(a_log_entry_type + (0 .. LOG_ENTRY_LENGTH -1));
   @*/
 secure_log create_secure_log(const secure_log_name the_secure_log_name,
-                             const log_entry a_log_entry_type,
-                             const secure_log_security_policy* the_policy);
+                             const log_entry
+			     ,
+                             const secure_log_security_policy the_policy);
 
 /*@
   @ requires \valid_read(((char*)a_secure_log_name) + (0 .. LOG_ENTRY_LENGTH -1));
