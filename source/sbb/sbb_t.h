@@ -75,6 +75,7 @@ typedef enum { //motor_ASM
                //barcode_ASM
                INTERNAL_BARCODE_E,
                //display_ASM
+               INTERNAL_DISPLAY_E,
                DISPLAY_TEXT_E,
                //paper_detect_ASM
                INTERNAL_PAPER_DETECT_E,
@@ -82,7 +83,11 @@ typedef enum { //motor_ASM
                SPOIL_E,
                CAST_E,
                INTERNAL_CAST_SPOIL_E,
-               //internal event
+               //timer_ASM
+               INTERNAL_TIMER_E,
+               TIMER_TICK_UNDER_E,
+               TIMER_TICK_OVER_E,
+               RESET_TIMER_E,
              } SBB_event;
 
 // @design kiniry This is the record type that encodes the full

@@ -61,7 +61,7 @@
   @       (preS.BS == BARCODE_PRESENT_AND_RECORDED && postS.BS == BARCODE_NOT_PRESENT));
   @ }
   @ axiomatic SBB_display_ASM {
-  @ predicate barcode_ASM_transition(SBB_state preS,
+  @ predicate display_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
   @                                  SBB_state postS) =
   @   ((E == INTERNAL_DISPLAY_E) ==>
@@ -96,33 +96,51 @@
   @     ((preS.B == SPOIL_BUTTON_DOWN || preS.B == CAST_BUTTON_DOWN) && (postS.B == ALL_BUTTONS_UP)));
   @ }
   @ axiomatic SBB_paper_detect_ASM {
-  @ spec abakst should NO_PAPER_DETECTED be reachable from the other states?
   @ predicate paper_detect_ASM_transition(SBB_state preS,
   @                                       SBB_event E,
   @                                       SBB_state postS) =
-  @    ((E == INTERNAL_PAPER_DETECT) ==>
+  @    ((E == INTERNAL_PAPER_DETECT_E) ==>
   @     ((preS.P == NO_PAPER_DETECTED && postS.P == EARLY_PAPER_DETECTED) ||
   @      ((preS.P == EARLY_PAPER_DETECTED ||
   @        preS.P == LATE_PAPER_DETECTED  ||
-  @        preS.P == EARLY_ANDLATE_PAPER_DETECTED) &&
-  @        (postS.P == EARLY_PAPER_DETECTED ||
-  @         postS.P == LATE_PAPER_DETECTED  ||
-  @         postS.P == EARLY_ANDLATE_PAPER_DETECTED) &&
-  @        preS.P != postS.P)));
+  @        preS.P == EARLY_AND_LATE_DETECTED) &&
+  @       (postS.P == EARLY_PAPER_DETECTED ||
+  @        postS.P == LATE_PAPER_DETECTED  ||
+  @        postS.P == EARLY_AND_LATE_DETECTED) &&
+  @       preS.P != postS.P)));
+  @ }
+  @ axiomatic SBB_timer_ASM {
+  @   predicate timer_ASM_transition(SBB_state preS,
+  @                                  SBB_event E,
+  @                                  SBB_state postS) =
+  @   ((E == INTERNAL_TIMER_E) ==>
+  @      (preS.T == INITIALIZED && postS.T == RUNNING)) &&
+  @   ((E == RESET_TIMER_E) ==>
+  @      (preS.T == RUNNING && postS.T == INITIALIZED)) &&
+  @   ((E == TIMER_TICK_UNDER_E) ==>
+  @      (preS.T == RUNNING && postS.T == RUNNING)) &&
+  @   ((E == TIMER_TICK_OVER_E) ==>
+  @     (preS.T == RUNNING && postS.T == STOPPED)) &&
+  @   ((E == INTERNAL_TIMER_E) ==>
+  @     (preS.T == STOPPED && postS.T == INITIALIZED)); 
   @ }
   @ axiomatic SBB_ASM {
   @   predicate ASM_transition(SBB_state preS,
   @                            SBB_event E,
   @                            SBB_state postS) =
-  @     motor_ASM_transition(preS, E, postS)       &&
-  @     cast_spoil_ASM_transition(preS, E, postS)  &&
-  @     barcode_ASM_transition(preS, E, postS)     &&
-  @     display_ASM_transition(preS, E, postS)     &&
+  @     motor_ASM_transition(preS, E, postS)        &&
+  @     cast_spoil_ASM_transition(preS, E, postS)   &&
+  @     barcode_ASM_transition(preS, E, postS)      &&
+  @     display_ASM_transition(preS, E, postS)      &&
   @     paper_detect_ASM_transition(preS, E, postS) &&
+  @     timer_ASM_transition(preS, E, postS)        &&
   @     sd_card_ASM_transition(preS, E, postS)
   @     ;
   @ }
   @*/
+
+// @spec abakst should NO_PAPER_DETECTED be reachable from the other states?
+// @spec abakst the diagram seems to indicate there is a skip transition from stopped to initialized
 
 // @design kiniry Note that when the SBB is powered on, a ballot paper
 // may be inside of the device.  We cannot make assumptions about
