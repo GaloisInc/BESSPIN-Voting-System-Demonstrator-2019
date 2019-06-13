@@ -76,6 +76,8 @@ typedef enum { //motor_ASM
                INTERNAL_BARCODE_E,
                //display_ASM
                DISPLAY_TEXT_E,
+               //paper_detect_ASM
+               INTERNAL_PAPER_DETECT_E,
                //cast_spoil_ASM
                SPOIL_E,
                CAST_E,

@@ -48,26 +48,26 @@
   @                                    SBB_event E,
   @                                    SBB_state postS) =
   @      ((E == CARD_PRESENT_E) ==>
-  @        (preS.M == UNKNOWN_SD_CARD_STATE && postS.M == SD_CARD_READY)) &&
+  @        (preS.C == UNKNOWN_SD_CARD_STATE && postS.C == SD_CARD_READY)) &&
   @      ((E == ERASE_CARD_E) ==>
-  @        (preS.M == SD_CARD_READY && postS.M == SD_CARD_READY));
+  @        (preS.C == SD_CARD_READY && postS.C == SD_CARD_READY));
   @ }
   @ axiomatic SBB_barcode_scanner_ASM {
   @   predicate barcode_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
   @                                  SBB_state postS) =
   @     (E == INTERNAL_BARCODE_E) ==>
-  @      ((preS.M == BARCODE_NOT_PRESENT && postS.M == BARCODE_PRESENT_AND_RECORDED) ||
-  @       (preS.M == BARCODE_PRESENT_AND_RECORDED && postS.M == BARCODE_NOT_PRESENT));
+  @      ((preS.BS == BARCODE_NOT_PRESENT && postS.BS == BARCODE_PRESENT_AND_RECORDED) ||
+  @       (preS.BS == BARCODE_PRESENT_AND_RECORDED && postS.BS == BARCODE_NOT_PRESENT));
   @ }
   @ axiomatic SBB_display_ASM {
   @ predicate barcode_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
   @                                  SBB_state postS) =
   @   ((E == INTERNAL_DISPLAY_E) ==>
-  @     (preS.M == INITIALIZATION && postS.M == INITIALIZED_DISPLAY)) &&
+  @     (preS.D == INITIALIZATION && postS.D == INITIALIZED_DISPLAY)) &&
   @   ((E == DISPLAY_TEXT_E) ==>
-  @    ((preS.M == INITIALIZED_DISPLAY || preS.M == SHOWING_TEXT) && postS.M == SHOWING_TEXT));
+  @    ((preS.D == INITIALIZED_DISPLAY || preS.D == SHOWING_TEXT) && postS.D == SHOWING_TEXT));
   @ }
   @ axiomatic SBB_motor_ASM {
   @   predicate motor_ASM_transition(SBB_state preS,
@@ -89,20 +89,36 @@
   @                                      SBB_event E,
   @                                      SBB_state postS) =
   @    ((E == SPOIL_E) ==>
-  @     (preS.M == ALL_BUTTONS_UP) && (postS.M == SPOIL_BUTTON_DOWN)) &&
+  @     (preS.B == ALL_BUTTONS_UP) && (postS.B == SPOIL_BUTTON_DOWN)) &&
   @    ((E == CAST_E)  ==>
-  @     (preS.M == ALL_BUTTONS_UP) && (postS.M == CAST_BUTTON_DOWN)) &&
+  @     (preS.B == ALL_BUTTONS_UP) && (postS.B == CAST_BUTTON_DOWN)) &&
   @    ((E == INTERNAL_CAST_SPOIL_E)  ==>
-  @     ((preS.M == SPOIL_BUTTON_DOWN || preS.M == CAST_BUTTON_DOWN) && (postS.M == ALL_BUTTONS_UP)));
+  @     ((preS.B == SPOIL_BUTTON_DOWN || preS.B == CAST_BUTTON_DOWN) && (postS.B == ALL_BUTTONS_UP)));
+  @ }
+  @ axiomatic SBB_paper_detect_ASM {
+  @ spec abakst should NO_PAPER_DETECTED be reachable from the other states?
+  @ predicate paper_detect_ASM_transition(SBB_state preS,
+  @                                       SBB_event E,
+  @                                       SBB_state postS) =
+  @    ((E == INTERNAL_PAPER_DETECT) ==>
+  @     ((preS.P == NO_PAPER_DETECTED && postS.P == EARLY_PAPER_DETECTED) ||
+  @      ((preS.P == EARLY_PAPER_DETECTED ||
+  @        preS.P == LATE_PAPER_DETECTED  ||
+  @        preS.P == EARLY_ANDLATE_PAPER_DETECTED) &&
+  @        (postS.P == EARLY_PAPER_DETECTED ||
+  @         postS.P == LATE_PAPER_DETECTED  ||
+  @         postS.P == EARLY_ANDLATE_PAPER_DETECTED) &&
+  @        preS.P != postS.P)));
   @ }
   @ axiomatic SBB_ASM {
   @   predicate ASM_transition(SBB_state preS,
   @                            SBB_event E,
   @                            SBB_state postS) =
-  @     motor_ASM_transition(preS, E, postS)      ||
-  @     cast_spoil_ASM_transition(preS, E, postS) ||
-  @     barcode_ASM_transition(preS, E, postS)    ||
-  @     display_ASM_transition(preS, E, postS)    ||
+  @     motor_ASM_transition(preS, E, postS)       &&
+  @     cast_spoil_ASM_transition(preS, E, postS)  &&
+  @     barcode_ASM_transition(preS, E, postS)     &&
+  @     display_ASM_transition(preS, E, postS)     &&
+  @     paper_detect_ASM_transition(preS, E, postS) &&
   @     sd_card_ASM_transition(preS, E, postS)
   @     ;
   @ }
