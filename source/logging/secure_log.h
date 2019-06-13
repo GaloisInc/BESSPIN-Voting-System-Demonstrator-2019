@@ -12,6 +12,10 @@
 #include "secure_log_t.h"
 #include "secure_log.acsl"
 
+typedef log_name secure_log_name;
+typedef log secure_log;
+typedef log_io_stream secure_log_io_stream;
+
 // @spec kiniry These functions need ACSL specifications, based upon
 // an axiomatic spec of logs in `secure_log.acsl` that algebraically
 // matches that which was specified by Joey in Cryptol.

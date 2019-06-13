@@ -12,6 +12,7 @@
 // Subsystem includes
 #include "log_t.h"
 #include "log.acsl"
+#include "log_io.h"
 
 // @design kiniry In this API should logs be referred to via filenames
 // or file pointers?

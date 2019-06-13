@@ -6,11 +6,6 @@
 
 #define SECURE_LOG_ENTRY_LENGTH 256+sizeof(digest)
 
-typedef log_name secure_log_name;
-typedef log secure_log;
-typedef log_io_stream secure_log_io_stream;
-
-
 // RCC thinks this is wrong - should be 32 bytes for 256 _bit_ digest.
 // And should be picked up from hsm.h anyway.
 // typedef uint8_t digest[256];
