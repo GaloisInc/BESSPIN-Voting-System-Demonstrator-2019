@@ -1,0 +1,18 @@
+# Makefile for Building the logging subsystem "host" tests - e.g. tests that run on Linux or MacOS
+
+# Assume clang is on PATH, but needs some special setup on Darwin to override
+# Apple's clang and use the HomeBrew one instead...
+export CC := clang
+
+# Build the bottom target
+all: test1 test2
+
+test1:
+	$(CC) -g -o test1 test1.c log.c secure_log.c log_io.c hsm.c
+
+test2:
+	$(CC) -g -o test2 test2.c log.c secure_log.c log_io.c hsm.c
+
+clean:
+	rm test1 test2 *.o
+	
