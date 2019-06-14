@@ -327,16 +327,10 @@ bool Log_IO_File_Exists (const char *name)
 
 size_t Log_IO_Num_Entries (Log_Handle *stream)
 {
-  Log_Handle *local_stream_ptr;
-  local_stream_ptr = fopen (name, "r");
-  if (local_stream_ptr == NULL)
-    {
-      return 0;
-    }
-  fseek(local_stream_ptr, 0L, SEEK_END);
-  off_t N = ftell(local_stream_ptr) / SECURE_LOG_ENTRY_LENGTH;
-    
-  fclose (local_stream_ptr);
+  off_t position = ftell(stream);
+  fseek(stream, 0L, SEEK_END);
+  off_t N = ftell(stream) / SECURE_LOG_ENTRY_LENGTH;
+  fseek(stream,position,SEEK_SET);
   return N;
 }
 
