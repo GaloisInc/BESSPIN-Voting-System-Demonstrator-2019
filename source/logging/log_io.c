@@ -338,6 +338,17 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 
 secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream)
 {
-  return null_secure_log_entry;
+  size_t N;
+  N = Log_IO_Num_Entries (stream);
+  
+  // We cannot get anything from an empty file so
+  if (N > 0)
+    {
+      return Log_IO_Read_Entry (stream, N - 1);
+    }
+  else
+    {
+      return null_secure_log_entry;
+    }
 }
 #endif
