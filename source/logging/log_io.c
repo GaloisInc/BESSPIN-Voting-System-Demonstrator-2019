@@ -320,6 +320,7 @@ bool Log_IO_File_Exists (const char *name)
     {
       return false;
     }
+  fclose (local_stream_ptr);
   return true;
 }
 
