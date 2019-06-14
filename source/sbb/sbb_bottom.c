@@ -16,7 +16,7 @@ void perform_tabulation(void) {
   printf("Performing tabulation\r\n");
 }
 
-bool is_barcode_valid(barcode the_barcode, barcode_length its_length) {
+bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
   assert(false);
   //@ assert false;
   return false;
@@ -39,7 +39,7 @@ void just_received_barcode(void) {
   //@ assert false;
 }
 
-void set_received_barcode(barcode the_barcode, barcode_length its_length) {
+void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
   assert(false);
   //@ assert false;
 }
@@ -50,7 +50,7 @@ bool has_a_barcode(void) {
   return false;
 }
 
-void what_is_the_barcode(barcode the_barcode, barcode_length its_length) {
+void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length) {
   assert(false);
   //@ assert false;
 }
