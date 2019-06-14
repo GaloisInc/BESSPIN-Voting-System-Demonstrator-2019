@@ -15,3 +15,4 @@ else
 $(info unknown target type: $(TARGET) Available types are "bottom", "freertos" and "verification")
 endif
 endif
+endif
