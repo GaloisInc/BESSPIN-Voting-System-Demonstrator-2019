@@ -81,6 +81,9 @@ void create_secure_log(Log_Handle *secure_log,
   // 3. Write that new block to the file.
   write_result = Log_IO_Write_Entry (secure_log, initial_entry);
 
+  // TBD - what to do with the_policy parameter?
+  //       awaiting requirements on this.
+  
   // 4. sync the file.
   sync_result = Log_IO_Sync (secure_log);
 
