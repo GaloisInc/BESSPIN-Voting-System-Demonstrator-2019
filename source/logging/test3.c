@@ -1,10 +1,14 @@
 #include "log.h"
+#include <stdio.h>
 
 int main(void)
 {
   Log_Handle my_log;
+  size_t num;
 
-  const log_entry second_entry = "hello rod   xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+  const log_entry second_entry = "hello draganxxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+
+  const log_entry third_entry = "hello rod   xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
 
   
   Log_IO_Initialize();
@@ -12,7 +16,12 @@ int main(void)
   create_log (&my_log, "test3log.txt");
 
   write_entry (&my_log, second_entry);
+  write_entry (&my_log, third_entry);
 	       
+  num = Log_IO_Num_Entries (&my_log);
+
+  printf ("Num entries in the files is %d\n", (int) num);
+
   Log_IO_Close (&my_log);
 
   // It should be there so
