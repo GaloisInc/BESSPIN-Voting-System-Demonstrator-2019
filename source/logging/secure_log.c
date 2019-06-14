@@ -126,30 +126,33 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
     }
 
    // invoke hash ( paddedMsg # previousHash)
-   sha256 (msg,SECURE_LOG_ENTRY_LENGTH, &current_entry.the_digest[0]);
-
+   //   sha256 (msg,SECURE_LOG_ENTRY_LENGTH, &current_entry.the_digest[0]);
+   sha256 (msg,SECURE_LOG_ENTRY_LENGTH, &new_hash[0]);
+   
    // Add the a_log_entry to the current_entry
-
-  for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-      current_entry.the_entry[i] = a_log_entry[i];
-    }
-
-  // 3. Save the new hash to previous_hash
-  for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-    {
-      previous_hash[i] = new_hash[i];
-    }
-
-  // 4. Write the log_entry message to the_secure_log
-
-  write_result = Log_IO_Write_Entry (the_secure_log, current_entry);
-
-  // 5. Write the hash block
-
-  // 6. Sync the file.
-  sync_result = Log_IO_Sync (the_secure_log);
-
-  return;
+   
+   for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+     {
+       current_entry.the_entry[i] = a_log_entry[i];
+     }
+   
+   // 3. Save the new hash to previous_hash and
+   //    copy new_hash into the current_entry
+   for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
+     {
+       current_entry.the_digest[i] = new_hash[i];
+       previous_hash[i]            = new_hash[i];
+     }
+   
+   // 4. Write the log_entry message to the_secure_log
+   
+   write_result = Log_IO_Write_Entry (the_secure_log, current_entry);
+   
+   // 5. Write the hash block
+   
+   // 6. Sync the file.
+   sync_result = Log_IO_Sync (the_secure_log);
+   
+   return;
 }
 
