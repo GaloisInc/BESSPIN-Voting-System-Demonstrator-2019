@@ -39,19 +39,30 @@ type Log sizeBytes = {
     msgHash : [HashSizeBytes][8]
 }
 
+serializeBinaryLog : {sizeBytes} (fin sizeBytes) =>
+    Log sizeBytes -> [sizeBytes + HashSizeBytes][8]
+serializeBinaryLog log = log.message # log.msgHash
+
 /**
     A log file is a series of log messages. We must
     specify a maximum log size so that all of the entries
     can have the same type
 */
-type LogFile maxSizeBites msgs = [msgs](Log maxSizeBites)
+type LogFile maxSizeBytes msgs = [msgs](Log maxSizeBytes)
+
+serializeBinaryLogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
+    LogFile maxSizeBytes msgs ->
+    [msgs * (maxSizeBytes + HashSizeBytes)][8]
+serializeBinaryLogFile logFile = join serializedLogs where
+    serializedLogs = [serializeBinaryLog entry | entry <- logFile]
 
 //Message will be something from secure boot, not identified yet
 initialLogEntry : {msgSize, keySize, resultSize}
-                (fin msgSize, fin keySize, msgSize <= resultSize) =>
+                (fin msgSize, fin keySize, fin resultSize, msgSize <= resultSize) =>
     [keySize][8] -> [msgSize][8] -> Log resultSize
-initialLogEntry key msg = { message = (msg # zero), msgHash = hmac key (msg # zero)}
-
+initialLogEntry key msg =
+    { message = paddedMsg, msgHash = hmac key paddedMsg} where
+        paddedMsg = ((msg # zero) : [resultSize][8])
 
 /**
     Utility function to get the previous hash
