@@ -45,5 +45,5 @@ log_file import_log(const log_file the_log_name) {
 }
 
 bool verify_log_well_formedness(const log_file the_log) {
-  return false;
+  return verify_secure_log_security (the_log);
 }
