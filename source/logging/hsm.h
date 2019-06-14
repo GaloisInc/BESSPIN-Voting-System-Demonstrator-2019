@@ -40,6 +40,6 @@ void hmac (const aes256_key key,     // IN
 */
 void sha256 (const uint8_t msg[],     // IN
 	     const size_t  msg_size,       // IN
-             sha256_digest *const digest); // OUT
+             uint8_t *const digest); // OUT
 
 #endif

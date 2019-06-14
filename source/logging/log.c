@@ -26,6 +26,9 @@ void create_log(Log_Handle *log,
 }
 
 void write_entry(const log the_log, const log_entry a_log_entry) {
+  
+  write_entry_to_secure_log(the_log, a_log_entry);
+
   return;
 }
 

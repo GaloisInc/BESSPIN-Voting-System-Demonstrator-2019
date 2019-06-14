@@ -3,8 +3,7 @@
 
 #include "log_t.h"
 #include "hsm.h"
-
-#define SECURE_LOG_ENTRY_LENGTH 256+sizeof(digest)
+#define SECURE_LOG_ENTRY_LENGTH 256+sizeof(SHA256_DIGEST_LENGTH_BYTES)
 
 // RCC thinks this is wrong - should be 32 bytes for 256 _bit_ digest.
 // And should be picked up from hsm.h anyway.
