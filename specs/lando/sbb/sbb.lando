@@ -7,6 +7,8 @@ subsystem Smart Ballot Box
       Parker Southwick <psouthwick@galois.com>
       Steven Osborn <steven@freeandfair.us>
       Joe Kiniry <kiniry@freeandfair.us>
+      Daniel M. Zimmerman <dmz@freeandfair.us>
+      Alexander Bakst <abakst@galois.com>
     potential contributors: Daniel M., Alexander B.
 
 // @todo kiniry This top-level system specification should either
@@ -49,6 +51,10 @@ component Ballot Box
   Ballot inserted?
   Spoil this ballot!
   Cast this ballot!
+// @design dmz the following query is really asking whether, if a ballot is
+// detected, it has already been spoiled or rejected for being invalid; 
+// we should address this (both here and in the state machine) for the
+// next milestone.
   Is the ballot spoiled?
   Go to standby!
   Reset the ballot detect timeout!

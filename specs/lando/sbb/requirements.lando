@@ -4,7 +4,7 @@ Reject invalid ballots.
 All ballots with invalid or non-existent barcode are rejected.
 
 Recognize valid ballots.
-All ballots with a valid barcode are recognized, and the user is let
+All ballots with a valid barcode are recognized, and the user is allowed
 to decide whether to cast or spoil the given ballot
 
 User can accept a valid ballot.
@@ -13,7 +13,8 @@ is deposited into the ballot box.
 
 User can spoil a valid ballot.
 The user can decide to spoil a valid ballot. In such case, the ballot
-is rejected and returned to the user.
+is rejected and returned to the user, and is subsequently considered 
+invalid.
 
 Barcodes have limited information density.
 The maximum length of a barcode is 16 bytes, which is 128 bits.
