@@ -52,7 +52,7 @@ component Ballot Box
   Spoil this ballot!
   Cast this ballot!
 // @design dmz the following query is really asking whether, if a ballot is
-// detected, it has already been spoiled or rejected for being invalid; 
+// in the machine, it has already been spoiled or rejected for being invalid; 
 // we should address this (both here and in the state machine) for the
 // next milestone.
   Is the ballot spoiled?

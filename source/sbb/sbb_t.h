@@ -38,7 +38,6 @@ typedef enum { MOTORS_OFF = STOPPED+1,
 typedef enum { INITIALIZATION = MOTORS_TURNING_BACKWARD+1,
                INITIALIZED_DISPLAY,
                SHOWING_TEXT } display_state;
-// @review kiniry We are missing a NO_PAPER_DETECTED state.
 typedef enum { NO_PAPER_DETECTED = SHOWING_TEXT+1,
                EARLY_PAPER_DETECTED,
                LATE_PAPER_DETECTED,
