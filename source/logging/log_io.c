@@ -336,9 +336,9 @@ size_t Log_IO_Num_Entries (Log_Handle *stream)
 
 secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 				    size_t n)  // IN
-{
+ { 
   return null_secure_log_entry;
-}
+ }
 
 secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream)
 {
