@@ -1,0 +1,172 @@
+/**
+ * Smart Ballot Box ACSL specification
+ * @refine sbb.lando
+ */
+
+#ifndef __SBB_API_ACSL__
+#define __SBB_API_ACSL__
+
+#include "sbb_t.h"
+
+// @spec kiniry What follows is an algebraic description of the SBB
+// hardware.  The predicates in `SBB_hardware` are used to define the
+// refinement relation between the axiomatic model and the concrete
+// implementation of the ASM.
+
+/*@ axiomatic button {
+  @   type button = down | up;
+  @ }
+  @ axiomatic light {
+  @   type light = lit | dark;
+  @ }
+  @ axiomatic barcode_present {
+  @   type has_barcode = yes | no;
+  @ }
+  @ axiomatic paper_detect {
+  @   type paper_present = early | late | none;
+  @ }
+  @ axiomatic motor {
+  @   type motor = forward | backward | off;
+  @ }
+  @ axiomatic SBB_hardware {
+  @   type cast_button = button;
+  @   type spoil_button = button;
+  @   type cast_button_light = light;
+  @   type spoil_button_light = light;
+  @   type paper_feed_motor = motor;
+  @   predicate lights_off(cast_button_light cbl,
+  @                        spoil_button_light sbl,
+  @                        SBB_state S) =
+  @     (cbl == dark && sbl == dark) <==> no_buttons_lit(S);
+  @   predicate buttons_up(cast_button cb, spoil_button sb, SBB_state S) =
+  @     (cb == up && sb == up) <==> (S.B == ALL_BUTTONS_UP);
+  @   predicate motor_running(motor m, SBB_state S) =
+  @     (m != off) <==> (S.M == MOTORS_TURNING_FORWARD || S.M == MOTORS_TURNING_BACKWARD);
+  @ }
+  @ axiomatic SBB_sd_card_ASM {
+  @   predicate sd_card_ASM_transition(SBB_state preS,
+  @                                    SBB_event E,
+  @                                    SBB_state postS) =
+  @      ((E == CARD_PRESENT_E) ==>
+  @        (preS.C == UNKNOWN_SD_CARD_STATE && postS.C == SD_CARD_READY)) &&
+  @      ((E == ERASE_CARD_E) ==>
+  @        (preS.C == SD_CARD_READY && postS.C == SD_CARD_READY));
+  @ }
+  @ axiomatic SBB_barcode_scanner_ASM {
+  @   predicate barcode_ASM_transition(SBB_state preS,
+  @                                  SBB_event E,
+  @                                  SBB_state postS) =
+  @     (E == INTERNAL_BARCODE_E) ==>
+  @      ((preS.BS == BARCODE_NOT_PRESENT && postS.BS == BARCODE_PRESENT_AND_RECORDED) ||
+  @       (preS.BS == BARCODE_PRESENT_AND_RECORDED && postS.BS == BARCODE_NOT_PRESENT));
+  @ }
+  @ axiomatic SBB_display_ASM {
+  @ predicate display_ASM_transition(SBB_state preS,
+  @                                  SBB_event E,
+  @                                  SBB_state postS) =
+  @   ((E == INTERNAL_DISPLAY_E) ==>
+  @     (preS.D == INITIALIZATION && postS.D == INITIALIZED_DISPLAY)) &&
+  @   ((E == DISPLAY_TEXT_E) ==>
+  @    ((preS.D == INITIALIZED_DISPLAY || preS.D == SHOWING_TEXT) && postS.D == SHOWING_TEXT));
+  @ }
+  @ axiomatic SBB_motor_ASM {
+  @   predicate motor_ASM_transition(SBB_state preS,
+  @                                  SBB_event E,
+  @                                  SBB_state postS) =
+  @     ((E == MOTOR_OFF_E) ==>
+  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_OFF) ||
+  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) &&
+  @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_OFF)) &&
+  @     ((E == MOTOR_FORWARD_E) ==>
+  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_FORWARD) ||
+  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_TURNING_FORWARD)) &&
+  @     ((E == MOTOR_BACKWARD_E) ==>
+  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_BACKWARD) ||
+  @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_TURNING_BACKWARD));
+  @ }
+  @ axiomatic SBB_cast_spoil_ASM {
+  @  predicate cast_spoil_ASM_transition(SBB_state preS,
+  @                                      SBB_event E,
+  @                                      SBB_state postS) =
+  @    ((E == SPOIL_E) ==>
+  @     (preS.B == ALL_BUTTONS_UP) && (postS.B == SPOIL_BUTTON_DOWN)) &&
+  @    ((E == CAST_E)  ==>
+  @     (preS.B == ALL_BUTTONS_UP) && (postS.B == CAST_BUTTON_DOWN)) &&
+  @    ((E == INTERNAL_CAST_SPOIL_E)  ==>
+  @     ((preS.B == SPOIL_BUTTON_DOWN || preS.B == CAST_BUTTON_DOWN) && (postS.B == ALL_BUTTONS_UP)));
+  @ }
+  @ axiomatic SBB_paper_detect_ASM {
+  @ predicate paper_detect_ASM_transition(SBB_state preS,
+  @                                       SBB_event E,
+  @                                       SBB_state postS) =
+  @    ((E == INTERNAL_PAPER_DETECT_E) ==>
+  @     ((preS.P == NO_PAPER_DETECTED && postS.P == EARLY_PAPER_DETECTED) ||
+  @      ((preS.P == EARLY_PAPER_DETECTED ||
+  @        preS.P == LATE_PAPER_DETECTED  ||
+  @        preS.P == EARLY_AND_LATE_DETECTED) &&
+  @       (postS.P == EARLY_PAPER_DETECTED ||
+  @        postS.P == LATE_PAPER_DETECTED  ||
+  @        postS.P == EARLY_AND_LATE_DETECTED) &&
+  @       preS.P != postS.P)));
+  @ }
+  @ axiomatic SBB_timer_ASM {
+  @   predicate timer_ASM_transition(SBB_state preS,
+  @                                  SBB_event E,
+  @                                  SBB_state postS) =
+  @   ((E == INTERNAL_TIMER_E) ==>
+  @      (preS.T == INITIALIZED && postS.T == RUNNING)) &&
+  @   ((E == RESET_TIMER_E) ==>
+  @      (preS.T == RUNNING && postS.T == INITIALIZED)) &&
+  @   ((E == TIMER_TICK_UNDER_E) ==>
+  @      (preS.T == RUNNING && postS.T == RUNNING)) &&
+  @   ((E == TIMER_TICK_OVER_E) ==>
+  @     (preS.T == RUNNING && postS.T == STOPPED)) &&
+  @   ((E == INTERNAL_TIMER_E) ==>
+  @     (preS.T == STOPPED && postS.T == INITIALIZED)); 
+  @ }
+  @ axiomatic SBB_ASM {
+  @   predicate ASM_transition(SBB_state preS,
+  @                            SBB_event E,
+  @                            SBB_state postS) =
+  @     motor_ASM_transition(preS, E, postS)        &&
+  @     cast_spoil_ASM_transition(preS, E, postS)   &&
+  @     barcode_ASM_transition(preS, E, postS)      &&
+  @     display_ASM_transition(preS, E, postS)      &&
+  @     paper_detect_ASM_transition(preS, E, postS) &&
+  @     timer_ASM_transition(preS, E, postS)        &&
+  @     sd_card_ASM_transition(preS, E, postS)
+  @     ;
+  @ }
+  @*/
+
+// @spec abakst should NO_PAPER_DETECTED be reachable from the other states?
+// @spec abakst the diagram seems to indicate there is a skip transition from stopped to initialized
+
+// @design kiniry Note that when the SBB is powered on, a ballot paper
+// may be inside of the device.  We cannot make assumptions about
+// initial button state as they may get physically stuck or someone
+// can hold them down during reset.  This spec is currently not quite
+// right because it will only hold after `initialize` is called.
+
+// @design kiniry The spec has been refined so that `initialize` calls
+// `go_to_standby` which guarantees that the paper path is clear.
+
+// @assurance kiniry Recall that the `Init` state holds just after all
+// static initialization is complete.
+
+// @todo kiniry We do not yet have a model for the barcode, so this
+// invariant is currently elided.
+//  global invariant Button_lighting_conditions_ballot:
+//    cast_button_light_on() <==> is_barcode_valid(..);
+
+/*@ global invariant Button_lighting_conditions_jointness:
+  @   \forall cast_button_light cbl, spoil_button_light sbl;
+  @     (cbl == lit) <==> (sbl == lit);
+  @*/
+
+/*@ global invariant Motor_enabled_condition:
+  @   \forall motor m, paper_present p;
+  @      (m != off) <==> (p != none);
+  @*/
+
+#endif

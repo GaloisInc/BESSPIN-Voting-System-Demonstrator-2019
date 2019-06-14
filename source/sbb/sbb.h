@@ -9,8 +9,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Subsystem includes
+#include "sbb_t.h"
+#include "sbb.acsl"
+
 // Aux
-#define BARCODE_MAX_LENGTH 16
+// @review kiniry Aren't these consts?
 extern char *insert_ballot_text;
 extern char *barcode_detected_text;
 extern char *cast_or_spoil_text;
@@ -20,145 +24,219 @@ extern char *not_a_valid_barcode_text;
 extern char *no_barcode_text;
 extern char *remove_ballot_text;
 
-/**
- * Initialize peripherals
- */
-void init_sbb(void);
+extern SBB_state the_state;
 
-/**
- * Perform Tally!
- */
-void perform_tally(void);
+// @todo kiniry This is a placeholder state representation so that we
+// can talk about the state of memory-mapped firmware.  It should
+// probably be refined to a separate memory-mapped region (or more
+// than one) per device and an invariant should stipulate that the
+// memory regions are distinct.
+typedef bool firmware_state;
+extern firmware_state the_firmware_state;
 
-/**
- * Is barcode valid?
- * Check validity of the given barcode string
- */
-bool is_barcode_valid(char *str, uint8_t len);
+// @spec abakst Specifications needed for for hardware, related to the
+// above I think we probably want some ghost `uint8_t` array to model
+// these reads/writes.
+extern uint8_t gpio_mem[8];
 
-/**
- * Is Cast button pressed?
- */
+// Motor defines
+#define MOTOR_0 4
+#define MOTOR_1 5
+
+/*@ assigns \nothing; */
+uint8_t gpio_read(uint8_t i);
+
+/*@ assigns gpio_mem[i]; */
+void    gpio_write(uint8_t i);
+
+/*@ assigns gpio_mem[i]; */
+void    gpio_clear(uint8_t i);
+
+
+// @design kiniry I am presuming that this function must be called
+// prior to any other function and guarantees that all devices are put
+// in their initial state.
+
+// @design kiniry We could (should?) encode device driver/hardware
+// subsystem state explicitly and state a separated clause between
+// them here, something like
+//   \separated(sd_card_dd_state, time_dd_state, etc.);
+
+// @design kiniry All of these functions that are commands have a
+// tight frame axiom, as they state exactly what part of `the_state`
+// of the system is update, which is the model state for the SBB ASM.
+// They must also explicitly state which mem-mapped state they modify
+// in the implementation itself for compositional reasoning to be
+// sound.
+
+/*@ assigns the_firmware_state;
+*/
+// @todo Should immediately transition to `go_to_standby()`.
+// @assurance kiniry The implementation of `initialize` must have a
+// the C label `DevicesInitialized` on its final statement.
+void initialize(void);
+
+// @review kiniry Needs a postcondition that states that the currently
+// held ballot is a legal ballot for the election, as soon as the crypto
+// spec is ready for use.
+/*@ requires \valid(the_barcode + (0..its_length));
+  @ requires the_state.P == EARLY_AND_LATE_DETECTED;
+  @ assigns \nothing;
+*/
+bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
+
+/*@ assigns \nothing;
+  @ ensures \result == (the_state.B == CAST_BUTTON_DOWN);
+*/
 bool is_cast_button_pressed(void);
 
-/**
- * Is Spoil button pressed?
- */
+/*@ assigns \nothing;
+  @ ensures \result == (the_state.B == SPOIL_BUTTON_DOWN);
+*/
 bool is_spoil_button_pressed(void);
 
-/**
- * Has a barcode?
- */
+/*@ requires the_state.P == EARLY_AND_LATE_DETECTED;
+  @ assigns \nothing;
+  @ ensures \result == (the_state.BS == BARCODE_PRESENT_AND_RECORDED);
+*/
 bool has_a_barcode(void);
 
-/**
- * Just received barcode!
- */
-void just_received_barcode(void);
+// @review kiniry Is the intention that this set of functions
+// (just_received_barcode, set_received_barcode, and
+// what_is_the_barcode) is the underlying (non-public) functions
+// encoding the device driver/firmware for the barcode scanner
+// subsystem?
+/*@ requires \valid(the_barcode + (0..its_length));
+  @ requires the_state.BS == BARCODE_PRESENT_AND_RECORDED;
+*/
+// assigns the_barcode + (0..its_length);
+// ensures (* the model barcode is written to the_barcode *)
+// @design kiniry Should this function return the number of bytes in
+// the resulting barcode?
+void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
-/**
- * Set barcode to this value
- */
-void set_received_barcode(char *str, uint8_t len);
-
-/**
- * What is the barcode?
- */
-void what_is_the_barcode(char *str, uint8_t len);
-
-/**
- * Spoil Button Light On!
- */
+// @review kiniry We have no ASM for button light states.
+/*@ assigns the_state.button_illumination;
+  @ ensures spoil_button_lit(the_state);
+*/
 void spoil_button_light_on(void);
 
-/**
- * Spoil Button Light Off!
- */
+/*@ assigns the_state.button_illumination;
+  @ ensures !spoil_button_lit(the_state);
+*/
 void spoil_button_light_off(void);
 
-/**
- * Cast Button Light On!
- */
+/*@ assigns the_state.button_illumination;
+  @ ensures cast_button_lit(the_state);
+*/
 void cast_button_light_on(void);
 
-/**
- * Cast Button Light Off!
- */
+/*@ assigns the_state.button_illumination;
+  @ ensures !cast_button_lit(the_state);
+*/
 void cast_button_light_off(void);
 
-/**
- * Move Motor Forward!
- */
+/*@ requires the_state.M == MOTORS_TURNING_FORWARD ||
+  @          the_state.M == MOTORS_OFF;
+  @ assigns the_state.M,
+  @         gpio_mem[MOTOR_0],
+  @         gpio_mem[MOTOR_1];
+  @ ensures the_state.M == MOTORS_TURNING_FORWARD;
+*/
 void move_motor_forward(void);
 
-/**
- * Move Motor back!
- */
+/*@ requires the_state.M == MOTORS_TURNING_BACKWARD ||
+  @          the_state.M == MOTORS_OFF;
+  @ assigns the_state.M,
+  @         gpio_mem[MOTOR_0],
+  @         gpio_mem[MOTOR_1];
+  @ ensures the_state.M == MOTORS_TURNING_BACKWARD;
+  @ ensures ASM_transition(\old(the_state), MOTOR_BACKWARD_E, the_state);
+  @*/
 void move_motor_back(void);
 
-/**
- * Stop Motor!
- */
+/*@ assigns the_state.M,
+            gpio_mem[MOTOR_0],
+            gpio_mem[MOTOR_1];
+  @ ensures the_state.M == MOTORS_OFF;
+*/
 void stop_motor(void);
 
-/**
- * Display this text!
- */
-void display_this_text(char *str, uint8_t len);
+// @design kiniry What is the memory map for the display?  We should
+// be able to specify, both at the model and code level, what is on
+// the display.
 
-/**
- * Ballot detected?
- */
+/*@ requires \valid_read(str+(0..len));
+  @ assigns the_state.D;
+  @ ensures the_state.D == SHOWING_TEXT;
+*/
+void display_this_text(char* str, uint8_t len);
+
+/*@ assigns \nothing;
+  @ ensures \result == (the_state.P == EARLY_PAPER_DETECTED);
+*/
 bool ballot_detected(void);
 
-/**
- * Ballot inserted?
- */
+/*@ requires (the_state.P == EARLY_PAPER_DETECTED);
+  @ assigns \nothing;
+  @ ensures \result == (the_state.P == EARLY_AND_LATE_DETECTED);
+*/
 bool ballot_inserted(void);
 
-/**
- * Spoil ballot!
- */
+/*@ requires spoil_button_lit(the_state);
+  @ requires the_state.P == EARLY_AND_LATE_DETECTED;
+  @ assigns the_state.button_illumination,
+  @         the_state.P;
+  @ ensures no_buttons_lit(the_state);
+  @ ensures the_state.P == NO_PAPER_DETECTED;
+*/
 void spoil_ballot(void);
 
-/**
- * Cast ballot!
- */
+/*@ requires cast_button_lit(the_state);
+  @ requires the_state.P == EARLY_AND_LATE_DETECTED;
+  @ assigns the_state.button_illumination,
+  @         the_state.P;
+  @ ensures no_buttons_lit(the_state);
+  @ ensures the_state.P == NO_PAPER_DETECTED;
+*/
 void cast_ballot(void);
 
-/**
- * Ballot spoiled?
- */
+/*@ assigns the_state.P;
+  @ ensures \result == the_state.P == EARLY_PAPER_DETECTED;
+*/
 bool ballot_spoiled(void);
 
-/**
- * Go to standby!
- */
+// Semi-equivalent to initialize() without firmware initialization.
+// @review Shouldn't calling this function clear the paper path?
+/*@ assigns the_state.M, the_state.D, the_state.P, the_state.BS, the_state.S;
+  @ ensures the_state.M == MOTORS_OFF;
+  @ ensures the_state.D == SHOWING_TEXT;
+  @ ensures the_state.P == NO_PAPER_DETECTED;
+  @ ensures the_state.BS == BARCODE_NOT_PRESENT;
+  @ ensures the_state.S == INNER;
+  @ ensures no_buttons_lit(the_state);
+*/
+// @todo kiniry `insert_ballot_text` should be displayed.
 void go_to_standby(void);
 
-/**
- * Ballot Detect Timeout Reset!
- */
+// @design kiniry These next four functions should also probably move
+// out of this API, right Michal?
+
+//@ assigns \nothing;
 void ballot_detect_timeout_reset(void);
 
-/**
- * Ballot Detect Timeout Expired?
- */
+//@ assigns \nothing;
 bool ballot_detect_timeout_expired(void);
 
-/**
- * Cast Or Spoil Timeout Reset!
- */
+//@ assigns \nothing;
 void cast_or_spoil_timeout_reset(void);
 
-/**
- * Cast Or Spoil Timeout Expired?
- */
+//@ assigns \nothing;
 bool cast_or_spoil_timeout_expired(void);
 
-/**
- * Main ballot box loop
- */
+/*@ terminates \false;
+    ensures \false;
+*/
 void ballot_box_main_loop(void);
 
 #endif /* __SBB_H__ */
