@@ -14,6 +14,8 @@
 
 // Subsystem includes
 #include "sbb.h"
+#include "sbb_freertos.h"
+
 // BESSPIN Voting System devices
 #include "gpio.h"
 #include "serLcd.h"
