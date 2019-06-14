@@ -9,7 +9,7 @@ subsystem Smart Ballot Box
       Joe Kiniry <kiniry@freeandfair.us>
       Daniel M. Zimmerman <dmz@freeandfair.us>
       Alexander Bakst <abakst@galois.com>
-    potential contributors: Daniel M., Alexander B.
+    potential contributors: Daniel M.
 
 // @todo kiniry This top-level system specification should either
 // import all of the related specifications in this directory, or
