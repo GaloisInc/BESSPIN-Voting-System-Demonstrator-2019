@@ -2,6 +2,7 @@
 #define __LOG_IO_H__
 
 #include "secure_log_t.h"
+#include <string.h>
 
 #ifdef TARGET_OS_FreeRTOS
 #include "ff.h"

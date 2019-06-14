@@ -312,10 +312,15 @@ Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
     }
 }
 
-
 bool Log_IO_File_Exists (const char *name)
 {
-  return false;
+  Log_Handle *local_stream_ptr;
+  local_stream_ptr = fopen (name, "r");
+  if (local_stream_ptr == NULL)
+    {
+      return false;
+    }
+  return true;
 }
 
 
