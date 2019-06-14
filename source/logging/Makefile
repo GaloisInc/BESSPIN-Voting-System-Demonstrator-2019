@@ -6,6 +6,9 @@ else
 ifeq ($(TARGET),freertos)
 include Makefile.freertos
 else
+ifeq ($(TARGET),hosttests)
+include Makefile.hosttests
+else
 ifeq ($(TARGET),verification)
 include Makefile.verification
 else
