@@ -15,11 +15,11 @@ typedef FIL Log_Handle;
 typedef FILE Log_Handle;
 #endif
 
-typedef Log_Handle *log;
+typedef Log_Handle *log_file;
 typedef Log_Handle *log_io_stream;
 
 // Abstract ghost state representing the overall state of the filesystem
-//@ logic int fs;
+//@ ghost int fs;
 
 
 typedef enum {
@@ -35,12 +35,12 @@ Log_FS_Result Log_IO_Initialize(void);
 
 /* Create new and empty log file. Any existing file with same name is destroyed. */
 /*@ assigns fs \from fs, name;
-    assigns stream \from fs, name;
+    assigns *stream \from fs, name;
  */
 Log_FS_Result Log_IO_Create_New (Log_Handle *stream, // OUT
 				 const char *name);  // IN
 
-/*@ assigns stream \from fs, name;
+/*@ assigns *stream \from fs, name;
  */
 Log_FS_Result Log_IO_Open_Read (Log_Handle *stream, // OUT
 				const char *name);  // IN

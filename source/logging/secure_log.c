@@ -156,3 +156,9 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
    return;
 }
 
+
+bool verify_secure_log_security(const secure_log the_secure_log)
+{
+
+  return false;
+}

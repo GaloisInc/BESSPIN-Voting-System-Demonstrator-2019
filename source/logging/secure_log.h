@@ -13,7 +13,7 @@
 #include "secure_log.acsl"
 
 typedef log_name secure_log_name;
-typedef log secure_log;
+typedef log_file secure_log;
 typedef log_io_stream secure_log_io_stream;
 
 // @spec kiniry These functions need ACSL specifications, based upon
