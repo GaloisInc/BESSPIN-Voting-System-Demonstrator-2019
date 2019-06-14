@@ -1,10 +1,12 @@
+#ifndef __LOG_IO_H__
+#define __LOG_IO_H__
+
 #include "secure_log_t.h"
 
 #ifdef TARGET_OS_FreeRTOS
 #include "ff.h"
 
 typedef FIL Log_Handle;
-FATFS FatFs; // Persistent state of current disk volume
 
 #else
 
@@ -29,7 +31,7 @@ typedef enum {
 /* Mounts the FileSystem and any other initialization necessary */
 /*@ assigns fs \from \nothing;
  */
-Log_FS_Result Log_IO_Initialize();
+Log_FS_Result Log_IO_Initialize(void);
 
 /* Create new and empty log file. Any existing file with same name is destroyed. */
 /*@ assigns fs \from fs, name;
@@ -66,7 +68,7 @@ size_t Log_IO_Num_Entries (Log_Handle *stream);
 /* reads the n'th entry. n = 0 means the "initial" or "root" entry */
 /*@
    requires n >= 0;
-   requires n <= Log_IO_Num_Entries (stream);
+   requires n <  Log_IO_Num_Entries (stream);
 */
 secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 				    size_t n); // IN
@@ -74,3 +76,4 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 /* reads the last entry (i.e. most recently written to the end of the file) */
 secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream);
 
+#endif /* __LOG_IO_H__ */
