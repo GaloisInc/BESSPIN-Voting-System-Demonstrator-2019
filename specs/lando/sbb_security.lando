@@ -1,4 +1,6 @@
 subsystem Security
+// @design kiniry The security of the SBB is focused on the system and
+// application logs and their security properties.
   indexing
     owner: Joe Kiniry <kiniry@freeandfair.us>
     contributors: Rod Chapman <rod.chapman@freeandfair.us> 
@@ -15,6 +17,116 @@ subsystem Security
 // have written in our R&D on high-assurance cryptography (hacrypto
 // and libvcrypt).
 
+scenarios Smart Ballot Box Security
+scenario Normal Log Activities  Initialize a secure log, write N entries into that log, check that the log is well-formed, verify that it is secure, export it to a device.
+scenario Validation Violation  Create a well-formed log, write it to a device, illegally modify it outside of the context of the security subsystem implementation to violate a well-formedness property, import the log, ensure that it fails well-formedness checking.
+scenario Verification Violation  Create a well-formed log, write it to a device, illegally modify it outside of the context of the security subsystem implementation to violate a security property, import the log, ensure that it fails verification.
+scenario Benchmark Log Measure how long it takes to perform a predictable set of write operations on a log.
+scenario Benchmark Log Validity Measure how long it takes to perform a validation of a log of a known size.
+scenario Benchmark Log Verification Measure how long it takes to perform a verification of a log of a known size.
+scenario Measure Log Storage Use Perform a normal log activities and measure the amount of space used by the log file in persistent store.
+
+requirements Smart Ballot Box Security
+SysLog Every event at the system level must be logged to the system log.
+SysEvents Calling any feature in the security subsystem is a system event.
+EventSecurityProperties The security properties of every system and application 
+event are specified in the system event cryptographic protocol and are denoted and 
+checked at the code-level via source annotations.
+ApplicationLog Every event at the application level must be logged to the application log.
+
+SecureLogAppendOnly The good guys can detect if any events have been deleted from a secure log (by either adversaries or the good guys).
+SecureLogAuthenticity Adversaries cannot forge events and add them to a secure log.
+SecureLogImmutable The good guys can detect any modifications to an event in a secure log (either by an adversary or the good guys).
+SecureLogPrivate Adversaries cannot learn anything about any single event given the content of a secure log. (Learning the number of events is okay.)
+SecureLogComplete The good guys can recover all events in a secure log.
+// @design Daniel Wagner Ideally we'd like to demonstrate to third parties (not just the good guys) that the secure log is append-only and authentic, but that would probably require some asymmetric crypto that we don't currently plan to implement.
+Smart Ballot Box Reliability The smart ballot box can be turned off and on at any time with no harm to the ongoing election.
+
+
+// The Security subsystem contains two subsystems, `Logging` and
+// `Crypto`.
+
 subsystem Logging
+
+component Log Entry inherit String // Refine to JSONValue or CSVValue?
+component Log
+  May I have an empty log?
+  A log is an often persistent sequence of events recorded about a given system.
+  What kind of entries can this log contain?
+  Export the log to the following target!
+  Save this entry to the log!
+component Secure Log inherit Log
+  A secure log is a log that has evidence that specific security properties hold.
+  What kind of data integrity does this log have?
+  What kind of provenance does this log have?
+  What kind of confidentiality does this log have?
+  What kind of authentication and access control does this log have?
+  What non-repudiation properties does this log have?
+  May I have a log created conforming to the following security properties?
+  Must stipulate what kinds of events are permitted in the log.
+
+component Secure System Log inherit Secure Log
+  Must contain only system events.
+component System Event inherit Log Entry
+  Must only describe a system-level event related to hardware state changes.
+
+component Secure Application Log inherit Secure Log
+  Must only contain application entries of a specified kind.
+component Application Entry inherit Log Entry
+  May I have a new entry that contains the following data?
+
+events Logging
+event sytem_log_init Initialize system log.
+event application_log_init Initialize application log.
+event system_log Log event E to the system log.
+event application_log Log the event E to the application log.
+event log_export Export log L to device D.
+event log_import Import log L from device D.
+event validate_log Verify that log L is well-formed wrt correctness properties in its configuration.
+event verify_log Verify that log L is secure wrt the security properties in its configuration.
+
+
 subsystem Crypto
+
+component AES Key inherit Cryptographic Key
+  Must be kept secret from unauthenticated entities.
+component Symmetric Encryption
+  What is the ciphertext produced by encrypting this plaintext with that key?
+  What is the plaintext produced by decrypting this ciphertext with that key?
+component AES inherit Symmetric Encryption
+  The NIST-standardized AES cryptographic algorithm.
+  What is your key size?
+component SHA
+  The NIST-standardized SHA-2 cryptographic hash algorithm.
+  What is your digest size?
+  What is the hash of this value?
+component Asymmetric Encryption
+  A public key-based cryptographic encryption algorithm.
+  What is the ciphertext corresponding to this plaintext using this public key?
+  What is the plaintext corresponding to this ciphertext using this private key?
+
+component HSM
+  A Hardware Security Module bundles together a set of cryptographic constructs and
+  provides access to them via a secure API.
+component BVS HSM
+  The HSM for the BESSPIN Voting System.
+  Must contain a symmetric cipher.
+  Must contain a hash function.
+  Must contain a random number generator.
+component BSV HSM 2019
+  The HSM for the DEF CON 2019 demonstrator.
+  Must contain a hardware AES implementation.
+  Must contain a SHA-2 implementation.
+  Must contain a RNG implementation.
+component BSV HSM 2020
+  The HSM for the DEF CON 2020 demonstrator.
+  Must contain a hardware AES implementation.
+  Must contain a hardware SHA-2 implementation.
+  Must contain a hardware RNG implementation.
+
+requirements Security
+
+scenarios Security
+
+events Security
 

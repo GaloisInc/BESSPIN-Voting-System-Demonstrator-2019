@@ -1,0 +1,23 @@
+/**
+ * Secure Log ACSL specification
+ * @refines log.lando
+ */
+
+#ifndef __SECURE_LOG_API_ACSL__
+#define __SECURE_LOG_API_ACSL__
+
+#include "secure_log_t.h"
+
+// @spec kiniry An algebraic specification of secure logs should be
+// added here, much like we have in `sbb.acsl`, complementing and
+// depending upon `log.acsl`.  This specification should be type
+// isomorphic to, and behaviorally equivalent to, that which is
+// specified by Joey in the Cryptol spec of secure logging.
+
+/*  axiomatic secure_log {
+  @   type secure_log_entry = base_block | hashchained_block;
+  @   type secure_log = List<secure_log_entry>;
+  @*/
+
+#endif
+

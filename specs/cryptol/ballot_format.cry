@@ -1,8 +1,8 @@
 // a number of contests where a unique candidate is selected for each contest
 
-// we have a number nct of contests (0,1,...,nct-1) with ncd candidates (0,1,...,ncd-1) per contest.
-// given a contest, a selection for candidate i, 0 <= i < ncd, is represented as "i:[width (ncd-1)]"
-// a ballot is a vector of size nct where each entry is a bitvector of length "width (ncd-1)"
+// we have a number `nct` of contests (0,1,...,nct-1) with `ncd` candidates (0,1,...,ncd-1) per contest.
+// given a contest, a selection for candidate `i`, 0 <= i < ncd, is represented as `i:[width (ncd-1)]`
+// a ballot is a vector of size `nct` where each entry is a bitvector of length `width (ncd-1)`
 // there must be at least 2 candidates (and, of course, everything is finite)
 
 type ballot nct ncd = [nct][width (ncd-1)]
@@ -13,8 +13,9 @@ type constraint ballot_constraint nct ncd = (fin nct, fin ncd, nct >= 1, ncd >= 
 is_valid : {nct, ncd} ballot_constraint nct ncd => ballot nct ncd -> Bit
 is_valid b = all (\x -> True) [b@i <= `(ncd-1) | i <- [0..(nct-1)]]
 
-// selection b ct == cd if and only if candidate cd is selected in contest ct
+// `selection b ct == cd` if and only if candidate `cd` is selected in contest `ct`
 selection : {nct, ncd} ballot_constraint nct ncd => ballot nct ncd -> [width (nct-1)] -> [width (ncd-1)]
 selection b ct = (b@ct)
 
-// TODO: do we want to represent a ballot as an array of booleans instead?
+// @todo all do we want to represent a ballot as an array of booleans instead?
+// @todo jdodds add some properties to validate this theory
