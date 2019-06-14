@@ -1,0 +1,125 @@
+module Log where
+
+parameter
+
+    /** This defines the output size of the hash in bytes.
+        For our use it is expected we will use SHA256 and
+        this will be instantiated as 32
+    */
+
+    type HashSizeBytes : #
+
+    /**
+        We cannot use a hash function that outputs a stream
+    */
+    type constraint fin HashSizeBytes
+
+    /**
+        Our hash function must take in an arbitrary number
+        of bytes (n) and output the hash size of bytes
+    */
+    hash : {n} (fin n) => [n][8] -> [HashSizeBytes][8]
+
+    /**
+        We also need an HMAC function. This function could
+        be entirely defined using the hash function but
+        we specify it here for simplicity
+    */
+    hmac : {msgSizeBytes, keySizeBytes} (fin msgSizeBytes, fin keySizeBytes) =>
+        [keySizeBytes][8] ->
+        [msgSizeBytes][8] ->
+        [HashSizeBytes][8]
+
+/**
+    A log entry. The msgHash should always be the hash of the message,
+    unless it's the first entry in which case it should be the MAC
+*/
+type Log sizeBytes = {
+    message : [sizeBytes][8],
+    msgHash : [HashSizeBytes][8]
+}
+
+serializeBinaryLog : {sizeBytes} (fin sizeBytes) =>
+    Log sizeBytes -> [sizeBytes + HashSizeBytes][8]
+serializeBinaryLog log = log.message # log.msgHash
+
+/**
+    A log file is a series of log messages. We must
+    specify a maximum log size so that all of the entries
+    can have the same type
+*/
+type LogFile maxSizeBytes msgs = [msgs](Log maxSizeBytes)
+
+serializeBinaryLogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
+    LogFile maxSizeBytes msgs ->
+    [msgs * (maxSizeBytes + HashSizeBytes)][8]
+serializeBinaryLogFile logFile = join serializedLogs where
+    serializedLogs = [serializeBinaryLog entry | entry <- logFile]
+
+//Message will be something from secure boot, not identified yet
+initialLogEntry : {msgSize, keySize, resultSize}
+                (fin msgSize, fin keySize, fin resultSize, msgSize <= resultSize) =>
+    [keySize][8] -> [msgSize][8] -> Log resultSize
+initialLogEntry key msg =
+    { message = paddedMsg, msgHash = hmac key paddedMsg} where
+        paddedMsg = ((msg # zero) : [resultSize][8])
+
+/**
+    Utility function to get the previous hash
+*/
+getLastHash : {sizeBytes, msgs} (fin msgs, msgs >= 1) => LogFile sizeBytes msgs -> [HashSizeBytes][8]
+getLastHash logs = (logs ! 0).msgHash
+
+/**
+    Update a log with a new entry
+    We require the number of messages to be >= 1 because
+    this operation should not be used for the first message
+*/
+updateLog : {msgSize, maxMsgSize, msgs}
+    (fin msgSize, msgSize <= maxMsgSize, fin msgs, fin maxMsgSize, msgs >=1) =>
+    (LogFile maxMsgSize msgs) ->
+    [msgSize][8] ->
+    LogFile maxMsgSize (msgs + 1)
+updateLog log msg = log # [newEntry] where
+    paddedMsg = msg # zero
+    previousHash = getLastHash log
+    newEntry = {message = paddedMsg, msgHash = hash (paddedMsg # previousHash)}
+
+/**
+    Given a log entry, check to see if it is a valid first entry
+*/
+validFirstEntry : {msgSizeBytes, keySizeBytes}
+    (fin msgSizeBytes, fin keySizeBytes) =>
+    Log msgSizeBytes ->
+    [keySizeBytes][8] ->
+    Bit
+property validFirstEntry log key = log.msgHash == hmac key log.message
+
+/**
+    Check to see if a log entry is valid given the previous hash
+*/
+validLogEntry : {msgSizeBytes}
+    (fin msgSizeBytes) =>
+    Log msgSizeBytes ->
+    [HashSizeBytes][8] ->
+    Bit
+property validLogEntry log prevHash =
+    log.msgHash == hash (log.message # prevHash)
+
+
+/**
+Check the validity of an entire log file relative to a key
+*/
+validLogFile : {maxMsgSize, keySize, msgs}
+    (fin maxMsgSize, fin keySize, fin msgs) =>
+    LogFile maxMsgSize msgs ->
+    [keySize][8] ->
+    Bit
+property validLogFile logFile key =
+    `msgs == (0 : [width msgs]) \/
+    (foldResult ! 0 where
+        foldResult = [validFirstEntry (logFile @ 0) key] #
+                        [prevValid /\ validLogEntry log (prevLog.msgHash)
+                            | log <- logFile
+                            | prevLog <- [zero] # logFile
+                            | prevValid <- foldResult])
