@@ -67,7 +67,7 @@ CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany
 
 DEMO_SRC = \
     main_freertos.c \
-    sbb.c \
+    sbb_demo.c \
     sbb_main.c
 
 APP_SRC = \
