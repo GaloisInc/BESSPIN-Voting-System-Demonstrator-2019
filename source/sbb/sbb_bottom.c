@@ -90,7 +90,7 @@ void stop_motor(void) {
   //@ assert false;
 }
 
-void display_this_text(char *str, uint8_t len) {
+void display_this_text(const char *str, uint8_t len) {
   assert(false);
   //@ assert false;
 }
