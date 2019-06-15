@@ -43,7 +43,6 @@
   @}
   @ 
   @
-  @
   @ axiomatic secure_log_entry_type {
   @ type Secure_log_entry =  Struct(Log_entry, Sha256_digest);
   @
