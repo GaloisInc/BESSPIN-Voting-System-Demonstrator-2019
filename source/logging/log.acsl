@@ -14,22 +14,55 @@
 // isomorphic to, and behaviorally equivalent to, that which is
 // specified by Joey in the Cryptol spec of secure logging.
 
-/*@ axiomatic log {
+/*@ axiomatic polymorphic_list {
   @ type list<A> = Nil | Cons(A,list<A>);
-  @ type Log=list<log_entry>;
-  @ logic log_entry l_entry;
-  @ logic Log log_list;
-  @ logic Log nil;
-  @ logic Log cons(log_entry l_entry, Log log_list);
+  @}
+  @
+  @
+  @ axiomatic log_entry_type {
+  @ type Log_entry = char[256];
+  @}
+  @
+  @
+  @ axiomatic log_log_entry {
+  @ type Log=list<Log_entry>;
+  @ logic Log cons(Log_entry the_entry, Log log_list);
   @ logic Log append(Log log_list1,Log log_list2);
   @
   @ axiom append_Nil:
-  @ \forall Log log_list; append(nil,log_list) == log_list;
+  @ \forall Log log_list, nil; append(nil,log_list) == log_list;
   @
   @ axiom append_Cons:
-  @ \forall  log_entry l_entry, Log log_list1,log_list2;
-  @ append(cons(l_entry,log_list1),log_list2) == cons(l_entry,append(log_list1,log_list2));
-  @
+  @ \forall  Log_entry the_entry, Log log_list1,log_list2;
+  @ append(cons(the_entry,log_list1),log_list2) == cons(the_entry,append(log_list1,log_list2));
   @}
-@*/
+  @ 
+  @
+  @ axiomatic sha_256_digest_type {
+  @ type Sha256_digest = uint8_t[32];
+  @}
+  @
+  @
+  @ axiomatic secure_log_entry_type {
+  @ type Secure_log_entry =  Struct(Log_entry, Sha256_digest);
+  @}
+  @
+  @
+  @ axiomatic secure_log_entry_elements{
+  @ logic Log_entry sle_the_entry(Secure_log_entry sle);
+  @ logic Sha256_digest sle_the_digest(Secure_log_entry sle);
+  @
+  @ axiom sle_the_entry_def: 
+  @ \forall Log_entry le, Sha256_digest sd; sle_the_entry(Struct(le,sd)) == le;
+  @
+  @ axiom sle_the_digest_def: 
+  @ \forall Log_entry le, Sha256_digest sd; sle_the_digest(Struct(le,sd)) == sd;
+  @}
+  @
+  @
+  @ axiomatic secure_log_type {
+  @ type Secure_log = list<Secure_log_entry>;
+  @}
+  @*/
+
 #endif
