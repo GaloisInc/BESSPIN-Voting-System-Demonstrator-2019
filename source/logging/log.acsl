@@ -41,15 +41,18 @@
   @ axiomatic sha_256_digest_type {
   @ type Sha256_digest = uint8_t[32];
   @}
+  @ 
   @
   @
   @ axiomatic secure_log_entry_type {
   @ type Secure_log_entry =  Struct(Log_entry, Sha256_digest);
+  @
   @}
   @
   @
-  @ axiomatic secure_log_entry_elements{
+  @ axiomatic secure_log_entry_elements {
   @ logic Log_entry sle_the_entry(Secure_log_entry sle);
+  @
   @ logic Sha256_digest sle_the_digest(Secure_log_entry sle);
   @
   @ axiom sle_the_entry_def: 
@@ -57,13 +60,20 @@
   @
   @ axiom sle_the_digest_def: 
   @ \forall Log_entry le, Sha256_digest sd; sle_the_digest(Struct(le,sd)) == sd;
+  @
+  @ logic uint8_t sizeOf(Secure_log_entry sle)=  
+  @       \let size_entry = (uint8_t)sizeof(sle_the_entry(sle));                                      
+  @        \let size_digest =(uint8_t)sizeof(sle_the_digest(sle));
+  @         (uint8_t)(size_entry + size_digest);
+  @
+  @ lemma test_sizeof_identity: // crash!!!
+  @ \forall Log_entry le, Sha256_digest sd;
+  @  \let su = Struct(le,sd);
+  @  \let sle_entry = sle_the_entry(su); 
+  @  \let sle_digest = sle_the_digest(su);
+  @     (uint8_t)((uint8_t)sizeof(sle_entry) + (uint8_t)sizeof(sle_digest)) == sizeOf(su); 
   @}
-  @
-  @
-  @ logic size_t sizeOf(Secure_log_entry sle)=(uint8_t) (sizeof(sle_the_entry(sle)) + 
-  @                                            sizeof(sle_the_digest(sle)));
-  @
-  @ lemma upper_bound_limit_sle: \forall Secure_log_entry sle; sizeOf(sle) == (uint8_t)288;
+  @ 
   @
   @ axiomatic secure_log_type {
   @ type Secure_log = list<Secure_log_entry>;
