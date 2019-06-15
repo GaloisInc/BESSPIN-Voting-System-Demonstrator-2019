@@ -69,7 +69,7 @@ size_t Log_IO_Num_Entries (Log_Handle *stream);
 /* reads the n'th entry. n = 0 means the "initial" or "root" entry */
 /*@
    requires n >= 0;
-   requires n <  Log_IO_Num_Entries (stream);
+   //requires n <  Log_IO_Num_Entries (stream);
 */
 secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 				    size_t n); // IN
