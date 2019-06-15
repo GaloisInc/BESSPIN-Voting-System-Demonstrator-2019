@@ -60,6 +60,11 @@
   @}
   @
   @
+  @ logic size_t sizeOf(Secure_log_entry sle)=(uint8_t) (sizeof(sle_the_entry(sle)) + 
+  @                                            sizeof(sle_the_digest(sle)));
+  @
+  @ lemma upper_bound_limit_sle: \forall Secure_log_entry sle; sizeOf(sle) == (uint8_t)288;
+  @
   @ axiomatic secure_log_type {
   @ type Secure_log = list<Secure_log_entry>;
   @}

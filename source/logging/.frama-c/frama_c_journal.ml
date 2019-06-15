@@ -1,4 +1,4 @@
-(* Frama-C journal generated at 18:51 the 15/06/2019 *)
+(* Frama-C journal generated at 20:20 the 15/06/2019 *)
 
 exception Unreachable
 exception Exception of string
@@ -6,7 +6,15 @@ exception Exception of string
 [@@@ warning "-26"]
 
 (* Run the user commands *)
-let run () = ()
+let run () =
+  Dynamic.Parameter.Bool.set "-lib-entry" true;
+  Dynamic.Parameter.Bool.set "-c11" true;
+  Dynamic.Parameter.String.set "-cpp-extra-args"
+    "-I. -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1 -I../../FreeRTOS-mirror/FreeRTOS/Source/include -I../../FreeRTOS-mirror/FreeRTOS/Source/portable/GCC/RISC-V -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/demo -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/bsp -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/devices -D__riscv_xlen=32";
+  Dynamic.Parameter.String.set "" "log.c,secure_log.c";
+  File.init_from_cmdline ();
+  Project.set_keep_current false;
+  ()
 
 (* Main *)
 let main () =
