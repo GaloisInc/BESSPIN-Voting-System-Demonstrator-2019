@@ -14,6 +14,8 @@
 
 // Subsystem includes
 #include "sbb.h"
+#include "sbb_freertos.h"
+
 // BESSPIN Voting System devices
 #include "gpio.h"
 #include "serLcd.h"
@@ -143,7 +145,7 @@ void stop_motor(void) {
   the_state.M = MOTORS_OFF;
 }
 
-void display_this_text(char *str, uint8_t len) {
+void display_this_text(const char *str, uint8_t len) {
   serLcdPrintf(str, len);
 }
 

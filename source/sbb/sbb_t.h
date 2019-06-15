@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define BARCODE_MAX_LENGTH 16
+#define BARCODE_MAX_LENGTH 254
 
 typedef char* barcode_t;
 // @todo kiniry Add a pure helper function for relating

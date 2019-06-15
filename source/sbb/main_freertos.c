@@ -33,6 +33,10 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+/* FreeRTOS includes */
+#include "stream_buffer.h"
+#include "event_groups.h"
+
 /* Standard includes */ 
 #include <stdio.h>
 #include <string.h>
@@ -41,11 +45,13 @@
 /* Drivers */
 #include "bsp.h"
 #include "uart.h"
+#include "gpio.h"
 #include "ff.h" /* Declarations of FatFs API */
 #include "diskio.h"
 
 /* Smart Ballot Box includes */
 #include "sbb.h"
+#include "sbb_freertos.h"
 
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented
 within this file.  See https://www.freertos.org/a00016.html */
@@ -63,10 +69,21 @@ char statsBuffer[1024];
 static void prvStatsTask(void *pvParameters);
 #endif /* configGENERATE_RUN_TIME_STATS */
 
-/* Smart Ballot Box Tasks */
+/* Smart Ballot Box Tasks and priorities*/
+#define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY+2
+#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+1
+#define SBB_LOGGING_TASK_PRIORITY tskIDLE_PRIORITY+2
+#define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+3
+
 static void prvBallotBoxMainTask(void *pvParameters);
 static void prvBarcodeScannerTask(void *pvParameters);
 static void prvLoggingTask(void *pvParameters);
+static void prvInputTask(void *pvParameters);
+
+/*-----------------------------------------------------------*/
+
+StreamBufferHandle_t xScannerStreamBuffer;
+EventGroupHandle_t xSBBEventGroup;
 
 /*-----------------------------------------------------------*/
 
@@ -113,9 +130,17 @@ int main(void)
 {
 	prvSetupHardware();
 
-	xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, tskIDLE_PRIORITY + 1, NULL);
-	xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, tskIDLE_PRIORITY + 1, NULL);
-	xTaskCreate(prvLoggingTask, "prvLoggingTask", configMINIMAL_STACK_SIZE * 2U, NULL, tskIDLE_PRIORITY + 1, NULL);
+	/* Initialize stream buffers */
+	xScannerStreamBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
+	/* Initialize event groups */
+	xSBBEventGroup = xEventGroupCreate();
+	configASSERT( xSBBEventGroup );
+	
+
+	xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
+	xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
+	//xTaskCreate(prvLoggingTask, "prvLoggingTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_LOGGING_TASK_PRIORITY, NULL);
+	xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 
 #if configGENERATE_RUN_TIME_STATS
 	xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY, NULL);
@@ -219,7 +244,6 @@ void vApplicationTickHook(void)
 static void prvBallotBoxMainTask(void *pvParameters)
 {
 	(void)pvParameters;
-
 	printf("Starting prvBallotBoxMainTask\r\n");
 
 	ballot_box_main_loop();
@@ -257,10 +281,6 @@ static void prvLoggingTask(void *pvParameters)
         }
     }
     printf("prvSdTestTask0 terminating, exit code = %u\r\n", res);
-
-	for (;;) {
-		;;
-	}
 }
 /*-----------------------------------------------------------*/
 
@@ -281,9 +301,18 @@ static void prvBarcodeScannerTask(void *pvParameters)
         configASSERT(uart1_rxbuffer(&barcode[idx], 1) == 1);
         if (barcode[idx] == 0xd)
         {
-			set_received_barcode(barcode, idx);
-            just_received_barcode();
-            idx = 0;
+			/* Debug print below */
+			printf("Barcode, idx=%u: ", idx);
+			for (uint8_t i=0;i<idx;i++) {
+				printf("%c",barcode[i]);
+			}
+			printf("\r\n");
+			/* We have a barcode, send it over stream buffer and fire the event */
+			configASSERT( xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS ) == idx);
+			/* Broadcast the event */
+			configASSERT(xEventGroupSetBits( xSBBEventGroup, ebBARCODE_SCANNED ) & ebBARCODE_SCANNED);
+			/* reset state */
+			idx = 0;
 			memset(barcode, 0, BARCODE_MAX_LENGTH);
         }
         else
@@ -291,11 +320,119 @@ static void prvBarcodeScannerTask(void *pvParameters)
             idx++;
             if (idx >= BARCODE_MAX_LENGTH)
             {
+				printf("Erasing idx\r\n");
                 idx = 0;
             }
         }
-        vTaskDelay(pdMS_TO_TICKS(10));
+        //vTaskDelay(pdMS_TO_TICKS(1));
     }
+}
+
+/*-----------------------------------------------------------*/
+
+/* Task handling the GPIO inputs */
+static void prvInputTask(void *pvParameters) {
+	(void)pvParameters;
+	EventBits_t uxReturned;
+
+	printf("Starting prvInputTask\r\n");
+
+	/* Buttons are active high */
+    uint8_t cast_button_input = 0;
+    uint8_t cast_button_input_last = 0;
+	uint8_t spoil_button_input = 0;
+    uint8_t spoil_button_input_last = 0;
+
+	/* Sensors are active low */
+	uint8_t paper_sensor_in_input = 1;
+    uint8_t paper_sensor_in_input_last = 1;
+	uint8_t paper_sensor_out_input = 1;
+    uint8_t paper_sensor_out_input_last = 1;
+
+	gpio_set_as_input(BUTTON_CAST_IN);
+    gpio_set_as_input(BUTTON_SPOIL_IN);
+    gpio_set_as_input(PAPER_SENSOR_IN);
+    gpio_set_as_input(PAPER_SENSOR_OUT);
+
+	for(;;) {
+		/* Paper sensor in */
+		paper_sensor_in_input = gpio_read(PAPER_SENSOR_IN);
+		if (paper_sensor_in_input != paper_sensor_in_input_last) {
+            printf("#paper_sensor_in_input changed: %u -> %u\r\n", paper_sensor_in_input_last, paper_sensor_in_input);
+            
+			/* Broadcast the event */
+			if (paper_sensor_in_input == 0) {
+				//configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
+				uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
+				uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
+			} else {
+				//configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
+				uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
+				uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
+			}
+			printf("uxReturned = 0x%lx\r\n",uxReturned);
+			paper_sensor_in_input_last = paper_sensor_in_input;
+        }
+
+		/* Paper sensor out */
+		paper_sensor_out_input = gpio_read(PAPER_SENSOR_OUT);
+		if (paper_sensor_out_input != paper_sensor_out_input_last) {
+            printf("#paper_sensor_out_input changed: %u -> %u\r\n", paper_sensor_out_input_last, paper_sensor_out_input);
+            
+			/* Broadcast the event */
+			if (paper_sensor_out_input == 0) {
+				//configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_PRESSED) & ebPAPER_SENSOR_OUT_PRESSED);
+				uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_PRESSED);
+				uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_RELEASED );
+			} else {
+				uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_RELEASED);
+				uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_PRESSED );
+				//configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_RELEASED) & ebPAPER_SENSOR_OUT_RELEASED);
+			}
+			printf("uxReturned = 0x%lx\r\n",uxReturned);
+			paper_sensor_out_input_last = paper_sensor_out_input;
+        }
+
+		/* Cast button */
+		cast_button_input = gpio_read(BUTTON_CAST_IN);
+		if (cast_button_input != cast_button_input_last) {
+            printf("#cast_button_input changed: %u -> %u\r\n", cast_button_input_last, cast_button_input);
+            
+			/* Broadcast the event */
+			if (cast_button_input == 1) {
+				//configASSERT(xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_PRESSED ) & ebCAST_BUTTON_PRESSED);
+				uxReturned = xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_PRESSED );
+				uxReturned = xEventGroupClearBits( xSBBEventGroup, ebCAST_BUTTON_RELEASED );
+			} else {
+				//configASSERT(xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_RELEASED ) & ebCAST_BUTTON_RELEASED);
+				uxReturned = xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_RELEASED );
+				uxReturned = xEventGroupClearBits( xSBBEventGroup, ebCAST_BUTTON_PRESSED );
+			}
+			printf("uxReturned = 0x%lx\r\n",uxReturned);
+			cast_button_input_last = cast_button_input;
+        }
+
+		/* Spoil button */
+		spoil_button_input = gpio_read(BUTTON_SPOIL_IN);
+		if (spoil_button_input != spoil_button_input_last) {
+            printf("#spoil_button_input changed: %u -> %u\r\n", spoil_button_input_last, spoil_button_input);
+            
+		/* Broadcast the event */
+		if (spoil_button_input == 1) {
+		    //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_PRESSED ) & ebSPOIL_BUTTON_PRESSED);
+		    uxReturned = xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
+		    uxReturned = xEventGroupClearBits( xSBBEventGroup, ebSPOIL_BUTTON_RELEASED );
+		} else {
+		    //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_RELEASED ) & ebSPOIL_BUTTON_RELEASED);
+		    uxReturned = xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_RELEASED );
+		    uxReturned = xEventGroupClearBits( xSBBEventGroup, ebSPOIL_BUTTON_PRESSED );
+		}
+		printf("uxReturned = 0x%lx\r\n",uxReturned);
+		spoil_button_input_last = spoil_button_input;
+            }
+
+        vTaskDelay(GPIO_READ_DELAY_MS);
+	}
 }
 
 /*-----------------------------------------------------------*/

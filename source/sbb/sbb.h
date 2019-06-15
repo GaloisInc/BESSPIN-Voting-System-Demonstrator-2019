@@ -13,16 +13,15 @@
 #include "sbb_t.h"
 #include "sbb.acsl"
 
-// Aux
-// @review kiniry Aren't these consts?
-extern char *insert_ballot_text;
-extern char *barcode_detected_text;
-extern char *cast_or_spoil_text;
-extern char *casting_ballot_text;
-extern char *spoiling_ballot_text;
-extern char *not_a_valid_barcode_text;
-extern char *no_barcode_text;
-extern char *remove_ballot_text;
+// Display strings
+extern const char *insert_ballot_text;
+extern const char *barcode_detected_text;
+extern const char *cast_or_spoil_text;
+extern const char *casting_ballot_text;
+extern const char *spoiling_ballot_text;
+extern const char *not_a_valid_barcode_text;
+extern const char *no_barcode_text;
+extern const char *remove_ballot_text;
 
 extern SBB_state the_state;
 
@@ -38,6 +37,16 @@ extern firmware_state the_firmware_state;
 // above I think we probably want some ghost `uint8_t` array to model
 // these reads/writes.
 extern uint8_t gpio_mem[8];
+
+/* Button defines */
+#define BUTTON_CAST_LED 3
+#define BUTTON_SPOIL_LED 1
+#define BUTTON_CAST_IN 2
+#define BUTTON_SPOIL_IN 0
+
+/* Paper sensor inputs */
+#define PAPER_SENSOR_OUT 6
+#define PAPER_SENSOR_IN 7
 
 // Motor defines
 #define MOTOR_0 4
@@ -170,7 +179,7 @@ void stop_motor(void);
   @ assigns the_state.D;
   @ ensures the_state.D == SHOWING_TEXT;
 */
-void display_this_text(char* str, uint8_t len);
+void display_this_text(const char* str, uint8_t len);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.P == EARLY_PAPER_DETECTED);

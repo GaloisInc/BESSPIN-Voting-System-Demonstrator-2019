@@ -3,14 +3,14 @@
 #include <string.h>
 
 // Text defines
-char *insert_ballot_text = "Insert ballot.";
-char *barcode_detected_text = "Barcode detected.";
-char *cast_or_spoil_text = "Cast or Spoil?";
-char *casting_ballot_text = "Casting ballot.";
-char *spoiling_ballot_text = "Spoiling ballot.";
-char *not_a_valid_barcode_text = "Not a valid barcode!";
-char *no_barcode_text = "No barcode detected!";
-char *remove_ballot_text = "Remove ballot!";
+const char *insert_ballot_text = "Insert ballot.";
+const char *barcode_detected_text = "Barcode detected.";
+const char *cast_or_spoil_text = "Cast or Spoil?";
+const char *casting_ballot_text = "Casting ballot.";
+const char *spoiling_ballot_text = "Spoiling ballot.";
+const char *not_a_valid_barcode_text = "Not a valid barcode!";
+const char *no_barcode_text = "No barcode detected!";
+const char *remove_ballot_text = "Remove ballot!";
 
 // @design kiniry Here is the explicit encoding of the SBB state.
 SBB_state the_state = { .S = START };
