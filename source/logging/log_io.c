@@ -336,7 +336,24 @@ size_t Log_IO_Num_Entries (Log_Handle *stream)
 
 secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 				    size_t n)  // IN
- { 
+ {
+  fseek(stream,0,SEEK_SET); 
+  off_t original_offset;
+  off_t byte_offset_of_entry_n;
+  byte_offset_of_entry_n = n * size_of_one_log_entry;
+  original_offset = ftell (stream); 
+  fseek(stream,byte_offset_of_entry_n,SEEK_CUR);
+  secure_log_entry result;
+  size_t ret_entry = fread(&result.the_entry[0],1,LOG_ENTRY_LENGTH,stream);
+  size_t ret_digest = fread (&result.the_digest[0],1,SHA256_DIGEST_LENGTH_BYTES,stream);
+ 
+    // Restore the original offset
+  fseek(stream,original_offset,SEEK_SET);
+  if (ret_entry == LOG_ENTRY_LENGTH &&
+      ret_digest == SHA256_DIGEST_LENGTH_BYTES)
+  {
+     return result;
+  }
   return null_secure_log_entry;
  }
 
