@@ -20,6 +20,8 @@
   @}
   @
   @ //binding C type log_entry
+  @ // passed frama-c but in case it doesn't work
+  @ // switch to char[256]
   @ axiomatic log_entry_type {
   @ type Log_entry = log_entry;
   @}
@@ -38,7 +40,9 @@
   @ append(cons(the_entry,log_list1),log_list2) == cons(the_entry,append(log_list1,log_list2));
   @}
   @ 
-  @ //binding C type sha256_digest
+  @ //@dragan binding C type sha256_digest
+  @ // passed frama-c but in case it doesn't work
+  @ // switch to uint8_t[32]
   @ axiomatic sha_256_digest_type {
   @ type Sha256_digest = sha256_digest;
   @}
