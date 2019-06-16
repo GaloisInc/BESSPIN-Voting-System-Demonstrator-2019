@@ -17,6 +17,9 @@
 
 /*@ axiomatic polymorphic_list {
   @ type list<A> = Nil | Cons(A,list<A>);
+  @
+  @
+  @
   @}
   @
   @ //binding C type log_entry
@@ -25,7 +28,7 @@
   @ axiomatic log_entry_type {
   @ type Log_entry = log_entry;
   @}
-  @
+  @ 
   @
   @ axiomatic log_log_entry {
   @ type Log=list<Log_entry>;
@@ -62,12 +65,12 @@
   @ \forall Log_entry le, Sha256_digest sd; sle_the_digest(Struct(le,sd)) == sd;
   @
   @
-  @ logic uint8_t total_sizeOf(Log_entry le, Sha256_digest sd)=
-  @   \let sle_the_entry = (uint8_t)sizeof(le); 
-  @   \let sle_the_digest = (uint8_t)sizeof(sd);
-  @     (uint8_t)(sle_the_entry + sle_the_digest);
+  @ logic integer total_sizeOf(Log_entry le, Sha256_digest sd)=
+  @   \let sle_the_entry = (integer)sizeof(le); 
+  @   \let sle_the_digest = (integer)sizeof(sd);
+  @     (integer)(sle_the_entry + sle_the_digest);
   @
-  @ logic uint8_t sizeOf(Secure_log_entry sle)= 
+  @ logic integer sizeOf(Secure_log_entry sle)= 
   @   \let sle_the_entry = sle_the_entry(sle);
   @   \let sle_the_digest = sle_the_digest(sle);
   @     total_sizeOf(sle_the_entry, sle_the_digest);
