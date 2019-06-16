@@ -7,6 +7,7 @@
 #define __LOG_API_ACSL__
 
 #include "log_t.h"
+#include "hsm.h"
 
 // @spec kiniry An algebraic specification of logs should be added
 // here, much like we have in `sbb.acsl`, complementing that which is
@@ -18,9 +19,9 @@
   @ type list<A> = Nil | Cons(A,list<A>);
   @}
   @
-  @
+  @ //binding C type log_entry
   @ axiomatic log_entry_type {
-  @ type Log_entry = char[256];
+  @ type Log_entry = log_entry;
   @}
   @
   @
@@ -37,19 +38,15 @@
   @ append(cons(the_entry,log_list1),log_list2) == cons(the_entry,append(log_list1,log_list2));
   @}
   @ 
-  @
+  @ //binding C type sha256_digest
   @ axiomatic sha_256_digest_type {
-  @ type Sha256_digest = uint8_t[32];
+  @ type Sha256_digest = sha256_digest;
   @}
   @ 
-  @
+  @ //cannot bind struct in C
   @ axiomatic secure_log_entry_type {
   @ type Secure_log_entry =  Struct(Log_entry, Sha256_digest);
   @
-  @}
-  @
-  @
-  @ axiomatic secure_log_entry_elements {
   @ logic Log_entry sle_the_entry(Secure_log_entry sle);
   @
   @ logic Sha256_digest sle_the_digest(Secure_log_entry sle);
@@ -60,17 +57,17 @@
   @ axiom sle_the_digest_def: 
   @ \forall Log_entry le, Sha256_digest sd; sle_the_digest(Struct(le,sd)) == sd;
   @
-  @ logic uint8_t sizeOf(Secure_log_entry sle)=  
-  @       \let size_entry = (uint8_t)sizeof(sle_the_entry(sle));                                      
-  @        \let size_digest =(uint8_t)sizeof(sle_the_digest(sle));
-  @         (uint8_t)(size_entry + size_digest);
   @
-  @ lemma test_sizeof_identity: // crash!!!
-  @ \forall Log_entry le, Sha256_digest sd;
-  @  \let su = Struct(le,sd);
-  @  \let sle_entry = sle_the_entry(su); 
-  @  \let sle_digest = sle_the_digest(su);
-  @     (uint8_t)((uint8_t)sizeof(sle_entry) + (uint8_t)sizeof(sle_digest)) == sizeOf(su); 
+  @ logic uint8_t total_sizeOf(Log_entry le, Sha256_digest sd)=
+  @   \let sle_the_entry = (uint8_t)sizeof(le); 
+  @   \let sle_the_digest = (uint8_t)sizeof(sd);
+  @     (uint8_t)(sle_the_entry + sle_the_digest);
+  @
+  @ logic uint8_t sizeOf(Secure_log_entry sle)= 
+  @   \let sle_the_entry = sle_the_entry(sle);
+  @   \let sle_the_digest = sle_the_digest(sle);
+  @     total_sizeOf(sle_the_entry, sle_the_digest);
+  @       
   @}
   @ 
   @
