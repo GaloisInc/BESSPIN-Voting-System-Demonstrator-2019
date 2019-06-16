@@ -17,9 +17,6 @@
 
 /*@ axiomatic polymorphic_list {
   @ type list<A> = Nil | Cons(A,list<A>);
-  @
-  @
-  @
   @}
   @
   @ //binding C type log_entry
