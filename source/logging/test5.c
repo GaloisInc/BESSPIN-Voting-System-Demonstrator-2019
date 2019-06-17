@@ -4,7 +4,7 @@
 int main(void)
 {
  Log_Handle my_log;
- Log_Handle *r_log;
+ Log_Handle r_log;
 
   const log_entry second_entry = "hello draganxxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
 
@@ -14,8 +14,10 @@ int main(void)
   create_log (&my_log, "test5log.txt");
   write_entry (&my_log, second_entry);
   Log_IO_Close (&my_log);
-  r_log = fopen("test5log.txt","r");   
-  secure_log_entry _secure_log_entry=Log_IO_Read_Entry(r_log,0);
+
+  Log_IO_Open_Read (&r_log, "test5log.txt");
+
+  secure_log_entry _secure_log_entry=Log_IO_Read_Entry(&r_log,0);
   uint8_t index=0;
   // check digest 
   for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
@@ -46,7 +48,7 @@ int main(void)
 
    
   index=0;
-  secure_log_entry _secure_log_entry1=Log_IO_Read_Entry(r_log,1);
+  secure_log_entry _secure_log_entry1=Log_IO_Read_Entry(&r_log,1);
   for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
     	if(_secure_log_entry1.the_digest[i] == (uint8_t)(255 - i)) {
@@ -70,6 +72,6 @@ int main(void)
     }
 
 
-  Log_IO_Close (r_log);
+  Log_IO_Close (&r_log);
 
 }
