@@ -2,38 +2,43 @@ module Base64 where
 
 // Base64 encoding
 
-// This choice of characters corresponds to IETF RFC 4648 §5:
-// "Base 64 Encoding with URL and Filename Safe Alphabet"
-// <https://tools.ietf.org/html/rfc4648#section-5>
+/** This choice of characters corresponds to IETF RFC 4648 §5:
+  "Base 64 Encoding with URL and Filename Safe Alphabet"
+ <https://tools.ietf.org/html/rfc4648#section-5>
+*/
 char62, char63, padChar : [8]
 (char62, char63, padChar) = ('-', '_', '=')
 
-// The mapping from [6] sextets to ASCII octets representing them
+/** The mapping from [6] sextets to ASCII octets representing them
+*/
 base64 : [64][8]
 base64 = ['A'..'Z'] # ['a'..'z'] # ['0'..'9'] # [char62, char63]
 
-// The inverse mapping from ASCII octets to [6] sextets that they represent
-// Note that those octets without a corresponding sextet are left undefined as
-// a (lazy) error value.
+/** The inverse mapping from ASCII octets to [6] sextets that they represent
+Note that those octets without a corresponding sextet are left undefined as
+a (lazy) error value.
+*/
 unBase64 : [256][6]
 unBase64 =
-  update (updates allUndefined base64 [0..])
+  update (updates allUndefined base64 [0 .. 63])
          padChar
          (error ("Illegal read from Base64 padding: " #
                  "did you ask for too many bytes?"))
   where
     allUndefined =
-      map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0..]
+      map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0.. 255]
 
-// Pad an n-length sequence until it is a multiple of m long
+/** Pad an n-length sequence until it is a multiple of m long
+*/
 padWith :
   {mod, n, a} (fin n, fin mod, mod >= 1) =>
   a -> [n]a -> [mod * (n /^ mod)]a
 padWith pad items = items # repeat pad
 
-type Base64 n = [4 * ((8 * n) /^ 6 /^ 4)][8]
+type Base64Length n = 4 * ((8 * n) /^ 6 /^ 4)
+type Base64 n = [Base64Length n][8]
 
-// Encode n bytes as Base64, padding to 4-byte chunks
+/** Encode n bytes as Base64, padding to 4-byte chunks */
 encodeBase64 : {n} (fin n) => [n][8] -> Base64 n
 encodeBase64 bytes =
   padWith`{mod=4} padChar (base64 @@ sextets)
@@ -41,7 +46,7 @@ encodeBase64 bytes =
     bits = join bytes
     sextets = groupBy`{each=6} (padWith`{mod=6} zero bits)
 
-// Decode a Base64-encoded string to n bytes
+/** Decode a Base64-encoded string to n bytes */
 decodeBase64 : {n} (fin n) => Base64 n -> [n][8]
 decodeBase64 chars =
   groupBy`{each=8} bits
@@ -50,7 +55,7 @@ decodeBase64 chars =
 
 // Some proofs about Base64 encoding
 
-// Predicate that a string is valid Base64 for a particular bit width.
+/** Predicate that a string is valid Base64 for a particular bit width. */
 validBase64 : {n} (fin n, n >= 1) => Base64 n -> Bool
 validBase64 chars =
   and (validMask @@ message)          // all used chars are valid
@@ -64,23 +69,23 @@ validBase64 chars =
     validMask : [256]
     validMask = updates zero base64 (repeat True)
 
-// Decode is inverse to encode.
+/** Decode is inverse to encode. */
 base64_decode_encode : {n} (fin n) => [n][8] -> Bool
 property base64_decode_encode bytes =
   decodeBase64`{n} (encodeBase64 bytes) == bytes
 
-// Encoding always results in a valid Base64 string.
+/** Encoding always results in a valid Base64 string. */
 base64_encode_valid : {n} (fin n, n >= 1) => [n][8] -> Bool
 property base64_encode_valid bytes =
   validBase64`{n} (encodeBase64 bytes)
 
-// Encode is inverse to decode, for valid Base64 strings.
+/** Encode is inverse to decode, for valid Base64 strings. */
 base64_encode_decode : {n} (fin n, n >= 1) => Base64 n -> Bool
 property base64_encode_decode encoding =
   validBase64`{n} encoding ==>
     encodeBase64 (decodeBase64`{n} encoding) == encoding
 
-// Every byte string corresponds to exactly one valid encoded Base64 string.
+/** Every byte string corresponds to exactly one valid encoded Base64 string. */
 base64_canonical : {n} (fin n, n >= 1) => [n][8] -> Base64 n -> Bool
 property base64_canonical bytes encoding =
   validBase64`{n} encoding ==>

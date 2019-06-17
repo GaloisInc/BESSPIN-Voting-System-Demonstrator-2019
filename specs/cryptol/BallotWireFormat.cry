@@ -29,10 +29,10 @@ decodeBallot :
   Ballot contests maxPositions
 decodeBallot chars =
   if padding == zero
-  then { number = number, time = time, contests = split (contests) }
+  then { number = num, time = time, contests = split (contests) }
   else error "Non-zero padding in ballot encoding"
   where
-    number # time # contests # padding =
+    num # time # contests # padding =
       join (decodeBase64`{(seq + time + contests * maxPositions) /^ 8} chars)
 
 // Proofs that ballot encoding is correct
