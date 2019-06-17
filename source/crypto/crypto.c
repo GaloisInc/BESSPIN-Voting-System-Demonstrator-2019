@@ -8,7 +8,6 @@
 // Subsystem includes
 #include "crypto.h"
 
-
 void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext) {
   return;
 }

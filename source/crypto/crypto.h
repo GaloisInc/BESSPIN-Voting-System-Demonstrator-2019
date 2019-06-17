@@ -14,14 +14,14 @@
 #include "crypto_t.h"
 #include "crypto.acsl"
 
-/*@ requires \valid(the_plaintext);
-  @ requires \valid(the_ciphertext+(0..AES_BLOCK_SIZE-1));
+/*@ requires \valid(the_plaintext + (0..AES_BLOCK_SIZE-1));
+  @ requires \valid(the_ciphertext + (0..AES_BLOCK_SIZE-1));
   @ assigns the_ciphertext[0..AES_BLOCK_SIZE-1];
   @*/
 void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext);
 
-/*@ requires \valid(the_ciphertext);
-  @ requires \valid(the_plaintext+(0..AES_BLOCK_SIZE-1));
+/*@ requires \valid(the_ciphertext + (0..AES_BLOCK_SIZE-1));
+  @ requires \valid(the_plaintext + (0..AES_BLOCK_SIZE-1));
   @ assigns the_plaintext[0..AES_BLOCK_SIZE-1];
   @*/
 void decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext);

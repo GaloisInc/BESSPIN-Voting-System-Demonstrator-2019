@@ -11,10 +11,22 @@
 // @spec kiniry An algebraic specification of crypto should be added
 // here, much like we have in `sbb.acsl`.
 
-/*  axiomatic crypto {
-  @ type plaintext;
-  @ type ciphertext;
-  @ axiom symmetric: \forall plaintext pt, ciphertext ct; decrypt(encrypt(pt)) == pt;
+/*@ axiomatic crypto {
+  @   type model_byte;
+  @   type model_data = \list<model_byte>;
+  @   type model_plaintext = model_data;
+  @   type model_ciphertext = model_data;
+  @   type model_digest = model_data;
+  @   logic model_digest hash(model_data d);
+  @   logic model_ciphertext encrypt(model_plaintext pt);
+  @   logic model_plaintext decrypt(model_ciphertext ct);
+  @
+  @   axiom sha_digest_size:
+  @     \forall model_digest d; \length(d) == (integer)SHA_DIGEST_SIZE;
+  @   axiom digest_is_a_hash:
+  @     \forall model_data d, e; d == e <==> hash(d) == hash(e);
+  @   axiom symmetric:
+  @     \forall model_plaintext pt, model_ciphertext ct; decrypt(encrypt(pt)) == pt;
   @ }
   @*/
 #endif
