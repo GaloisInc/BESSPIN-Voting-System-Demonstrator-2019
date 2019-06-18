@@ -77,7 +77,6 @@ static void prvStatsTask(void *pvParameters);
 
 static void prvBallotBoxMainTask(void *pvParameters);
 static void prvBarcodeScannerTask(void *pvParameters);
-static void prvLoggingTask(void *pvParameters);
 static void prvInputTask(void *pvParameters);
 
 /*-----------------------------------------------------------*/
@@ -139,7 +138,6 @@ int main(void)
 
 	xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
 	xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-	//xTaskCreate(prvLoggingTask, "prvLoggingTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_LOGGING_TASK_PRIORITY, NULL);
 	xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 
 #if configGENERATE_RUN_TIME_STATS
@@ -247,40 +245,6 @@ static void prvBallotBoxMainTask(void *pvParameters)
 	printf("Starting prvBallotBoxMainTask\r\n");
 
 	ballot_box_main_loop();
-}
-/*-----------------------------------------------------------*/
-
-/**
- * Logs data onto the SD card
- */
-static void prvLoggingTask(void *pvParameters)
-{
-	(void)pvParameters;
-	FATFS FatFs; /* FatFs work area needed for each volume */
-	FIL Fil;     /* File object needed for each open file */
-	UINT bw;
-	uint8_t res;
-
-	printf("Starting prvLoggingTask\r\n");
-
-	res = f_mount(&FatFs, "", 0);
-    printf("f_mount result = %i\r\n", res); /* Give a work area to the default drive */
-
-    if (!res) {
-        if (f_open(&Fil, "log.txt", FA_WRITE | FA_CREATE_ALWAYS) == FR_OK) {	/* Create a new file */
-            f_write(&Fil, "It works!\r\n", 11, &bw);	/* Write data to the file */
-            f_close(&Fil);								/* Close the file */
-            f_close(&Fil);								/* Close the file */
-            if (bw == 11) {		/* was data written well */
-                printf("data written sucessfully\r\n");
-            } else {
-                printf("data write error!\r\n");
-            }
-        } else {
-            printf("f_mount error!\r\n");
-        }
-    }
-    printf("prvSdTestTask0 terminating, exit code = %u\r\n", res);
 }
 /*-----------------------------------------------------------*/
 
