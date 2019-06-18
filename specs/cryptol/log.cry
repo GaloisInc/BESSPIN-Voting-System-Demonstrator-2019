@@ -1,5 +1,7 @@
 module Log where
 
+import Base64
+
 parameter
 
     /** This defines the output size of the hash in bytes.
@@ -43,6 +45,10 @@ serializeBinaryLog : {sizeBytes} (fin sizeBytes) =>
     Log sizeBytes -> [sizeBytes + HashSizeBytes][8]
 serializeBinaryLog log = log.message # log.msgHash
 
+serializeASCIILog : {sizeBytes} (fin sizeBytes) =>
+    Log sizeBytes -> [sizeBytes + Base64Length HashSizeBytes + 2][8]
+serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # ['\n']
+
 /**
     A log file is a series of log messages. We must
     specify a maximum log size so that all of the entries
@@ -55,6 +61,12 @@ serializeBinaryLogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs 
     [msgs * (maxSizeBytes + HashSizeBytes)][8]
 serializeBinaryLogFile logFile = join serializedLogs where
     serializedLogs = [serializeBinaryLog entry | entry <- logFile]
+
+serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
+    LogFile maxSizeBytes msgs ->
+    [msgs * (maxSizeBytes + Base64Length HashSizeBytes + 2)][8]
+serializeASCIILogFile logFile = join serializedLogs where
+    serializedLogs = [serializeASCIILog entry | entry <- logFile]
 
 //Message will be something from secure boot, not identified yet
 initialLogEntry : {msgSize, keySize, resultSize}
