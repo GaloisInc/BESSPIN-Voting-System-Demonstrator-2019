@@ -32,8 +32,6 @@ typedef uint8_t* digest;
 typedef uint8_t* message;
 
 // @note kiniry 256/8 = 32
-
-typedef uint8_t aes_block[32];
 typedef uint8_t sha_digest[32];
 
 #endif

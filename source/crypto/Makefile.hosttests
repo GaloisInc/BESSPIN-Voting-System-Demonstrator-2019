@@ -2,11 +2,14 @@
 
 export CC := clang
 
-all: hosttest1
+all: hosttest1 hosttest2
 
-hosttest1:
+hosttest1: hosttest1.c
 	$(CC) -g -Wall -o hosttest1 hosttest1.c aes.c cbc.c mode_wrappers.c
 
+hosttest2: hosttest2.c
+	$(CC) -g -Wall -o hosttest2 hosttest2.c aes.c cbc.c mode_wrappers.c crypto_defs.c crypto.c
+
 clean:
-	rm -f hosttest1 *.o
+	rm -f hosttest1 hosttest2 *.o
 

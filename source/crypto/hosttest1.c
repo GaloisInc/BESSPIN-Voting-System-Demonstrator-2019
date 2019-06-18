@@ -8,15 +8,14 @@
 #include "internal.h"
 #include "modes.h"
 
-#define BLOCK_SIZE_BYTES 16
 #define KEY_SIZE_BYTES 32
 
-typedef unsigned char block[BLOCK_SIZE_BYTES];
+typedef unsigned char aes_block[AES_BLOCK_SIZE_BYTES];
 typedef unsigned char key256[KEY_SIZE_BYTES];
 
-void dump (block b)
+void dump (aes_block b)
 {
-  for (int i = 0; i < BLOCK_SIZE_BYTES; i++)
+  for (int i = 0; i < AES_BLOCK_SIZE_BYTES; i++)
     {
       printf ("%02x ", b[i]);
     }
@@ -33,9 +32,9 @@ int main()
   {
     key256 key  = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufp = { 0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufp = { 0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     AES_set_encrypt_key(key, 256, &aes_ks1);
     AES_cbc_encrypt(bufp, bufc, (size_t)16, &aes_ks1, iv, AES_ENCRYPT);
@@ -46,9 +45,9 @@ int main()
   {
     key256 key  = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufp = { 0xc0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufp = { 0xc0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     AES_set_encrypt_key(key, 256, &aes_ks1);
     AES_cbc_encrypt(bufp, bufc, (size_t)16, &aes_ks1, iv, AES_ENCRYPT);
@@ -58,9 +57,9 @@ int main()
   {
     key256 key  = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufp = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+    aes_block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufp = { 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 		   0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
     AES_set_encrypt_key(key, 256, &aes_ks1);
@@ -73,9 +72,9 @@ int main()
   {
     key256 key  = { 0x80,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufp = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufp = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     AES_set_encrypt_key(key, 256, &aes_ks1);
     AES_cbc_encrypt(bufp, bufc, (size_t)16, &aes_ks1, iv, AES_ENCRYPT);
@@ -85,9 +84,9 @@ int main()
   {
     key256 key  = { 0xc0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 		    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufp = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufp = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     AES_set_encrypt_key(key, 256, &aes_ks1);
     AES_cbc_encrypt(bufp, bufc, (size_t)16, &aes_ks1, iv, AES_ENCRYPT);
@@ -100,9 +99,9 @@ int main()
 		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 		    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-    block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
-    block bufp = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block iv   = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufc = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
+    aes_block bufp = { 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 
     AES_set_encrypt_key(key, 256, &aes_ks1);
     AES_cbc_encrypt(bufp, bufc, (size_t)16, &aes_ks1, iv, AES_ENCRYPT);

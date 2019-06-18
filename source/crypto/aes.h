@@ -65,7 +65,7 @@ extern "C" {
 /* AES_MAXNR is the maximum number of AES rounds. */
 #define AES_MAXNR 14
 
-#define AES_BLOCK_SIZE 16
+#define AES_BLOCK_SIZE_BYTES 16
 
 /* aes_key_st should be an opaque type, but EVP requires that the size be
  * known. */
@@ -109,8 +109,8 @@ OPENSSL_EXPORT void AES_decrypt(const uint8_t *in, uint8_t *out,
  * first call and |ivec| will be incremented. */
 OPENSSL_EXPORT void AES_ctr128_encrypt(const uint8_t *in, uint8_t *out,
                                        size_t len, const AES_KEY *key,
-                                       uint8_t ivec[AES_BLOCK_SIZE],
-                                       uint8_t ecount_buf[AES_BLOCK_SIZE],
+                                       uint8_t ivec[AES_BLOCK_SIZE_BYTES],
+                                       uint8_t ecount_buf[AES_BLOCK_SIZE_BYTES],
                                        unsigned int *num);
 
 /* AES_ecb_encrypt encrypts (or decrypts, if |enc| == |AES_DECRYPT|) a single,
