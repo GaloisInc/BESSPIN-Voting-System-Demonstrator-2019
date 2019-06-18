@@ -1,0 +1,12 @@
+# Makefile for Building the crypto subsystem "host" tests - e.g. tests that run on Linux or MacOS
+
+export CC := clang
+
+all: hosttest1
+
+hosttest1:
+	$(CC) -g -Wall -o hosttest1 hosttest1.c aes.c cbc.c mode_wrappers.c
+
+clean:
+	rm -f hosttest1 *.o
+
