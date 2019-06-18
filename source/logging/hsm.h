@@ -31,10 +31,10 @@ typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
 #define BVS2019_SHA_DIGEST_LENGTH_BITS SHA256_DIGEST_LENGTH_BITS
 #define BVS2019_SHA_DIGEST_LENGTH_BYTES SHA256_DIGEST_LENGTH_BYTES
 
-/*@ requires \valid_read(the_plaintext + (0..AES_BLOCK_SIZE-1));
-  @ requires \valid(the_ciphertext + (0..AES_BLOCK_SIZE-1));
+/*@ requires \valid_read(the_plaintext + (0 .. AES_BLOCK_SIZE - 1));
+  @ requires \valid(the_ciphertext + (0 .. AES_BLOCK_SIZE - 1));
   @ requires \separated(the_plaintext, the_ciphertext);
-  @ assigns the_ciphertext[0..AES_BLOCK_SIZE-1];
+  @ assigns the_ciphertext[0 .. AES_BLOCK_SIZE - 1];
   @ ensures lift_ciphertext(the_ciphertext) ==
   @         encrypt(lift_plaintext(the_plaintext));
   @ ensures decrypt(encrypt(lift_plaintext(the_plaintext))) ==
@@ -43,10 +43,10 @@ typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
 void aes_encrypt_block(plaintext_block  the_plaintext,
                        ciphertext_block the_ciphertext);
 
-/*@ requires \valid_read(the_ciphertext + (0..AES_BLOCK_SIZE-1));
-  @ requires \valid(the_plaintext + (0..AES_BLOCK_SIZE-1));
+/*@ requires \valid_read(the_ciphertext + (0 .. AES_BLOCK_SIZE - 1));
+  @ requires \valid(the_plaintext + (0 .. AES_BLOCK_SIZE - 1));
   @ requires \separated(the_ciphertext, the_plaintext);
-  @ assigns the_plaintext[0..AES_BLOCK_SIZE-1];
+  @ assigns the_plaintext[0 .. AES_BLOCK_SIZE - 1];
   @ ensures lift_plaintext(the_plaintext) ==
   @         decrypt(lift_ciphertext(the_ciphertext));
   @ ensures encrypt(decrypt(lift_ciphertext(the_ciphertext))) ==
@@ -67,7 +67,7 @@ void hmac(const aes256_key key,      // IN
 	  const size_t     msg_size, // IN
           digest           digest);  // OUT
 
-/*@ requires \valid_read(msg + (0..msg_size-1));
+/*@ requires \valid_read(msg + (0 .. msg_size - 1));
   @ requires \separated(msg, digest);
   @ assigns digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
   @ ensures \valid (digest + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));

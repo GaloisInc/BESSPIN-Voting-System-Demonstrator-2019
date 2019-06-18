@@ -88,7 +88,7 @@ void initialize(void);
 // @review kiniry Needs a postcondition that states that the currently
 // held ballot is a legal ballot for the election, as soon as the crypto
 // spec is ready for use.
-/*@ requires \valid(the_barcode + (0..its_length));
+/*@ requires \valid(the_barcode + (0 .. its_length));
   @ requires the_state.P == EARLY_AND_LATE_DETECTED;
   @ assigns \nothing;
 */
@@ -115,10 +115,10 @@ bool has_a_barcode(void);
 // what_is_the_barcode) is the underlying (non-public) functions
 // encoding the device driver/firmware for the barcode scanner
 // subsystem?
-/*@ requires \valid(the_barcode + (0..its_length));
+/*@ requires \valid(the_barcode + (0 .. its_length));
   @ requires the_state.BS == BARCODE_PRESENT_AND_RECORDED;
 */
-// assigns the_barcode + (0..its_length);
+// assigns the_barcode + (0 .. its_length);
 // ensures (* the model barcode is written to the_barcode *)
 // @design kiniry Should this function return the number of bytes in
 // the resulting barcode?
@@ -175,7 +175,7 @@ void stop_motor(void);
 // be able to specify, both at the model and code level, what is on
 // the display.
 
-/*@ requires \valid_read(str+(0..len));
+/*@ requires \valid_read(str + (0 .. len));
   @ assigns the_state.D;
   @ ensures the_state.D == SHOWING_TEXT;
 */
