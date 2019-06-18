@@ -1,4 +1,5 @@
-source/sbb/*.elf
+**/*.elf
+**/.DS_Store
+source/logging/test*
 source/sbb/TAGS
 source/sbb/metrics
-.DS_Store
