@@ -88,6 +88,9 @@ extern "C" {
 #elif defined(__pnacl__)
 #define OPENSSL_32_BIT
 #define OPENSSL_PNACL
+#elif defined(__riscv)
+#define OPENSSL_32_BIT
+#define OPENSSL_RISCV
 #else
 #error "Unknown target CPU"
 #endif
