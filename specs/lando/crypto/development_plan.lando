@@ -1,12 +1,12 @@
 subsystem Crypto
 The cryptographic algorithms and protocol for the DEF CON 2019 Voting System.
   indexing
-    owner: Joey Dodds <jdodds@galois.com> 
+    owner: Rod Chapman <rod.chapman@freeandfair.us>
     contributors: Luke Myers <lmyers@galois.com> 
-      Daniel Wagner <dmwit@galois.com> 
-      Joe Kiniry <kiniry@freeandfair.us>
-      Dragan Stosic <dragan.stosic@freeandfair.us>
-      Rod Chapman <rod.chapman@freeandfair.us>
+                  Daniel Wagner <dmwit@galois.com> 
+                  Joe Kiniry <kiniry@freeandfair.us>
+                  Dragan Stosic <dragan.stosic@freeandfair.us>
+                  Joey Dodds <jdodds@galois.com> 
     design_effort_estimate: 1 week
     implementation_effort_estimate: 1 week
     assurance_effort_estimate: 1 week

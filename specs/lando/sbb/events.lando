@@ -1,121 +1,73 @@
-event 
-    Standby
-description
-    Initial state. The ballot box is ready and waiting for a paper to be inserted
+events SBB
 
-event
-    Motor forward
-description
-    Move motor forward, to feed paper inside the ballot box
+Standby.
+Initial state wherein the ballot box is ready and waiting for a paper to be inserted.
 
-event
-    Motor stop
-description
-    Stop moving the motor.
+Motor forward.
+Move motor forward, to feed paper inside the ballot box.
 
-event
-    Motor back
-description
-    Move motor back, to feed paper out of the ballot box
+Motor stop.
+Stop moving the motor.
 
-event
-    Paper detected
-description
-    No paper sensor detects a paper.
-    A sheet of paper is inserted into the paper feeder and is detected
-    by the paper sensor 1
+Motor backward.
+Move motor backward, to feed paper out of the ballot box.
 
-event
-    Paper inserted
-description
-    Paper sensor 1 detects a paper, paper sensor 2 does not.
-    A sheet of paper was detected by the paper sensor 2.
+Paper detected.
+No paper sensor detects a paper then a sheet of paper is inserted into
+the paper feeder and is detected by the early paper sensor.
 
-event
-    Paper accepted
-description
-    Paper sensor 1 and 2 detect a paper. Paper sensor 1 is released,
-    then paper sensor 2 is released. The paper is deposited inside the ballot box.
+Paper inserted.
+The early paper sensor detects some paper and the later paper sensor
+does not, then a sheet of paper is detected by the later paper sensor.
 
-event
-    Paper returned
-description
-    Paper sensor 1 and 2 detect a paper. Paper sensor 2 is released,
-    then paper sensor 1 is released. The paper is assumed to be removed from
-    the feeder tray.
+Paper accepted.
+Both early and late paper sensors detect some paper, then the early
+paper sensor does not, then the later paper sensor does not, and
+the paper is deposited inside the ballot box.
 
+Paper returned.
+Both early and late paper sensors detect some paper, then the later
+paper sensor does not, then the early paper sensor does not, thus
+paper has been removed from the feeder tray.
 
-event
-    Paper sensor 1 engaged
-description
-    Paper sensor 1 detects paper
+Early paper sensor trigger.
+The early paper sensor detects paper.
 
-event
-    Paper sensor 1 released
-description
-    Paper sensor 1 detects no paper
+Early paper sensor is released.
+The early paper sensor detects no paper.
 
-event
-    Paper sensor 2 engaged
-description
-    Paper sensor 2 detects paper
+Late paper sensor trigger.
+The late paper sensor detects paper.
 
-event
-    Paper sensor 2 released
-description
-    Paper sensor 2 detects no paper
+Late paper sensor is released.
+The late paper sensor detects no paper.
 
-event
-    DisplayText
-description
-    A text is diplayed on the LCD display
+Display some text.
+Some text is diplayed on the LCD display.
 
-event
-    Cast Button is pressed
-description
-    Cast Button is released. Cast Button is pressed
+Cast button pressed.
+The cast button is released then the cast button is pressed.
 
-event
-    Cast Button is released
-description
-    Cast Button is pressed. Cast Button is released
+Cast button released.
+The cast button is pressed then the cast button is released.
 
-event
-    Spoil Button is pressed
-description
-    Spoil Button is released. Spoil Button is pressed
+Spoil button pressed.
+The spoil button is released then the spoil button is pressed.
 
-event
-    Spoil Button is released
-description
-    Spoil Button is pressed. Spoil Button is released
+Spoil button released.
+The spoil button is pressed the the spoil button is released.
 
-event
-    Cast Light is On
-description
-    Cast Light is turned on
+Cast light lit.
+The cast light is turned on.
 
-event
-    Cast Light is Off
-description
-    Cast Light is turned off
+Cast light dark.
+The cast light is turned off.
 
-event
-    Spoil Light is On
-description
-    Spoil Light is turned on
+Spoil light lit.
+The spoil light is turned on.
 
-event
-    Spoil Light is Off
-description
-    Spoil Light is turned off
+Spoil light dark.
+The spoil light is turned off.
 
-event
-    Barcode is scanned
-description
-    A barcode is scanned
-
-event
-    Tally performed
-description
-    A tally of votes was performed
+Barcode scanned.
+A barcode is scanned.

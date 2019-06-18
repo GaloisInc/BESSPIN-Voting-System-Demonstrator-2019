@@ -1,15 +1,6 @@
-Smart Ballot Box
-subsystem Smart Ballot Box
-  The software, firmware, and hardware that make up the BSV smart ballot box.
-  indexing
-    owner: Michal Podhradsky <mpodhradsky@galois.com>
-    contributors: Haneef Mubarak <hmubarak@galois.com>
-      Parker Southwick <psouthwick@galois.com>
-      Steven Osborn <steven@freeandfair.us>
-      Joe Kiniry <kiniry@freeandfair.us>
-      Daniel M. Zimmerman <dmz@freeandfair.us>
-      Alexander Bakst <abakst@galois.com>
-    potential contributors: Daniel M.
+subsystem Smart Ballot Box (SBB)
+The software, firmware, and hardware that make up the BSV smart ballot
+box.
 
 // @todo kiniry This top-level system specification should either
 // import all of the related specifications in this directory, or

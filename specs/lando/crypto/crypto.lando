@@ -1,7 +1,5 @@
 subsystem Crypto
 
-// cryptographic protocol and its entities
-
 component Protocol
   Communications protocol between the BMD and the SBB.
   Messages are all from BMD to SBB via the ballot.
