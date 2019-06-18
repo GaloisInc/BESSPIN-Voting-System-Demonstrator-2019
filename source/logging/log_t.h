@@ -19,6 +19,6 @@ typedef char* log_name;
 //typedef FIL* log;
 //typedef FIL* log_io_stream;
 
-typedef char log_entry[LOG_ENTRY_LENGTH];
+typedef uint8_t log_entry[LOG_ENTRY_LENGTH];
 
 #endif

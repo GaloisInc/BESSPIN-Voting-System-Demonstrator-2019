@@ -57,32 +57,34 @@ void aes_decrypt_block(ciphertext_block the_ciphertext,
 
 /*@ requires \valid_read(key + (0 .. AES256_KEY_LENGTH_BYTES - 1));
   @ requires \valid_read(msg + (0 .. msg_size - 1));
-  @ requires \separated(key, msg, digest);
-  @ assigns digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-  @ ensures \valid(digest + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+  @ requires \separated(key, msg, the_digest);
+  @ assigns the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+  @ ensures \valid(the_digest + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
   @*/
 // @design kiniry Shouldn't the type for `msg` be `message` from `crypto_t.h`?
+// @design rod    Agrees - changed to message
 void hmac(const aes256_key key,      // IN
-	  const char       msg[],    // IN
+	  const message    msg,      // IN
 	  const size_t     msg_size, // IN
-          digest           digest);  // OUT
+          digest           the_digest);  // OUT
 
 /*@ requires \valid_read(msg + (0 .. msg_size - 1));
-  @ requires \separated(msg, digest);
-  @ assigns digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-  @ ensures \valid (digest + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+  @ requires \separated(msg, the_digest);
+  @ assigns the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+  @ ensures \valid (the_digest + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
   @*/
-// @review kiniry When do we use `[]` vs. `*`?
+// @review kiniry When do we use `[]` vs. `*`? rod - good question!
 // @review kiniry Much like `hmac`, reflect on choice of types in
 // formal parameters.
+// @review rod    Done - changed to "message" and "the_digest" to avoid ambiguity
 // @review kiniry In vs. out parameters are denoted via an `assigns`
 // clause in a function's contract.  Having a second hint about such,
 // either in formal parameter names (such as `in_msg`) or comments, as
 // is done below, is a possibility.  We should reflect on what we want
 // overall in our coding standard, given we are currently using three
 // different convensions for such.
-void sha256(const uint8_t msg[],     // IN
-	    const size_t  msg_size,  // IN
-            digest        digest);   // OUT
+void sha256(const message msg,         // IN
+	    const size_t  msg_size,    // IN
+            digest        the_digest); // OUT
 
 #endif
