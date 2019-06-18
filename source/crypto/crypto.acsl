@@ -20,6 +20,8 @@
   @   logic model_digest hash(model_data d);
   @   logic model_ciphertext encrypt(model_plaintext pt);
   @   logic model_plaintext decrypt(model_ciphertext ct);
+  @   logic model_ciphertext lift_ciphertext(ciphertext_block ct);
+  @   logic model_plaintext lift_plaintext(plaintext_block pt);
   @
   @   axiom sha_digest_size:
   @     \forall model_digest d; \length(d) == (integer)SHA_DIGEST_SIZE;

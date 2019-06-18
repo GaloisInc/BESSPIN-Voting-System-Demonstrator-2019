@@ -135,6 +135,9 @@ size_t Log_IO_Num_Entries (Log_Handle *stream);
 
 
 /* reads the n'th entry. n = 0 means the "initial" or "root" entry */
+// @design kiniry We need a logic query for the model of
+// Log_IO_Num_Entries so that we can express the precondition for this
+// function.
 /*@ requires Log_IO_Initialized;
     requires File_Is_Open (stream);
     requires n >= 0;

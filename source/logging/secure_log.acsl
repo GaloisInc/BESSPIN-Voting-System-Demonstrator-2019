@@ -14,9 +14,13 @@
 // isomorphic to, and behaviorally equivalent to, that which is
 // specified by Joey in the Cryptol spec of secure logging.
 
-/*  axiomatic secure_log {
-  @   type secure_log_entry = base_block | hashchained_block;
-  @   type secure_log = List<secure_log_entry>;
+// @spec kiniry In order to write a strong spec here, we need to
+// rely upon the specification of the crypto subsystem.
+
+/*@ axiomatic secure_log_theory {
+  @   type model_secure_log_entry = base_block | hashchained_block;
+  @   type model_secure_log = \list<model_secure_log_entry>;
+  @ }
   @*/
 
 #endif

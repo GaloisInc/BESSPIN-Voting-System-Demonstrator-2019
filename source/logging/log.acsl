@@ -8,6 +8,7 @@
 
 #include "log_t.h"
 #include "hsm.h"
+#include "../crypto/crypto.acsl"
 
 // @spec kiniry An algebraic specification of logs should be added
 // here, much like we have in `sbb.acsl`, complementing that which is
@@ -78,6 +79,23 @@
   @ axiomatic secure_log_type {
   @ type Secure_log = list<Secure_log_entry>;
   @}
+
+/*@ axiomatic log {
+  @   type list<A> = Nil | Cons(A, list<A>);
+  @   type Log = list<log_entry>;
+  @   logic log_entry l_entry;
+  @   logic Log log_list;
+  @   logic Log nil;
+  @   logic Log cons(log_entry l_entry, Log log_list);
+  @   logic Log append(Log log_list1, Log log_list2);
+  @
+  @   axiom append_Nil:
+  @     \forall Log log_list; append(nil,log_list) == log_list;
+  @
+  @   axiom append_Cons:
+  @     \forall log_entry l_entry, Log log_list1, log_list2;
+  @     append(cons(l_entry, log_list1), log_list2) == cons(l_entry, append(log_list1, log_list2));
+  @ }
   @*/
 
 #endif
