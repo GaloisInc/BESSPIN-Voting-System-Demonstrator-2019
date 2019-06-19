@@ -1,0 +1,16 @@
+scenario_chart BMD_SCENARIOS
+-- normal
+explanation
+    top-level scenarios of the ballot marking device subsystem.
+scenario ON_OFF
+description
+    after power_on the bmd will wait for load_election_configuration or until power off; after which the bmd will turn off retaining no state.
+scenario LOAD_CONFIG
+description
+    after power_on the bmd will wait at load_election_configuration until the election configuration is provided; after which the bmd will move through initialize; then the bmd will wait at display_wait_for_ballot_style_indicator_screen until user input is detected.
+scenario CONFIG_CYCLE
+description 
+    after display_wait_for_ballot_style_indicator_screen the bmd can power off and then power_on; after which the bmd will wait at load_election_configuration until the election configuration is loaded onto the bmd; then the bmd will proceed to display_wait_for_ballot_style_indicator_screen.
+scenario VOTE
+description
+    after display_wait_for_ballot_style_indicator_screen the bmd will wait for user input to move to begin voting; then the bmd will present each ballot choice with the ability to make selections; after the user has made all their selections and input that they have finished the bmd will move to review_selections until the user selects to print their ballot; after which the bmd will take the user's selections and a nonce and encrypt them then encode them into a barcode which is printed with the user's ballot; then the bmd will log_ballot and return to display_wait_for_ballot_style_indicator_screen.

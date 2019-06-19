@@ -1,0 +1,12 @@
+event_chart BMD_EVENTS
+explanation
+    "Events triggering software behavior on the ballot marking device (bmd) under deployment."
+event power_on. The bmd turns on.
+event power_off. The bmd turns off.
+event load_election_configuration. The configuration file containing the parameters of the election is loaded into the memory of the bmd.
+event display_wait_for_ballot_style_indicator_screen. The bmd display shows a screen to the user to inform them that they need to indicate which style of ballot they will be casting.
+event select_candidates. The bmd presents the list of candidates to the user and only allows the user to select up to the maximum number of candidates allowed to be voted for in that particualr contest.
+event next_race. The bmd updates to display the next contest on the ballot.
+event review_selections. The bmd displays all contests and indicates the user's selections in each contest.
+event print_ballot. The bmd will print out the paper ballot.
+event log_ballot.  The bmd will write the encrypted format of the ballot to the log.
