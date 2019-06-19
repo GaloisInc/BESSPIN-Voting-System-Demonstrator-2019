@@ -50,30 +50,25 @@ void update_paper_state(bool paper_in_pressed,
   case NO_PAPER_DETECTED:
     if ( paper_in_pressed ) {
       the_state.P = EARLY_PAPER_DETECTED;
-      printf("NONE -> EARLY\n");
     }
     break;
 
   case EARLY_PAPER_DETECTED:
     if ( paper_in_released && paper_out_pressed ) {
       the_state.P = LATE_PAPER_DETECTED;
-      printf("EARLY -> LATE\n");
     } else if ( paper_in_released ) {
       // see todo above
       the_state.P = NO_PAPER_DETECTED;
     } else if ( paper_out_pressed ) {
       the_state.P = EARLY_AND_LATE_DETECTED;
-      printf("EARLY -> EARLY AND LATE\n");
     }
     break;
 
   case LATE_PAPER_DETECTED:
     if ( paper_in_pressed && paper_out_released ) {
       the_state.P = EARLY_PAPER_DETECTED;
-      printf("LATE -> EARLY \n");
     } else if ( paper_in_pressed ) {
       the_state.P = EARLY_AND_LATE_DETECTED;
-      printf("LATE -> EARLY AND LATE\n");
     } else if ( paper_out_released ) {
       // see todo above
       the_state.P = NO_PAPER_DETECTED;
@@ -85,10 +80,8 @@ void update_paper_state(bool paper_in_pressed,
       // see todo above
       the_state.P = NO_PAPER_DETECTED;
     } else if ( paper_in_released ) { 
-      printf("EARLYLATE -> LATE\n");
       the_state.P = LATE_PAPER_DETECTED;
     } else if ( paper_out_released ) {
-      printf("EARLYLATE -> EARLY\n");
       the_state.P = EARLY_PAPER_DETECTED;
     }
     break;
@@ -109,10 +102,8 @@ void update_button_state(bool cast_button_pressed,
   case ALL_BUTTONS_UP:
     if ( cast_button_pressed ) {
       the_state.B = CAST_BUTTON_DOWN;
-      printf("CAST PRESSED\n");
     } else if ( spoil_button_pressed ) {
       the_state.B = SPOIL_BUTTON_DOWN;
-      printf("SPOIL PRESSED\n");
     }
     break;
 
@@ -138,7 +129,6 @@ void update_barcode_state( bool barcode_scanned ) {
   switch ( the_state.BS ) {
   case BARCODE_NOT_PRESENT:
     if ( barcode_scanned ) {
-      printf("barcode scanned!\n");
       char barcode[BARCODE_MAX_LENGTH] = {0};
       barcode_length_t xReceiveLength = 0;
       xReceiveLength = xStreamBufferReceive(xScannerStreamBuffer,
@@ -146,7 +136,6 @@ void update_barcode_state( bool barcode_scanned ) {
                                             SCANNER_BUFFER_RX_BLOCK_TIME_MS);
       if ( xReceiveLength > 0 ) {
         set_received_barcode(barcode, xReceiveLength);
-	printf("SET RECEIVED\n");
         the_state.BS = BARCODE_PRESENT_AND_RECORDED;
       }
     }
@@ -275,7 +264,6 @@ void ballot_box_main_loop(void) {
       if ( ballot_detected() ) {
         ballot_detect_timeout_reset();
         move_motor_forward();
-        printf("FEED BALLOT\n");
         the_state.L = FEED_BALLOT;
       }
       break;
@@ -286,14 +274,10 @@ void ballot_box_main_loop(void) {
       // this state: either we have a ballot with a barcode
       // or we're out of time.
       if ( ballot_inserted() || has_a_barcode() || ballot_detect_timeout_expired() ) {
-        printf("BALLOT INSERTED\n");
         stop_motor();
-        printf("MOTOR_STOPPED\n");
         if ( /* ballot_inserted()  && */ has_a_barcode() ) {
-	      printf("BARCODE DETECTED\n");
           the_state.L = BARCODE_DETECTED;
         } else {
-	      printf("NO BARCODE DETECTED\n");
           display_this_text(no_barcode_text, strlen(no_barcode_text));
           the_state.L = ERROR;
         }
@@ -306,7 +290,6 @@ void ballot_box_main_loop(void) {
                         strlen(barcode_detected_text));
       what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
       if ( is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH) ) {
-	      printf("VALID!\n");
         // Prompt the user for a decision
         cast_button_light_on();
         spoil_button_light_on();
@@ -316,7 +299,6 @@ void ballot_box_main_loop(void) {
         // Go to the waiting state
         the_state.L = WAIT_FOR_DECISION;
       } else {
-	      printf("INVALID!\n");
         display_this_text(not_a_valid_barcode_text,
                           strlen(not_a_valid_barcode_text));
         the_state.L = ERROR;
@@ -331,7 +313,6 @@ void ballot_box_main_loop(void) {
       } else if ( is_cast_button_pressed() ) {
         the_state.L = CAST;
       } else if ( is_spoil_button_pressed() ) {
-	printf("SPOILING BALLOT\n");
         the_state.L = SPOIL;
       }
       break;

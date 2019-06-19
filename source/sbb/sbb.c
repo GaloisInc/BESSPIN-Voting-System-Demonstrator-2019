@@ -153,11 +153,9 @@ bool ballot_inserted(void) {
 
 void spoil_ballot(void) {
   move_motor_back();
-  printf("SPOIL: %d\n", the_state.P);
   while (!(ballot_detected() && !ballot_inserted())) {
     ;
   }
-  printf("DONE SPOILING: %d\n", the_state.P);
   stop_motor();
 }
 
