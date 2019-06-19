@@ -5,7 +5,7 @@
 export CC := clang
 
 # Build the bottom target
-all: test1 test2 test3 test4
+all: test1 test2 test3 test4 test5
 
 test1:
 	$(CC) -g -Wall -o test1 test1.c log.c secure_log.c log_io.c hsm.c
@@ -19,6 +19,9 @@ test3:
 test4:  
 	$(CC) -g -Wall -o test4 test4.c log.c secure_log.c log_io.c hsm.c
 
+test5:
+	$(CC) -g -Wall -o test5 test5.c log.c secure_log.c log_io.c hsm.c
+
 clean:
-	rm -f test1 test2 test3 test4 *.o
+	rm -f test1 test2 test3 test4 test5 *.o
 	

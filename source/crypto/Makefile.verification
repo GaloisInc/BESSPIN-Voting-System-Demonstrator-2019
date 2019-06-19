@@ -57,7 +57,7 @@ SOFTWARE_SPECS := crypto.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := crypto.c crypto_defs.c
+FRAMA_C_SOURCES := crypto.c 
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
 SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) crypto_main.c

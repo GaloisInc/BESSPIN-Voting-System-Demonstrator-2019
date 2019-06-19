@@ -10,8 +10,7 @@
 #include "log.h"
 
 void create_log(Log_Handle *new_log_file,
-		const log_name the_log_name)
-{
+                const log_name the_log_name) {
   assert(false);
   //@ assert false;
   return;
