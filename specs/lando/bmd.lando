@@ -1,0 +1,14 @@
+subsystem Ballot Marking Device
+  indexing
+    owner: Luke Myers <lmyers@galois.com> 
+           Dragan Stosic <dragan.stosic@freeandfair.us>
+           
+component Ballot Encryption
+  What is the encryption of this ballot and nonce?
+component Random Number Generator
+  May I have a nonce?
+component Printer
+  What is the barcode encoding for this ballot?
+  Print this ballot!
+  Print this receipt!
+

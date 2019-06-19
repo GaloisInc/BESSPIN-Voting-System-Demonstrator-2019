@@ -1,16 +1,15 @@
-all subsystems and/or components have 
-    identified owners and contributors
-        owner: Michal Podhradsky <mpodhradsky@galois.com>
-        contributors: Haneef Mubarak <hmubarak@galois.com>
-        Parker Southwick <psouthwick@galois.com>
-        Steven Osborn <steven@freeandfair.us>
-        potential contributors: Daniel M., Alexander B.
-    effort estimates for design, implementation, and assurance work
-        design/implementation: 1 week
-        assurance: 1 week
-    complexity estimates (low, medium, high)
-        medium
-    risk levels (low, medium, high)
-        medium
-    mandatory dependencies elucidated
-        N/A
+subsystem SBB
+The Smart Ballot Box (SBB) for the DEF CON 2019 BESSPIN Voting System
+(BVS).
+  indexing
+    owner: Alexander Bakst <abakst@galois.com>
+    contributors: Michal Podhradsky <mpodhradsky@galois.com>
+                  Haneef Mubarak <hmubarak@galois.com>
+                  Parker Southwick <psouthwick@galois.com>
+                  Steven Osborn <steven@freeandfair.us>
+    design: 1 week
+    implementation: 2 weeks
+    assurance: 2 weeks
+    complexity estimate: medium
+    risk level: medium
+    mandatory dependencies: crypto logging security

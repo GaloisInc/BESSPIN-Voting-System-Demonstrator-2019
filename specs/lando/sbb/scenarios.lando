@@ -1,34 +1,27 @@
-scenario
-  Accept Valid Ballot -- NORMAL
-description
-  Startup the system, and wait for an inserted paper. A valid ballot 
-   is inserted. The ballot is scanned, the barcode is read. Ask the user 
-   whether they want to accept or spoil the ballot. They choose to accept it. 
-   The ballot is accepted. The ballot box returns to the standby state.
+Accept valid ballot. // NORMAL
+Startup the system, and wait for an inserted paper; a valid ballot is
+inserted; the ballot is scanned, the barcode is read; ask the user
+whether they want to accept or spoil the ballot; they choose to accept
+it; the ballot is accepted; then the ballot box returns to the standby
+state.
 
-scenario
-  Spoil Valid Ballot -- NORMAL
-description
-  Startup the system, and wait for an inserted paper. A valid ballot 
-   is inserted. The ballot is scanned, the barcode is read. Ask the user 
-   whether they want to accept or spoil the ballot. They choose to spoil it. 
-   The ballot is spoiled from the paper feeder. 
-   The ballot box returns to the standby state.
+Spoil valid ballot. // NORMAL
+Startup the system, and wait for an inserted paper; a valid ballot is
+inserted; the ballot is scanned, the barcode is read; ask the user
+whether they want to accept or spoil the ballot; they choose to spoil
+it; the ballot is spoiled from the paper feeder; then the ballot box
+returns to the standby state.
 
-scenario
-  Spoil Invalid Ballot -- NORMAL
-description
-  Startup the system, and wait for an inserted paper. A ballot 
-   with invalid barcode is inserted. The ballot is scanned, and becasue the barcode
-   is not valid, the ballot is spoiled from the paper feeder.
-   The ballot box prints Ballot spoiled message.
-   The ballot box returns to the standby state.
+Spoil invalid ballot. // NORMAL
+Startup the system, and wait for an inserted paper; a ballot with
+invalid barcode is inserted; the ballot is scanned, and becasue the
+barcode is not valid, the ballot is spoiled from the paper feeder; the
+ballot box prints Ballot spoiled message; then the ballot box returns
+to the standby state.
 
-scenario
-  Ballot with no Barcode -- NORMAL
-description
-  Startup the system, and wait for an inserted paper. A ballot 
-   with no barcode is inserted. The ballot is scanned, and becasue the barcode
-   cannot be found, the ballot is spoiled from the paper feeder.
-   The ballot box prints Ballot spoiled message.
-   The ballot box returns to the standby state.
+Ballot with no barcode. // NORMAL
+Startup the system, and wait for an inserted paper; a ballot with no
+barcode is inserted; the ballot is scanned, and because the barcode
+cannot be found, the ballot is spoiled from the paper feeder; the
+ballot box prints a ballot spoiled message; then the ballot box
+returns to the standby state.

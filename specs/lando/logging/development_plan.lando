@@ -3,8 +3,8 @@ Persistent logs and their security properties.
   indexing
     owner: Dragan Stosic <dragan.stosic@freeandfair.us>
     contributors: Rod Chapman <rod.chapman@freeandfair.us> 
-      Dan Zimmerman <dmz@freeandfair.us>
-      Joe Kiniry <kiniry@freeandfair.us>
+                  Dan Zimmerman <dmz@freeandfair.us>
+                  Joe Kiniry <kiniry@freeandfair.us>
    effort estimates for design, implementation, and assurance work
         design: 1 week
         implementation: 1 week

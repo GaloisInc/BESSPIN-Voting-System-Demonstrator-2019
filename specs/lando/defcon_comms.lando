@@ -1,7 +1,7 @@
-DEF CON Communications
-subsystem Polling Place Summary
+subsystem DEF CON Communications
   indexing
-    owner: Jason Graalum
+    owner: Jason Graalum <jasongraalum@galois.com>
+    
 component Team Summary
   What are the slides summarizing this team’s SSITH R&D?
 component Issues Summary

@@ -1,9 +1,11 @@
 subsystem Smart Ballot Box Hardware
+The hardware components which augment the SSITH GFE and make up the
+SBB.
   indexing
     owner: Steven Osborn <steven@freeandfair.us>
     contributors: Haneef Mubarak <hmubarak@galois.com>
-      Parker Southwick <psouthwick@galois.com>
-      Michal Podhradsky <mpodhradsky@galois.com>
+                  Parker Southwick <psouthwick@galois.com>
+                  Michal Podhradsky <mpodhradsky@galois.com>
 
 component Ballot Box
   Deposit ballot!

@@ -1,10 +1,10 @@
-Red Team
 subsystem Red Team
   indexing
-    owner: David Jefferson
-    contributors: Bunnie Huang
-      OSU - Prof. Yeongjin Jang - EECS
-      Auxon
-      JoeFitz
-      Joe Grand
-
+    owner: John Sebes <jsebes@osetfoundation.org>
+    contributors: Joe Kiniry <kiniry@freeandfair.us>
+                  Dan Zimmerman <dmz@freeandfair.us>
+                  Joey Dodds <jdodds@freeandfair.us>
+    possible future contributors: Joe Fitzgerald
+                                  Joe Grand
+                                  Bunnie Huang
+                                  OSU - Prof. Yeongjin Jang - EECS

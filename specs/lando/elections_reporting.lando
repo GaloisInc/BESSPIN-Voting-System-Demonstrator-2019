@@ -1,7 +1,7 @@
-Election Reporting
 subsystem Election Reporting
   indexing
-    owner: Jason Graalum
+    owner: Jason Graalum <jasongraalum@galois.com>
+    
 component Election Status
   How many votes have been cast?
   What is the current outcome of the election?

@@ -1,7 +1,7 @@
-Polling Place Controller
-subsystem Controller
+subsystem Polling Place Controller
   indexing
     owner: TBD2
+    
 component Ballot Manager
   Spoil this ballot card!
   Is this ballot card legitimate?
