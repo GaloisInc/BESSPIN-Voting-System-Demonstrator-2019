@@ -12,6 +12,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "../crypto/crypto_t.h"
+#include "../crypto/crypto.acsl"
+
 
 #define AES128_KEY_LENGTH_BITS 128
 #define AES128_KEY_LENGTH_BYTES (AES128_KEY_LENGTH_BITS / 8)
