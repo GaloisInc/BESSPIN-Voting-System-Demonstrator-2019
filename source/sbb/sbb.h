@@ -151,6 +151,7 @@ void cast_button_light_off(void);
   @         gpio_mem[MOTOR_0],
   @         gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_TURNING_FORWARD;
+  @ ensures ASM_transition(\old(the_state), MOTOR_FORWARD_E, the_state);
 */
 void move_motor_forward(void);
 
@@ -168,6 +169,7 @@ void move_motor_back(void);
             gpio_mem[MOTOR_0],
             gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_OFF;
+  @ ensures ASM_transition(\old(the_state), MOTOR_OFF_E, the_state);
 */
 void stop_motor(void);
 
@@ -178,6 +180,7 @@ void stop_motor(void);
 /*@ requires \valid_read(str + (0 .. len));
   @ assigns the_state.D;
   @ ensures the_state.D == SHOWING_TEXT;
+  @ ensures ASM_transition(\old(the_state), DISPLAY_TEXT_E, the_state);
 */
 void display_this_text(const char* str, uint8_t len);
 
@@ -198,6 +201,7 @@ bool ballot_inserted(void);
   @         the_state.P;
   @ ensures no_buttons_lit(the_state);
   @ ensures the_state.P == NO_PAPER_DETECTED;
+  @ ensures ASM_transition(\old(the_state), SPOIL_E, the_state);
 */
 void spoil_ballot(void);
 
@@ -207,6 +211,7 @@ void spoil_ballot(void);
   @         the_state.P;
   @ ensures no_buttons_lit(the_state);
   @ ensures the_state.P == NO_PAPER_DETECTED;
+  @ ensures ASM_transition(\old(the_state), CAST_E, the_state);
 */
 void cast_ballot(void);
 
