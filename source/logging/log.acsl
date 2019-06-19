@@ -79,12 +79,12 @@
   @ axiomatic secure_log_type {
   @ type Secure_log = list<Secure_log_entry>;
   @}
-
-// @design kiniry We should be using ACSL's built-in \list type here
-// and its associated functions such as \Cons and \concat, not define
-// our own.
-
-/*@ axiomatic log {
+  @
+  @ // @design kiniry We should be using ACSL's built-in \list type here
+  @ // and its associated functions such as \Cons and \concat, not define
+  @ // our own.
+  @
+  @ axiomatic log {
   @   type model_log = \list<log_entry>;
   @ }
   @*/
