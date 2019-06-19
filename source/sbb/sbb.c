@@ -112,6 +112,7 @@ bool has_a_barcode(void) {
 }
 
 void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length) {
+
   configASSERT(its_length <= BARCODE_MAX_LENGTH);
   if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
     memcpy(the_barcode, barcode, its_length);
@@ -149,10 +150,12 @@ void display_this_text(const char *str, uint8_t len) {
   serLcdPrintf(str, len);
 }
 
-bool ballot_detected(void) { return gpio_read(PAPER_SENSOR_IN); }
+bool ballot_detected(void) {
+  return (the_state.P == EARLY_PAPER_DETECTED);
+}
 
 bool ballot_inserted(void) {
-  return gpio_read(PAPER_SENSOR_OUT);
+  return (the_state.P == EARLY_AND_LATE_DETECTED);
 }
 
 void spoil_ballot(void) {
