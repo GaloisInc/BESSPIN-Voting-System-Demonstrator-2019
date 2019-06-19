@@ -13,7 +13,7 @@ component Ballot Selection Interface
   Load election configuration!
   What are the voter's selections?
 component Random Number Generator
-  May I have the last most recently generated nonce?
+  May I have the most recently generated nonce?
   Generate a new nonce!
 component Ballot Encryptor
   What is the encryption of this ballot and nonce?
