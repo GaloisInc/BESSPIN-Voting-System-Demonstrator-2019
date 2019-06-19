@@ -45,7 +45,3 @@ bool verify_secure_log_security(const secure_log the_secure_log) {
   //@ assert false;
   return false;
 }
-
-int main(void) {
-  printf("Hello from secure log...\r\n");
-}

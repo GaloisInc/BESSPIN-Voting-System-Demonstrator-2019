@@ -24,7 +24,7 @@
   @   logic model_plaintext lift_plaintext(plaintext_block pt);
   @
   @   axiom sha_digest_size:
-  @     \forall model_digest d; \length(d) == (integer)SHA_DIGEST_SIZE;
+  @     \forall model_digest d; \length(d) == (integer)SHA256_DIGEST_LENGTH_BYTES;
   @   axiom digest_is_a_hash:
   @     \forall model_data d, e; d == e <==> hash(d) == hash(e);
   @   axiom symmetric:

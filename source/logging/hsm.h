@@ -15,28 +15,16 @@
 #include "../crypto/crypto.acsl"
 
 
-#define AES128_KEY_LENGTH_BITS 128
-#define AES128_KEY_LENGTH_BYTES (AES128_KEY_LENGTH_BITS / 8)
-typedef uint8_t aes128_key[AES128_KEY_LENGTH_BYTES];
-
-#define AES256_KEY_LENGTH_BITS 256
-#define AES256_KEY_LENGTH_BYTES (AES256_KEY_LENGTH_BITS / 8)
-typedef uint8_t aes256_key[AES256_KEY_LENGTH_BYTES];
-
-#define SHA256_DIGEST_LENGTH_BITS 256
-#define SHA256_DIGEST_LENGTH_BYTES (SHA256_DIGEST_LENGTH_BITS / 8)
-typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
-
 #define BVS2019_AES_KEY_LENGTH_BITS AES128_KEY_LENGTH_BITS 
 #define BVS2019_AES_KEY_LENGTH_BYTES AES128_KEY_LENGTH_BYTES
 
 #define BVS2019_SHA_DIGEST_LENGTH_BITS SHA256_DIGEST_LENGTH_BITS
 #define BVS2019_SHA_DIGEST_LENGTH_BYTES SHA256_DIGEST_LENGTH_BYTES
 
-/*@ requires \valid_read(the_plaintext + (0 .. AES_BLOCK_SIZE - 1));
-  @ requires \valid(the_ciphertext + (0 .. AES_BLOCK_SIZE - 1));
+/*@ requires \valid_read(the_plaintext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
+  @ requires \valid(the_ciphertext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @ requires \separated(the_plaintext, the_ciphertext);
-  @ assigns the_ciphertext[0 .. AES_BLOCK_SIZE - 1];
+  @ assigns the_ciphertext[0 .. AES_BLOCK_LENGTH_BYTES - 1];
   @ ensures lift_ciphertext(the_ciphertext) ==
   @         encrypt(lift_plaintext(the_plaintext));
   @ ensures decrypt(encrypt(lift_plaintext(the_plaintext))) ==
@@ -45,10 +33,10 @@ typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
 void aes_encrypt_block(plaintext_block  the_plaintext,
                        ciphertext_block the_ciphertext);
 
-/*@ requires \valid_read(the_ciphertext + (0 .. AES_BLOCK_SIZE - 1));
-  @ requires \valid(the_plaintext + (0 .. AES_BLOCK_SIZE - 1));
+/*@ requires \valid_read(the_ciphertext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
+  @ requires \valid(the_plaintext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @ requires \separated(the_ciphertext, the_plaintext);
-  @ assigns the_plaintext[0 .. AES_BLOCK_SIZE - 1];
+  @ assigns the_plaintext[0 .. AES_BLOCK_LENGTH_BYTES - 1];
   @ ensures lift_plaintext(the_plaintext) ==
   @         decrypt(lift_ciphertext(the_ciphertext));
   @ ensures encrypt(decrypt(lift_ciphertext(the_ciphertext))) ==
@@ -66,8 +54,8 @@ void aes_decrypt_block(ciphertext_block the_ciphertext,
 // @design kiniry Shouldn't the type for `msg` be `message` from `crypto_t.h`?
 // @design rod    Agrees - changed to message
 void hmac(const aes256_key key,      // IN
-	  const message    msg,      // IN
-	  const size_t     msg_size, // IN
+          const message    msg,      // IN
+          const size_t     msg_size, // IN
           digest           the_digest);  // OUT
 
 /*@ requires \valid_read(msg + (0 .. msg_size - 1));
@@ -86,7 +74,7 @@ void hmac(const aes256_key key,      // IN
 // overall in our coding standard, given we are currently using three
 // different convensions for such.
 void sha256(const message msg,         // IN
-	    const size_t  msg_size,    // IN
+            const size_t  msg_size,    // IN
             digest        the_digest); // OUT
 
 #endif
