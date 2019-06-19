@@ -7,13 +7,21 @@
 #ifdef TARGET_OS_FreeRTOS
 #include "ff.h"
 
-typedef FIL Log_Handle;
+
+typedef struct Log_Handles {
+  FIL     the_file;
+  sha256_digest previous_hash;
+} Log_Handle;
 
 #else
 
 // Assume Linux/Posix system
 #include <stdio.h>
-typedef FILE Log_Handle;
+
+typedef struct Log_Handles {
+  FILE     the_file;
+  sha256_digest previous_hash;
+} Log_Handle;
 #endif
 
 typedef Log_Handle *log_file;
