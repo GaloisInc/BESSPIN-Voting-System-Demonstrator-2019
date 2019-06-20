@@ -18,9 +18,12 @@ The BESSPIN Voting System project uses Git for revision control. Currently, we a
    Request (MR) from your branch to `master`. Such a MR should include a brief
    characterization of work being carried out in the branch, be CC'd to individuals who
    should be aware of that work (even if they are not the assignees of the MR), and 
-   an explicit statement of the expected outcomes of the MR. If you open a MR while the
-   work is in progress, prefix its name with "WIP:" (this makes GitLab explicitly
-   treat it as work in progress).
+   an explicit statement of the expected outcomes of the MR. Be sure to designate 
+   _assignees_, a _milestone_, and appropriate _labels_ when opening the MR. 
+   If you open a MR while the work is in progress, prefix its name with _"WIP:"_ 
+   (this makes GitLab explicitly treat it as work in progress). The `wip` label is
+   optional for MRs on GitLab; the work in progress status is based solely 
+   on the _"WIP:"_ prefix on the MR name.
 5. When you are ready to merge to `master`, make sure your branch has
    been pushed to the upstream repository and open a MR (if
    you haven't already). Remove the "WIP:" prefix and add the `ready for review`
