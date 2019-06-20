@@ -5,6 +5,7 @@
 
 // General includes
 #include <assert.h>
+#include <stdio.h>
 
 // Subsystem includes
 #include "log_main.h"
@@ -38,7 +39,11 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
 }
 
 int main(int argc, char* argv[]) {
-  assert(false && "unimplemented");
-  //@ assert false;
-  return -1;
+  // @todo kiniry The use of STDERR and printf needs to be refactored
+  // to an appropriate calls on FreeRTOS.
+  if (argc == 1)
+    Empty_Log_Smoketest("smoketest.log", stderr);
+  else
+    printf("usage: log_main [smoketest]\n");
+  return 0;
 }
