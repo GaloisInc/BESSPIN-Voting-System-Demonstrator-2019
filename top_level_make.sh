@@ -9,8 +9,10 @@ elif [ "$1" == "typecheck" ]; then
     parameters="typecheck"
 elif [ "$1" == "verify" ]; then
     target="verification"
-elif [ "$1" == "tests" ]; then
+elif [ "$1" == "freertos" ]; then
     target="freertos"
+elif [ "$1" == "tests" ]; then
+    target="hosttests"
 else
     echo "Unknown target: " $1
     exit -1

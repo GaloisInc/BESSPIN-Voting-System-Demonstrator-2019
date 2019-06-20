@@ -48,7 +48,7 @@ All-Freertos:
 
 All-Tests:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh hosttests'
+    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh tests'
   tags: ["voting-system"]
 
 #-----------------------------------------------------------------------------#
