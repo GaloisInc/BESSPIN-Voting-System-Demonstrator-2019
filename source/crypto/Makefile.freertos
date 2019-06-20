@@ -70,6 +70,7 @@ DEMO_SRC = \
     crypto.c \
     cbc.c \
     aes.c \
+    sha2-openbsd.c \
     mode_wrappers.c
 
 APP_SRC = \
