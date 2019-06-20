@@ -38,7 +38,7 @@ bool verify_log_entry_well_formedness(const log_entry a_log_entry);
   @ requires \separated(the_log, a_target);
   @ assigns \nothing; // TBD
   @*/
-void export_log(const log_file the_log, log_io_stream a_target);
+void export_log(const log_file the_log, const log_io_stream a_target);
 
 /*@ requires \valid(the_log_name);
   @ assigns  \result \from fs, the_log_name;
