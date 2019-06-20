@@ -1,5 +1,12 @@
 subsystem Logging
 
+// @note kiniry A static architecture is described via three core
+// relations: containment, subtyping, and client.  Note that subtyping
+// is specified using the `inherit` keyword below. Containment is
+// specified structurally using syntactic nesting.  And
+// client-supplier dependencies is specified using the `client`
+// keyword.
+
 component Log Entry inherit String // Refine to JSONValue or CSVValue?
   A structured set of linear data that is to be written to a log.
   Are these two log entries equal?
@@ -31,11 +38,24 @@ component Secure Log inherit Log
 
 component Secure System Log inherit Secure Log
   Must contain only system events.
-component System Event inherit Log Entry
+component System Entry inherit Log Entry
   Must only describe a system-level event related to hardware state changes.
 
 component Secure Application Log inherit Secure Log
   Must only contain application entries of a specified kind.
 component Application Entry inherit Log Entry
-  May I have a new entry that contains the following data?
+  Must only describe an voting system-level event related to
+  election-related state changes.
+
+// Here are the client relationships for this subsystem.  Note that
+// client relationships can be between components or subsystems.
+
+Log client Log Entry
+Secure Log client Secure Log Entry
+Secure Log client Log
+Secure Log client Crypto
+Secure System Log client System Entry
+System Entry client Crypto
+Secure Log Entry client Crypto
+Secure Application Log client Application Event
 
