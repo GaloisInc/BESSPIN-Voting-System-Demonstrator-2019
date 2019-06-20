@@ -37,7 +37,7 @@ void export_log(const log_file the_log, log_io_stream a_target)
     return;
 }
 
-log_file import_log(const log_file the_log_name)
+log_file import_log(const log_name the_log_name)
 {
     assert(false);
     //@ assert false;
