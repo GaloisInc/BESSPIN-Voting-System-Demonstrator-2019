@@ -43,7 +43,11 @@ int main(int argc, char* argv[]) {
   // to an appropriate calls on FreeRTOS.
   if (argc == 1)
     Empty_Log_Smoketest("smoketest.log", stderr);
+  else if (argc == 2 && strncmp("smoketest", argv[1], 9) == 0)
+    Empty_Log_Smoketest("smoketest.log", stderr);
+  else if (argc == 3 && strncmp("smoketest", argv[1], 9) == 0)
+    Empty_Log_Smoketest(argv[2], stderr);
   else
-    printf("usage: log_main [smoketest]\n");
+    printf("usage: log_main [smoketest [<log filename>]]\n");
   return 0;
 }
