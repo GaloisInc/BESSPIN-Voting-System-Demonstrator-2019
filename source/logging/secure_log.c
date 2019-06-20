@@ -173,7 +173,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
      {
        current_entry.the_digest[i] = new_hash[i];
-       the_secure_log -> previous_hash[i]            = new_hash[i];
+       the_secure_log -> previous_hash[i] = new_hash[i];
      }
    
    // 4. Write the log_entry message to the_secure_log
