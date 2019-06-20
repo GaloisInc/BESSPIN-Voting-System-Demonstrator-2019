@@ -6,7 +6,7 @@ This subsystem supplies cryptographic primitives supporting the BVS.
 Top-Level API
 -------------
 
-This appears in `crypto.h``.
+This appears in `crypto.h`.
 
 This API should be used by all other BVS subsystems.
 
