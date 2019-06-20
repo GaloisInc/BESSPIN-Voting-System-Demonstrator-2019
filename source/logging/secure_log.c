@@ -15,8 +15,6 @@ const aes256_key test_key = { 0 };
 
 // Local persistent state
 
-static sha256_digest previous_hash;
-
 // Local functions
 
 // Refines Cryptol initialLogEntry
@@ -81,7 +79,7 @@ void create_secure_log(Log_Handle *secure_log,
   */
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
-      previous_hash[i] = initial_entry.the_digest[i];
+      secure_log -> previous_hash[i] = initial_entry.the_digest[i];
     }
 
   // 3. Write that new block to the file.
@@ -143,7 +141,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
   */
    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
-      msg[index] = previous_hash[i];
+      msg[index] = the_secure_log -> previous_hash[i];
       index++;
     }
 
@@ -175,7 +173,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
      {
        current_entry.the_digest[i] = new_hash[i];
-       previous_hash[i]            = new_hash[i];
+       the_secure_log -> previous_hash[i]            = new_hash[i];
      }
    
    // 4. Write the log_entry message to the_secure_log
