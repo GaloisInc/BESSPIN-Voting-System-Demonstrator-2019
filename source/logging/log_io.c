@@ -174,8 +174,8 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
       UINT bytes_log_entry, bytes_sha_digest;
 
       // read the data
-      read_log_entry_status = f_read (&stream->the_file, &result.the_entry[0], LOG_ENTRY_LENGTH, &bytes_read1);
-      read_digest_status = f_read (&stream->the_file, &result.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_read2);
+      read_log_entry_status = f_read (&stream->the_file, &result.the_entry[0], LOG_ENTRY_LENGTH, &bytes_log_entry);
+      read_digest_status = f_read (&stream->the_file, &result.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_sha_digest);
 
       // Restore the original offset
       restore_offset_status = f_lseek (&stream->the_file, original_offset);
