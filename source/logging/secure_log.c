@@ -15,8 +15,6 @@ const aes256_key test_key = { 0 };
 
 // Local persistent state
 
-static sha256_digest previous_hash;
-
 // Local functions
 
 // Refines Cryptol initialLogEntry
@@ -75,13 +73,13 @@ void create_secure_log(Log_Handle *secure_log,
   // 2.1 @dragan keep the first hash
      /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant \forall size_t k; 0 <= k < i ==> previous_hash[k] == initial_entry.the_digest[k];
-      loop assigns previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+      loop invariant \forall size_t k; 0 <= k < i ==> secure_log -> previous_hash[k] == initial_entry.the_digest[k];
+      loop assigns secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
   */
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
-      previous_hash[i] = initial_entry.the_digest[i];
+      secure_log -> previous_hash[i] = initial_entry.the_digest[i];
     }
 
   // 3. Write that new block to the file.
@@ -143,7 +141,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
   */
    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
-      msg[index] = previous_hash[i];
+      msg[index] = the_secure_log -> previous_hash[i];
       index++;
     }
 
@@ -167,15 +165,15 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
      /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
       loop invariant \forall size_t j; 0 <= j < i ==> current_entry.the_digest[j] == new_hash[j];
-      loop invariant \forall size_t k; 0 <= k < i ==> previous_hash[k] == new_hash[k];
+      loop invariant \forall size_t k; 0 <= k < i ==> the_secure_log -> previous_hash[k] == new_hash[k];
       loop assigns i, current_entry.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-      loop assigns previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+      loop assigns the_secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
   */
    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
      {
        current_entry.the_digest[i] = new_hash[i];
-       previous_hash[i]            = new_hash[i];
+       the_secure_log -> previous_hash[i] = new_hash[i];
      }
    
    // 4. Write the log_entry message to the_secure_log

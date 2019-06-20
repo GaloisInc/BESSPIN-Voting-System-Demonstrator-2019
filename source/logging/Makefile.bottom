@@ -12,4 +12,4 @@ all:
 	rm -f *.o
 
 clean:
-	rm secure_log_bottom.elf
+	rm -f secure_log_bottom.elf

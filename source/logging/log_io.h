@@ -7,13 +7,21 @@
 #ifdef TARGET_OS_FreeRTOS
 #include "ff.h"
 
-typedef FIL Log_Handle;
+
+typedef struct Log_Handles {
+  FIL     the_file;
+  sha256_digest previous_hash;
+} Log_Handle;
 
 #else
 
 // Assume Linux/Posix system
 #include <stdio.h>
-typedef FILE Log_Handle;
+
+typedef struct Log_Handles {
+  FILE     the_file;
+  sha256_digest previous_hash;
+} Log_Handle;
 #endif
 
 typedef Log_Handle *log_file;
@@ -45,7 +53,9 @@ typedef enum {
 */
 
 
-/* Mounts the FileSystem and any other initialization necessary */
+/* Mounts the FileSystem and any other initialization necessary.  */
+/* This must be called EXACTLY ONCE by a main program before any  */
+/* other Log_IO operations can be performed.                      */
 /*@ assigns fs \from \nothing;
     ensures Log_IO_Initialized;
  */
@@ -53,7 +63,8 @@ Log_FS_Result Log_IO_Initialize(void);
 
 
 
-/*@ assigns \result \from *name, fs;
+/*@ requires Log_IO_Initialized;
+    assigns \result \from *name, fs;
     ensures \result <==> File_Exists (name);
  */
 bool Log_IO_File_Exists (const char *name);
@@ -73,7 +84,7 @@ bool Log_IO_File_Exists (const char *name);
     behavior failure:
       ensures \result == LOG_FS_ERROR;
       ensures !File_Is_Open (stream);
-   
+
     complete behaviors;
     disjoint behaviors;
  */
