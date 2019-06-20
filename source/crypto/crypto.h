@@ -11,8 +11,8 @@
 #include <stdint.h>
 
 // Subsystem includes
-#include "crypto_t.h"
 #include "crypto.acsl"
+#include "crypto_t.h"
 
 /*@ requires \valid_read(the_plaintext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @ requires \valid(the_ciphertext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
