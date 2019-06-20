@@ -2,5 +2,8 @@
 **/.DS_Store
 **/TAGS
 **/metrics
+*.o
+*.asm
+*.gdb
 source/logging/test*
 source/logging/log_main
