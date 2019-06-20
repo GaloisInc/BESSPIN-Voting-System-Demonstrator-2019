@@ -19,8 +19,7 @@ int main(void)
   write_entry (&my_log_first, first_entry);
 
 
-  // initialize create log write entry
-   Log_IO_Initialize();
+  // create log write entry
   create_log (&my_log_second, "test62log.txt");
   write_entry (&my_log_second, second_entry);
 
