@@ -24,7 +24,7 @@ for file in `find source/* -maxdepth 0 -type d` ; do
     TARGET=$target make $parameters
     if [ $? -gt 0 ] ; then
         echo ">>> Subsystem: " $file " FAILED"
-        #exit -1
+        exit -1
     else
         echo ">>> Subsystem: " $file " OK"
     fi
