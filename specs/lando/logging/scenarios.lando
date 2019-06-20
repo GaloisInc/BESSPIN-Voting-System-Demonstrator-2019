@@ -1,9 +1,33 @@
 scenarios Logging
 
+// ASM https://docs.google.com/drawings/d/1cCYgy1WrWCjoa6tH3t2nA-8rVs0lYU0D5AjbnXnl4BQ/edit?usp=sharing
+
+// Core Log scenarios.
+// This minimal set of parametrized scenarios gives us full path
+// coverage over the Logging Subsystem ASM.
+
+// The shortest possible path to a final state that does not create a
+// non-empty log.
+Empty log smoketest.
+Create a new, empty log, validate it, and export it to a device.
+
+Import/export empty log.
+Create a new, empty log, validate it, and export it to a device, import
+it from the device, validate it, and ensure that the two logs are equal.
+
+Non-empty log smoketest.
+Create a new, empty log, fill it with some log entries, validate it, and
+export it to a device.
+
+Import/export non-empty log.
+Create a new, empty log, fill it with some log entries, export it to a
+device, import it from the device, validate it, and ensure that the
+two logs are equal.
+
 // initialization
 
 Initialize a secure log. // NORMAL
-Create a new, empty secure log file.
+Create a new, empty secure log.
 
 // @refines Initialize a secure log.
 Initialize a secure system log. // NORMAL
@@ -15,10 +39,7 @@ Create a new, empty application log file in the SD card filesystem.
 
 // writes
 
-Append an event. // NORMAL
-Log event E into a log file L.
-
-// @refines Append an event.
+// @refines Write log entry.
 Append a secure system event. // NORMAL
 Log a system event into a system log file.
 
@@ -27,6 +48,7 @@ Log an application event into an application log file.
 
 // correctness
 
+// @refines Validate log.
 Verify the well-formedness of a secure log file. // NORMAL
 Verify that a secure log file L is well-formed wrt correctness
 properties P in its specification.
@@ -58,6 +80,7 @@ security properties.
 
 // I/O
 
+// @refines Export log.
 Export a secure log file.
 Export a secure system log file L to a device D.
 
@@ -69,6 +92,7 @@ Export a secure system log file L to the Reporting component.
 Export a secure application log file.
 Export a secure application log file L to the Reporting component.
 
+// @refines Import log.
 Import a secure log file L.
 Import a secure log file L from device D.
 
