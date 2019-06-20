@@ -23,7 +23,7 @@ Log_FS_Result Log_IO_Initialize()
   res = f_mount (&FatFs,
 		 "", // Mount the default volume
 		 0); // Mount on first access
-  
+
   if (res == FR_OK)
     {
       return LOG_FS_OK;
@@ -138,7 +138,7 @@ size_t Log_IO_Num_Entries (Log_Handle *stream)
   size_t file_size;
 
   file_size = (size_t) f_size (stream -> the_file);
-  
+
   // The file size _should_ be an exact multiple of
   // the size of one log entry.
   if ((file_size % size_of_one_log_entry) == 0)
@@ -156,9 +156,9 @@ size_t Log_IO_Num_Entries (Log_Handle *stream)
 secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 				    size_t n)  // IN
 {
-  FRESULT res1;  
+  FRESULT res1;
   FSIZE_t original_offset;
-  size_t byte_offset_of_entry_n;  
+  size_t byte_offset_of_entry_n;
 
   // Entry 0 is at byte offset 0, so...
   byte_offset_of_entry_n = n * size_of_one_log_entry;
@@ -170,7 +170,7 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
   if (res1 == FR_OK)
     {
       secure_log_entry result;
-      FRESULT res2, res3, res4;  
+      FRESULT res2, res3, res4;
       UINT bytes_read1, bytes_read2;
 
       // read the data
@@ -205,7 +205,7 @@ secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream)
 
   size_t N;
   N = Log_IO_Num_Entries (stream -> the_file);
-  
+
   // We cannot get anything from an empty file so
   if (N > 0)
     {
@@ -235,11 +235,11 @@ Log_FS_Result Log_IO_Initialize()
 Log_FS_Result Log_IO_Create_New (Log_Handle *stream, // OUT
 				 const char *name)   // IN
 {
-  Log_Handle *local_stream_ptr;
+  FILE *local_stream_ptr;
 
   // POSIX fopen allocates for us, unlike FreeRTOS there the caller passed in a
   // pointer to memory that it has allocated. This is rather ugly.
-  local_stream_ptr -> the_file = *fopen (name, "w");
+  local_stream_ptr = fopen (name, "w");
   if (local_stream_ptr == NULL)
     {
       printf ("fopen() failed in Log_IO_Create_New\n");
@@ -248,26 +248,26 @@ Log_FS_Result Log_IO_Create_New (Log_Handle *stream, // OUT
   else
     {
       printf ("sizeof(FILE) is %lu\n", sizeof(FILE));
-      
+
       // RCC - this is dodgy - possibly undefined behaviour to attempt to
-      // copy a FILE struct like this.  
+      // copy a FILE struct like this.
 
       printf ("Copying the FILE structure\n");
       memcpy (&stream -> the_file, local_stream_ptr, sizeof(FILE));
       printf ("Done copying\n");
     }
-  
+
   return LOG_FS_OK;
 }
 
 Log_FS_Result Log_IO_Open_Read (Log_Handle *stream, // OUT
 				const char *name)   // IN
 {
-  Log_Handle *local_stream_ptr;
+  FILE *local_stream_ptr;
 
   // POSIX fopen allocates for us, unlike FreeRTOS there the caller passed in a
   // pointer to memory that it has allocated. This is rather ugly.
-  local_stream_ptr -> the_file= *fopen (name, "r");
+  local_stream_ptr = fopen (name, "r");
   if (local_stream_ptr == NULL)
     {
       printf ("fopen() failed in Log_IO_Open_Read\n");
@@ -276,11 +276,11 @@ Log_FS_Result Log_IO_Open_Read (Log_Handle *stream, // OUT
   else
     {
       printf ("sizeof(FILE) is %lu\n", sizeof(FILE));
-      
+
       // RCC - as above
       memcpy (&stream -> the_file, local_stream_ptr, sizeof(FILE));
     }
-  
+
   return LOG_FS_OK;
 }
 
@@ -332,13 +332,13 @@ Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
 
 bool Log_IO_File_Exists (const char *name)
 {
-  Log_Handle *local_stream_ptr;
-  local_stream_ptr -> the_file = *fopen (name, "r");
+  FILE *local_stream_ptr;
+  local_stream_ptr = fopen (name, "r");
   if (local_stream_ptr == NULL)
     {
       return false;
     }
-  fclose (&local_stream_ptr -> the_file);
+  fclose (local_stream_ptr);
   return true;
 }
 
@@ -355,16 +355,16 @@ size_t Log_IO_Num_Entries (Log_Handle *stream)
 secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
 				    size_t n)  // IN
  {
-  fseek(&stream -> the_file,0,SEEK_SET); 
+  fseek(&stream -> the_file,0,SEEK_SET);
   off_t original_offset;
   off_t byte_offset_of_entry_n;
   byte_offset_of_entry_n = n * size_of_one_log_entry;
-  original_offset = ftell (&stream -> the_file); 
+  original_offset = ftell (&stream -> the_file);
   fseek(&stream -> the_file,byte_offset_of_entry_n,SEEK_CUR);
   secure_log_entry result;
   size_t ret_entry = fread(&result.the_entry[0],1,LOG_ENTRY_LENGTH,&stream -> the_file);
   size_t ret_digest = fread (&result.the_digest[0],1,SHA256_DIGEST_LENGTH_BYTES,&stream -> the_file);
- 
+
     // Restore the original offset
   fseek(&stream -> the_file,original_offset,SEEK_SET);
   if (ret_entry == LOG_ENTRY_LENGTH &&
@@ -379,7 +379,7 @@ secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream)
 {
   size_t N;
   N = Log_IO_Num_Entries (stream);
-  
+
   // We cannot get anything from an empty file so
   if (N > 0)
     {
