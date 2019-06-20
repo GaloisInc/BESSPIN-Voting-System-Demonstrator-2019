@@ -14,7 +14,7 @@
 // All software implementation of SHA2. To be replaced when hardware HSM is available
 #include "sha2-openbsd.h"
 
-typedef unsigned char key256[AES256_KEY_LENGTH_BYTES];
+typedef uint8_t key256[AES256_KEY_LENGTH_BYTES];
 
 // This is for initial integration and testing only
 static const key256 mock_key =
@@ -49,5 +49,29 @@ void hash(message the_message, size_t the_message_size, digest the_digest) {
 }
 
 void hmac(message the_message, size_t the_message_size, digest the_digest) {
-  return;
+
+  ///////////////////////////////////////////////////
+  // NOTE - This is a "mock" implementation        //
+  // It does not implement the true HMAC algorithm //
+  // but rather implements something simpler that  //
+  // exhibits the properties of a MAC function     //
+  // without the cryptographic provenance of HMAC  //
+  //                                               //
+  // This implementation is only intended as a     //
+  // placeholder to allow the integration and test //
+  // of other subsystem on which it depends to     //
+  // progress                                      //
+  ///////////////////////////////////////////////////
+
+  // This is NOT the proper HMAC Algorithm
+  SHA2_CTX context;
+  SHA256Init (&context);
+
+  // Mix in the mock_key
+  SHA256Update (&context, mock_key, AES256_KEY_LENGTH_BYTES);
+
+  // Plus the_message itself
+  SHA256Update (&context, the_message, the_message_size);
+
+  SHA256Final (the_digest, &context);
 }
