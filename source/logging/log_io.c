@@ -170,20 +170,20 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
   if (res1 == FR_OK)
     {
       secure_log_entry result;
-      FRESULT res2, res3, res4;
-      UINT bytes_read1, bytes_read2;
+      FRESULT read_log_entry_status, read_digest_status, restore_offset_status;
+      UINT bytes_log_entry, bytes_sha_digest;
 
       // read the data
-      res2 = f_read (&stream->the_file, &result.the_entry[0], LOG_ENTRY_LENGTH, &bytes_read1);
-      res3 = f_read (&stream->the_file, &result.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_read2);
+      read_log_entry_status = f_read (&stream->the_file, &result.the_entry[0], LOG_ENTRY_LENGTH, &bytes_read1);
+      read_digest_status = f_read (&stream->the_file, &result.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_read2);
 
       // Restore the original offset
-      res4 = f_lseek (&stream->the_file, original_offset);
-      if (res2 == FR_OK &&
-          res3 == FR_OK &&
-          res4 == FR_OK &&
-          bytes_read1 == LOG_ENTRY_LENGTH &&
-          bytes_read2 == SHA256_DIGEST_LENGTH_BYTES)
+      restore_offset_status = f_lseek (&stream->the_file, original_offset);
+      if (read_log_entry_status == FR_OK &&
+          read_digest_status == FR_OK &&
+          restore_offset_status == FR_OK &&
+          bytes_log_entry == LOG_ENTRY_LENGTH &&
+          bytes_sha_digest == SHA256_DIGEST_LENGTH_BYTES)
         {
           return result;
         }
@@ -315,7 +315,7 @@ Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
 
   printf ("Going for the first write\n");
   written = fwrite (&the_entry.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream -> the_file);
-  printf ("Goinf for the second write\n");
+  printf ("Going for the second write\n");
   written += fwrite (&the_entry.the_digest[0], 1, SHA256_DIGEST_LENGTH_BYTES, &stream -> the_file);
 
   printf ("Bytes written is %zu\n", written);
