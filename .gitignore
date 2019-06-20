@@ -3,3 +3,4 @@
 source/logging/test*
 source/sbb/TAGS
 source/sbb/metrics
+/source/logging/log_main
