@@ -23,6 +23,36 @@ before_script:
 
 #-----------------------------------------------------------------------------#
 #
+# Top level tests
+#
+#-----------------------------------------------------------------------------#
+All-Bottom:
+  script:
+    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh bottom'
+  tags: ["voting-system"]
+
+All-Typecheck:
+  script:
+    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh typecheck'
+  tags: ["voting-system"]
+
+All-Verify:
+  script:
+    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh verify'
+  tags: ["voting-system"]
+
+All-Freertos:
+  script:
+    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh freertos'
+  tags: ["voting-system"]
+
+All-Tests:
+  script:
+    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh hosttests'
+  tags: ["voting-system"]
+
+#-----------------------------------------------------------------------------#
+#
 # Smart ballot box
 #
 #-----------------------------------------------------------------------------#
