@@ -2,14 +2,19 @@
 
 export CC := clang
 
-all: hosttest1 hosttest2
+all: hosttest1 hosttest2 hosttest3
 
-hosttest1: hosttest1.c
-	$(CC) -g -Wall -o hosttest1 hosttest1.c aes.c cbc.c mode_wrappers.c
+SOURCES = aes.c cbc.c mode_wrappers.c sha2-openbsd.c crypto.c
+CFLAGS = -g -Wall -DNO_MEMSET_S
 
-hosttest2: hosttest2.c
-	$(CC) -g -Wall -o hosttest2 hosttest2.c aes.c cbc.c mode_wrappers.c crypto_defs.c crypto.c
+hosttest1: hosttest1.c $(SOURCES)
+	$(CC) $(CFLAGS) -o hosttest1 hosttest1.c $(SOURCES)
+
+hosttest2: hosttest2.c $(SOURCES)
+	$(CC) $(CFLAGS) -o hosttest2 hosttest2.c $(SOURCES)
+
+hosttest3: hosttest3.c $(SOURCES)
+	$(CC) $(CFLAGS) -o hosttest3 hosttest3.c $(SOURCES)
 
 clean:
-	rm -f hosttest1 hosttest2 *.o
-
+	rm -f hosttest1 hosttest2 hosttest3 *.o

@@ -31,7 +31,6 @@ typedef block ciphertext_block;
 typedef uint8_t* digest;
 typedef uint8_t* message;
 
-// @note kiniry 256/8 = 32
-typedef uint8_t sha_digest[32];
+typedef uint8_t sha_digest[SHA256_DIGEST_LENGTH_BYTES];
 
 #endif
