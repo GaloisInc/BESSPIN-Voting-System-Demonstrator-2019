@@ -38,7 +38,7 @@ Log_FS_Result Log_IO_Create_New (Log_Handle *stream, // OUT
 				 const char *name)   // IN
 {
   FRESULT res;
-  res = f_open(stream -> the_file, name, FA_WRITE | FA_CREATE_ALWAYS);
+  res = f_open(&stream->the_file, name, FA_WRITE | FA_CREATE_ALWAYS);
 
   if (res == FR_OK)
     {
@@ -54,7 +54,7 @@ Log_FS_Result Log_IO_Open_Read (Log_Handle *stream, // OUT
 				const char *name)   // IN
 {
   FRESULT res;
-  res = f_open(stream -> the_file, name, FA_READ | FA_OPEN_EXISTING);
+  res = f_open(&stream->the_file, name, FA_READ | FA_OPEN_EXISTING);
 
   if (res == FR_OK)
     {
@@ -69,7 +69,7 @@ Log_FS_Result Log_IO_Open_Read (Log_Handle *stream, // OUT
 Log_FS_Result Log_IO_Close (Log_Handle *stream) // IN
 {
   FRESULT res;
-  res = f_close (stream -> the_file);
+  res = f_close (&stream->the_file);
   if (res == FR_OK)
     {
       return LOG_FS_OK;
@@ -83,7 +83,7 @@ Log_FS_Result Log_IO_Close (Log_Handle *stream) // IN
 Log_FS_Result Log_IO_Sync (Log_Handle *stream)  // IN
 {
   FRESULT res;
-  res = f_sync (stream -> the_file);
+  res = f_sync (&stream->the_file);
   if (res == FR_OK)
     {
       return LOG_FS_OK;
@@ -99,8 +99,8 @@ Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
 {
   FRESULT res1, res2;
   UINT bytes_written1, bytes_written2;
-  res1 = f_write (stream -> the_file, &the_entry.the_entry[0], LOG_ENTRY_LENGTH, &bytes_written1);
-  res2 = f_write (stream -> the_file, &the_entry.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_written2);
+  res1 = f_write (&stream->the_file, &the_entry.the_entry[0], LOG_ENTRY_LENGTH, &bytes_written1);
+  res2 = f_write (&stream->the_file, &the_entry.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_written2);
 
   if (res1 == FR_OK &&
       res2 == FR_OK &&
@@ -117,13 +117,13 @@ Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
 
 bool Log_IO_File_Exists (const char *name)
 {
-  Log_Handle *stream;
+  FIL file;
   FRESULT res;
-  res = f_open(stream -> the_file, name, FA_READ | FA_OPEN_EXISTING);
+  res = f_open(&file, name, FA_READ | FA_OPEN_EXISTING);
 
   if (res == FR_OK)
     {
-      res = f_close (stream -> the_file);
+      res = f_close (&file);
       return true;
     }
   else
@@ -137,7 +137,7 @@ size_t Log_IO_Num_Entries (Log_Handle *stream)
 {
   size_t file_size;
 
-  file_size = (size_t) f_size (stream -> the_file);
+  file_size = (size_t) f_size (&stream->the_file);
 
   // The file size _should_ be an exact multiple of
   // the size of one log entry.
@@ -164,9 +164,9 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
   byte_offset_of_entry_n = n * size_of_one_log_entry;
 
   // Record the current offset so we can restore it later...
-  original_offset = f_tell (stream -> the_file);
+  original_offset = f_tell (&stream->the_file);
 
-  res1 = f_lseek (stream -> the_file, (FSIZE_t) byte_offset_of_entry_n);
+  res1 = f_lseek (&stream->the_file, (FSIZE_t) byte_offset_of_entry_n);
   if (res1 == FR_OK)
     {
       secure_log_entry result;
@@ -174,11 +174,11 @@ secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
       UINT bytes_read1, bytes_read2;
 
       // read the data
-      res2 = f_read (stream -> the_file, &result.the_entry[0], LOG_ENTRY_LENGTH, &bytes_read1);
-      res3 = f_read (stream -> the_file, &result.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_read2);
+      res2 = f_read (&stream->the_file, &result.the_entry[0], LOG_ENTRY_LENGTH, &bytes_read1);
+      res3 = f_read (&stream->the_file, &result.the_digest[0], SHA256_DIGEST_LENGTH_BYTES, &bytes_read2);
 
       // Restore the original offset
-      res4 = f_lseek (stream -> the_file, original_offset);
+      res4 = f_lseek (&stream->the_file, original_offset);
       if (res2 == FR_OK &&
           res3 == FR_OK &&
           res4 == FR_OK &&
@@ -204,12 +204,12 @@ secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream)
   // we need to ask for the (N - 1)'th
 
   size_t N;
-  N = Log_IO_Num_Entries (stream -> the_file);
+  N = Log_IO_Num_Entries (stream);
 
   // We cannot get anything from an empty file so
   if (N > 0)
     {
-      return Log_IO_Read_Entry (stream -> the_file, N - 1);
+      return Log_IO_Read_Entry (stream, N - 1);
     }
   else
     {
