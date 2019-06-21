@@ -32,6 +32,27 @@ char barcode[BARCODE_MAX_LENGTH] = {0};
 SemaphoreHandle_t barcode_mutex;
 
 
+// Assigns declarations for FreeRTOS functions; these may not be
+// accurate but are currently required to avoid crashing wp.
+
+//@ assigns \nothing;
+extern void serLcdPrintf(char *str, uint8_t len);
+//@ assigns \nothing;
+extern void serLcdPrintTwoLines(char* line_1, uint8_t len_1, char* line_2, uint8_t len_2);
+//@ assigns \nothing;
+extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,
+                                   void *pvRxData,
+                                   size_t xBufferLengthBytes,
+							       TickType_t xTicksToWait);
+//@ assigns \nothing;
+extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup, 
+                                       const EventBits_t uxBitsToWaitFor, 
+                                       const BaseType_t xClearOnExit, 
+                                       const BaseType_t xWaitForAllBits, 
+                                       TickType_t xTicksToWait);
+
+// main code
+                                       
 void initialize(void) {
   gpio_set_as_input(BUTTON_CAST_IN);
   gpio_set_as_input(BUTTON_SPOIL_IN);
