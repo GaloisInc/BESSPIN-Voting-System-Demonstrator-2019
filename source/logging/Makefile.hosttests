@@ -33,5 +33,5 @@ test7:
 	$(CC) $(CFLAGS) -o test7 test7.c $(LSOURCES) $(CSOURCES)
 
 clean:
-	rm -f test1 test2 test3 test4 test5 test6 *.o
+	rm -f test1 test2 test3 test4 test5 test6 test7 *.o
 
