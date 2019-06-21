@@ -32,6 +32,15 @@ void dump(aes128_block b)
     printf("\n");
 }
 
+// TEST CASES FOR AES-CBC-MAC
+//
+// Results of these test cases are printed to stdout.
+//
+// These have been checked manually against the results obtained using
+// the on-line implemenation at:
+//   http://www.cryptogrium.com/aes-cbc.html
+// with the same Key, IV and input data.
+
 int main()
 {
     {
