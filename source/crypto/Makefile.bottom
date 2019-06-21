@@ -12,4 +12,4 @@ all:
 	rm -f *.o
 
 clean:
-	rm crypto_bottom.elf
+	rm -f crypto_bottom.elf
