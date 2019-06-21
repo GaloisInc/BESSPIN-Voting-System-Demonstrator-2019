@@ -62,7 +62,7 @@ INCLUDES = \
 
 ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy -I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions -DportasmHANDLE_INTERRUPT=external_interrupt_handler
 
-CFLAGS = $(WARNINGS) $(INCLUDES) -DTARGET_OS_FreeRTOS
+CFLAGS = $(WARNINGS) $(INCLUDES) -DTARGET_OS_FreeRTOS -DNO_MEMSET_S
 CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany
 
 DEMO_SRC = \
@@ -165,15 +165,15 @@ $(info ARFLAGS=$(ARFLAGS))
 
 all: $(PROG).elf
 
-$(PROG).elf  : $(OBJS) Makefile 
+$(PROG).elf  : $(OBJS) Makefile
 	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
-	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm	
+	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
 	@echo Completed $@
 
 clean :
 	@rm -f $(OBJS)
-	@rm -f $(PROG).elf 
+	@rm -f $(PROG).elf
 	@rm -f $(PROG).map
 	@rm -f $(PROG).asm
 
