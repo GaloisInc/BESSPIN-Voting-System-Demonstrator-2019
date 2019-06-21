@@ -69,8 +69,12 @@ DEMO_SRC = \
     test_freertos.c \
     log.c \
     secure_log.c \
-    hsm.c \
-    log_io.c
+    log_io.c \
+    ../crypto/aes.c \
+    ../crypto/cbc.c \
+    ../crypto/mode_wrappers.c \
+    ../crypto/sha2-openbsd.c \
+    ../crypto/crypto.c
 
 APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
