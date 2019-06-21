@@ -67,10 +67,10 @@ CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany
 
 DEMO_SRC = \
     test_freertos.c \
-    crypto_defs.c \
     crypto.c \
     cbc.c \
     aes.c \
+    sha2-openbsd.c \
     mode_wrappers.c
 
 APP_SRC = \
