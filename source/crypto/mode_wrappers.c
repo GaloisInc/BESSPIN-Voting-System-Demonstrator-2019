@@ -6,7 +6,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
+ *    notice, this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -48,7 +48,7 @@
 
 #include "aes.h"
 
-#include "assert.h"
+// #include "assert.h"
 
 #include "modes.h"
 
@@ -62,8 +62,8 @@ void AES_ctr128_encrypt(const uint8_t *in, uint8_t *out, size_t len,
 
 void AES_ecb_encrypt(const uint8_t *in, uint8_t *out, const AES_KEY *key,
                      const int enc) {
-  assert(in && out && key);
-  assert((AES_ENCRYPT == enc) || (AES_DECRYPT == enc));
+  //  assert(in && out && key);
+  //  assert((AES_ENCRYPT == enc) || (AES_DECRYPT == enc));
 
   if (AES_ENCRYPT == enc) {
     AES_encrypt(in, out, key);

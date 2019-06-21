@@ -4,7 +4,10 @@
  */
 
 // General includes
+#ifndef TARGET_OS_FreeRTOS
+// assert.h not supported on RISCV/FreeRTOS
 #include <assert.h>
+#endif
 
 // Subsystem includes
 #include "crypto.h"
@@ -87,7 +90,9 @@ void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest)
     aes128_block plaintext_block = {0};
     aes128_block ciphertext_block = {0};
 
+#ifndef TARGET_OS_FreeRTOS
     assert(the_message_size % AES_BLOCK_LENGTH_BYTES == 0);
+#endif
 
     // Only fails if mock_key == NULL || &key_schedule == NULL
     AES_set_encrypt_key(mock_key, AES256_KEY_LENGTH_BITS, &key_schedule);
@@ -95,7 +100,7 @@ void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest)
     block_count = the_message_size / AES_BLOCK_LENGTH_BYTES;
 
     // For each block of input data
-    for (int b = 0; b < block_count; b++)
+    for (size_t b = 0; b < block_count; b++)
     {
         // Input data to encrypt is IV xor Mi
         for (size_t i = 0; i < AES_BLOCK_LENGTH_BYTES; i++)

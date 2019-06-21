@@ -6,7 +6,7 @@
  * are met:
  *
  * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer. 
+ *    notice, this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in
@@ -48,7 +48,7 @@
 
 #include "aes.h"
 
-#include <assert.h>
+// #include <assert.h>
 
 #include "internal.h"
 
@@ -677,7 +677,7 @@ void AES_encrypt(const uint8_t *in, uint8_t *out, const AES_KEY *key) {
   int r;
 #endif /* ?FULL_UNROLL */
 
-  assert(in && out && key);
+  //  assert(in && out && key);
   rk = key->rd_key;
 
   /* map byte array block to cipher state
@@ -865,7 +865,7 @@ void AES_decrypt(const uint8_t *in, uint8_t *out, const AES_KEY *key) {
   int r;
 #endif /* ?FULL_UNROLL */
 
-  assert(in && out && key);
+  //  assert(in && out && key);
   rk = key->rd_key;
 
   /* map byte array block to cipher state
