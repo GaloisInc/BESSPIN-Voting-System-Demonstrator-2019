@@ -7,7 +7,7 @@
 #define __LOG_API_ACSL__
 
 #include "log_t.h"
-#include "hsm.h"
+#include "../crypto/crypto_t.h"
 #include "../crypto/crypto.acsl"
 
 // @spec kiniry An algebraic specification of logs should be added
@@ -26,7 +26,7 @@
   @ axiomatic log_entry_type {
   @ type Log_entry = log_entry;
   @}
-  @ 
+  @
   @
   @ axiomatic log_log_entry {
   @ type Log=list<Log_entry>;
@@ -40,14 +40,14 @@
   @ \forall  Log_entry the_entry, Log log_list1,log_list2;
   @ append(cons(the_entry,log_list1),log_list2) == cons(the_entry,append(log_list1,log_list2));
   @}
-  @ 
+  @
   @ //@dragan binding C type sha256_digest
   @ // passed frama-c but in case it doesn't work
   @ // switch to uint8_t[32]
   @ axiomatic sha_256_digest_type {
   @ type Sha256_digest = sha256_digest;
   @}
-  @ 
+  @
   @ //cannot bind struct in C
   @ axiomatic secure_log_entry_type {
   @ type Secure_log_entry =  Struct(Log_entry, Sha256_digest);
@@ -56,25 +56,25 @@
   @
   @ logic Sha256_digest sle_the_digest(Secure_log_entry sle);
   @
-  @ axiom sle_the_entry_def: 
+  @ axiom sle_the_entry_def:
   @ \forall Log_entry le, Sha256_digest sd; sle_the_entry(Struct(le,sd)) == le;
   @
-  @ axiom sle_the_digest_def: 
+  @ axiom sle_the_digest_def:
   @ \forall Log_entry le, Sha256_digest sd; sle_the_digest(Struct(le,sd)) == sd;
   @
   @
   @ logic integer total_sizeOf(Log_entry le, Sha256_digest sd)=
-  @   \let sle_the_entry = (integer)sizeof(le); 
+  @   \let sle_the_entry = (integer)sizeof(le);
   @   \let sle_the_digest = (integer)sizeof(sd);
   @     (integer)(sle_the_entry + sle_the_digest);
   @
-  @ logic integer sizeOf(Secure_log_entry sle)= 
+  @ logic integer sizeOf(Secure_log_entry sle)=
   @   \let sle_the_entry = sle_the_entry(sle);
   @   \let sle_the_digest = sle_the_digest(sle);
   @     total_sizeOf(sle_the_entry, sle_the_digest);
-  @       
+  @
   @}
-  @ 
+  @
   @
   @ axiomatic secure_log_type {
   @ type Secure_log = list<Secure_log_entry>;

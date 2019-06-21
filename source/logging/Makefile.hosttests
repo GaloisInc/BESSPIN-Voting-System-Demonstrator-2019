@@ -5,26 +5,33 @@
 export CC := clang
 
 # Build the bottom target
-all: test1 test2 test3 test4 test5 test6
+all: test1 test2 test3 test4 test5 test6 test7
+
+LSOURCES = log.c secure_log.c log_io.c
+CSOURCES = ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c
+CFLAGS = -g -Wall -DNO_MEMSET_S -Wno-macro-redefined
 
 test1:
-	$(CC) -g -Wall -o test1 test1.c log.c secure_log.c log_io.c hsm.c
+	$(CC) $(CFLAGS) -o test1 test1.c $(LSOURCES) $(CSOURCES)
 
 test2:
-	$(CC) -g -Wall -o test2 test2.c log.c secure_log.c log_io.c hsm.c
+	$(CC) $(CFLAGS) -o test2 test2.c $(LSOURCES) $(CSOURCES)
 
 test3:
-	$(CC) -g -Wall -o test3 test3.c log.c secure_log.c log_io.c hsm.c
+	$(CC) $(CFLAGS) -o test3 test3.c $(LSOURCES) $(CSOURCES)
 
-test4:  
-	$(CC) -g -Wall -o test4 test4.c log.c secure_log.c log_io.c hsm.c
+test4:
+	$(CC) $(CFLAGS) -o test4 test4.c $(LSOURCES) $(CSOURCES)
 
 test5:
-	$(CC) -g -Wall -o test5 test5.c log.c secure_log.c log_io.c hsm.c
+	$(CC) $(CFLAGS) -o test5 test5.c $(LSOURCES) $(CSOURCES)
 
 test6:
-	$(CC) -g -Wall -o test6 test6.c log.c secure_log.c log_io.c hsm.c
+	$(CC) $(CFLAGS) -o test6 test6.c $(LSOURCES) $(CSOURCES)
+
+test7:
+	$(CC) $(CFLAGS) -o test7 test7.c $(LSOURCES) $(CSOURCES)
 
 clean:
 	rm -f test1 test2 test3 test4 test5 test6 *.o
-	
+

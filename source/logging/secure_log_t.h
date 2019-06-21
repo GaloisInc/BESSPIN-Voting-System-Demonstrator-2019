@@ -2,7 +2,7 @@
 #define __SECURE_LOG_T__
 
 #include "log_t.h"
-#include "hsm.h"
+#include "../crypto/crypto_t.h"
 #define SECURE_LOG_ENTRY_LENGTH (LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES)
 
 typedef struct secure_log_entries {

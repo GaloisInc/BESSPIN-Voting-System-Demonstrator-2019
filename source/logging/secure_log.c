@@ -7,7 +7,7 @@
 
 // Subsystem includes
 #include "secure_log.h"
-#include "hsm.h"
+#include "../crypto/crypto.h"
 
 // Local constants
 
@@ -27,14 +27,15 @@ const aes256_key test_key = { 0 };
 static secure_log_entry initial_log_entry(const aes256_key key, // IN
 			                  const log_entry msg)  // IN
 {
-  secure_log_entry initial_entry;
+  secure_log_entry initial_entry = { .the_entry = {0},
+                                     .the_digest = {0} };
 
   // 1. Zero-pad msg to exactly 256 chars with zeros.
   // log_entry is exactly 256 chars, so we'll assume this has already been
   // done by the caller.
 
-  // 2. Form "hmac key msg"
-  hmac (key, (message) msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0]);
+  // 2. Form "aes_cbc_mac msg"
+  aes_cbc_mac ((message) msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0]);
 
   // 3. Copy the msg data
   /*@
@@ -87,7 +88,7 @@ void create_secure_log(Log_Handle *secure_log,
 
   // TBD - what to do with the_policy parameter?
   //       awaiting requirements on this.
-  
+
   // 4. sync the file.
   sync_result = Log_IO_Sync (secure_log);
 
@@ -113,8 +114,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
 
   // 0. Assume a_log_entry is already padded with zeroes
 
-  // 1. Introduce a local (static, file-scope) variable previous_hash. Set it above in
-  //    create_secure_log for the first time.
+  // 1. Removed this step - no longer required.
 
   // 2. Form the hash value from the message and previous_hash as per the Cryptol spec.
   // hash (paddedMsg # previousHash) is secure_log_entry I guess.
@@ -146,8 +146,8 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
     }
 
    // invoke hash ( paddedMsg # previousHash)
-   sha256 (msg,SECURE_LOG_ENTRY_LENGTH, &new_hash[0]);
-   
+   hash (msg,SECURE_LOG_ENTRY_LENGTH, &new_hash[0]);
+
    // Add the a_log_entry to the current_entry
    /*@
       loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
@@ -159,7 +159,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
      {
        current_entry.the_entry[i] = a_log_entry[i];
      }
-   
+
    // 3. Save the new hash to previous_hash and
    //    copy new_hash into the current_entry
      /*@
@@ -175,31 +175,30 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
        current_entry.the_digest[i] = new_hash[i];
        the_secure_log -> previous_hash[i] = new_hash[i];
      }
-   
+
    // 4. Write the log_entry message to the_secure_log
-   
+
    write_result = Log_IO_Write_Entry (the_secure_log, current_entry);
-   
+
    // 5. Write the hash block
-   
+
    // 6. Sync the file.
    sync_result = Log_IO_Sync (the_secure_log);
-   
+
    return;
 }
 
 // Refinces Cryptol validFirstEntry
 bool valid_first_entry (const secure_log the_secure_log)
 {
-  const aes256_key dummy_key = {0};
   sha256_digest new_hmac = {0};
   secure_log_entry root_entry;
 
   // 1. Fetch the root block from the file
-  root_entry = Log_IO_Read_Entry (the_secure_log, 0);  
+  root_entry = Log_IO_Read_Entry (the_secure_log, 0);
 
   // 2. Form "hmac key log.msg"
-  hmac (dummy_key, root_entry.the_entry, LOG_ENTRY_LENGTH, &new_hmac[0]);
+  aes_cbc_mac (root_entry.the_entry, LOG_ENTRY_LENGTH, &new_hmac[0]);
 
   // 3. new_hmac and root_entry.the_digest should match
   /*@
@@ -238,7 +237,7 @@ bool valid_log_entry (const secure_log_entry this_entry,
       msg[index] = this_entry.the_entry[i];
       index++;
     }
-  
+
   /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
       loop invariant 0 <= index <= SECURE_LOG_ENTRY_LENGTH;
@@ -250,9 +249,9 @@ bool valid_log_entry (const secure_log_entry this_entry,
       msg[index] = prev_hash[i];
       index++;
     }
-  
-  sha256 (msg, SECURE_LOG_ENTRY_LENGTH, &new_hash[0]);
-  
+
+  hash (msg, SECURE_LOG_ENTRY_LENGTH, &new_hash[0]);
+
   // 3. new_hash and this_entry.the_digest should match
   /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
@@ -297,11 +296,11 @@ bool verify_secure_log_security(const secure_log the_secure_log)
 
 	default:
 	  // Fetch the root entry and keep a copy of it Hash in prev_hash
-	  root_entry = Log_IO_Read_Entry (the_secure_log, 0);  
+	  root_entry = Log_IO_Read_Entry (the_secure_log, 0);
 
 	  // whole array assignment  prev_hash = root_entry.the_digest;
 	  memcpy (&prev_hash[0], &root_entry.the_digest[0], SHA256_DIGEST_LENGTH_BYTES);
-	  
+
 	  // Two or more entries
 	  /*@
 	    loop invariant 2 <= i <= (num_entries + 1);
@@ -313,7 +312,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
 	      // In the file, entries are numbered starting at 0, so we want the
 	      // (i - 1)'th entry...
 	      this_entry = Log_IO_Read_Entry (the_secure_log, (i - 1));
-	      
+
               if (valid_log_entry (this_entry, prev_hash))
 		{
 		  // whole array assignment  prev_hash = this_entry.the_digest;
@@ -330,7 +329,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
 	  return true;
 	  break;
 	}
-      
+
     }
   else
     {
