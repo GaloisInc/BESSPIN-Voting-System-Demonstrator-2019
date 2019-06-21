@@ -24,16 +24,6 @@
 #define BALLOT_DETECT_TIMEOUT_MS 6000
 #define CAST_OR_SPOIL_TIMEOUT_MS 30000
 
-// Buttons
-#define BUTTON_CAST_LED 1
-#define BUTTON_SPOIL_LED 3
-#define BUTTON_CAST_IN 0
-#define BUTTON_SPOIL_IN 2
-
-// Paper sensor inputs
-#define PAPER_SENSOR_OUT 6
-#define PAPER_SENSOR_IN 7
-
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;
 
@@ -137,6 +127,9 @@ void stop_motor(void) {
   gpio_clear(MOTOR_1);
   the_state.M = MOTORS_OFF;
 }
+
+//@ ensures true;
+extern void serLcdPrintf(char *str, uint8_t len);
 
 void display_this_text(const char *str, uint8_t len) {
   serLcdPrintf(str, len);
