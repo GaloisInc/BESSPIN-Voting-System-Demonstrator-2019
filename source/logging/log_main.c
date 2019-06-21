@@ -44,10 +44,10 @@ void Import_Export_Empty_Log(const log_name the_log_name,
   Log_Handle my_first_log;
   Log_IO_Initialize();
   create_log(&my_first_log, the_log_name);
-  validate_log(&my_first_log);
+  verify_log_well_formedness(&my_first_log);
   export_log(&my_first_log, a_target);
   log_file my_second_log = import_log(the_log_name);
-  validate_log(my_second_log);
+  verify_log_well_formedness(my_second_log);
   // @todo kiniry We have no means by which to compare the two logs.
   return;
 }
