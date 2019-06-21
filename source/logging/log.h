@@ -11,17 +11,16 @@
 #include <string.h>
 
 // Subsystem includes
-#include "log_t.h"
 #include "log.acsl"
 #include "log_io.h"
+#include "log_t.h"
 
 /*@ requires \valid(new_log_file);
   @ requires valid_string(the_log_name);
   @ requires \separated(new_log_file, the_log_name);
   @ assigns *new_log_file \from the_log_name, fs;
   @*/
-void create_log(Log_Handle *new_log_file,
-		const log_name the_log_name);
+void create_log(Log_Handle *new_log_file, const log_name the_log_name);
 
 /*@ requires \valid(the_log);
   @ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));

@@ -9,8 +9,8 @@
 
 // Subsystem includes
 #include "log.h"
-#include "secure_log_t.h"
 #include "secure_log.acsl"
+#include "secure_log_t.h"
 
 typedef log_name secure_log_name;
 typedef log_file secure_log;
