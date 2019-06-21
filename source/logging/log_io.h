@@ -7,10 +7,10 @@
 #ifdef TARGET_OS_FreeRTOS
 #include "ff.h"
 
-
-typedef struct Log_Handles {
-  FIL     the_file;
-  sha256_digest previous_hash;
+typedef struct Log_Handles
+{
+    FIL the_file;
+    sha256_digest previous_hash;
 } Log_Handle;
 
 #else
@@ -18,9 +18,10 @@ typedef struct Log_Handles {
 // Assume Linux/Posix system
 #include <stdio.h>
 
-typedef struct Log_Handles {
-  FILE     the_file;
-  sha256_digest previous_hash;
+typedef struct Log_Handles
+{
+    FILE the_file;
+    sha256_digest previous_hash;
 } Log_Handle;
 #endif
 
@@ -30,10 +31,10 @@ typedef Log_Handle *log_io_stream;
 // Abstract ghost state representing the overall state of the filesystem
 //@ ghost int fs;
 
-
-typedef enum {
-	      LOG_FS_OK = 0, /* success */
-	      LOG_FS_ERROR
+typedef enum
+{
+    LOG_FS_OK = 0, /* success */
+    LOG_FS_ERROR
 } Log_FS_Result;
 
 //
@@ -52,7 +53,6 @@ typedef enum {
 
 */
 
-
 /* Mounts the FileSystem and any other initialization necessary.  */
 /* This must be called EXACTLY ONCE by a main program before any  */
 /* other Log_IO operations can be performed.                      */
@@ -61,15 +61,11 @@ typedef enum {
  */
 Log_FS_Result Log_IO_Initialize(void);
 
-
-
 /*@ requires Log_IO_Initialized;
     assigns \result \from *name, fs;
     ensures \result <==> File_Exists (name);
  */
-bool Log_IO_File_Exists (const char *name);
-
-
+bool Log_IO_File_Exists(const char *name);
 
 /* Create new and empty log file. Any existing file with same name is destroyed. */
 /*@ requires Log_IO_Initialized;
@@ -88,8 +84,8 @@ bool Log_IO_File_Exists (const char *name);
     complete behaviors;
     disjoint behaviors;
  */
-Log_FS_Result Log_IO_Create_New (Log_Handle *stream, // OUT
-				 const char *name);  // IN
+Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
+                                const char *name);  // IN
 
 /*@ requires Log_IO_Initialized;
     assigns *stream \from fs, name;
@@ -105,18 +101,14 @@ Log_FS_Result Log_IO_Create_New (Log_Handle *stream, // OUT
     complete behaviors;
     disjoint behaviors;
  */
-Log_FS_Result Log_IO_Open_Read (Log_Handle *stream, // OUT
-				const char *name);  // IN
-
-
+Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
+                               const char *name);  // IN
 
 /*@ requires Log_IO_Initialized;
     assigns fs \from fs, stream;
     ensures !File_Is_Open (stream);
  */
-Log_FS_Result Log_IO_Close (Log_Handle *stream); // IN
-
-
+Log_FS_Result Log_IO_Close(Log_Handle *stream); // IN
 
 /* Forces any internal buffers out to disk. Call this after Write */
 /*@ requires Log_IO_Initialized;
@@ -124,17 +116,14 @@ Log_FS_Result Log_IO_Close (Log_Handle *stream); // IN
     assigns fs \from fs, stream;
     ensures File_Is_Open (stream);
  */
-Log_FS_Result Log_IO_Sync (Log_Handle *stream); // IN
-
-
+Log_FS_Result Log_IO_Sync(Log_Handle *stream); // IN
 
 /*@ requires Log_IO_Initialized;
     requires File_Is_Open (stream);
     assigns fs \from fs, stream, the_entry;
  */
-Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
-                                  secure_log_entry the_entry); // IN
-
+Log_FS_Result Log_IO_Write_Entry(Log_Handle *stream,          // IN
+                                 secure_log_entry the_entry); // IN
 
 /* returns the number of secure_log_entry records in the given file */
 /*@ requires Log_IO_Initialized;
@@ -142,8 +131,7 @@ Log_FS_Result Log_IO_Write_Entry (Log_Handle *stream,          // IN
     assigns \result \from *stream, fs;
     ensures \result == File_Num_Entries (stream);
  */
-size_t Log_IO_Num_Entries (Log_Handle *stream);
-
+size_t Log_IO_Num_Entries(Log_Handle *stream);
 
 /* reads the n'th entry. n = 0 means the "initial" or "root" entry */
 // @design kiniry We need a logic query for the model of
@@ -155,14 +143,14 @@ size_t Log_IO_Num_Entries (Log_Handle *stream);
     requires n <  File_Num_Entries (stream);
     assigns \result \from *stream, n, fs;
  */
-secure_log_entry Log_IO_Read_Entry (Log_Handle *stream, // IN
-				    size_t n); // IN
+secure_log_entry Log_IO_Read_Entry(Log_Handle *stream, // IN
+                                   size_t n);          // IN
 
 /* reads the last entry (i.e. most recently written to the end of the file) */
 /*@ requires Log_IO_Initialized;
     requires File_Is_Open (stream);
     assigns \result \from *stream, fs;
  */
-secure_log_entry Log_IO_Read_Last_Entry (Log_Handle *stream);
+secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
 #endif /* __LOG_IO_H__ */

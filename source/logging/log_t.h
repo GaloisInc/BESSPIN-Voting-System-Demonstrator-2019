@@ -6,13 +6,13 @@
 #ifndef __LOG_T__
 #define __LOG_T__
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #define LOG_ENTRY_LENGTH 256
 
-typedef char* log_name;
+typedef char *log_name;
 
 // These have moved to log_io.h - delete when build and analysis OK
 //typedef Log_Handle *log;

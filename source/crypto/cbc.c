@@ -47,7 +47,7 @@
  * ==================================================================== */
 #include "modes.h"
 
-#include <assert.h>
+// #include <assert.h>
 #include <string.h>
 
 #include "internal.h"
@@ -63,7 +63,7 @@ void CRYPTO_cbc128_encrypt(const uint8_t *in, uint8_t *out, size_t len,
   size_t n;
   const uint8_t *iv = ivec;
 
-  assert(in && out && key && ivec);
+  //  assert(in && out && key && ivec);
 
   if (STRICT_ALIGNMENT &&
       ((size_t)in | (size_t)out | (size_t)ivec) % sizeof(size_t) != 0) {
@@ -119,7 +119,7 @@ void CRYPTO_cbc128_decrypt(const uint8_t *in, uint8_t *out, size_t len,
     uint8_t c[16];
   } tmp;
 
-  assert(in && out && key && ivec);
+  //  assert(in && out && key && ivec);
 
   if (in != out) {
     const uint8_t *iv = ivec;

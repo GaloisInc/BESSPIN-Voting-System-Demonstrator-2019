@@ -3,18 +3,16 @@
 
 int main(void)
 {
-  Log_Handle my_log;
-  size_t num;
-  
-  Log_IO_Initialize();
+    Log_Handle my_log;
+    size_t num;
 
-  create_log (&my_log, "test1log.txt");
-  
-  num = Log_IO_Num_Entries (&my_log);
+    Log_IO_Initialize();
 
-  printf ("Num entries in the files is %d\n", (int) num);
+    create_log(&my_log, "test1log.txt");
 
-  Log_IO_Close (&my_log);
+    num = Log_IO_Num_Entries(&my_log);
+
+    printf("Num entries in the files is %d\n", (int)num);
+
+    Log_IO_Close(&my_log);
 }
-
-
