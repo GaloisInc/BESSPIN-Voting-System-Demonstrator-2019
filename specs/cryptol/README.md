@@ -1,6 +1,6 @@
 # Cryptol Specifications of the BESSPIN Voting System
 
-*Joey Dodds, Joe Kiniry*
+*Joey Dodds, Joe Kiniry, Kenny Foner*
 
 # Introduction and Purpose
 
@@ -11,7 +11,7 @@ level decoupled from implementation decisions), subsystem components,
 data-types, and correctness properties.
 
 Using such specifications Cryptol is used to make sure the subsystem
-is: 
+is:
  - _simple_, _clean_ and _well-typed_,
  - _complete_ from the point of view of scenarios we wish for it to
    support, and
@@ -24,7 +24,7 @@ more of the following purposes:
    level, as Cryptol specifications are executable,
  - _validate the model_ by testing properties with automatic random
    testing,
- - _generate test vectors_ for the model and implementation, 
+ - _generate test vectors_ for the model and implementation,
  - _inspire and help formulate an algebraic/axiomatic specification of
    the subsystem in ACSL_, and,
  - in tandem with SAW, _formally verify our C implementation against
@@ -53,4 +53,25 @@ Four main subsystems are specified here using Cryptol.
    of the *Crypto* subsystem.
 4. The Abstract State Machine (ASM) for the *Smart Ballot Box*.
 
+# Running Cryptol files
 
+These files all work with the current release (2.7.0) of
+[Cryptol](https://cryptol.net/)
+
+To typecheck and load the files use the ```cryptol``` command
+
+```> cryptol Base64.cry```
+
+This will load an environment where you can interact with the definitions
+in the file. You can run the functions to see their output:
+
+```
+Base64> :set ascii=true
+Base64> encodeBase64 [0x12]
+```
+
+You can also conclusively prove the properties:
+
+```
+Base64> :prove base64_encode_decode`{4}
+```
