@@ -24,16 +24,6 @@
 #define BALLOT_DETECT_TIMEOUT_MS 6000
 #define CAST_OR_SPOIL_TIMEOUT_MS 30000
 
-// Buttons
-#define BUTTON_CAST_LED 1
-#define BUTTON_SPOIL_LED 3
-#define BUTTON_CAST_IN 0
-#define BUTTON_SPOIL_IN 2
-
-// Paper sensor inputs
-#define PAPER_SENSOR_OUT 6
-#define PAPER_SENSOR_IN 7
-
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;
 
@@ -78,13 +68,11 @@ bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
 }
 
 bool is_cast_button_pressed(void) {
-  return gpio_read(BUTTON_CAST_IN);
+	return the_state.B == CAST_BUTTON_DOWN;
 }
 
 bool is_spoil_button_pressed(void) {
-  bool pressed = gpio_read(BUTTON_CAST_IN);
-  the_state.B  = pressed ? SPOIL_BUTTON_DOWN : the_state.B;
-  return pressed;
+	return the_state.B == SPOIL_BUTTON_DOWN;
 }
 
 void just_received_barcode(void) {
@@ -103,12 +91,7 @@ void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
 }
 
 bool has_a_barcode(void) {
-  bool val = false;
-  if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
-    val = barcode_present;
-    xSemaphoreGive(barcode_mutex);
-  }
-  return val;
+	return the_state.BS == BARCODE_PRESENT_AND_RECORDED;
 }
 
 void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length) {
@@ -128,14 +111,14 @@ void cast_button_light_on(void) { gpio_write(BUTTON_CAST_LED); }
 void cast_button_light_off(void) { gpio_clear(BUTTON_CAST_LED); }
 
 void move_motor_forward(void) {
-  gpio_write(MOTOR_0);
-  gpio_clear(MOTOR_1);
+  gpio_clear(MOTOR_0);
+  gpio_write(MOTOR_1);
   the_state.M = MOTORS_TURNING_FORWARD;
 }
 
 void move_motor_back(void) {
-  gpio_clear(MOTOR_0);
-  gpio_write(MOTOR_1);
+  gpio_write(MOTOR_0);
+  gpio_clear(MOTOR_1);
   the_state.M = MOTORS_TURNING_BACKWARD;
 }
 
@@ -145,14 +128,19 @@ void stop_motor(void) {
   the_state.M = MOTORS_OFF;
 }
 
+//@ ensures true;
+extern void serLcdPrintf(char *str, uint8_t len);
+
 void display_this_text(const char *str, uint8_t len) {
   serLcdPrintf(str, len);
 }
 
-bool ballot_detected(void) { return gpio_read(PAPER_SENSOR_IN); }
+bool ballot_detected(void) {
+  return (the_state.P == EARLY_PAPER_DETECTED);
+}
 
 bool ballot_inserted(void) {
-  return gpio_read(PAPER_SENSOR_OUT);
+  return (the_state.P == EARLY_AND_LATE_DETECTED);
 }
 
 void spoil_ballot(void) {
@@ -178,6 +166,12 @@ void go_to_standby(void) {
   cast_button_light_off();
   spoil_button_light_off();
   display_this_text(insert_ballot_text, strlen(insert_ballot_text));
+  the_state.M = MOTORS_OFF;
+  the_state.D = SHOWING_TEXT;
+  the_state.P = NO_PAPER_DETECTED;
+  the_state.BS = BARCODE_NOT_PRESENT;
+  the_state.S = INNER;
+  the_state.B = ALL_BUTTONS_UP;
 }
 
 void ballot_detect_timeout_reset(void) {

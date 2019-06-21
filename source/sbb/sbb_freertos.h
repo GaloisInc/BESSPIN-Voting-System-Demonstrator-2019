@@ -31,15 +31,27 @@ the Blocked state so it can read the bytes. */
 
 
 /* Event bit definitions. */
-#define ebPAPER_SENSOR_IN_PRESSED		( 0x01 )
-#define ebPAPER_SENSOR_IN_RELEASED		( 0x02 )
-#define ebPAPER_SENSOR_OUT_PRESSED		( 0x04 )
-#define ebPAPER_SENSOR_OUT_RELEASED		( 0x08 )
-#define ebBARCODE_SCANNED       		( 0x10 )
-#define ebCAST_BUTTON_PRESSED	    	( 0x20 )
-#define ebCAST_BUTTON_RELEASED	    	( 0x40 )
-#define ebSPOIL_BUTTON_PRESSED	    	( 0x80 )
-#define ebSPOIL_BUTTON_RELEASED		    ( 0x100 )
+#define ebPAPER_SENSOR_IN_PRESSED     ( 0x01  )
+#define ebPAPER_SENSOR_IN_RELEASED    ( 0x02  )
+#define ebPAPER_SENSOR_OUT_PRESSED    ( 0x04  )
+#define ebPAPER_SENSOR_OUT_RELEASED   ( 0x08  )
+#define ebBARCODE_SCANNED             ( 0x10  )
+#define ebCAST_BUTTON_PRESSED         ( 0x20  )
+#define ebCAST_BUTTON_RELEASED        ( 0x40  )
+#define ebSPOIL_BUTTON_PRESSED        ( 0x80  )
+#define ebSPOIL_BUTTON_RELEASED       ( 0x100 )
+#define ebALL_EVENTS                  ( 0x1FF )
+
+#define ebALL_PAPER_SENSOR_EVENTS     ( ebPAPER_SENSOR_IN_PRESSED   | \
+                                        ebPAPER_SENSOR_IN_RELEASED  | \
+                                        ebPAPER_SENSOR_OUT_RELEASED | \
+                                        ebPAPER_SENSOR_OUT_RELEASED   )
+
+#define ebALL_BUTTON_EVENTS ( ebCAST_BUTTON_RELEASED  | \
+                              ebCAST_BUTTON_PRESSED   | \
+                              ebSPOIL_BUTTON_RELEASED | \
+                              ebSPOIL_BUTTON_PRESSED    )
+
 
 /* Input defines */
 #define GPIO_READ_DELAY_MS pdMS_TO_TICKS(15)

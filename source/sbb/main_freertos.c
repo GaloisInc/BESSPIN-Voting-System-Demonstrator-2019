@@ -274,7 +274,7 @@ static void prvBarcodeScannerTask(void *pvParameters)
 			/* We have a barcode, send it over stream buffer and fire the event */
 			configASSERT( xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS ) == idx);
 			/* Broadcast the event */
-			configASSERT(xEventGroupSetBits( xSBBEventGroup, ebBARCODE_SCANNED ) & ebBARCODE_SCANNED);
+			xEventGroupSetBits( xSBBEventGroup, ebBARCODE_SCANNED );
 			/* reset state */
 			idx = 0;
 			memset(barcode, 0, BARCODE_MAX_LENGTH);
