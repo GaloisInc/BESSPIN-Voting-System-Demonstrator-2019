@@ -43,4 +43,3 @@ void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest)
     //@ assert false;
     return;
 }
-

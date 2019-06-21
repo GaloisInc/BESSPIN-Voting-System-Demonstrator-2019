@@ -48,6 +48,7 @@ void hmac(message the_message, size_t the_message_size, digest the_digest);
   @ requires the_message_size % AES_BLOCK_LENGTH_BYTES == 0;
   @ assigns the_digest[0 .. AES_BLOCK_LENGTH_BYTES - 1];
   @*/
-void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest);
+void aes_cbc_mac(message the_message, size_t the_message_size,
+                 block the_digest);
 
 #endif
