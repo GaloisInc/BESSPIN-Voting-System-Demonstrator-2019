@@ -1,4 +1,5 @@
 **/*.elf
+**/*.dSYM
 **/.DS_Store
 **/TAGS
 **/metrics

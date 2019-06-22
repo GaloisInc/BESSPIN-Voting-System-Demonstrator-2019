@@ -12,4 +12,4 @@ all:
 	rm -f *.o
 
 clean:
-	rm sbb_bottom.elf
+	rm -f sbb_bottom.elf

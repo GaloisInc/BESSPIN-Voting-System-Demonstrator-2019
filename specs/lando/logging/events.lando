@@ -1,5 +1,24 @@
 events Logging
 
+// Log
+
+Create log.
+Create a new, empty log.
+
+Write log entry.
+Write a new log entry E to a log L.
+
+Validate log.
+Check whether or not log L is well-formed.
+
+Export log.
+Export log L to device D.
+
+Import log.
+Import log L from device D.
+
+// Secure Log
+
 system_log_init.
 Initialize a secure system log.
 

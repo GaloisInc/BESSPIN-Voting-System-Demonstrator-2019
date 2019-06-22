@@ -23,7 +23,7 @@ component Log
   Write this entry to the log!
   Export this log to the following target!
   Import this log!
-  Is this log verifiable wrt its well-formedness properties?
+  Is this log valid wrt its well-formedness properties?
 
 component Secure Log inherit Log
   A secure log is a log that has evidence that specific security properties hold.

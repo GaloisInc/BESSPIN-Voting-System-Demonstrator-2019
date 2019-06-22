@@ -20,7 +20,7 @@
   @ requires \separated(new_log_file, the_log_name);
   @ assigns *new_log_file \from the_log_name, fs;
   @*/
-void create_log(Log_Handle *new_log_file, const log_name the_log_name);
+void create_log(log_file new_log_file, const log_name the_log_name);
 
 /*@ requires \valid(the_log);
   @ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
@@ -34,16 +34,26 @@ void write_entry(const log_file the_log, const log_entry a_log_entry);
   @*/
 bool verify_log_entry_well_formedness(const log_entry a_log_entry);
 
+// @design kiniry I do not understand how these two functions are
+// duals of each other, given that once you export a log to a device
+// (which may be a socket, for all we know), there is no binding
+// between that export and its `log_file`.  I *think* that
+// `import_log` has to return a `Log_Handle`?
+
+// @review kiniry I'm experiencing some type confusion as well between
+// `log_name` and `log_file`.
+
+// @todo re-evaluate frame axiom for this function.
 /*@ requires \valid(the_log);
   @ requires \separated(the_log, a_target);
   @ assigns \nothing; // TBD
   @*/
-void export_log(const log_file the_log, log_io_stream a_target);
+void export_log(const log_file the_log, const log_io_stream a_target);
 
 /*@ requires \valid(the_log_name);
   @ assigns  \result \from fs, the_log_name;
   @*/
-log_file import_log(const log_file the_log_name);
+log_file import_log(const log_name the_log_name);
 
 /*@ requires \valid(the_log);
   @ assigns  \result \from fs, the_log;

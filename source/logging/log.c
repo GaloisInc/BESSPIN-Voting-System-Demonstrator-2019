@@ -41,7 +41,7 @@ bool verify_log_entry_well_formedness(const log_entry a_log_entry)
 
 void export_log(const log_file the_log, log_io_stream a_target) { return; }
 
-log_file import_log(const log_file the_log_name) { return NULL; }
+log_file import_log(const log_name the_log_name) { return NULL; }
 
 bool verify_log_well_formedness(const log_file the_log)
 {

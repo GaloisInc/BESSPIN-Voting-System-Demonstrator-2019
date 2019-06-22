@@ -15,7 +15,7 @@ typedef struct Log_Handles
 
 #else
 
-// Assume Linux/Posix system
+// @assume We have a POSIX I/O filesystem.
 #include <stdio.h>
 
 typedef struct Log_Handles
