@@ -54,15 +54,36 @@ void Import_Export_Empty_Log(const log_name the_log_name,
 
 void Non_Empty_Log_Smoketest(const log_name the_log_name,
                              const log_io_stream a_target) {
-  assert(false && "unimplemented");
-  //@ assert false;
+  Log_Handle test_log;
+  const log_entry test01_entry = "hello test01xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+  const log_entry test02_entry = "hello test02xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+
+  Log_IO_Initialize();
+  create_log (&test_log, the_log_name);
+  write_entry (&test_log, test01_entry);
+  write_entry (&test_log, test02_entry);
+  verify_log_well_formedness(&test_log);
+  export_log(&test_log,a_target);
+  Log_IO_Close (&test_log);
   return;
 }
 
 void Import_Export_Non_Empty_Log(const log_name the_log_name,
                                  const log_io_stream a_target) {
-  assert(false && "unimplemented");
-  //@ assert false;
+  Log_Handle test_log;
+  const log_entry test01_entry = "hello test01xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+  const log_entry test02_entry = "hello test02xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+
+  Log_IO_Initialize();
+  create_log (&test_log, the_log_name);
+  write_entry (&test_log, test01_entry);
+  write_entry (&test_log, test02_entry);
+  verify_log_well_formedness(&test_log);
+  export_log(&test_log,a_target);
+  log_file second_test_log = import_log(the_log_name);
+  verify_log_well_formedness(second_test_log);
+  // @todo kiniry/dragan We have no means by which to compare the two logs.
+  Log_IO_Close (&test_log);
   return;
 }
 
