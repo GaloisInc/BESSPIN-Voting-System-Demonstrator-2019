@@ -124,8 +124,15 @@ int main(int argc, char* argv[]) {
     Empty_Log_Smoketest(smoketest_log, stderr);
   else if (argc == 3 && strncmp("smoketest", argv[1], 9) == 0)
     Empty_Log_Smoketest(argv[2], stderr);
+  else if (argc == 2 && strncmp("import_export_empty_log", argv[1], 23) == 0)
+    Import_Export_Empty_Log(smoketest_log,stderr);
+  else if (argc == 2 && strncmp("non_empty_log_smoketest", argv[1], 23) == 0)
+    Non_Empty_Log_Smoketest(smoketest_log, stderr);
+  else if (argc == 2 && strncmp("import_export_non_empty_log", argv[1], 27) == 0)
+    Import_Export_Non_Empty_Log(smoketest_log, stderr);
   else
-    printf("usage: log_main [smoketest [<log filename>]]\n");
+    //printf("usage: log_main [smoketest [<log filename>]]\n");
+    printf("usage: software_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
   */
   return 0;
 }
