@@ -50,12 +50,17 @@ typedef enum
     File_Exists{L}(char *name) = \true; // abstract
   logic
     size_t File_Num_Entries{L}(Log_Handle *f) = (size_t) 0; // abstract
+  
   predicate
     Valid_Log_Entries_Count(Log_Handle * l_handle) =
       \valid(l_handle) &&
       \let fne = File_Num_Entries(l_handle); 
        fne == 0 ==> \false || fne > 0 ==> \true;
-        
+
+  predicate 
+    valid_secure_log_entry(secure_log_entry sle)=
+      \valid_read((uint8_t*)sle.the_entry[0 .. LOG_ENTRY_LENGTH -1]) &&
+      \valid_read((uint8_t*)sle.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES -1]);
 */
 
 /* Mounts the FileSystem and any other initialization necessary.  */
@@ -67,6 +72,7 @@ typedef enum
 Log_FS_Result Log_IO_Initialize(void);
 
 /*@ requires Log_IO_Initialized;
+    requires valid_string(name);
     assigns \result \from *name, fs;
     ensures \result <==> File_Exists (name);
  */
@@ -74,6 +80,9 @@ bool Log_IO_File_Exists(const char *name);
 
 /* Create new and empty log file. Any existing file with same name is destroyed. */
 /*@ requires Log_IO_Initialized;
+    requires valid_string(name);
+    requires \valid(stream);
+    requires \separated(stream, name);
     assigns fs \from fs, name;
     assigns *stream \from fs, name;
 
@@ -93,6 +102,9 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
                                 const char *name);  // IN
 
 /*@ requires Log_IO_Initialized;
+    requires \valid(stream);
+    requires valid_string(name);
+    requires \separated(stream, name);
     assigns *stream \from fs, name;
     behavior success:
       ensures \result == LOG_FS_OK;
@@ -110,6 +122,7 @@ Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
                                const char *name);  // IN
 
 /*@ requires Log_IO_Initialized;
+    requires \valid(stream);
     assigns fs \from fs, stream;
     ensures !File_Is_Open (stream);
  */
@@ -117,6 +130,7 @@ Log_FS_Result Log_IO_Close(Log_Handle *stream); // IN
 
 /* Forces any internal buffers out to disk. Call this after Write */
 /*@ requires Log_IO_Initialized;
+    requires \valid(stream);
     requires File_Is_Open (stream);
     assigns fs \from fs, stream;
     ensures File_Is_Open (stream);
@@ -124,6 +138,8 @@ Log_FS_Result Log_IO_Close(Log_Handle *stream); // IN
 Log_FS_Result Log_IO_Sync(Log_Handle *stream); // IN
 
 /*@ requires Log_IO_Initialized;
+    requires \valid(stream);
+    requires valid_secure_log_entry(the_entry);
     requires File_Is_Open (stream);
     assigns fs \from fs, stream, the_entry;
  */
@@ -132,6 +148,7 @@ Log_FS_Result Log_IO_Write_Entry(Log_Handle *stream,          // IN
 
 /* returns the number of secure_log_entry records in the given file */
 /*@ requires Log_IO_Initialized;
+    requires \valid(stream);
     requires File_Is_Open (stream);
     assigns \result \from *stream, fs;
     ensures \result == File_Num_Entries (stream);
@@ -143,6 +160,7 @@ size_t Log_IO_Num_Entries(Log_Handle *stream);
 // Log_IO_Num_Entries so that we can express the precondition for this
 // function.
 /*@ requires Log_IO_Initialized;
+    requires \valid(stream);
     requires File_Is_Open (stream);
     requires Valid_Log_Entries_Count(stream);
     requires n >= 0;
@@ -154,6 +172,7 @@ secure_log_entry Log_IO_Read_Entry(Log_Handle *stream, // IN
 
 /* reads the last entry (i.e. most recently written to the end of the file) */
 /*@ requires Log_IO_Initialized;
+    requires \valid(stream);
     requires File_Is_Open (stream);
     assigns \result \from *stream, fs;
  */

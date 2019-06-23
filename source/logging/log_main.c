@@ -69,7 +69,7 @@ void Import_Export_Empty_Log(const log_name the_log_name,
   export_log(&my_first_log, a_target);
   log_file my_second_log = import_log(the_log_name);
   verify_log_well_formedness(my_second_log);
-  compare_logs(&my_first_log,&my_second_log);
+  compare_logs(&my_first_log,my_second_log);
   // @todo kiniry We have no means by which to compare the two logs.
   return;
 }
@@ -99,7 +99,7 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
   log_file second_test_log = import_log(the_log_name);
   verify_log_well_formedness(second_test_log);
   // @todo kiniry/dragan We have no means by which to compare the two logs.
-  compare_logs(&test_log,&second_test_log);
+  compare_logs(&test_log,second_test_log);
   Log_IO_Close (&test_log);
   return;
 }
