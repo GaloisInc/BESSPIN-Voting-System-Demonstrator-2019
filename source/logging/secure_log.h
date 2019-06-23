@@ -58,6 +58,18 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
 
 /*@ requires \valid_read(the_secure_log);
   @ assigns \result \from fs, the_secure_log;
+  @
+  @ behavior failure:
+  @ assumes !Valid_Log_Entries_Count(the_secure_log);
+  @ assigns \nothing;
+  @ ensures !\result;
+  @
+  @ behavior success:
+  @ assumes Valid_Log_Entries_Count(the_secure_log); 
+  @ ensures \result;
+  @
+  @ complete behaviors failure, success;
+  @ disjoint behaviors failure, success;
   @*/
 bool verify_secure_log_security(const secure_log the_secure_log);
 

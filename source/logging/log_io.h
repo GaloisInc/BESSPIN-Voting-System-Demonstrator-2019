@@ -50,7 +50,12 @@ typedef enum
     File_Exists{L}(char *name) = \true; // abstract
   logic
     size_t File_Num_Entries{L}(Log_Handle *f) = (size_t) 0; // abstract
-
+  predicate
+    Valid_Log_Entries_Count(Log_Handle * l_handle) =
+      \valid(l_handle) &&
+      \let fne = File_Num_Entries(l_handle); 
+       fne == 0 ==> \false || fne > 0 ==> \true;
+        
 */
 
 /* Mounts the FileSystem and any other initialization necessary.  */
@@ -139,6 +144,7 @@ size_t Log_IO_Num_Entries(Log_Handle *stream);
 // function.
 /*@ requires Log_IO_Initialized;
     requires File_Is_Open (stream);
+    requires Valid_Log_Entries_Count(stream);
     requires n >= 0;
     requires n <  File_Num_Entries (stream);
     assigns \result \from *stream, n, fs;
