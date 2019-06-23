@@ -84,10 +84,10 @@
  * @ // and its associated functions such as \Cons and \concat, not define
  * @ // our own.
  * @
- * @ axiomatic log {
- * @   type model_log = \list<log_entry>;
- * @ }
- * @
  */
-
+ /*@
+  @ axiomatic log {
+  @   type model_log = \list<log_entry>;
+  @ }
+ @*/
 #endif
