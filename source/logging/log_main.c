@@ -10,9 +10,8 @@
 // Subsystem includes
 #include "log_main.h"
 
-// Helper functions
 
-uint8_t empty_log_entry[LOG_ENTRY_LENGTH];
+// constants
 
 static const log_entry test01_entry =
         "hello "
@@ -28,10 +27,18 @@ static const log_entry test02_entry =
         "iiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmm"
         "mmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
 
+// Helper functions
+
+uint8_t empty_log_entry[LOG_ENTRY_LENGTH];
+
 static log_name generate_log_name(void) {
   return "";
 }
 
+// N.Y.I @dragan - needs to be implemented
+static bool compare_logs(Log_Handle* first, Log_Handle *second){
+  return true;
+}
 /*
 static log_io_stream generate_log_io_stream(void) {
   return stderr;
@@ -62,6 +69,7 @@ void Import_Export_Empty_Log(const log_name the_log_name,
   export_log(&my_first_log, a_target);
   log_file my_second_log = import_log(the_log_name);
   verify_log_well_formedness(my_second_log);
+  compare_logs(&my_first_log,&my_second_log);
   // @todo kiniry We have no means by which to compare the two logs.
   return;
 }
@@ -91,6 +99,7 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
   log_file second_test_log = import_log(the_log_name);
   verify_log_well_formedness(second_test_log);
   // @todo kiniry/dragan We have no means by which to compare the two logs.
+  compare_logs(&test_log,&second_test_log);
   Log_IO_Close (&test_log);
   return;
 }
