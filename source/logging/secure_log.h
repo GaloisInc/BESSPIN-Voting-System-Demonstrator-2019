@@ -44,6 +44,8 @@ void create_secure_log(Log_Handle *secure_log,
   @ requires \valid(the_secure_log);
   @ requires \separated(the_secure_log, a_log_entry);
   @ assigns fs \from fs, the_secure_log, a_log_entry;
+  @ ensures File_Is_Open (the_secure_log);
+  @ ensures \valid(the_secure_log);
   @*/
 void write_entry_to_secure_log(const secure_log the_secure_log,
                                const log_entry a_log_entry);
