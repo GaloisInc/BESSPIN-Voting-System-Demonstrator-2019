@@ -6,5 +6,5 @@
 *.o
 *.asm
 *.gdb
-source/logging/test*
+###source/logging/test*
 source/logging/log_main

@@ -5,7 +5,7 @@
 export CC := clang
 
 # Build the bottom target
-all: test1 test2 test3 test4 test5 test6 test7 test8
+all: test1 test2 test3 test4 test5 test6 test7
 
 LSOURCES = log.c secure_log.c log_io.c
 CSOURCES = ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c
@@ -32,9 +32,6 @@ test6:
 test7:
 	$(CC) $(CFLAGS) -o test7 test7.c $(LSOURCES) $(CSOURCES)
 
-test8:
-	$(CC) $(CFLAGS) -o test8 test8.c $(LSOURCES) $(CSOURCES)
-
 clean:
-	rm -f test1 test2 test3 test4 test5 test6 test7 test8 *.o
+	rm -f test1 test2 test3 test4 test5 test6 test7 *.o
 
