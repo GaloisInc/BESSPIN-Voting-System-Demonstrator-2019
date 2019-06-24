@@ -17,20 +17,24 @@ parameter
     type constraint fin HashSizeBytes
 
     /**
+        The hash size must be bigger than the output of the CBC-MAC used on
+        the initial message
+    */
+    type constraint HashSizeBytes >= 16
+
+    /**
         Our hash function must take in an arbitrary number
         of bytes (n) and output the hash size of bytes
     */
     hash : {n} (fin n) => [n][8] -> [HashSizeBytes][8]
 
     /**
-        We also need an HMAC function. This function could
-        be entirely defined using the hash function but
-        we specify it here for simplicity
+        We also need the CBC-MAC function.
     */
-    hmac : {msgSizeBytes, keySizeBytes} (fin msgSizeBytes, fin keySizeBytes) =>
+    cbcMAC : {msgSizeBytes, keySizeBytes} (fin msgSizeBytes, fin keySizeBytes) =>
         [keySizeBytes][8] ->
         [msgSizeBytes][8] ->
-        [HashSizeBytes][8]
+        [16][8] //cbcMAC with AES always has 128 bit output, regardless of keysize
 
 /**
     A log entry. The msgHash should always be the hash of the message,
@@ -73,7 +77,7 @@ initialLogEntry : {msgSize, keySize, resultSize}
                 (fin msgSize, fin keySize, fin resultSize, msgSize <= resultSize) =>
     [keySize][8] -> [msgSize][8] -> Log resultSize
 initialLogEntry key msg =
-    { message = paddedMsg, msgHash = hmac key paddedMsg} where
+    { message = paddedMsg, msgHash = (cbcMAC key paddedMsg # zero)} where
         paddedMsg = ((msg # zero) : [resultSize][8])
 
 /**
@@ -105,7 +109,7 @@ validFirstEntry : {msgSizeBytes, keySizeBytes}
     Log msgSizeBytes ->
     [keySizeBytes][8] ->
     Bit
-property validFirstEntry log key = log.msgHash == hmac key log.message
+property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero)
 
 /**
     Check to see if a log entry is valid given the previous hash
