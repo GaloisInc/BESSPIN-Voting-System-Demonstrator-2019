@@ -92,7 +92,7 @@ void initialize(void);
 // @review kiniry Needs a postcondition that states that the currently
 // held ballot is a legal ballot for the election, as soon as the crypto
 // spec is ready for use.
-/*@ requires \valid(the_barcode + (0 .. its_length));
+/*@ requires \valid(the_barcode + (0 .. its_length - 1));
   @ requires the_state.P == EARLY_AND_LATE_DETECTED;
   @ assigns \nothing;
 */
@@ -119,7 +119,7 @@ bool has_a_barcode(void);
 // what_is_the_barcode) is the underlying (non-public) functions
 // encoding the device driver/firmware for the barcode scanner
 // subsystem?
-/*@ requires \valid(the_barcode + (0 .. its_length));
+/*@ requires \valid(the_barcode + (0 .. its_length - 1));
   @ requires the_state.BS == BARCODE_PRESENT_AND_RECORDED;
   @ assigns the_barcode[0 .. its_length];
 */
@@ -181,21 +181,21 @@ void stop_motor(void);
 // be able to specify, both at the model and code level, what is on
 // the display.
 
-/*@ requires \valid_read(str + (0 .. len));
+/*@ requires \valid_read(the_text + (0 .. its_length - 1));
   @ assigns the_state.D;
   @ ensures the_state.D == SHOWING_TEXT;
   @ ensures ASM_transition(\old(the_state), DISPLAY_TEXT_E, the_state);
 */
-void display_this_text(const char* str, uint8_t len);
+void display_this_text(const char* the_text, uint8_t its_length);
 
-/*@ requires \valid_read(line_1 + (0 .. len_1));
-  @ requires \valid_read(line_2 + (0 .. len_2));
+/*@ requires \valid_read(line_1 + (0 .. length_1 - 1));
+  @ requires \valid_read(line_2 + (0 .. length_2 - 1));
   @ assigns the_state.D;
   @ ensures the_state.D == SHOWING_TEXT;
   @ ensures ASM_transition(\old(the_state), DISPLAY_TEXT_E, the_state);
 */
-void display_this_2_line_text(const char *line_1, uint8_t len_1, 
-                              const char *line_2, uint8_t len_2);
+void display_this_2_line_text(const char *line_1, uint8_t length_1, 
+                              const char *line_2, uint8_t length_2);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.P == EARLY_PAPER_DETECTED);

@@ -76,13 +76,13 @@ void stop_motor(void) {
   //@ assert false;
 }
 
-void display_this_text(const char *str, uint8_t len) {
+void display_this_text(const char *the_text, uint8_t its_length) {
   assert(false);
   //@ assert false;
 }
 
-void display_this_2_line_text(const char *line_1, uint8_t len_1, 
-                              const char *line_2, uint8_t len_2) {
+void display_this_2_line_text(const char *line_1, uint8_t length_1, 
+                              const char *line_2, uint8_t length_2) {
   assert(false);
   //@ assert false;
 }
