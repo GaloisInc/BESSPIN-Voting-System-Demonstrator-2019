@@ -35,10 +35,6 @@ static log_name generate_log_name(void) {
   return "";
 }
 
-// N.Y.I @dragan - needs to be implemented
-static bool compare_logs(Log_Handle* first, Log_Handle *second){
-  return true;
-}
 /*
 static log_io_stream generate_log_io_stream(void) {
   return stderr;
@@ -49,7 +45,7 @@ static log_entry *generate_log_entry(void) {
   return &empty_log_entry;
 }
 
-uint8_t compare_logs_by_bytes(Log_Handle* first_log, Log_Handle *second_log)
+static uint8_t compare_logs_by_bytes(Log_Handle* first_log, Log_Handle *second_log)
 {
     size_t      lsize_first, lsize_second; // log sizes
     uint8_t      byte1, byte2;
