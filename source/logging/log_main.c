@@ -148,7 +148,7 @@ int main(int argc, char* argv[]) {
   // @todo kiniry The use of `stderr` and `printf` needs to be
   // refactored to use appropriate calls on FreeRTOS when building to
   // that target.
-  /*
+  
   if (argc == 1)
     Empty_Log_Smoketest(smoketest_log, stderr);
   else if (argc == 2 && strncmp("smoketest", argv[1], 9) == 0)
@@ -163,7 +163,12 @@ int main(int argc, char* argv[]) {
     Import_Export_Non_Empty_Log(smoketest_log, stderr);
   else
     //printf("usage: log_main [smoketest [<log filename>]]\n");
-    printf("usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
-  */
+    #ifdef DEBUG
+    #ifdef TARGET_OS_FreeRTOS
+    FreeRTOS_debug_printf( ( "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n" ) );
+    #else
+    fprintf(stderr, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
+    #endif
+    #endif  
   return 0;
 }
