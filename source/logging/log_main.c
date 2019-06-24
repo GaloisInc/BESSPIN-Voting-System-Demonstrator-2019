@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
     Import_Export_Non_Empty_Log(smoketest_log, stderr);
   else
     //printf("usage: log_main [smoketest [<log filename>]]\n");
-    printf("usage: software_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
+    printf("usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
   */
   return 0;
 }
