@@ -14,14 +14,18 @@
 #include "sbb.acsl"
 
 // Display strings
+extern const char *welcome_text;
 extern const char *insert_ballot_text;
 extern const char *barcode_detected_text;
-extern const char *cast_or_spoil_text;
+extern const char *cast_or_spoil_line_1_text;
+extern const char *cast_or_spoil_line_2_text;
 extern const char *casting_ballot_text;
 extern const char *spoiling_ballot_text;
-extern const char *not_a_valid_barcode_text;
+extern const char *invalid_barcode_text;
 extern const char *no_barcode_text;
 extern const char *remove_ballot_text;
+extern const char *error_line_1_text;
+extern const char *error_line_2_text;
 
 extern SBB_state the_state;
 
@@ -117,8 +121,8 @@ bool has_a_barcode(void);
 // subsystem?
 /*@ requires \valid(the_barcode + (0 .. its_length));
   @ requires the_state.BS == BARCODE_PRESENT_AND_RECORDED;
+  @ assigns the_barcode[0 .. its_length];
 */
-// assigns the_barcode + (0 .. its_length);
 // ensures (* the model barcode is written to the_barcode *)
 // @design kiniry Should this function return the number of bytes in
 // the resulting barcode?
@@ -183,6 +187,15 @@ void stop_motor(void);
   @ ensures ASM_transition(\old(the_state), DISPLAY_TEXT_E, the_state);
 */
 void display_this_text(const char* str, uint8_t len);
+
+/*@ requires \valid_read(line_1 + (0 .. len_1));
+  @ requires \valid_read(line_2 + (0 .. len_2));
+  @ assigns the_state.D;
+  @ ensures the_state.D == SHOWING_TEXT;
+  @ ensures ASM_transition(\old(the_state), DISPLAY_TEXT_E, the_state);
+*/
+void display_this_2_line_text(const char *line_1, uint8_t len_1, 
+                              const char *line_2, uint8_t len_2);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.P == EARLY_PAPER_DETECTED);

@@ -12,10 +12,6 @@ void initialize(void) {
   ;
 }
 
-void perform_tabulation(void) {
-  printf("Performing tabulation\r\n");
-}
-
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
   assert(false);
   //@ assert false;
@@ -32,16 +28,6 @@ bool is_spoil_button_pressed(void) {
   assert(false);
   //@ assert false;
   return false;
-}
-
-void just_received_barcode(void) {
-  assert(false);
-  //@ assert false;
-}
-
-void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
-  assert(false);
-  //@ assert false;
 }
 
 bool has_a_barcode(void) {
@@ -95,6 +81,12 @@ void display_this_text(const char *str, uint8_t len) {
   //@ assert false;
 }
 
+void display_this_2_line_text(const char *line_1, uint8_t len_1, 
+                              const char *line_2, uint8_t len_2) {
+  assert(false);
+  //@ assert false;
+}
+                              
 bool ballot_detected(void) {
   assert(false);
   //@ assert false;
@@ -150,6 +142,10 @@ bool cast_or_spoil_timeout_expired(void) {
   return false;
 }
 
+void ballot_box_main_loop(void) {
+  assert(false);
+  //@ assert false;
+}
 
 int main(void) {
   printf("Starting SBB...\r\n");
