@@ -19,7 +19,7 @@ uint8_t compare_logs_by_bytes(Log_Handle* first_log, Log_Handle *second_log)
 
     if (lsize_first != lsize_second) {
         printf("%s\n","Failure - sizes are not equal" );
-        return LOG_FS_ERROR;
+        return -1;
     }
 
     for (size_t i=0; i < lsize_first; i++) {
@@ -27,11 +27,11 @@ uint8_t compare_logs_by_bytes(Log_Handle* first_log, Log_Handle *second_log)
         fread(&byte2, 1, 1, &second_log -> the_file);
         if (byte1 != byte2) {
             printf("%s\n","Failure - bytes are not equal" );
-            return LOG_FS_ERROR;
+            return -1;
         }
     }
     printf("%s\n","both logs are equal!");
-    return LOG_FS_OK;
+    return 0;
 }
 
 int main(void)
