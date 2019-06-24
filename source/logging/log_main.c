@@ -45,36 +45,47 @@ static log_entry *generate_log_entry(void) {
   return &empty_log_entry;
 }
 
-static uint8_t compare_logs_by_bytes(Log_Handle* first_log, Log_Handle *second_log)
+Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log)
 {
-    size_t      lsize_first, lsize_second; // log sizes
-    uint8_t      byte1, byte2;
-    
-    // get the file size of the first log
-    fseek (&first_log -> the_file, 0 , SEEK_END);
-    lsize_first = ftell (&first_log -> the_file);
-    rewind (&first_log -> the_file);
-    
-    // get the file size of the second log
-    fseek (&second_log -> the_file , 0 , SEEK_END);
-    lsize_second = ftell (&second_log -> the_file);
-    rewind (&second_log -> the_file);
+  Log_Handle r_log;
 
-    if (lsize_first != lsize_second) {
-        printf("%s\n","Failure - sizes are not equal" );
-        return LOG_FS_ERROR;
-    }
+  bool file_exists = Log_IO_File_Exists(log_file);
+  
+  // check that first log exists
+  if (!file_exists) {
+    #ifdef DEBUG
+    #ifdef TARGET_OS_FreeRTOS
+      FreeRTOS_debug_printf( ( "Failure - log file does not exists.\n" ) );
+    #else
+      fprintf(stderr, "Failure - log file does not exists");
+    #endif
+    #endif
+    return LOG_FS_ERROR;
+  }
 
-    for (size_t i=0; i < lsize_first; i++) {
-        fread(&byte1, 1, 1, &first_log -> the_file);
-        fread(&byte2, 1, 1, &second_log -> the_file);
-        if (byte1 != byte2) {
-            printf("%s\n","Failure - bytes are not equal" );
-            return LOG_FS_ERROR;
-        }
-    }
-    printf("%s\n","both logs are equal!");
-    return LOG_FS_OK;
+  // open and read the log
+  Log_IO_Open_Read(&r_log,log_file);
+  
+  secure_log_entry sle  = Log_IO_Read_Last_Entry(&r_log);
+
+  // read compare hashes
+  for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
+  {
+
+      if(sle.the_digest[i] != second_log->previous_hash[i]) 
+      {
+       #ifdef DEBUG
+       #ifdef TARGET_OS_FreeRTOS
+         FreeRTOS_debug_printf( ( "Failure - the hashes are not equal.\n" ) );
+       #else
+         fprintf(stderr, "Failure - the hashes are not equal.");
+       #endif
+       #endif       
+       return LOG_FS_ERROR;
+      }
+
+  }
+  return LOG_FS_OK;
 }
 
 // Scenarios
@@ -97,8 +108,8 @@ void Import_Export_Empty_Log(const log_name the_log_name,
   export_log(&my_first_log, a_target);
   log_file my_second_log = import_log(the_log_name);
   verify_log_well_formedness(my_second_log);
-  compare_logs_by_bytes(&my_first_log,my_second_log);
-  // @todo kiniry We have no means by which to compare the two logs.
+  compare_logs_by_hash(the_log_name,my_second_log);
+
   return;
 }
 
@@ -126,8 +137,7 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
   export_log(&test_log,a_target);
   log_file second_test_log = import_log(the_log_name);
   verify_log_well_formedness(second_test_log);
-  // @todo kiniry/dragan We have no means by which to compare the two logs.
-  compare_logs_by_bytes(&test_log,second_test_log);
+  compare_logs_by_hash(the_log_name,second_test_log);
   Log_IO_Close (&test_log);
   return;
 }
