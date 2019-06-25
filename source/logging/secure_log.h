@@ -44,6 +44,8 @@ void create_secure_log(Log_Handle *secure_log,
   @ requires \valid(the_secure_log);
   @ requires \separated(the_secure_log, a_log_entry);
   @ assigns fs \from fs, the_secure_log, a_log_entry;
+  @ ensures File_Is_Open (the_secure_log);
+  @ ensures \valid(the_secure_log);
   @*/
 void write_entry_to_secure_log(const secure_log the_secure_log,
                                const log_entry a_log_entry);
@@ -56,6 +58,18 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
 
 /*@ requires \valid_read(the_secure_log);
   @ assigns \result \from fs, the_secure_log;
+  @
+  @ behavior failure:
+  @ assumes File_Num_Entries(the_secure_log) ==0;
+  @ assigns \nothing;
+  @ ensures !\result;
+  @
+  @ behavior success:
+  @ assumes File_Num_Entries(the_secure_log)>=1; 
+  @ ensures \result;
+  @
+  @ complete behaviors failure, success;
+  @ disjoint behaviors failure, success;
   @*/
 bool verify_secure_log_security(const secure_log the_secure_log);
 
