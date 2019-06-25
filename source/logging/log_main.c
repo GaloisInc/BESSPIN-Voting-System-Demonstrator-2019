@@ -41,9 +41,6 @@ static log_io_stream generate_log_io_stream(void) {
   log_name name = generate_log_name();
   Log_Handle *log;
   Log_IO_Create_New(log,name);
-  #ifndef TARGET_OS_FreeRTOS
-  log -> the_file = *stderr;
-  #endif
   return log;
 }
 
@@ -65,6 +62,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
       f_printf(stream -> the_file, "%8s", "Failure.");
     #else
       fprintf(stream -> the_file, "Failure - log file does not exists");
+      fprintf(stderr, "Failure - log file does not exists");
     #endif
     #endif
     return LOG_FS_ERROR;
@@ -88,6 +86,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
 
        #else
          fprintf(stream -> the_file, "Failure - the hashes are not equal.\n");
+         fprintf(stderr, "Failure - the hashes are not equal.\n");
        #endif
        #endif       
        return LOG_FS_ERROR;
