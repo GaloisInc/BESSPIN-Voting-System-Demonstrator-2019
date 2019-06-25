@@ -130,7 +130,7 @@ void Non_Empty_Log_Smoketest(const log_name the_log_name,
   write_entry (&test_log, test01_entry);
   write_entry (&test_log, test02_entry);
   verify_log_well_formedness(&test_log);
-  //export_log(&test_log,a_target);
+  export_log(&test_log,a_target);
   Log_IO_Close (&test_log);
   return;
 }
