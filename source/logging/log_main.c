@@ -39,7 +39,7 @@ static log_name generate_log_name(void) {
 
 static log_io_stream generate_log_io_stream(void) {
   log_name name = generate_log_name();
-  Log_Handle *log;
+  log_io_stream log;
   Log_IO_Create_New(log,name);
   return log;
 }
