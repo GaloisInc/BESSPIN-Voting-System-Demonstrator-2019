@@ -175,8 +175,9 @@ int main(int argc, char* argv[]) {
     #ifdef DEBUG
     #ifdef TARGET_OS_FreeRTOS
     FreeRTOS_debug_printf( ( "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n" ) );
+     f_printf(stream -> the_file, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
     #else
-    fprintf(stderr, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
+    fprintf(stream -> the_file, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
     #endif
     #endif  
   return 0;
