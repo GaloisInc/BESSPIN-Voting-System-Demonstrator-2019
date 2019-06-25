@@ -159,7 +159,7 @@ int main(int argc, char* argv[]) {
   // that target.
   log_io_stream stream = generate_log_io_stream();
   if (argc == 1)
-    Empty_Log_Smoketest(smoketest_log, stream);
+    Empty_Log_Smoketest(_log, stream);
   else if (argc == 2 && strncmp("smoketest", argv[1], 9) == 0)
     Empty_Log_Smoketest(_log, stream);
   else if (argc == 3 && strncmp("smoketest", argv[1], 9) == 0)
