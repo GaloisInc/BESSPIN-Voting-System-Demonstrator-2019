@@ -51,18 +51,16 @@ static log_io_stream generate_log_io_stream(void) {
 Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, log_io_stream stream)
 {
   Log_Handle r_log;
-
-  bool file_exists = Log_IO_File_Exists(log_file);
-  
+   
   // check that first log exists
-  if (!file_exists) {
+  if (!Log_IO_File_Exists(log_file)) {
     #ifdef DEBUG
     #ifdef TARGET_OS_FreeRTOS
-      FreeRTOS_debug_printf( ( "Failure - log file does not exists.\n" ) );
+      FreeRTOS_debug_printf( ( "Failure - log file does not exist.\n" ) );
       f_printf(stream -> the_file, "%8s", "Failure.");
     #else
-      fprintf(stream -> the_file, "Failure - log file does not exists");
-      fprintf(stderr, "Failure - log file does not exists");
+      fprintf(stream -> the_file, "Failure - log file does not exist.");
+      fprintf(stderr, "Failure - log file does not exist.");
     #endif
     #endif
     return LOG_FS_ERROR;
@@ -77,7 +75,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
   for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
   {
 
-      if(sle.the_digest[i] != second_log->previous_hash[i]) 
+      if (sle.the_digest[i] != second_log->previous_hash[i]) 
       {
        #ifdef DEBUG
        #ifdef TARGET_OS_FreeRTOS
@@ -100,25 +98,25 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
 
 void Empty_Log_Smoketest(const log_name the_log_name,
                          const log_io_stream a_target) {
-  Log_Handle my_log;
+  Log_Handle test_log;
   Log_IO_Initialize();
-  create_log(&my_log, the_log_name);
-  export_log(&my_log, a_target);
-  Log_IO_Close(&my_log);
+  create_log(&test_log, the_log_name);
+  export_log(&test_log, a_target);
+  Log_IO_Close(&test_log);
   return;
 }
 
 void Import_Export_Empty_Log(const log_name the_log_name,
                              const log_io_stream a_target) {
-  Log_Handle my_first_log;
+  Log_Handle first_log;
   Log_IO_Initialize();
-  create_log(&my_first_log, the_log_name);
-  verify_log_well_formedness(&my_first_log);
-  export_log(&my_first_log, a_target);
-  log_file my_second_log = import_log(the_log_name);
-  verify_log_well_formedness(my_second_log);
-  compare_logs_by_hash(the_log_name,my_second_log, a_target);
-  Log_IO_Close (&my_first_log);
+  create_log(&first_log, the_log_name);
+  verify_log_well_formedness(&first_log);
+  export_log(&first_log, a_target);
+  log_file second_log = import_log(the_log_name);
+  verify_log_well_formedness(second_log);
+  compare_logs_by_hash(the_log_name, second_log, a_target);
+  Log_IO_Close (&first_log);
   return;
 }
 
@@ -146,34 +144,34 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
   export_log(&test_log,a_target);
   log_file second_test_log = import_log(the_log_name);
   verify_log_well_formedness(second_test_log);
-  compare_logs_by_hash(the_log_name,second_test_log, a_target);
+  compare_logs_by_hash(the_log_name, second_test_log, a_target);
   Log_IO_Close (&test_log);
   return;
 }
 
 int main(int argc, char* argv[]) {
-  log_name _log = generate_log_name();
+  log_name generated_name = generate_log_name();
   
   // @todo kiniry The use of `stderr` and `printf` needs to be
   // refactored to use appropriate calls on FreeRTOS when building to
   // that target.
   log_io_stream stream = generate_log_io_stream();
   if (argc == 1)
-    Empty_Log_Smoketest(_log, stream);
+    Empty_Log_Smoketest(generated_name, stream);
   else if (argc == 2 && strncmp("smoketest", argv[1], 9) == 0)
-    Empty_Log_Smoketest(_log, stream);
+    Empty_Log_Smoketest(generated_name, stream);
   else if (argc == 3 && strncmp("smoketest", argv[1], 9) == 0)
     Empty_Log_Smoketest(argv[2], stream);
   else if (argc == 2 && strncmp("import_export_empty_log", argv[1], 23) == 0)
-    Import_Export_Empty_Log(_log,stream);
+    Import_Export_Empty_Log(generated_name, stream);
   else if (argc == 3 && strncmp("import_export_empty_log", argv[1], 23) == 0)
     Import_Export_Empty_Log(argv[2],stream);
   else if (argc == 2 && strncmp("non_empty_log_smoketest", argv[1], 23) == 0)
-    Non_Empty_Log_Smoketest(_log, stream);
+    Non_Empty_Log_Smoketest(generated_name, stream);
   else if (argc == 3 && strncmp("non_empty_log_smoketest", argv[1], 23) == 0)
     Non_Empty_Log_Smoketest(argv[2], stream);
   else if (argc == 2 && strncmp("import_export_non_empty_log", argv[1], 27) == 0)
-    Import_Export_Non_Empty_Log(_log, stream);
+    Import_Export_Non_Empty_Log(generated_name, stream);
   else if (argc == 3 && strncmp("import_export_non_empty_log", argv[1], 27) == 0)
     Import_Export_Non_Empty_Log(argv[2], stream);
   else
