@@ -27,25 +27,31 @@ static const log_entry test02_entry =
         "iiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmm"
         "mmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
 
+
 // Helper functions
 
 uint8_t empty_log_entry[LOG_ENTRY_LENGTH];
 
 static log_name generate_log_name(void) {
-  return "";
+  return "smoketest.log";
 }
 
-/*
+
 static log_io_stream generate_log_io_stream(void) {
-  return stderr;
+  log_name name = generate_log_name();
+  Log_Handle *log;
+  Log_IO_Create_New(log,name);
+  #ifndef TARGET_OS_FreeRTOS
+  log -> the_file = *stderr;
+  #endif
+  return log;
 }
-*/
 
 static log_entry *generate_log_entry(void) {
   return &empty_log_entry;
 }
 
-Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log)
+Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, log_io_stream stream)
 {
   Log_Handle r_log;
 
@@ -56,8 +62,9 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log)
     #ifdef DEBUG
     #ifdef TARGET_OS_FreeRTOS
       FreeRTOS_debug_printf( ( "Failure - log file does not exists.\n" ) );
+      f_printf(stream -> the_file, "Failure - log file does not exists.\n");
     #else
-      fprintf(stderr, "Failure - log file does not exists");
+      fprintf(stream -> the_file, "Failure - log file does not exists");
     #endif
     #endif
     return LOG_FS_ERROR;
@@ -77,8 +84,10 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log)
        #ifdef DEBUG
        #ifdef TARGET_OS_FreeRTOS
          FreeRTOS_debug_printf( ( "Failure - the hashes are not equal.\n" ) );
+         f_printf(stream -> the_file, "Failure - the hashes are not equal.\n");
+
        #else
-         fprintf(stderr, "Failure - the hashes are not equal.");
+         fprintf(stream -> the_file, "Failure - the hashes are not equal.\n");
        #endif
        #endif       
        return LOG_FS_ERROR;
@@ -108,7 +117,7 @@ void Import_Export_Empty_Log(const log_name the_log_name,
   export_log(&my_first_log, a_target);
   log_file my_second_log = import_log(the_log_name);
   verify_log_well_formedness(my_second_log);
-  compare_logs_by_hash(the_log_name,my_second_log);
+  compare_logs_by_hash(the_log_name,my_second_log, a_target);
   Log_IO_Close (&my_first_log);
   return;
 }
@@ -137,30 +146,30 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
   export_log(&test_log,a_target);
   log_file second_test_log = import_log(the_log_name);
   verify_log_well_formedness(second_test_log);
-  compare_logs_by_hash(the_log_name,second_test_log);
+  compare_logs_by_hash(the_log_name,second_test_log, a_target);
   Log_IO_Close (&test_log);
   return;
 }
 
 int main(int argc, char* argv[]) {
-  char* smoketest_log = "smoketest.log";
+  log_name smoketest_log = generate_log_name();
   
   // @todo kiniry The use of `stderr` and `printf` needs to be
   // refactored to use appropriate calls on FreeRTOS when building to
   // that target.
-  
+  log_io_stream stream = generate_log_io_stream();
   if (argc == 1)
-    Empty_Log_Smoketest(smoketest_log, stderr);
+    Empty_Log_Smoketest(smoketest_log, stream);
   else if (argc == 2 && strncmp("smoketest", argv[1], 9) == 0)
-    Empty_Log_Smoketest(smoketest_log, stderr);
+    Empty_Log_Smoketest(smoketest_log, stream);
   else if (argc == 3 && strncmp("smoketest", argv[1], 9) == 0)
-    Empty_Log_Smoketest(argv[2], stderr);
+    Empty_Log_Smoketest(argv[2], stream);
   else if (argc == 2 && strncmp("import_export_empty_log", argv[1], 23) == 0)
-    Import_Export_Empty_Log(smoketest_log,stderr);
+    Import_Export_Empty_Log(smoketest_log,stream);
   else if (argc == 2 && strncmp("non_empty_log_smoketest", argv[1], 23) == 0)
-    Non_Empty_Log_Smoketest(smoketest_log, stderr);
+    Non_Empty_Log_Smoketest(smoketest_log, stream);
   else if (argc == 2 && strncmp("import_export_non_empty_log", argv[1], 27) == 0)
-    Import_Export_Non_Empty_Log(smoketest_log, stderr);
+    Import_Export_Non_Empty_Log(smoketest_log, stream);
   else
     //printf("usage: log_main [smoketest [<log filename>]]\n");
     #ifdef DEBUG
