@@ -30,23 +30,23 @@ static const log_entry test02_entry =
 
 // Helper functions
 
-uint8_t empty_log_entry[LOG_ENTRY_LENGTH];
+//uint8_t empty_log_entry[LOG_ENTRY_LENGTH];
+Log_Handle log_handle;
 
 static log_name generate_log_name(void) {
-  return "smoketest.log";
+  return "test.log";
 }
 
 
 static log_io_stream generate_log_io_stream(void) {
   log_name name = generate_log_name();
-  log_io_stream log;
-  Log_IO_Create_New(log,name);
-  return log;
+  Log_IO_Create_New(&log_handle,name);
+  return &log_handle;
 }
 
-static log_entry *generate_log_entry(void) {
-  return &empty_log_entry;
-}
+// static log_entry *generate_log_entry(void) {
+//   return &empty_log_entry;
+// }
 
 Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, log_io_stream stream)
 {
@@ -130,7 +130,7 @@ void Non_Empty_Log_Smoketest(const log_name the_log_name,
   write_entry (&test_log, test01_entry);
   write_entry (&test_log, test02_entry);
   verify_log_well_formedness(&test_log);
-  export_log(&test_log,a_target);
+  //export_log(&test_log,a_target);
   Log_IO_Close (&test_log);
   return;
 }
@@ -152,7 +152,7 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
 }
 
 int main(int argc, char* argv[]) {
-  log_name smoketest_log = generate_log_name();
+  log_name _log = generate_log_name();
   
   // @todo kiniry The use of `stderr` and `printf` needs to be
   // refactored to use appropriate calls on FreeRTOS when building to
@@ -161,15 +161,21 @@ int main(int argc, char* argv[]) {
   if (argc == 1)
     Empty_Log_Smoketest(smoketest_log, stream);
   else if (argc == 2 && strncmp("smoketest", argv[1], 9) == 0)
-    Empty_Log_Smoketest(smoketest_log, stream);
+    Empty_Log_Smoketest(_log, stream);
   else if (argc == 3 && strncmp("smoketest", argv[1], 9) == 0)
     Empty_Log_Smoketest(argv[2], stream);
   else if (argc == 2 && strncmp("import_export_empty_log", argv[1], 23) == 0)
-    Import_Export_Empty_Log(smoketest_log,stream);
+    Import_Export_Empty_Log(_log,stream);
+  else if (argc == 3 && strncmp("import_export_empty_log", argv[1], 23) == 0)
+    Import_Export_Empty_Log(argv[2],stream);
   else if (argc == 2 && strncmp("non_empty_log_smoketest", argv[1], 23) == 0)
-    Non_Empty_Log_Smoketest(smoketest_log, stream);
+    Non_Empty_Log_Smoketest(_log, stream);
+  else if (argc == 3 && strncmp("non_empty_log_smoketest", argv[1], 23) == 0)
+    Non_Empty_Log_Smoketest(argv[2], stream);
   else if (argc == 2 && strncmp("import_export_non_empty_log", argv[1], 27) == 0)
-    Import_Export_Non_Empty_Log(smoketest_log, stream);
+    Import_Export_Non_Empty_Log(_log, stream);
+  else if (argc == 3 && strncmp("import_export_non_empty_log", argv[1], 27) == 0)
+    Import_Export_Non_Empty_Log(argv[2], stream);
   else
     //printf("usage: log_main [smoketest [<log filename>]]\n");
     #ifdef DEBUG
