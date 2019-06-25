@@ -62,7 +62,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
     #ifdef DEBUG
     #ifdef TARGET_OS_FreeRTOS
       FreeRTOS_debug_printf( ( "Failure - log file does not exists.\n" ) );
-      f_printf(stream -> the_file, "%8s", "Failure.\n");
+      f_printf(stream -> the_file, "%8s", "Failure.");
     #else
       fprintf(stream -> the_file, "Failure - log file does not exists");
     #endif
@@ -84,7 +84,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
        #ifdef DEBUG
        #ifdef TARGET_OS_FreeRTOS
          FreeRTOS_debug_printf( ( "Failure - the hashes are not equal.\n" ) );
-         f_printf(stream -> the_file, "%8s", "Failure.\n");
+         f_printf(stream -> the_file, "%8s", "Failure.");
 
        #else
          fprintf(stream -> the_file, "Failure - the hashes are not equal.\n");
