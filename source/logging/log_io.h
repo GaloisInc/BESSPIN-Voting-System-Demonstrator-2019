@@ -50,12 +50,6 @@ typedef enum
     File_Exists{L}(char *name) = \true; // abstract
   logic
     size_t File_Num_Entries{L}(Log_Handle *f) = (size_t) 0; // abstract
-  
-  predicate
-    Valid_Log_Entries_Count(Log_Handle * l_handle) =
-      \valid(l_handle) &&
-      \let fne = File_Num_Entries(l_handle); 
-       fne == 0 ==> \false || fne > 0 ==> \true;
 
   predicate 
     valid_secure_log_entry(secure_log_entry sle)=
@@ -64,6 +58,9 @@ typedef enum
 
   global invariant log_file_is_not_empty:
    \forall log_file f; File_Num_Entries(f) >0 ;
+
+  global invariant log_io_streams_is_not_empty:
+   \forall log_io_stream lis; File_Num_Entries(lis) >0 ;
 */
 
 /* Mounts the FileSystem and any other initialization necessary.  */
@@ -165,7 +162,6 @@ size_t Log_IO_Num_Entries(Log_Handle *stream);
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
     requires File_Is_Open (stream);
-    requires Valid_Log_Entries_Count(stream);
     requires n >= 0;
     requires n <  File_Num_Entries (stream);
     assigns \result \from *stream, n, fs;

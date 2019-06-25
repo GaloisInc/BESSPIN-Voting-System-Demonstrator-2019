@@ -60,12 +60,12 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
   @ assigns \result \from fs, the_secure_log;
   @
   @ behavior failure:
-  @ assumes !Valid_Log_Entries_Count(the_secure_log);
+  @ assumes File_Num_Entries(the_secure_log) ==0;
   @ assigns \nothing;
   @ ensures !\result;
   @
   @ behavior success:
-  @ assumes Valid_Log_Entries_Count(the_secure_log); 
+  @ assumes File_Num_Entries(the_secure_log)>=1; 
   @ ensures \result;
   @
   @ complete behaviors failure, success;
