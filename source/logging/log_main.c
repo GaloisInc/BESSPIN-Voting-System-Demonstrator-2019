@@ -62,7 +62,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
     #ifdef DEBUG
     #ifdef TARGET_OS_FreeRTOS
       FreeRTOS_debug_printf( ( "Failure - log file does not exists.\n" ) );
-      f_printf(stream -> the_file, "Failure - log file does not exists.\n");
+      f_printf(stream -> the_file, "%8s", "Failure.\n");
     #else
       fprintf(stream -> the_file, "Failure - log file does not exists");
     #endif
@@ -84,7 +84,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
        #ifdef DEBUG
        #ifdef TARGET_OS_FreeRTOS
          FreeRTOS_debug_printf( ( "Failure - the hashes are not equal.\n" ) );
-         f_printf(stream -> the_file, "Failure - the hashes are not equal.\n");
+         f_printf(stream -> the_file, "%8s", "Failure.\n");
 
        #else
          fprintf(stream -> the_file, "Failure - the hashes are not equal.\n");
@@ -175,7 +175,6 @@ int main(int argc, char* argv[]) {
     #ifdef DEBUG
     #ifdef TARGET_OS_FreeRTOS
     FreeRTOS_debug_printf( ( "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n" ) );
-     f_printf(stream -> the_file, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
     #else
     fprintf(stream -> the_file, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
     #endif
