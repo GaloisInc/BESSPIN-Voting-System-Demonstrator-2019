@@ -104,6 +104,7 @@ void Empty_Log_Smoketest(const log_name the_log_name,
   Log_IO_Initialize();
   create_log(&my_log, the_log_name);
   export_log(&my_log, a_target);
+  Log_IO_Close(&my_log);
   return;
 }
 
