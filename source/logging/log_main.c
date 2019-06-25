@@ -109,7 +109,7 @@ void Import_Export_Empty_Log(const log_name the_log_name,
   log_file my_second_log = import_log(the_log_name);
   verify_log_well_formedness(my_second_log);
   compare_logs_by_hash(the_log_name,my_second_log);
-
+  Log_IO_Close (&my_first_log);
   return;
 }
 
