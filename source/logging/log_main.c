@@ -53,12 +53,10 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log)
   
   // check that first log exists
   if (!file_exists) {
-    #ifdef DEBUG
     #ifdef TARGET_OS_FreeRTOS
       FreeRTOS_debug_printf( ( "Failure - log file does not exists.\n" ) );
     #else
       fprintf(stderr, "Failure - log file does not exists");
-    #endif
     #endif
     return LOG_FS_ERROR;
   }
@@ -74,12 +72,10 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log)
 
       if(sle.the_digest[i] != second_log->previous_hash[i]) 
       {
-       #ifdef DEBUG
        #ifdef TARGET_OS_FreeRTOS
          FreeRTOS_debug_printf( ( "Failure - the hashes are not equal.\n" ) );
        #else
          fprintf(stderr, "Failure - the hashes are not equal.");
-       #endif
        #endif       
        return LOG_FS_ERROR;
       }
