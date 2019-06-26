@@ -57,10 +57,10 @@ SOFTWARE_SPECS := sbb.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := sbb.c sbb_machine.c
+FRAMA_C_SOURCES := sbb.c sbb_machine.c sbb_strings.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) sbb_main.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES)
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 MAIN_ENTRY_POINT := ballot_box_main_loop
@@ -107,9 +107,9 @@ $(EVA_RESULTS) : $(FRAMA_C_SOURCES) $(SOFTWARE_SPECS)
 # To get EVA results for a single unit X.c, do
 #  make -f Makefile.verification X.evar
 #
-# Note: EVA needs a main entry point function, so we always append sbb_main.c no matter what...
+# Note: EVA needs a main entry point function, so we always append sbb_machine.c no matter what...
 %.evar: %.c $(SOFTWARE_SPECS)
-	frama-c -c11 -eva -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(EVA_DEPTH_OPTIONS) $< sbb_main.c >$@
+	frama-c -c11 -eva -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(EVA_DEPTH_OPTIONS) $< sbb_machine.c >$@
 
 # EVA Analysis of all modules
 value:

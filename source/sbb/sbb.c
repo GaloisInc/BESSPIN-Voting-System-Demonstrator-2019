@@ -52,7 +52,7 @@ extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
                                        TickType_t xTicksToWait);
 
 // main code
-                                       
+
 void initialize(void) {
   gpio_set_as_input(BUTTON_CAST_IN);
   gpio_set_as_input(BUTTON_SPOIL_IN);
@@ -149,11 +149,14 @@ void stop_motor(void) {
   the_state.M = MOTORS_OFF;
 }
 
-//@ ensures true;
-extern void serLcdPrintf(char *str, uint8_t len);
 
-void display_this_text(const char *str, uint8_t len) {
-  serLcdPrintf(str, len);
+void display_this_text(const char *the_text, uint8_t its_length) {
+  serLcdPrintf(the_text, its_length);
+}
+
+void display_this_2_line_text(const char *line_1, uint8_t length_1, 
+                              const char *line_2, uint8_t length_2) {
+  serLcdPrintTwoLines(line_1, length_1, line_2, length_2);                              
 }
 
 bool ballot_detected(void) {
@@ -186,7 +189,8 @@ void go_to_standby(void) {
   stop_motor();
   cast_button_light_off();
   spoil_button_light_off();
-  display_this_text(insert_ballot_text, strlen(insert_ballot_text));
+  display_this_2_line_text(welcome_text, strlen(welcome_text), 
+                           insert_ballot_text, strlen(insert_ballot_text));
   the_state.M = MOTORS_OFF;
   the_state.D = SHOWING_TEXT;
   the_state.P = NO_PAPER_DETECTED;

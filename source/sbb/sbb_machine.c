@@ -15,16 +15,6 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
-// Text defines
-const char *insert_ballot_text = "Insert ballot.";
-const char *barcode_detected_text = "Barcode detected.";
-const char *cast_or_spoil_text = "Cast or Spoil?";
-const char *casting_ballot_text = "Casting ballot.";
-const char *spoiling_ballot_text = "Spoiling ballot.";
-const char *not_a_valid_barcode_text = "Not a valid barcode!";
-const char *no_barcode_text = "No barcode detected!";
-const char *remove_ballot_text = "Remove ballot!";
-
 // @design kiniry Here is the explicit encoding of the SBB state.
 SBB_state the_state = { .S = START };
 
@@ -294,13 +284,15 @@ void ballot_box_main_loop(void) {
         cast_button_light_on();
         spoil_button_light_on();
         cast_or_spoil_timeout_reset();
-        display_this_text(cast_or_spoil_text,
-                          strlen(cast_or_spoil_text));
+        display_this_2_line_text(cast_or_spoil_line_1_text,
+                                 strlen(cast_or_spoil_line_1_text),
+                                 cast_or_spoil_line_2_text,
+                                 strlen(cast_or_spoil_line_2_text));
         // Go to the waiting state
         the_state.L = WAIT_FOR_DECISION;
       } else {
-        display_this_text(not_a_valid_barcode_text,
-                          strlen(not_a_valid_barcode_text));
+        display_this_text(invalid_barcode_text,
+                          strlen(invalid_barcode_text));
         the_state.L = ERROR;
       }
       break;
