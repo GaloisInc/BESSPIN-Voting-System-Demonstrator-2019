@@ -243,6 +243,8 @@ void ballot_box_main_loop(void) {
 
     case INITIALIZE:
       initialize();
+      Log_FS_Result logresult = Log_IO_Initialize();
+      // @todo check logresult
       load_or_create_logs();
       CHANGE_STATE(the_state, L, STANDBY);
       break;
