@@ -54,8 +54,8 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
    
   // check that first log exists
   if (!Log_IO_File_Exists(log_file)) {
-    debug_printf("Failure - log file does not exist.\n");
-    debug_log_printf(stream, "Failure - log file does not exist.\n");
+    debug_printf("Failure - log file does not exist.");
+    debug_log_printf(stream, "Failure - log file does not exist.");
     return LOG_FS_ERROR;
   }
 
@@ -70,8 +70,8 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
 
       if (sle.the_digest[i] != second_log->previous_hash[i]) 
       {
-        debug_printf("Failure - the hashes are not equal.\n");
-        debug_log_printf(stream, "Failure - the hashes are not equal.\n");
+        debug_printf("Failure - the hashes are not equal.");
+        debug_log_printf(stream, "Failure - the hashes are not equal.");
         return LOG_FS_ERROR;
       }
 
@@ -162,8 +162,8 @@ int main(int argc, char* argv[]) {
   else
   {
     //printf("usage: log_main [smoketest [<log filename>]]\n");
-    debug_printf("usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
-    debug_log_printf(stream, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
+    debug_printf("usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]");
+    debug_log_printf(stream, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]");
   }
   return 0;
 }
