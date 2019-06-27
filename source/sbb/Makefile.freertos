@@ -66,7 +66,7 @@ INCLUDES = \
 ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy -I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions -DportasmHANDLE_INTERRUPT=external_interrupt_handler
 
 CFLAGS = $(WARNINGS) $(INCLUDES)
-CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany
+CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DDEBUG
 
 DEMO_SRC = \
     main_freertos.c \
@@ -84,8 +84,8 @@ DEMO_SRC = \
     ../crypto/aes.c \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
-    
-APP_SRC = \
+ 
+ APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
 	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
 	$(FREERTOS_DEMO_DIR)/bsp/syscalls.c \

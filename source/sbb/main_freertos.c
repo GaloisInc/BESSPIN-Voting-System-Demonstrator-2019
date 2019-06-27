@@ -52,6 +52,7 @@
 /* Smart Ballot Box includes */
 #include "sbb.h"
 #include "sbb_freertos.h"
+#include "../logging/debug_io.h"
 
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented
 within this file.  See https://www.freertos.org/a00016.html */
@@ -136,9 +137,9 @@ int main(void)
 	configASSERT( xSBBEventGroup );
 	
 
-	xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
+//	xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
 	xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-	xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+//	xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 
 #if configGENERATE_RUN_TIME_STATS
 	xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY, NULL);
@@ -243,6 +244,7 @@ static void prvBallotBoxMainTask(void *pvParameters)
 {
 	(void)pvParameters;
 	printf("Starting prvBallotBoxMainTask\r\n");
+	debug_printf("DEBUG DEBUG DEBUG DEBUG!\r\n");
 
 	ballot_box_main_loop();
 }
@@ -263,6 +265,7 @@ static void prvBarcodeScannerTask(void *pvParameters)
     for (;;)
     {
         configASSERT(uart1_rxbuffer(&barcode[idx], 1) == 1);
+	debug_printf("got a barcode char: %c\r\n", barcode[idx]); 
         if (barcode[idx] == 0xd)
         {
 			/* Debug print below */
