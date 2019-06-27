@@ -231,10 +231,6 @@ void update_sensor_state(void) {
 
 // This main loop for the SBB never terminates until the system is
 // turned off.
-/*@ requires Log_IO_Initialized;
-  @ terminates \false;
-  @ ensures    \false;
-*/
 void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
 

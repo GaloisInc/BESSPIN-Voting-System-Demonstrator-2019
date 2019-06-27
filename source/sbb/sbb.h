@@ -12,6 +12,7 @@
 // Subsystem includes
 #include "sbb_t.h"
 #include "sbb.acsl"
+#include "sbb_logging.h"
 
 // Display strings
 extern const char *welcome_text;
@@ -261,8 +262,9 @@ void cast_or_spoil_timeout_reset(void);
 //@ assigns \nothing;
 bool cast_or_spoil_timeout_expired(void);
 
-/*@ terminates \false;
-    ensures \false;
+/*@ requires Log_IO_Initialized;
+  @ terminates \false;
+  @ ensures    \false;
 */
 void ballot_box_main_loop(void);
 

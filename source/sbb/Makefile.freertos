@@ -42,8 +42,11 @@ APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
 PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
 PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
 
+LOGGING_DIR = ../logging
+
 INCLUDES = \
     -I. \
+  -I$(LOGGING_DIR) \
 	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
