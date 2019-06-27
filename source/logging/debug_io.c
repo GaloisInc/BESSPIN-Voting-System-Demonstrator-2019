@@ -1,5 +1,10 @@
-#include <string.h>
+#ifdef TARGET_OS_FreeRTOS
+#include <FreeRTOS.h>
+#else // POSIX
 #include <stdio.h>
+#endif // TARGET_OS_FreeRTOS
+
+#include <string.h>
 
 #include "debug_io.h"
 #include "log_io.h"
@@ -27,7 +32,7 @@ int debug_printf(const char *the_format, ...)
       	// we can print it in a platform-appropriate way
       	
       	#ifdef TARGET_OS_FreeRTOS
-      	FreeRTOS_debug_printf( (buffer) );
+      	printf(buffer);
     	#else
     	fprintf(stderr, buffer);
     	#endif // TARGET_OS_FreeRTOS
@@ -57,8 +62,8 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
       	// we can print it in a platform-appropriate way
       	
       	#ifdef TARGET_OS_FreeRTOS
-      	f_printf(the_io_stream->the_file, "%8s", buffer);
-      	f_flush(the_io_stream->the_file);
+      	f_printf(&the_io_stream->the_file, "%8s", buffer);
+      	f_sync(&the_io_stream->the_file);
     	#else
     	fprintf(&the_io_stream->the_file, buffer);
     	fflush(&the_io_stream->the_file);
