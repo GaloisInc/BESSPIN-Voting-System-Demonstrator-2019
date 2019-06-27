@@ -47,7 +47,8 @@ typedef enum { ALL_BUTTONS_UP=EARLY_AND_LATE_DETECTED+1,
                CAST_BUTTON_DOWN } buttons_state;
 typedef enum { BARCODE_NOT_PRESENT = CAST_BUTTON_DOWN+1,
                BARCODE_PRESENT_AND_RECORDED } barcode_scanner_state;
-typedef enum { STANDBY = BARCODE_PRESENT_AND_RECORDED+1,
+typedef enum { INITIALIZE = BARCODE_PRESENT_AND_RECORDED+1,
+               STANDBY,
                WAIT_FOR_BALLOT,
                FEED_BALLOT,
                BARCODE_DETECTED,

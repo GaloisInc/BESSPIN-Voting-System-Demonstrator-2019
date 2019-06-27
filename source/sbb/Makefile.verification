@@ -57,7 +57,7 @@ SOFTWARE_SPECS := sbb.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := sbb.c sbb_machine.c sbb_strings.c
+FRAMA_C_SOURCES := sbb.c sbb_machine.c sbb_strings.c sbb_logging.c 
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
 SOFTWARE_SOURCES := $(FRAMA_C_SOURCES)
@@ -83,7 +83,7 @@ typecheck: $(FRAMA_C_SOURCES)
 # WP reasoning.
 
 wp:
-	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp -wp-rte $(FRAMA_C_SOURCES)
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES)
 
 wp-verbose-report:
 	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp-verbose 0 $(FRAMA_C_SOURCES) -then -report
@@ -119,7 +119,7 @@ value:
 
 # Frama-C GUI
 gui:
-	frama-c-gui -lib-entry -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
+	frama-c-gui -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
 
 
 

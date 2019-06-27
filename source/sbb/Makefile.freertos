@@ -69,6 +69,7 @@ DEMO_SRC = \
     main_freertos.c \
     sbb.c \
     sbb_strings.c \
+    sbb_logging.c \
     sbb_machine.c
 
 APP_SRC = \

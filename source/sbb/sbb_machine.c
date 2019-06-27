@@ -7,10 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
-// Subsystem includes
+// SBB subsystem includes
 #include "sbb.h"
 #include "sbb_freertos.h"
 #include "sbb.acsl"
+#include "sbb_logging.h"
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -39,40 +40,40 @@ void update_paper_state(bool paper_in_pressed,
   switch (the_state.P) {
   case NO_PAPER_DETECTED:
     if ( paper_in_pressed ) {
-      the_state.P = EARLY_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
     }
     break;
 
   case EARLY_PAPER_DETECTED:
     if ( paper_in_released && paper_out_pressed ) {
-      the_state.P = LATE_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, LATE_PAPER_DETECTED);
     } else if ( paper_in_released ) {
       // see todo above
-      the_state.P = NO_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
     } else if ( paper_out_pressed ) {
-      the_state.P = EARLY_AND_LATE_DETECTED;
+      CHANGE_STATE(the_state, P, EARLY_AND_LATE_DETECTED);
     }
     break;
 
   case LATE_PAPER_DETECTED:
     if ( paper_in_pressed && paper_out_released ) {
-      the_state.P = EARLY_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
     } else if ( paper_in_pressed ) {
-      the_state.P = EARLY_AND_LATE_DETECTED;
+      CHANGE_STATE(the_state, P, EARLY_AND_LATE_DETECTED);
     } else if ( paper_out_released ) {
       // see todo above
-      the_state.P = NO_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
     }
     break;
 
   case EARLY_AND_LATE_DETECTED:
     if ( paper_in_released && paper_out_released ) {
       // see todo above
-      the_state.P = NO_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
     } else if ( paper_in_released ) { 
-      the_state.P = LATE_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, LATE_PAPER_DETECTED);
     } else if ( paper_out_released ) {
-      the_state.P = EARLY_PAPER_DETECTED;
+      CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
     }
     break;
   }
@@ -91,21 +92,21 @@ void update_button_state(bool cast_button_pressed,
   switch ( the_state.B ) {
   case ALL_BUTTONS_UP:
     if ( cast_button_pressed ) {
-      the_state.B = CAST_BUTTON_DOWN;
+      CHANGE_STATE(the_state, B, CAST_BUTTON_DOWN);
     } else if ( spoil_button_pressed ) {
-      the_state.B = SPOIL_BUTTON_DOWN;
+      CHANGE_STATE(the_state, B, SPOIL_BUTTON_DOWN);
     }
     break;
 
   case CAST_BUTTON_DOWN:
     if ( cast_button_released ) {
-      the_state.B = ALL_BUTTONS_UP;
+      CHANGE_STATE(the_state, B, ALL_BUTTONS_UP);
     }
     break;
 
   case SPOIL_BUTTON_DOWN:
     if ( spoil_button_released ) {
-      the_state.B = ALL_BUTTONS_UP;
+      CHANGE_STATE(the_state, B, ALL_BUTTONS_UP);
     }
     break;
   }
@@ -126,7 +127,7 @@ void update_barcode_state( bool barcode_scanned ) {
                                             SCANNER_BUFFER_RX_BLOCK_TIME_MS);
       if ( xReceiveLength > 0 ) {
         set_received_barcode(barcode, xReceiveLength);
-        the_state.BS = BARCODE_PRESENT_AND_RECORDED;
+        CHANGE_STATE(the_state, BS, BARCODE_PRESENT_AND_RECORDED);
       }
     }
     break;
@@ -230,31 +231,32 @@ void update_sensor_state(void) {
 
 // This main loop for the SBB never terminates until the system is
 // turned off.
-/*@ terminates \false;
+/*@ requires Log_IO_Initialized;
+  @ terminates \false;
   @ ensures    \false;
 */
 void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
 
-  initialize();
-  the_state.L = STANDBY;
   for(;;) {
-
-    // Do internal transitions
-    update_sensor_state();
-
     switch ( the_state.L ) {
+
+    case INITIALIZE:
+      initialize();
+      load_or_create_logs();
+      CHANGE_STATE(the_state, L, STANDBY);
+      break;
 
     case STANDBY:
       go_to_standby();
-      the_state.L = WAIT_FOR_BALLOT;
+      CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
       break;
 
     case WAIT_FOR_BALLOT:
       if ( ballot_detected() ) {
         ballot_detect_timeout_reset();
         move_motor_forward();
-        the_state.L = FEED_BALLOT;
+        CHANGE_STATE(the_state, L, FEED_BALLOT);
       }
       break;
 
@@ -266,10 +268,10 @@ void ballot_box_main_loop(void) {
       if ( ballot_inserted() || has_a_barcode() || ballot_detect_timeout_expired() ) {
         stop_motor();
         if ( /* ballot_inserted()  && */ has_a_barcode() ) {
-          the_state.L = BARCODE_DETECTED;
+          CHANGE_STATE(the_state, L, BARCODE_DETECTED);
         } else {
           display_this_text(no_barcode_text, strlen(no_barcode_text));
-          the_state.L = ERROR;
+          CHANGE_STATE(the_state, L, ERROR);
         }
       }
       break;
@@ -289,11 +291,11 @@ void ballot_box_main_loop(void) {
                                  cast_or_spoil_line_2_text,
                                  strlen(cast_or_spoil_line_2_text));
         // Go to the waiting state
-        the_state.L = WAIT_FOR_DECISION;
+        CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
       } else {
         display_this_text(invalid_barcode_text,
                           strlen(invalid_barcode_text));
-        the_state.L = ERROR;
+        CHANGE_STATE(the_state, L, ERROR);
       }
       break;
 
@@ -301,11 +303,11 @@ void ballot_box_main_loop(void) {
       if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
-        the_state.L = ERROR;
+        CHANGE_STATE(the_state, L, ERROR);
       } else if ( is_cast_button_pressed() ) {
-        the_state.L = CAST;
+        CHANGE_STATE(the_state, L, CAST);
       } else if ( is_spoil_button_pressed() ) {
-        the_state.L = SPOIL;
+        CHANGE_STATE(the_state, L, SPOIL);
       }
       break;
 
@@ -313,7 +315,7 @@ void ballot_box_main_loop(void) {
       display_this_text(casting_ballot_text,
                         strlen(casting_ballot_text));
       cast_ballot();
-      the_state.L = STANDBY;
+      CHANGE_STATE(the_state, L, STANDBY);
       break;
 
     case SPOIL:
@@ -323,7 +325,7 @@ void ballot_box_main_loop(void) {
                         strlen(spoiling_ballot_text));
       spoil_ballot();
       display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-      the_state.L = STANDBY;
+      CHANGE_STATE(the_state, L, STANDBY);
       break;
 
     case ERROR:
@@ -332,13 +334,15 @@ void ballot_box_main_loop(void) {
         move_motor_back();
       } else {
         stop_motor();
-        the_state.L = STANDBY;
+        CHANGE_STATE(the_state, L, STANDBY);
       }
       break;
 
       //default:
       //assert(false);
     }
+
+    update_sensor_state();
   }
 }
 
