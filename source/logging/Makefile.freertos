@@ -70,6 +70,7 @@ DEMO_SRC = \
     log.c \
     secure_log.c \
     log_io.c \
+    debug_io.c \
     ../crypto/aes.c \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c \

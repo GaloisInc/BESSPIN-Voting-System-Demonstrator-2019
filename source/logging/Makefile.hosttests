@@ -7,9 +7,9 @@ export CC := clang
 # Build the bottom target
 all: test1 test2 test3 test4 test5 test6 test7 log_main
 
-LSOURCES = log.c secure_log.c log_io.c
+LSOURCES = log.c secure_log.c log_io.c debug_io.c
 CSOURCES = ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c
-CFLAGS = -g -Wall -DNO_MEMSET_S -Wno-macro-redefined
+CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -Wno-macro-redefined
 
 test1:
 	$(CC) $(CFLAGS) -o test1 test1.c $(LSOURCES) $(CSOURCES)
