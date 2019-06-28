@@ -230,12 +230,17 @@ void update_sensor_state(void) {
 void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
   the_state.L = INITIALIZE;
-    
+  logic_state old = 0;
+  
   for(;;) {
+    if (the_state.L != old) {
+        debug_printf("logic state changed to %d", the_state.L);
+        old = the_state.L;
+    }
+    
     switch ( the_state.L ) {
 
     case INITIALIZE:
-      debug_printf("case: INITIALIZE");
       initialize();
       Log_FS_Result logresult = Log_IO_Initialize();
       if ( logresult != LOG_FS_OK ) {
@@ -247,13 +252,11 @@ void ballot_box_main_loop(void) {
       break;
 
     case STANDBY:
-      debug_printf("case: STANDBY");
       go_to_standby();
       CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
       break;
 
     case WAIT_FOR_BALLOT:
-      debug_printf("case: WAIT_FOR_BALLOT");
       if ( ballot_detected() ) {
         ballot_detect_timeout_reset();
         move_motor_forward();
@@ -263,7 +266,6 @@ void ballot_box_main_loop(void) {
 
       // Requires: motor is running forward
     case FEED_BALLOT:
-      debug_printf("case: FEED_BALLOT");
       // The next guard is the transition out of
       // this state: either we have a ballot with a barcode
       // or we're out of time.
@@ -280,12 +282,12 @@ void ballot_box_main_loop(void) {
 
       // Requires: has_a_barcode
     case BARCODE_DETECTED:
-      debug_printf("case: BARCODE_DETECTED");
       display_this_text(barcode_detected_text,
                         strlen(barcode_detected_text));
       what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
       if ( is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH) ) {
         // Prompt the user for a decision
+        debug_printf("valid barcode detected");
         cast_button_light_on();
         spoil_button_light_on();
         cast_or_spoil_timeout_reset();
@@ -296,6 +298,7 @@ void ballot_box_main_loop(void) {
         // Go to the waiting state
         CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
       } else {
+        debug_printf("invalid barcode detected");
         display_this_text(invalid_barcode_text,
                           strlen(invalid_barcode_text));
         CHANGE_STATE(the_state, L, ERROR);
@@ -303,7 +306,6 @@ void ballot_box_main_loop(void) {
       break;
 
     case WAIT_FOR_DECISION:
-      debug_printf("case: WAIT_FOR_DECISION");
       if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
@@ -331,6 +333,10 @@ void ballot_box_main_loop(void) {
                         strlen(spoiling_ballot_text));
       spoil_ballot();
       display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+      while (!ballot_spoiled()) {
+        // wait for paper to be removed
+        // this should probably be a separate state
+      }
       CHANGE_STATE(the_state, L, STANDBY);
       break;
 
