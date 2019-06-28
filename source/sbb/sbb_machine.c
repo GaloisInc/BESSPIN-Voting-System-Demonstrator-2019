@@ -331,7 +331,6 @@ void ballot_box_main_loop(void) {
       if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
-        display_this_text(remove_ballot_text, strlen(remove_ballot_text));
         CHANGE_STATE(the_state, L, ERROR);
       } else if ( is_cast_button_pressed() ) {
         CHANGE_STATE(the_state, L, CAST);
