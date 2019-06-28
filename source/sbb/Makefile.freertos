@@ -66,7 +66,7 @@ INCLUDES = \
 ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy -I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions -DportasmHANDLE_INTERRUPT=external_interrupt_handler
 
 CFLAGS = $(WARNINGS) $(INCLUDES)
-CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DDEBUG
+CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
 
 DEMO_SRC = \
     main_freertos.c \
@@ -133,8 +133,8 @@ DEMO_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xbasic_types.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_io.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c \
-    $(FREERTOS_DEMO_DIR)/devices/serLcd.c \
-    $(FREERTOS_DEMO_DIR)/devices/sdmm.c \
+	$(FREERTOS_DEMO_DIR)/devices/serLcd.c \
+	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
 	$(FREERTOS_DEMO_DIR)/devices/ff.c \
 	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
 	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
