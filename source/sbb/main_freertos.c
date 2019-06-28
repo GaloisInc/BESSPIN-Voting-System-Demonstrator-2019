@@ -137,9 +137,9 @@ int main(void)
 	configASSERT( xSBBEventGroup );
 	
 
-//	xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
+	xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
 	xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-//	xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+	xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 
 #if configGENERATE_RUN_TIME_STATS
 	xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY, NULL);
@@ -265,7 +265,6 @@ static void prvBarcodeScannerTask(void *pvParameters)
     for (;;)
     {
         configASSERT(uart1_rxbuffer(&barcode[idx], 1) == 1);
-	debug_printf("got a barcode char: %c\r\n", barcode[idx]); 
         if (barcode[idx] == 0xd)
         {
 			/* Debug print below */
@@ -275,7 +274,8 @@ static void prvBarcodeScannerTask(void *pvParameters)
 			}
 			printf("\r\n");
 			/* We have a barcode, send it over stream buffer and fire the event */
-			configASSERT( xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS ) == idx);
+			//configASSERT( xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS ) == idx);
+			xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS );
 			/* Broadcast the event */
 			xEventGroupSetBits( xSBBEventGroup, ebBARCODE_SCANNED );
 			/* reset state */
