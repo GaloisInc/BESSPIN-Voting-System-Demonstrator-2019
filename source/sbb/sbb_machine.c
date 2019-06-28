@@ -318,7 +318,6 @@ void ballot_box_main_loop(void) {
       break;
 
     case CAST:
-      debug_printf("case: CAST");
       display_this_text(casting_ballot_text,
                         strlen(casting_ballot_text));
       cast_ballot();
@@ -326,7 +325,6 @@ void ballot_box_main_loop(void) {
       break;
 
     case SPOIL:
-      debug_printf("case: SPOIL");
       spoil_button_light_off();
       cast_button_light_off();
       display_this_text(spoiling_ballot_text,
@@ -341,7 +339,6 @@ void ballot_box_main_loop(void) {
       break;
 
     case ERROR:
-       debug_printf("case: ERROR");
      // abakst I think this needs a timeout & then head to an abort state?
       if ( ballot_inserted() || ballot_detected() ) {
         move_motor_back();
