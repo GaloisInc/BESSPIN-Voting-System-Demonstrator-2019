@@ -311,6 +311,7 @@ void ballot_box_main_loop(void) {
       if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
+        display_this_text(remove_ballot_text, strlen(remove_ballot_text));
         CHANGE_STATE(the_state, L, ERROR);
       } else if ( is_cast_button_pressed() ) {
         CHANGE_STATE(the_state, L, CAST);
@@ -324,6 +325,7 @@ void ballot_box_main_loop(void) {
                         strlen(casting_ballot_text));
       cast_ballot();
       CHANGE_STATE(the_state, L, STANDBY);
+      CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
       break;
 
     case SPOIL:
@@ -339,6 +341,7 @@ void ballot_box_main_loop(void) {
         update_sensor_state();
       }
       CHANGE_STATE(the_state, L, STANDBY);
+      CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
       break;
 
     case ERROR:
@@ -346,6 +349,7 @@ void ballot_box_main_loop(void) {
       if ( true /* ballot_inserted() || ballot_detected() */ ) {
         spoil_ballot(); // unconditionally eject a ballot in the error state
         CHANGE_STATE(the_state, L, STANDBY);
+        CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
         // the above is a temporary workaround
       } else {
         stop_motor();
