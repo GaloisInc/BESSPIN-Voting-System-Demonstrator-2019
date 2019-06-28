@@ -25,6 +25,7 @@
 #define BALLOT_DETECT_TIMEOUT_MS 6000
 #define CAST_OR_SPOIL_TIMEOUT_MS 30000
 #define SPOIL_EJECT_TIMEOUT_MS 6000
+#define CAST_INGEST_TIMEOUT_MS 2000
 
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;
@@ -183,9 +184,14 @@ void spoil_ballot(void) {
 
 void cast_ballot(void) {
   move_motor_forward();
-  while (!(!ballot_detected() && ballot_inserted())) {
-    ;
+
+  // run the motor for a bit to get the paper into the box
+  TickType_t cast_timeout = 
+    xTaskGetTickCount() + pdMS_TO_TICKS(CAST_INGEST_TIMEOUT_MS);
+  while (xTaskGetTickCount() < cast_timeout) {
+    // wait for the motor to run a while
   }
+
   stop_motor();
 }
 
