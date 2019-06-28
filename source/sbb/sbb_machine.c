@@ -365,24 +365,12 @@ void ballot_box_main_loop(void) {
         spoil_ballot(); // unconditionally eject a ballot in the error state
         await_ballot_removal();
         CHANGE_STATE(the_state, L, STANDBY);
-        // wait for ballot to be removed - this should probably be its own
-        // state...
-        display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-        while (!ballot_spoiled()) {
-          update_sensor_state();
-        }
         flush_barcodes();
         // the above is a temporary workaround
       } else {
         stop_motor();
         await_ballot_removal();
         CHANGE_STATE(the_state, L, STANDBY);
-        // wait for ballot to be removed - this should probably be its own
-        // state...
-        display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-        while (!ballot_spoiled()) {
-          update_sensor_state();
-        }
         flush_barcodes();
       }
       break;
