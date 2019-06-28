@@ -5,7 +5,7 @@ ARCH 		= -march=rv32im
 ABI 		= -mabi=ilp32
 
 
-TARGET=$(CCPATH)riscv${RISCV_XLEN}-unknown-${RISCV_LIB}
+TARGET=$(CCPATH)riscv$(RISCV_XLEN)-unknown-${RISCV_LIB}
 
 GCC		= $(TARGET)-gcc
 OBJCOPY	= $(TARGET)-objcopy
@@ -73,8 +73,18 @@ DEMO_SRC = \
     sbb.c \
     sbb_strings.c \
     sbb_logging.c \
-    sbb_machine.c
-
+    sbb_machine.c \
+    ../logging/log.c \
+    ../logging/secure_log.c \
+    ../logging/system_log.c \
+    ../logging/application_log.c \
+    ../logging/log_io.c \
+    ../crypto/crypto.c \
+    ../crypto/sha2-openbsd.c \
+    ../crypto/aes.c \
+    ../crypto/cbc.c \
+    ../crypto/mode_wrappers.c
+    
 APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
 	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
