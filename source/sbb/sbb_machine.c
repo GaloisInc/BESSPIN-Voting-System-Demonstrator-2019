@@ -122,6 +122,26 @@ void update_barcode_state( bool barcode_scanned ) {
   }
 }
 
+// this is a workaround for multiple barcodes being "queued"
+void flush_barcodes() {
+    while (the_state.BS == BARCODE_PRESENT_AND_RECORDED) {
+        the_state.BS = BARCODE_NOT_PRESENT;
+        update_sensor_state();
+    }
+}
+
+// this is a workaround for not having a state where a ballot
+// has been spit out but not removed
+void await_ballot_removal() {
+    // wait for ballot to be removed - this should probably be its own state...
+    display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+    while (!ballot_spoiled()) {
+      update_sensor_state();
+    }
+}
+
+// This refines the internal paper ASM event
+//@ assigns \nothing;
 EventBits_t next_paper_event_bits(void) {
   switch ( the_state.P ) {
   case NO_PAPER_DETECTED:
@@ -325,7 +345,7 @@ void ballot_box_main_loop(void) {
                         strlen(casting_ballot_text));
       cast_ballot();
       CHANGE_STATE(the_state, L, STANDBY);
-      CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
+      flush_barcodes();
       break;
 
     case SPOIL:
@@ -334,26 +354,24 @@ void ballot_box_main_loop(void) {
       display_this_text(spoiling_ballot_text,
                         strlen(spoiling_ballot_text));
       spoil_ballot();
-      // wait for ballot to be removed - this should probably be its own
-      // state...
-      display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-      while (!ballot_spoiled()) {
-        update_sensor_state();
-      }
+      await_ballot_removal();
       CHANGE_STATE(the_state, L, STANDBY);
-      CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
+      flush_barcodes();
       break;
 
     case ERROR:
      // abakst I think this needs a timeout & then head to an abort state?
       if ( true /* ballot_inserted() || ballot_detected() */ ) {
         spoil_ballot(); // unconditionally eject a ballot in the error state
+        await_ballot_removal();
         CHANGE_STATE(the_state, L, STANDBY);
-        CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
+        flush_barcodes();
         // the above is a temporary workaround
       } else {
         stop_motor();
+        await_ballot_removal();
         CHANGE_STATE(the_state, L, STANDBY);
+        flush_barcodes();
       }
       break;
 
