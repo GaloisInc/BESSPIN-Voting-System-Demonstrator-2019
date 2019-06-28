@@ -341,6 +341,7 @@ void ballot_box_main_loop(void) {
      // abakst I think this needs a timeout & then head to an abort state?
       if ( true /* ballot_inserted() || ballot_detected() */ ) {
         spoil_ballot(); // unconditionally eject a ballot in the error state
+        CHANGE_STATE(the_state, L, STANDBY);
         // the above is a temporary workaround
       } else {
         stop_motor();
