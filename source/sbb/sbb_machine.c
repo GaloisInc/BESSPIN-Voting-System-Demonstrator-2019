@@ -229,9 +229,9 @@ void update_sensor_state(void) {
 // turned off.
 void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
-
+  the_state.L = INITIALIZE;
+    
   for(;;) {
-    debug_printf("entering loop iteration in L state %d", the_state.L);
     switch ( the_state.L ) {
 
     case INITIALIZE:
