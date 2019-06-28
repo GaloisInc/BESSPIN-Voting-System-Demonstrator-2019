@@ -27,17 +27,19 @@ int debug_printf(const char *the_format, ...)
     int result = vsnprintf(buffer, BUFFER_SIZE, the_format, args);
     va_end(args);
     
-    if (result >= BUFFER_SIZE - 1) {
-        // the buffer was overrun or exactly filled, so replace 
-        // the last two characters with a newline and a null terminator
+    if (result >= BUFFER_SIZE - 2) {
+        // the buffer was overrun or almost filled, so replace 
+        // the last three characters with a CR/LF and a null terminator
+        buffer[BUFFER_SIZE - 3] = '\r';
         buffer[BUFFER_SIZE - 2] = '\n';
         buffer[BUFFER_SIZE - 1] = 0;
     } else {
         // the buffer was not overrun, so find the null terminator and
-        // insert a newline
+        // insert a CR/LF
         int len = strlen(buffer);
-        buffer[len] = '\n';
-        buffer[len + 1] = 0;
+        buffer[len] = '\r';
+        buffer[len + 1] = '\n';
+        buffer[len + 2] = 0;
     }
     
     if (result >= 0)
@@ -70,17 +72,19 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
     int result = vsnprintf(buffer, BUFFER_SIZE, the_format, args);
     va_end(args);
     
-    if (result >= BUFFER_SIZE - 1) {
-        // the buffer was overrun or exactly filled, so replace 
-        // the last two characters with a newline and a null terminator
+    if (result >= BUFFER_SIZE - 2) {
+        // the buffer was overrun or almost filled, so replace 
+        // the last three characters with a CR/LF and a null terminator
+        buffer[BUFFER_SIZE - 3] = '\r';
         buffer[BUFFER_SIZE - 2] = '\n';
         buffer[BUFFER_SIZE - 1] = 0;
     } else {
         // the buffer was not overrun, so find the null terminator and
-        // insert a newline
+        // insert a CR/LF
         int len = strlen(buffer);
-        buffer[len] = '\n';
-        buffer[len + 1] = 0;
+        buffer[len] = '\r';
+        buffer[len + 1] = '\n';
+        buffer[len + 2] = 0;
     }
     
     if (result >= 0)
