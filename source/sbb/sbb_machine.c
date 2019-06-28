@@ -231,9 +231,11 @@ void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
 
   for(;;) {
+    debug_printf("entering loop iteration in L state %d", the_state.L);
     switch ( the_state.L ) {
 
     case INITIALIZE:
+      debug_printf("case: INITIALIZE");
       initialize();
       Log_FS_Result logresult = Log_IO_Initialize();
       if ( logresult != LOG_FS_OK ) {
@@ -245,11 +247,13 @@ void ballot_box_main_loop(void) {
       break;
 
     case STANDBY:
+      debug_printf("case: STANDBY");
       go_to_standby();
       CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
       break;
 
     case WAIT_FOR_BALLOT:
+      debug_printf("case: WAIT_FOR_BALLOT");
       if ( ballot_detected() ) {
         ballot_detect_timeout_reset();
         move_motor_forward();
@@ -259,6 +263,7 @@ void ballot_box_main_loop(void) {
 
       // Requires: motor is running forward
     case FEED_BALLOT:
+      debug_printf("case: FEED_BALLOT");
       // The next guard is the transition out of
       // this state: either we have a ballot with a barcode
       // or we're out of time.
@@ -275,6 +280,7 @@ void ballot_box_main_loop(void) {
 
       // Requires: has_a_barcode
     case BARCODE_DETECTED:
+      debug_printf("case: BARCODE_DETECTED");
       display_this_text(barcode_detected_text,
                         strlen(barcode_detected_text));
       what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
@@ -297,6 +303,7 @@ void ballot_box_main_loop(void) {
       break;
 
     case WAIT_FOR_DECISION:
+      debug_printf("case: WAIT_FOR_DECISION");
       if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
@@ -309,6 +316,7 @@ void ballot_box_main_loop(void) {
       break;
 
     case CAST:
+      debug_printf("case: CAST");
       display_this_text(casting_ballot_text,
                         strlen(casting_ballot_text));
       cast_ballot();
@@ -316,6 +324,7 @@ void ballot_box_main_loop(void) {
       break;
 
     case SPOIL:
+      debug_printf("case: SPOIL");
       spoil_button_light_off();
       cast_button_light_off();
       display_this_text(spoiling_ballot_text,
@@ -326,7 +335,8 @@ void ballot_box_main_loop(void) {
       break;
 
     case ERROR:
-      // abakst I think this needs a timeout & then head to an abort state?
+       debug_printf("case: ERROR");
+     // abakst I think this needs a timeout & then head to an abort state?
       if ( ballot_inserted() || ballot_detected() ) {
         move_motor_back();
       } else {
