@@ -11,7 +11,9 @@
 #include "sbb.h"
 #include "sbb_freertos.h"
 #include "sbb.acsl"
+// SBB private includes
 #include "sbb_logging.h"
+#include "sbb_machine.h"
 
 #include <FreeRTOS.h>
 #include <task.h>
@@ -26,12 +28,6 @@ firmware_state the_firmware_state;
 // @todo abakst refactor or expose this
 extern void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
-// @todo abakst the ASM does not have NO_PAPER_DETECTED as reachable except from the initial
-// state. Is this intentional?
-/*@ assigns the_state.P;
-  @ ensures \old(the_state.P) == the_state.P
-  @      || ASM_transition(\old(the_state), INTERNAL_PAPER_DETECT_E, the_state);
-*/
 void update_paper_state(bool paper_in_pressed,
                         bool paper_in_released,
                         bool paper_out_pressed,
@@ -79,12 +75,6 @@ void update_paper_state(bool paper_in_pressed,
   }
 }
 
-/*@ assigns the_state.B;
-  @ ensures \old(the_state) == the_state
-  @      || ASM_transition(\old(the_state), INTERNAL_CAST_SPOIL_E, the_state)
-  @      || ASM_transition(\old(the_state), SPOIL_E, the_state)
-  @      || ASM_transition(\old(the_state), CAST_E, the_state);
-*/
 void update_button_state(bool cast_button_pressed,
                          bool cast_button_released,
                          bool spoil_button_pressed,
@@ -112,10 +102,6 @@ void update_button_state(bool cast_button_pressed,
   }
 }
 
-/*@ assigns the_state.BS;
-  @ ensures \old(the_state) == the_state
-  @      || ASM_transition(\old(the_state), INTERNAL_BARCODE_E, the_state);
-*/
 void update_barcode_state( bool barcode_scanned ) {
   switch ( the_state.BS ) {
   case BARCODE_NOT_PRESENT:
@@ -136,8 +122,6 @@ void update_barcode_state( bool barcode_scanned ) {
   }
 }
 
-// This refines the internal paper ASM event
-//@ assigns \nothing;
 EventBits_t next_paper_event_bits(void) {
   switch ( the_state.P ) {
   case NO_PAPER_DETECTED:
@@ -155,8 +139,6 @@ EventBits_t next_paper_event_bits(void) {
   return 0;
 }
 
-// This refines the internal button ASM event
-//@ assigns \nothing;
 EventBits_t next_button_event_bits(void) {
   switch ( the_state.B ) {
   case ALL_BUTTONS_UP:
@@ -172,7 +154,6 @@ EventBits_t next_button_event_bits(void) {
   return 0;
 }
 
-//@ assigns \nothing;
 EventBits_t next_barcode_event_bits(void) {
   switch ( the_state.BS ) {
   case BARCODE_NOT_PRESENT:
@@ -184,7 +165,6 @@ EventBits_t next_barcode_event_bits(void) {
   return 0;
 }
 
-//@ assigns \nothing;
 extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToSet );
 
@@ -210,14 +190,7 @@ void log_event_group_result ( EventBits_t bits ) {
 
   log_single_event(bits, ebBARCODE_SCANNED, barcode_scanned_msg);
 }
-/*@ ensures
-  @ \exists SBB_state s1, SBB_state s2;
-  @      (s1 == \old(the_state) || ASM_transition(\old(the_state), INTERNAL_PAPER_DETECT_E, s1))
-  @      && (s2 == s1 || ASM_transition(s1, INTERNAL_CAST_SPOIL_E, s2)
-  @                   || ASM_transition(\old(the_state), SPOIL_E, the_state)
-  @                   || ASM_transition(\old(the_state), CAST_E, the_state))
-  @      && (the_state == s2 || ASM_transition(s2, INTERNAL_BARCODE_E, the_state));
-*/
+
 void update_sensor_state(void) {
   EventBits_t waitEvents = 0;
   waitEvents |= next_paper_event_bits();

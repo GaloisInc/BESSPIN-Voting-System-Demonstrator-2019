@@ -27,6 +27,9 @@ extern log_entry barcode_scanned_msg;
 extern log_entry barcode_received_event_msg;
 extern log_entry empty_barcode_received_event_msg;
 
+//@ requires true;
+void load_or_create(log_file the_file, const log_name the_name);
+
 // For now, overwite the existing log
 // @todo check for errors once it is possible to do so
 //@ requires true;
