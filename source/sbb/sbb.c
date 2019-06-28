@@ -25,7 +25,7 @@
 #define BALLOT_DETECT_TIMEOUT_MS 6000
 #define CAST_OR_SPOIL_TIMEOUT_MS 30000
 #define SPOIL_EJECT_TIMEOUT_MS 6000
-#define CAST_INGEST_TIMEOUT_MS 2000
+#define CAST_INGEST_TIMEOUT_MS 6000
 
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;

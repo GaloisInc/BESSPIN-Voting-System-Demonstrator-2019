@@ -330,6 +330,8 @@ void ballot_box_main_loop(void) {
       display_this_text(spoiling_ballot_text,
                         strlen(spoiling_ballot_text));
       spoil_ballot();
+      // wait for ballot to be removed - this should probably be its own
+      // state...
       display_this_text(remove_ballot_text, strlen(remove_ballot_text));
       while (!ballot_spoiled()) {
         update_sensor_state();
