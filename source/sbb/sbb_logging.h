@@ -14,6 +14,18 @@ extern Log_Handle system_log_handle;
 extern const log_name system_log_file_name;
 extern const log_name app_log_file_name;
 
+// HW event messages
+extern log_entry sensor_in_pressed_msg;
+extern log_entry sensor_in_released_msg;
+extern log_entry sensor_out_pressed_msg;
+extern log_entry sensor_out_released_msg;
+extern log_entry cast_button_pressed_msg;
+extern log_entry cast_button_released_msg;
+extern log_entry spoil_button_pressed_msg;
+extern log_entry spoil_button_released_msg;
+extern log_entry barcode_scanned_msg;
+extern log_entry barcode_received_event_msg;
+extern log_entry empty_barcode_received_event_msg;
 
 // For now, overwite the existing log
 // @todo check for errors once it is possible to do so

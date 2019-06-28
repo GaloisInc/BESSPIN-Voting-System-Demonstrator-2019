@@ -16,3 +16,17 @@ const char *spoiling_ballot_text = "Spoiling ballot.";
 const char *invalid_barcode_text = "Invalid barcode.";
 const char *no_barcode_text = "No barcode.";
 const char *remove_ballot_text = "Remove ballot...";
+
+// HW event messages
+#define HW_EVENT(msg) "HW event:" msg "."
+log_entry sensor_in_pressed_msg            = HW_EVENT("Sensor in pressed");
+log_entry sensor_in_released_msg           = HW_EVENT("Sensor in released");
+log_entry sensor_out_pressed_msg           = HW_EVENT("Sensor out pressed");
+log_entry sensor_out_released_msg          = HW_EVENT("Sensor out released");
+log_entry cast_button_pressed_msg          = HW_EVENT("Cast button pressed");
+log_entry cast_button_released_msg         = HW_EVENT("Cast button released");
+log_entry spoil_button_pressed_msg         = HW_EVENT("Spoil button pressed");
+log_entry spoil_button_released_msg        = HW_EVENT("Spoil button released");
+log_entry barcode_scanned_msg              = HW_EVENT("Barcode scanned");
+log_entry barcode_received_event_msg       = HW_EVENT("Received barcode");
+log_entry empty_barcode_received_event_msg = HW_EVENT("Received empty barcode");

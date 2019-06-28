@@ -188,6 +188,28 @@ EventBits_t next_barcode_event_bits(void) {
 extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToSet );
 
+
+void log_single_event( EventBits_t bits,
+                       EventBits_t bit,
+                       const log_entry event_entry ) {
+  if ( bits && bit ) {
+    log_system_message(event_entry);
+  }
+}
+
+void log_event_group_result ( EventBits_t bits ) {
+  log_single_event(bits, ebPAPER_SENSOR_IN_PRESSED, sensor_in_pressed_msg);
+  log_single_event(bits, ebPAPER_SENSOR_IN_RELEASED, sensor_in_released_msg);
+  log_single_event(bits, ebPAPER_SENSOR_OUT_PRESSED, sensor_out_pressed_msg);
+  log_single_event(bits, ebPAPER_SENSOR_OUT_RELEASED, sensor_out_released_msg);
+
+  log_single_event(bits, ebCAST_BUTTON_PRESSED, cast_button_pressed_msg);
+  log_single_event(bits, ebCAST_BUTTON_RELEASED, cast_button_released_msg);
+  log_single_event(bits, ebSPOIL_BUTTON_PRESSED, spoil_button_pressed_msg);
+  log_single_event(bits, ebSPOIL_BUTTON_RELEASED, spoil_button_released_msg);
+
+  log_single_event(bits, ebBARCODE_SCANNED, barcode_scanned_msg);
+}
 /*@ ensures
   @ \exists SBB_state s1, SBB_state s2;
   @      (s1 == \old(the_state) || ASM_transition(\old(the_state), INTERNAL_PAPER_DETECT_E, s1))
@@ -212,6 +234,7 @@ void update_sensor_state(void) {
                                                   pdTRUE,  /* Clear events on return        */
                                                   pdFALSE, /* Wait for *any* event, not all */
                                                   pdMS_TO_TICKS(100) ); 
+  log_event_group_result(ux_Returned);
 
   /* "Run" the internal paper ASM transition */
   update_paper_state( (ux_Returned & ebPAPER_SENSOR_IN_PRESSED),
@@ -240,9 +263,12 @@ void ballot_box_main_loop(void) {
     case INITIALIZE:
       initialize();
       Log_FS_Result logresult = Log_IO_Initialize();
-      // @todo check logresult
-      load_or_create_logs();
-      CHANGE_STATE(the_state, L, STANDBY);
+      if ( logresult != LOG_FS_OK ) {
+        CHANGE_STATE(the_state, L, ABORT);
+      } else {
+        load_or_create_logs();
+        CHANGE_STATE(the_state, L, STANDBY);
+      }
       break;
 
     case STANDBY:
@@ -334,6 +360,9 @@ void ballot_box_main_loop(void) {
         stop_motor();
         CHANGE_STATE(the_state, L, STANDBY);
       }
+      break;
+
+    case ABORT:
       break;
 
       //default:
