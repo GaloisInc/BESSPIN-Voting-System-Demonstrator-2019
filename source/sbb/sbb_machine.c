@@ -212,8 +212,10 @@ void update_sensor_state(void) {
   /* "Run" the internal paper ASM transition */
   update_paper_state( (ux_Returned & ebPAPER_SENSOR_IN_PRESSED),
                       (ux_Returned & ebPAPER_SENSOR_IN_RELEASED),
-                      (ux_Returned & ebPAPER_SENSOR_OUT_PRESSED),
-                      (ux_Returned & ebPAPER_SENSOR_OUT_RELEASED) );
+                      0, 0);
+                      // there is no out sensor anymore
+                      //(ux_Returned & ebPAPER_SENSOR_OUT_PRESSED),
+                      //(ux_Returned & ebPAPER_SENSOR_OUT_RELEASED) );
 
   /* "Run" the internal button ASM transition */
   update_button_state( (ux_Returned & ebCAST_BUTTON_PRESSED),
