@@ -8,8 +8,8 @@
 #include "log.h"
 
 // @design abakst these are handles to the app and system logs
-extern log_file app_log_file;
-extern log_file system_log_file;
+extern Log_Handle app_log_handle;
+extern Log_Handle system_log_handle;
 
 extern const log_name system_log_file_name;
 extern const log_name app_log_file_name;
