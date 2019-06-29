@@ -131,7 +131,7 @@ int main()
         printf("buffer size=%zu\n", len );
         printf("base64 encoded length=%lu\n", strlen( encoded_string));
     }else {
-        printf("Wrong number of Base64 encoded buffer size.");
+        printf("Wrong Base64 encoded buffer size.");
     }
 
     
