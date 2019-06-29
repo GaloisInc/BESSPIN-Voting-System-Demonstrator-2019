@@ -1,6 +1,7 @@
 #include "base64.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 void compare(const char *s1, const char *s2){
     if (strcmp(s1, s2) == 0) {
@@ -120,5 +121,19 @@ int main()
     len = *obtain_encode_buffer_size(decoded_string);
     encode(decoded_string, dst, len);
     compare(encoded_string, dst);
+
+    printf("%s\n", "Test that 32 bytes become 44 bytes when Base64 encoded");
+    char src_string_32[]="dependingonwhethertheobjectpoint";
+    printf("Test string=%s\n", src_string_32);
+    len = *obtain_encode_buffer_size(src_string_32);
+    encode(src_string_32, encoded_string, len);
+    if ( len == 45) {
+        printf("buffer size=%zu\n", len );
+        printf("base64 encoded length=%lu\n", strlen( encoded_string));
+    }else {
+        printf("Wrong number of Base64 encoded bytes");
+    }
+
+    
     return 0;
 }
