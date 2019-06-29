@@ -118,12 +118,12 @@ int main()
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
 
-    printf("%s\n", "Test global invariant decode ( encode )");
+    printf("%s\n", "Test invariant decode ( encode )");
     if (strcmp(src_entry, decoded_string) == 0) {
         printf("%s\n","Success!");
     }
 
-    printf("%s\n", "Test global invariant encode ( decode )");
+    printf("%s\n", "Test invariant encode ( decode )");
     len = *obtain_encode_buffer_size(decoded_string);
     encode(decoded_string, dst, len);
 
