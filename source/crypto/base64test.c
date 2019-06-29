@@ -8,8 +8,8 @@ void compare(const char *s1, const char *s2){
     }else {
         printf("%s\n","Failure!\n");
     }
-
 }
+
 int main()
 {
 	char dst[1000];
@@ -32,7 +32,6 @@ int main()
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
     compare(src_string_padding_1_20, decoded_string);
-
 
     // padding 2 lendth 19
 
@@ -66,7 +65,6 @@ int main()
     printf("decoded=%s\n", decoded_string);
     compare(src_string_padding_0_18, decoded_string);
 
-
      // padding 1 lendth 17
 
     printf("%s\n", "padding 1 lendth 17:");
@@ -82,7 +80,6 @@ int main()
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
     compare(src_string_padding_1_17, decoded_string);
-
 
       // padding 2 lendth 16
 
