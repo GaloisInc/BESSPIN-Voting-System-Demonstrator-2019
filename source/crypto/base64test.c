@@ -127,13 +127,11 @@ int main()
     printf("Test string=%s\n", src_string_32);
     len = *obtain_encode_buffer_size(src_string_32);
     encode(src_string_32, encoded_string, len);
-    if ( len == 45) {
+    if ( strlen( encoded_string) == 44) {
         printf("buffer size=%zu\n", len );
         printf("base64 encoded length=%lu\n", strlen( encoded_string));
     }else {
         printf("Wrong Base64 encoded buffer size.");
     }
-
-    
     return 0;
 }
