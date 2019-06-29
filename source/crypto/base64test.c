@@ -19,7 +19,7 @@ int main()
 
 	// padding 1 lendth 20
 
-	printf("%s\n", "padding 1 lendth 20:");
+    printf("%s\n", "padding 1 lendth 20:");
     char src_string_padding_1_20[]="any carnal pleasure.";
     printf("Test string: %s\n", src_string_padding_1_20);
     
