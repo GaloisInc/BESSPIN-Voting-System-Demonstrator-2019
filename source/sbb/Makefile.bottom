@@ -6,9 +6,13 @@
 # Apple's clang and use the HomeBrew one instead...
 export CC := clang
 
+INCLUDES = -I ../logging
+
+CFLAGS = $(INCLUDES)
+
 # Build the bottom target
 all:
-	$(CC) sbb_strings.c sbb_bottom.c -o sbb_bottom.elf
+	$(CC) $(CFLAGS) sbb_strings.c sbb_bottom.c -o sbb_bottom.elf
 	rm -f *.o
 
 clean:

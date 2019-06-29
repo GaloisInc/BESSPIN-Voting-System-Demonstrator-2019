@@ -32,8 +32,11 @@ FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
 FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 
+LOGGING_DIR = ../logging
+
 FREERTOS_INCLUDES = \
-    -I. \
+  -I. \
+  -I $(LOGGING_DIR) \
 	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
@@ -53,11 +56,11 @@ FREERTOS_INCLUDES = \
 FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V -I$(FREERTOS_INCLUDES) -D__riscv_xlen=32"
 
 # These lists will grow as the software is developed and modules are added.
-SOFTWARE_SPECS := sbb.h
+SOFTWARE_SPECS := sbb.h sbb_logging.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := sbb.c sbb_machine.c sbb_strings.c
+FRAMA_C_SOURCES := sbb_logging.c sbb.c sbb_machine.c sbb_strings.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
 SOFTWARE_SOURCES := $(FRAMA_C_SOURCES)
@@ -83,7 +86,7 @@ typecheck: $(FRAMA_C_SOURCES)
 # WP reasoning.
 
 wp:
-	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp -wp-rte $(FRAMA_C_SOURCES)
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES)
 
 wp-verbose-report:
 	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp-verbose 0 $(FRAMA_C_SOURCES) -then -report
@@ -119,7 +122,7 @@ value:
 
 # Frama-C GUI
 gui:
-	frama-c-gui -lib-entry -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
+	frama-c-gui -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
 
 
 

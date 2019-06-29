@@ -15,6 +15,7 @@
 // Subsystem includes
 #include "sbb.h"
 #include "sbb_freertos.h"
+#include "sbb_logging.h"
 
 // BESSPIN Voting System devices
 #include "gpio.h"
@@ -134,19 +135,19 @@ void cast_button_light_off(void) { gpio_clear(BUTTON_CAST_LED); }
 void move_motor_forward(void) {
   gpio_clear(MOTOR_0);
   gpio_write(MOTOR_1);
-  the_state.M = MOTORS_TURNING_FORWARD;
+  CHANGE_STATE(the_state, M, MOTORS_TURNING_FORWARD);
 }
 
 void move_motor_back(void) {
   gpio_write(MOTOR_0);
   gpio_clear(MOTOR_1);
-  the_state.M = MOTORS_TURNING_BACKWARD;
+  CHANGE_STATE(the_state, M, MOTORS_TURNING_BACKWARD);
 }
 
 void stop_motor(void) {
   gpio_clear(MOTOR_0);
   gpio_clear(MOTOR_1);
-  the_state.M = MOTORS_OFF;
+  CHANGE_STATE(the_state, M, MOTORS_OFF);
 }
 
 
@@ -191,12 +192,12 @@ void go_to_standby(void) {
   spoil_button_light_off();
   display_this_2_line_text(welcome_text, strlen(welcome_text), 
                            insert_ballot_text, strlen(insert_ballot_text));
-  the_state.M = MOTORS_OFF;
-  the_state.D = SHOWING_TEXT;
-  the_state.P = NO_PAPER_DETECTED;
-  the_state.BS = BARCODE_NOT_PRESENT;
-  the_state.S = INNER;
-  the_state.B = ALL_BUTTONS_UP;
+  CHANGE_STATE(the_state, M, MOTORS_OFF);
+  CHANGE_STATE(the_state, D, SHOWING_TEXT);
+  CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
+  CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
+  CHANGE_STATE(the_state, S, INNER);
+  CHANGE_STATE(the_state, B, ALL_BUTTONS_UP);
 }
 
 void ballot_detect_timeout_reset(void) {

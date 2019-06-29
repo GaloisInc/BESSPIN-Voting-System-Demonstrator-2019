@@ -5,7 +5,7 @@ ARCH 		= -march=rv32im
 ABI 		= -mabi=ilp32
 
 
-TARGET=$(CCPATH)riscv${RISCV_XLEN}-unknown-${RISCV_LIB}
+TARGET=$(CCPATH)riscv$(RISCV_XLEN)-unknown-${RISCV_LIB}
 
 GCC		= $(TARGET)-gcc
 OBJCOPY	= $(TARGET)-objcopy
@@ -42,8 +42,11 @@ APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
 PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
 PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
 
+LOGGING_DIR = ../logging
+
 INCLUDES = \
     -I. \
+  -I$(LOGGING_DIR) \
 	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
@@ -69,8 +72,19 @@ DEMO_SRC = \
     main_freertos.c \
     sbb.c \
     sbb_strings.c \
-    sbb_machine.c
-
+    sbb_logging.c \
+    sbb_machine.c \
+    ../logging/log.c \
+    ../logging/secure_log.c \
+    ../logging/system_log.c \
+    ../logging/application_log.c \
+    ../logging/log_io.c \
+    ../crypto/crypto.c \
+    ../crypto/sha2-openbsd.c \
+    ../crypto/aes.c \
+    ../crypto/cbc.c \
+    ../crypto/mode_wrappers.c
+    
 APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
 	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
