@@ -12,7 +12,7 @@ void compare(const char *s1, const char *s2){
 
 int main()
 {
-	char dst[1000];
+    char dst[1000];
     char decoded_string[1000];
     char encoded_string[1000];
     size_t len;
