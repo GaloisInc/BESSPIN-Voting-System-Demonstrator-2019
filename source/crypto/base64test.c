@@ -2,6 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void compare(const char *s1, const char *s2){
+    if (strcmp(s1, s2) == 0) {
+        printf("%s\n","Success!\n");
+    }else {
+        printf("%s\n","Failure!\n");
+    }
+
+}
 int main()
 {
 	char dst[1000];
@@ -23,9 +31,7 @@ int main()
 
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
-    if (strcmp(src_string_padding_1_20, decoded_string) == 0) {
-        printf("%s\n","Success!\n");
-    }
+    compare(src_string_padding_1_20, decoded_string);
 
 
     // padding 2 lendth 19
@@ -42,9 +48,7 @@ int main()
 
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
-    if (strcmp(src_string_padding_2_19, decoded_string) == 0) {
-        printf("%s\n","Success!\n");
-    }
+    compare(src_string_padding_2_19, decoded_string);
 
     // padding 0 lendth 18
 
@@ -60,9 +64,7 @@ int main()
 
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
-    if (strcmp(src_string_padding_0_18, decoded_string) == 0) {
-        printf("%s\n","Success!\n");
-    }
+    compare(src_string_padding_0_18, decoded_string);
 
 
      // padding 1 lendth 17
@@ -79,9 +81,7 @@ int main()
 
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
-    if (strcmp(src_string_padding_1_17, decoded_string) == 0) {
-        printf("%s\n","Success!\n");
-    }
+    compare(src_string_padding_1_17, decoded_string);
 
 
       // padding 2 lendth 16
@@ -98,9 +98,7 @@ int main()
 
     decode(encoded_string, decoded_string);
     printf("decoded=%s\n", decoded_string);
-    if (strcmp(src_string_padding_2_16, decoded_string) == 0) {
-        printf("%s\n","Success!\n");
-    }
+    compare(src_string_padding_2_16, decoded_string);
      
     printf("%s\n", "test log entry:");
     char src_entry[]="hello "
@@ -119,17 +117,11 @@ int main()
     printf("decoded=%s\n", decoded_string);
 
     printf("%s\n", "Test invariant decode ( encode )");
-    if (strcmp(src_entry, decoded_string) == 0) {
-        printf("%s\n","Success!");
-    }
+    compare(src_entry, decoded_string);
 
     printf("%s\n", "Test invariant encode ( decode )");
     len = *obtain_encode_buffer_size(decoded_string);
     encode(decoded_string, dst, len);
-
-    if (strcmp(encoded_string, dst) == 0) {
-        printf("%s\n","Success!");
-    }
-
+    compare(encoded_string, dst);
     return 0;
 }
