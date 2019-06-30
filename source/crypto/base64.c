@@ -215,7 +215,6 @@ void encode( unsigned char * src_string, unsigned char * dst_string, int dst_buf
 
     memset(src_str, 0x00, 1000);
     memset(dst_str, 0x00, 1000);
-
     memcpy(src_str, src_string, sizeof(src_str) - 1);
     mbedtls_base64_encode( dst_str, dst_buf_size, &len, src_str, strlen( (char *) src_str ));
     for ( int i=0 ; i < dst_buf_size ; i++){
@@ -229,7 +228,6 @@ size_t * obtain_encode_buffer_size( unsigned char * src_string){
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
     
-
     memset(src_str, 0x00, 1000);
     memset(dst_str, 0x00, 1000);
     memcpy(src_str, src_string, sizeof(src_str) - 1);
@@ -241,7 +239,6 @@ size_t * obtain_encode_buffer_size( unsigned char * src_string){
 size_t * obtain_decode_buffer_size( unsigned char * src_string){
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
-    
 
     memset(src_str, 0x00, 1000);
     memset(dst_str, 0x00, 1000);
