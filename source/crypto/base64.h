@@ -76,13 +76,13 @@ int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
                    const unsigned char *src, size_t slen );
 
 
-size_t * obtain_encode_buffer_size( char * src_string);
+size_t * obtain_encode_buffer_size( unsigned char * src_string);
 
-size_t * obtain_decode_buffer_size( char * src_string);
+size_t * obtain_decode_buffer_size( unsigned char * src_string);
 
-void decode( char * src_string, char * dst_string );
+void decode( unsigned char * src_string, unsigned char * dst_string);
 
-void encode( char * src_string,char * dst_string, int dst_buf_size);
+void encode( unsigned char * src_string, unsigned char * dst_string, int dst_buf_size);
 
 
 #endif /* base64.h */

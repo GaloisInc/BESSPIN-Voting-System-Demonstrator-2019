@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-void compare(const char *s1, const char *s2){
-    if (strcmp(s1, s2) == 0) {
+void compare(unsigned char *s1, unsigned char *s2){
+    if (memcmp(s1, s2, sizeof(s1) - 1) == 0) {
         printf("%s\n","Success!\n");
     }else {
         printf("%s\n","Failure!\n");
@@ -13,15 +13,15 @@ void compare(const char *s1, const char *s2){
 
 int main()
 {
-    char dst[1000];
-    char decoded_string[1000];
-    char encoded_string[1000];
+    unsigned char dst[1000];
+    unsigned char decoded_string[1000];
+    unsigned char encoded_string[1000];
     size_t len;
 
 	// padding 1 lendth 20
 
     printf("%s\n", "padding 1 lendth 20:");
-    char src_string_padding_1_20[]="any carnal pleasure.";
+    unsigned char src_string_padding_1_20[]="any carnal pleasure.";
     printf("Test string: %s\n", src_string_padding_1_20);
     
     len = *obtain_encode_buffer_size(src_string_padding_1_20);
@@ -37,7 +37,7 @@ int main()
     // padding 2 lendth 19
 
     printf("%s\n", "padding 2 lendth 19:");
-    char src_string_padding_2_19[]="any carnal pleasure";
+    unsigned char src_string_padding_2_19[]="any carnal pleasure";
     printf("Test string: %s\n", src_string_padding_2_19);
     
     len = *obtain_encode_buffer_size(src_string_padding_2_19);
@@ -53,7 +53,7 @@ int main()
     // padding 0 lendth 18
 
     printf("%s\n", "padding 0 lendth 18:");
-    char src_string_padding_0_18[]="any carnal pleasur";
+    unsigned char src_string_padding_0_18[]="any carnal pleasur";
     printf("Test string: %s\n", src_string_padding_0_18);
     
     len = *obtain_encode_buffer_size(src_string_padding_0_18);
@@ -69,7 +69,7 @@ int main()
      // padding 1 lendth 17
 
     printf("%s\n", "padding 1 lendth 17:");
-    char src_string_padding_1_17[]="any carnal pleasu";
+    unsigned char src_string_padding_1_17[]="any carnal pleasu";
     printf("Test string: %s\n", src_string_padding_1_17);
     
     len = *obtain_encode_buffer_size(src_string_padding_1_17);
@@ -85,7 +85,7 @@ int main()
       // padding 2 lendth 16
 
     printf("%s\n", "padding 2 lendth 16:");
-    char src_string_padding_2_16[]="any carnal pleas";
+    unsigned char src_string_padding_2_16[]="any carnal pleas";
     printf("Test string: %s\n", src_string_padding_2_16);
     
     len = *obtain_encode_buffer_size(src_string_padding_2_16);
@@ -99,7 +99,7 @@ int main()
     compare(src_string_padding_2_16, decoded_string);
      
     printf("%s\n", "test log entry:");
-    char src_entry[]="hello "
+    unsigned char src_entry[]="hello "
         "test01xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccdddddddddddd"
         "ddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhii"
         "iiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmm"
@@ -123,13 +123,14 @@ int main()
     compare(encoded_string, dst);
 
     printf("%s\n", "Test that 32 bytes become 44 bytes when Base64 encoded");
-    char src_string_32[]="dependingonwhethertheobjectpoint";
+    unsigned char src_string_32[]="dependingonwhethertheobjectpoint";
     printf("Test string=%s\n", src_string_32);
     len = *obtain_encode_buffer_size(src_string_32);
     encode(src_string_32, encoded_string, len);
-    if (strlen( encoded_string) == 44) {
-        printf("buffer size=%zu\n", len );
-        printf("base64 encoded length=%lu\n", strlen( encoded_string));
+
+    if (strlen( (char*) encoded_string) == 44) {
+        printf("buffer size=%zu\n", len);
+        printf("base64 encoded length=%lu\n", strlen( (char*) encoded_string));
     }else {
         printf("Wrong Base64 encoded length.");
     }
