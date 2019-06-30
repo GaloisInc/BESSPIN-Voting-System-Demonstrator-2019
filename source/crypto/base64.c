@@ -207,7 +207,7 @@ int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
     return( 0 );
 }
 //@dragan added custom wrapper to reduce params
-void encode( char * src_string, char * dst_string, int dst_buf_size)
+void encode( unsigned char * src_string, unsigned char * dst_string, int dst_buf_size)
 {
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
@@ -216,44 +216,42 @@ void encode( char * src_string, char * dst_string, int dst_buf_size)
     memset(src_str, 0x00, 1000);
     memset(dst_str, 0x00, 1000);
 
-    strncpy( (char *) src_str, src_string, sizeof(src_str) - 1 );
+    memcpy(src_str, src_string, sizeof(src_str) - 1);
     mbedtls_base64_encode( dst_str, dst_buf_size, &len, src_str, strlen( (char *) src_str ));
-    for ( int i=0 ; i < sizeof(dst_str) ; i++){
+    for ( int i=0 ; i < dst_buf_size ; i++){
         dst_string[i] = dst_str[i];
     }
 }
 
 //@dragan added helper wrapper to obtain encoder buffer size - see 
 // description in the base64.h
-size_t * obtain_encode_buffer_size( char * src_string){
+size_t * obtain_encode_buffer_size( unsigned char * src_string){
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
     
 
     memset(src_str, 0x00, 1000);
     memset(dst_str, 0x00, 1000);
-
-    strncpy( (char *) src_str, src_string, sizeof(src_str) - 1 );
+    memcpy(src_str, src_string, sizeof(src_str) - 1);
     mbedtls_base64_encode( dst_str,0, &len, src_str, strlen( (char *) src_str ));
     return &len;
 }
 //@dragan added helper wrapper to obtain decoder buffer size - see 
 // description in the base64.h
-size_t * obtain_decode_buffer_size( char * src_string){
+size_t * obtain_decode_buffer_size( unsigned char * src_string){
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
     
 
     memset(src_str, 0x00, 1000);
     memset(dst_str, 0x00, 1000);
-
-    strncpy( (char *) src_str, src_string, sizeof(src_str) - 1 );
+    memcpy(src_str, src_string, sizeof(src_str) - 1);
     mbedtls_base64_decode( NULL,0, &len, src_str, strlen( (char *) src_str ));
     return &len;
 }
 
 //@dragan added custom wrapper to reduce params
-void decode( char * src_string, char * dst_string )
+void decode( unsigned char * src_string, unsigned char * dst_string )
 {
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
@@ -261,10 +259,9 @@ void decode( char * src_string, char * dst_string )
    
     memset(src_str, 0x00, 1000);
     memset(dst_str, 0x00, 1000);
-
-    strncpy( (char *) src_str, src_string, sizeof(src_str) - 1 );
+    memcpy(src_str, src_string, sizeof(src_str) - 1);
     mbedtls_base64_decode( dst_str, sizeof( dst_str ), &len, src_str, strlen( (char *) src_str ) );
-    for ( int i=0 ; i < sizeof(dst_str) ; i++){
+    for ( int i=0 ; i < sizeof( dst_str ); i++){
         dst_string[i] = dst_str[i];
     }
 }
