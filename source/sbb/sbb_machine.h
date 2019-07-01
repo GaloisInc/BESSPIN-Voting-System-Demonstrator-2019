@@ -20,9 +20,7 @@ extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
   @      || ASM_transition(\old(the_state), INTERNAL_PAPER_DETECT_E, the_state);
 */
 void update_paper_state( bool paper_in_pressed,
-                         bool paper_in_released,
-                         bool paper_out_pressed,
-                         bool paper_out_released );
+                         bool paper_in_released );
 
 /*@ assigns the_state.B;
   @ ensures \old(the_state) == the_state

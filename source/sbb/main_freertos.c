@@ -314,13 +314,10 @@ static void prvInputTask(void *pvParameters) {
     /* Sensors are active low */
     uint8_t paper_sensor_in_input = 1;
     uint8_t paper_sensor_in_input_last = 1;
-    uint8_t paper_sensor_out_input = 1;
-    uint8_t paper_sensor_out_input_last = 1;
 
     gpio_set_as_input(BUTTON_CAST_IN);
     gpio_set_as_input(BUTTON_SPOIL_IN);
     gpio_set_as_input(PAPER_SENSOR_IN);
-    gpio_set_as_input(PAPER_SENSOR_OUT);
 
     for(;;) {
         /* Paper sensor in */
@@ -342,25 +339,6 @@ static void prvInputTask(void *pvParameters) {
                 paper_sensor_in_input_last = paper_sensor_in_input;
             }
             printf("uxReturned = 0x%lx\r\n",uxReturned);
-        }
-
-        /* Paper sensor out */
-        paper_sensor_out_input = gpio_read(PAPER_SENSOR_OUT);
-        if (paper_sensor_out_input != paper_sensor_out_input_last) {
-            printf("#paper_sensor_out_input changed: %u -> %u\r\n", paper_sensor_out_input_last, paper_sensor_out_input);
-
-            /* Broadcast the event */
-            if (paper_sensor_out_input == 0) {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_PRESSED) & ebPAPER_SENSOR_OUT_PRESSED);
-                uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_PRESSED);
-                uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_RELEASED );
-            } else {
-                uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_RELEASED);
-                uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_PRESSED );
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_OUT_RELEASED) & ebPAPER_SENSOR_OUT_RELEASED);
-            }
-            printf("uxReturned = 0x%lx\r\n",uxReturned);
-            paper_sensor_out_input_last = paper_sensor_out_input;
         }
 
         /* Cast button */

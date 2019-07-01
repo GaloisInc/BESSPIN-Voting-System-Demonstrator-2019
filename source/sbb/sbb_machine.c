@@ -29,13 +29,12 @@ firmware_state the_firmware_state;
 extern void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
 void update_paper_state(bool paper_in_pressed,
-                        bool paper_in_released,
-                        bool paper_out_pressed,
-                        bool paper_out_released)
+                        bool paper_in_released)
 {
     switch (the_state.P) {
     case NO_PAPER_DETECTED:
         if ( paper_in_pressed ) {
+<<<<<<< HEAD
             CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
         }
         break;
@@ -70,6 +69,15 @@ void update_paper_state(bool paper_in_pressed,
             CHANGE_STATE(the_state, P, LATE_PAPER_DETECTED);
         } else if ( paper_out_released ) {
             CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
+=======
+            CHANGE_STATE(the_state, P, PAPER_DETECTED);
+        }
+        break;
+
+    case PAPER_DETECTED:
+        if ( paper_in_released ) {
+            CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
+>>>>>>> Remove SBB references to second paper sensor.
         }
         break;
     }
@@ -135,6 +143,7 @@ void flush_barcodes() {
 EventBits_t next_paper_event_bits(void) {
     switch ( the_state.P ) {
     case NO_PAPER_DETECTED:
+<<<<<<< HEAD
         return (ebPAPER_SENSOR_IN_PRESSED);
     case EARLY_PAPER_DETECTED:
         return (ebPAPER_SENSOR_IN_RELEASED | ebPAPER_SENSOR_OUT_PRESSED);
@@ -142,6 +151,11 @@ EventBits_t next_paper_event_bits(void) {
         return (ebPAPER_SENSOR_IN_PRESSED | ebPAPER_SENSOR_OUT_RELEASED);
     case EARLY_AND_LATE_DETECTED:
         return (ebPAPER_SENSOR_IN_RELEASED | ebPAPER_SENSOR_OUT_RELEASED);
+=======
+        return ebPAPER_SENSOR_IN_PRESSED;
+    case PAPER_DETECTED:
+        return ebPAPER_SENSOR_IN_RELEASED;
+>>>>>>> Remove SBB references to second paper sensor.
     default:
         break;
     }
@@ -190,8 +204,6 @@ void log_single_event( EventBits_t bits,
 void log_event_group_result ( EventBits_t bits ) {
     log_single_event(bits, ebPAPER_SENSOR_IN_PRESSED, sensor_in_pressed_msg);
     log_single_event(bits, ebPAPER_SENSOR_IN_RELEASED, sensor_in_released_msg);
-    log_single_event(bits, ebPAPER_SENSOR_OUT_PRESSED, sensor_out_pressed_msg);
-    log_single_event(bits, ebPAPER_SENSOR_OUT_RELEASED, sensor_out_released_msg);
 
     log_single_event(bits, ebCAST_BUTTON_PRESSED, cast_button_pressed_msg);
     log_single_event(bits, ebCAST_BUTTON_RELEASED, cast_button_released_msg);
@@ -221,11 +233,7 @@ void update_sensor_state(void) {
 
     /* "Run" the internal paper ASM transition */
     update_paper_state( (ux_Returned & ebPAPER_SENSOR_IN_PRESSED),
-                        (ux_Returned & ebPAPER_SENSOR_IN_RELEASED),
-                        0, 0);
-    // there is no out sensor anymore
-    //(ux_Returned & ebPAPER_SENSOR_OUT_PRESSED),
-    //(ux_Returned & ebPAPER_SENSOR_OUT_RELEASED) );
+                        (ux_Returned & ebPAPER_SENSOR_IN_RELEASED) );
 
     /* "Run" the internal button ASM transition */
     update_button_state( (ux_Returned & ebCAST_BUTTON_PRESSED),
@@ -278,12 +286,12 @@ void ballot_box_main_loop(void) {
             break;
 
         case FEED_BALLOT:
-            // The next guard is the transition out of
-            // this state: either we have a ballot with a barcode
-            // or we're out of time.
-            if ( ballot_inserted() || has_a_barcode() || ballot_detect_timeout_expired() ) {
+            // We want to stop the motor if we've run it for too long
+            // or if we no longer detect any paper. Then we see if we got a barcode
+            // to determine which state to transition to.
+            if ( !ballot_detected() || ballot_detect_timeout_expired() ) {
                 stop_motor();
-                if ( /* ballot_inserted()  && */ has_a_barcode() ) {
+                if ( has_a_barcode() ) {
                     CHANGE_STATE(the_state, L, BARCODE_DETECTED);
                 } else {
                     display_this_text(no_barcode_text, strlen(no_barcode_text));

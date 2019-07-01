@@ -163,11 +163,7 @@ void display_this_2_line_text(const char *line_1, uint8_t length_1,
 }
 
 bool ballot_detected(void) {
-    return (the_state.P == EARLY_PAPER_DETECTED);
-}
-
-bool ballot_inserted(void) {
-    return (the_state.P == EARLY_AND_LATE_DETECTED);
+    return (the_state.P == PAPER_DETECTED);
 }
 
 void eject_ballot(void) {
@@ -202,8 +198,6 @@ void cast_ballot(void) {
 
     stop_motor();
 }
-
-bool ballot_spoiled(void) { return (!ballot_detected() && !ballot_inserted()); }
 
 void go_to_standby(void) {
     stop_motor();
