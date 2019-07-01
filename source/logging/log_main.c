@@ -9,7 +9,7 @@
 
 // Subsystem includes
 #include "log_main.h"
-
+#include "debug_io.h"
 
 // constants
 
@@ -54,15 +54,8 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
    
   // check that first log exists
   if (!Log_IO_File_Exists(log_file)) {
-    #ifdef DEBUG
-    #ifdef TARGET_OS_FreeRTOS
-      FreeRTOS_debug_printf( ( "Failure - log file does not exist.\n" ) );
-      f_printf(stream -> the_file, "%8s", "Failure.");
-    #else
-      fprintf(stream -> the_file, "Failure - log file does not exist.");
-      fprintf(stderr, "Failure - log file does not exist.");
-    #endif
-    #endif
+    debug_printf("Failure - log file does not exist.");
+    debug_log_printf(stream, "Failure - log file does not exist.");
     return LOG_FS_ERROR;
   }
 
@@ -77,17 +70,9 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
 
       if (sle.the_digest[i] != second_log->previous_hash[i]) 
       {
-       #ifdef DEBUG
-       #ifdef TARGET_OS_FreeRTOS
-         FreeRTOS_debug_printf( ( "Failure - the hashes are not equal.\n" ) );
-         f_printf(stream -> the_file, "%8s", "Failure.");
-
-       #else
-         fprintf(stream -> the_file, "Failure - the hashes are not equal.\n");
-         fprintf(stderr, "Failure - the hashes are not equal.\n");
-       #endif
-       #endif       
-       return LOG_FS_ERROR;
+        debug_printf("Failure - the hashes are not equal.");
+        debug_log_printf(stream, "Failure - the hashes are not equal.");
+        return LOG_FS_ERROR;
       }
 
   }
@@ -175,13 +160,10 @@ int main(int argc, char* argv[]) {
   else if (argc == 3 && strncmp("import_export_non_empty_log", argv[1], 27) == 0)
     Import_Export_Non_Empty_Log(argv[2], stream);
   else
+  {
     //printf("usage: log_main [smoketest [<log filename>]]\n");
-    #ifdef DEBUG
-    #ifdef TARGET_OS_FreeRTOS
-    FreeRTOS_debug_printf( ( "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n" ) );
-    #else
-    printf(stream -> the_file, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]\n");
-    #endif
-    #endif  
+    debug_printf("usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]");
+    debug_log_printf(stream, "usage: log_main [smoketest | import_export_empty_log | non_empty_log_smoketest | import_export_non_empty_log]");
+  }
   return 0;
 }
