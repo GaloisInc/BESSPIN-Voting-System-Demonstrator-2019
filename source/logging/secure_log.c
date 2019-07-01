@@ -8,6 +8,8 @@
 // Subsystem includes
 #include "secure_log.h"
 #include "../crypto/crypto.h"
+//@dragan added
+#include "../crypto/base64.h"
 
 // Local constants
 
@@ -81,8 +83,19 @@ void create_secure_log(Log_Handle *secure_log,
         secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
 
+    //@dragan added create base64_secure_log_entry
+    base64_secure_log_entry base_64_current_entry;
+    size_t len = *obtain_encode_buffer_size(&initial_entry.the_digest[0]);
+    encode(&initial_entry.the_digest[0], &base_64_current_entry.the_digest[0], len);
+    
+    // invariant missing - needs to be added
+    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+    {
+        base_64_current_entry.the_entry[i] = initial_entry.the_entry[i];
+    }
+    write_result = Log_IO_Write_Base64_Entry(secure_log, base_64_current_entry);
     // 3. Write that new block to the file.
-    write_result = Log_IO_Write_Entry(secure_log, initial_entry);
+    //write_result = Log_IO_Write_Entry(secure_log, initial_entry);
 
     // TBD - what to do with the_policy parameter?
     //       awaiting requirements on this.
@@ -173,10 +186,20 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
         the_secure_log->previous_hash[i] = new_hash[i];
     }
 
+    //@dragan added create base64_secure_log_entry
+    base64_secure_log_entry base_64_current_entry;
+    size_t len = *obtain_encode_buffer_size(&current_entry.the_digest[0]);
+    encode(&current_entry.the_digest[0], &base_64_current_entry.the_digest[0], len);
+    
+    // invariant missing needs to be added
+    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+    {
+        base_64_current_entry.the_entry[i] = current_entry.the_entry[i];
+    }
     // 4. Write the log_entry message to the_secure_log
 
-    write_result = Log_IO_Write_Entry(the_secure_log, current_entry);
-
+    //write_result = Log_IO_Write_Entry(the_secure_log, current_entry);
+    write_result = Log_IO_Write_Base64_Entry(the_secure_log, base_64_current_entry);
     // 5. Write the hash block
 
     // 6. Sync the file.
