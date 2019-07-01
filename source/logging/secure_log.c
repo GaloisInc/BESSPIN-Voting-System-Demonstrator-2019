@@ -82,12 +82,12 @@ void create_secure_log(Log_Handle *secure_log,
         secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
 
-    //dragan added create base64_secure_log_entry
+    /*dragan added create base64_secure_log_entry*/
     base64_secure_log_entry base_64_current_entry;
     size_t len = *obtain_encode_buffer_size(&initial_entry.the_digest[0]);
     encode(&initial_entry.the_digest[0], &base_64_current_entry.the_digest[0], len);
     
-    // invariant missing - needs to be added
+  
     for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
     {
         base_64_current_entry.the_entry[i] = initial_entry.the_entry[i];
@@ -185,12 +185,11 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
         the_secure_log->previous_hash[i] = new_hash[i];
     }
 
-    //dragan added create base64_secure_log_entry
+    /*dragan added create base64_secure_log_entry*/
     base64_secure_log_entry base_64_current_entry;
     size_t len = *obtain_encode_buffer_size(&current_entry.the_digest[0]);
     encode(&current_entry.the_digest[0], &base_64_current_entry.the_digest[0], len);
     
-    // invariant missing needs to be added
     for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
     {
         base_64_current_entry.the_entry[i] = current_entry.the_entry[i];

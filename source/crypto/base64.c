@@ -206,7 +206,7 @@ int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
 
     return( 0 );
 }
-//dragan added custom wrapper to reduce params
+/*dragan added custom wrapper to reduce params*/
 void encode( unsigned char * src_string, unsigned char * dst_string, int dst_buf_size)
 {
     unsigned char src_str[1000];
@@ -222,8 +222,8 @@ void encode( unsigned char * src_string, unsigned char * dst_string, int dst_buf
     }
 }
 
-//dragan added helper wrapper to obtain encoder buffer size - see 
-// description in the base64.h
+/* dragan added helper wrapper to obtain encoder buffer size - see 
+ description in the base64.h */
 size_t * obtain_encode_buffer_size( unsigned char * src_string){
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
@@ -234,8 +234,8 @@ size_t * obtain_encode_buffer_size( unsigned char * src_string){
     mbedtls_base64_encode( dst_str,0, &len, src_str, strlen( (char *) src_str ));
     return &len;
 }
-//dragan added helper wrapper to obtain decoder buffer size - see 
-// description in the base64.h
+/* dragan added helper wrapper to obtain decoder buffer size - see 
+ description in the base64.h */
 size_t * obtain_decode_buffer_size( unsigned char * src_string){
     unsigned char src_str[1000];
     unsigned char dst_str[1000];
@@ -247,7 +247,7 @@ size_t * obtain_decode_buffer_size( unsigned char * src_string){
     return &len;
 }
 
-//dragan added custom wrapper to reduce params
+/* dragan added custom wrapper to reduce params */
 void decode( unsigned char * src_string, unsigned char * dst_string )
 {
     unsigned char src_str[1000];

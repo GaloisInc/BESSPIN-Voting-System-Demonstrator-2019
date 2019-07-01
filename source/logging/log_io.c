@@ -5,7 +5,7 @@ const secure_log_entry null_secure_log_entry = {{0}, {0}};
 const size_t size_of_one_log_entry =
     LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES;
 
-//dragan added 
+/*dragan added*/ 
 const base64_secure_log_entry null_base64_secure_log_entry = {{0}, {0}};
 const size_t size_of_one_base64_block_log_entry = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
 
@@ -223,7 +223,7 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream)
         return null_secure_log_entry;
     }
 }
-//dragan added
+/*dragan added*/
 size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
 {
     size_t file_size;
@@ -526,7 +526,7 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream)
         return null_secure_log_entry;
     }
 }
-//dragan added 
+/*dragan added*/ 
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
                                  base64_secure_log_entry the_entry) 
 {
