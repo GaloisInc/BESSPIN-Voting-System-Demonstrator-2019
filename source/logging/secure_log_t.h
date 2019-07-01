@@ -57,7 +57,7 @@ typedef struct secure_log_security_policies
     non_repudiation NR;
 } secure_log_security_policy;
 
-//@dragan added
+//dragan added
 typedef struct base64_secure_log_entries
 {
     log_entry the_entry;

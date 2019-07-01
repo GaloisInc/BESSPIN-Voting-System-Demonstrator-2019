@@ -72,7 +72,7 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
  * \note           Call this function with *dst = NULL or dlen = 0 to obtain
  *                 the required buffer size in *olen
  */
-// @dragan contract missing
+//dragan contract missing
 int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
                    const unsigned char *src, size_t slen );
 
