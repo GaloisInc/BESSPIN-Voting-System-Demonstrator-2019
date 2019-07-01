@@ -526,7 +526,7 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream)
         return null_secure_log_entry;
     }
 }
-//@dragan added 
+//dragan added 
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
                                  base64_secure_log_entry the_entry) 
 {
