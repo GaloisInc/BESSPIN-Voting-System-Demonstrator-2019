@@ -179,7 +179,7 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
 
 
-//@dragan added  - contract missing 
+//dragan added  - contract missing 
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,          // IN
                                  base64_secure_log_entry the_entry); // IN
 
