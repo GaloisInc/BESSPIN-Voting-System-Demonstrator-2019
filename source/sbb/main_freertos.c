@@ -52,6 +52,7 @@
 /* Smart Ballot Box includes */
 #include "sbb.h"
 #include "sbb_freertos.h"
+#include "../logging/debug_io.h"
 
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented
 within this file.  See https://www.freertos.org/a00016.html */
@@ -243,6 +244,7 @@ static void prvBallotBoxMainTask(void *pvParameters)
 {
 	(void)pvParameters;
 	printf("Starting prvBallotBoxMainTask\r\n");
+	debug_printf("DEBUG DEBUG DEBUG DEBUG!\r\n");
 
 	ballot_box_main_loop();
 }
@@ -272,7 +274,8 @@ static void prvBarcodeScannerTask(void *pvParameters)
 			}
 			printf("\r\n");
 			/* We have a barcode, send it over stream buffer and fire the event */
-			configASSERT( xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS ) == idx);
+			//configASSERT( xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS ) == idx);
+			xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS );
 			/* Broadcast the event */
 			xEventGroupSetBits( xSBBEventGroup, ebBARCODE_SCANNED );
 			/* reset state */

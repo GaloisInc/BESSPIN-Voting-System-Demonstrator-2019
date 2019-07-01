@@ -122,6 +122,26 @@ void update_barcode_state( bool barcode_scanned ) {
   }
 }
 
+// this is a workaround for multiple barcodes being "queued"
+void flush_barcodes() {
+    while (the_state.BS == BARCODE_PRESENT_AND_RECORDED) {
+        the_state.BS = BARCODE_NOT_PRESENT;
+        update_sensor_state();
+    }
+}
+
+// this is a workaround for not having a state where a ballot
+// has been spit out but not removed
+void await_ballot_removal() {
+    // wait for ballot to be removed - this should probably be its own state...
+    display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+    while (!ballot_spoiled()) {
+      update_sensor_state();
+    }
+}
+
+// This refines the internal paper ASM event
+//@ assigns \nothing;
 EventBits_t next_paper_event_bits(void) {
   switch ( the_state.P ) {
   case NO_PAPER_DETECTED:
@@ -212,8 +232,10 @@ void update_sensor_state(void) {
   /* "Run" the internal paper ASM transition */
   update_paper_state( (ux_Returned & ebPAPER_SENSOR_IN_PRESSED),
                       (ux_Returned & ebPAPER_SENSOR_IN_RELEASED),
-                      (ux_Returned & ebPAPER_SENSOR_OUT_PRESSED),
-                      (ux_Returned & ebPAPER_SENSOR_OUT_RELEASED) );
+                      0, 0);
+                      // there is no out sensor anymore
+                      //(ux_Returned & ebPAPER_SENSOR_OUT_PRESSED),
+                      //(ux_Returned & ebPAPER_SENSOR_OUT_RELEASED) );
 
   /* "Run" the internal button ASM transition */
   update_button_state( (ux_Returned & ebCAST_BUTTON_PRESSED),
@@ -229,8 +251,15 @@ void update_sensor_state(void) {
 // turned off.
 void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
-
+  the_state.L = INITIALIZE;
+  logic_state old = 0;
+  
   for(;;) {
+    if (the_state.L != old) {
+        debug_printf("logic state changed to %d", the_state.L);
+        old = the_state.L;
+    }
+    
     switch ( the_state.L ) {
 
     case INITIALIZE:
@@ -280,6 +309,7 @@ void ballot_box_main_loop(void) {
       what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
       if ( is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH) ) {
         // Prompt the user for a decision
+        debug_printf("valid barcode detected");
         cast_button_light_on();
         spoil_button_light_on();
         cast_or_spoil_timeout_reset();
@@ -290,6 +320,7 @@ void ballot_box_main_loop(void) {
         // Go to the waiting state
         CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
       } else {
+        debug_printf("invalid barcode detected");
         display_this_text(invalid_barcode_text,
                           strlen(invalid_barcode_text));
         CHANGE_STATE(the_state, L, ERROR);
@@ -313,6 +344,7 @@ void ballot_box_main_loop(void) {
                         strlen(casting_ballot_text));
       cast_ballot();
       CHANGE_STATE(the_state, L, STANDBY);
+      flush_barcodes();
       break;
 
     case SPOIL:
@@ -321,17 +353,24 @@ void ballot_box_main_loop(void) {
       display_this_text(spoiling_ballot_text,
                         strlen(spoiling_ballot_text));
       spoil_ballot();
-      display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+      await_ballot_removal();
       CHANGE_STATE(the_state, L, STANDBY);
+      flush_barcodes();
       break;
 
     case ERROR:
-      // abakst I think this needs a timeout & then head to an abort state?
-      if ( ballot_inserted() || ballot_detected() ) {
-        move_motor_back();
+     // abakst I think this needs a timeout & then head to an abort state?
+      if ( true /* ballot_inserted() || ballot_detected() */ ) {
+        spoil_ballot(); // unconditionally eject a ballot in the error state
+        await_ballot_removal();
+        CHANGE_STATE(the_state, L, STANDBY);
+        flush_barcodes();
+        // the above is a temporary workaround
       } else {
         stop_motor();
+        await_ballot_removal();
         CHANGE_STATE(the_state, L, STANDBY);
+        flush_barcodes();
       }
       break;
 
