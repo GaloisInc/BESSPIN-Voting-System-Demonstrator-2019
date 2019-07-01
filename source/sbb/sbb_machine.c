@@ -130,16 +130,6 @@ void flush_barcodes() {
     }
 }
 
-// this is a workaround for not having a state where a ballot
-// has been spit out but not removed
-void await_ballot_removal() {
-    // wait for ballot to be removed - this should probably be its own state...
-    display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-    while (!ballot_spoiled()) {
-        update_sensor_state();
-    }
-}
-
 // This refines the internal paper ASM event
 //@ assigns \nothing;
 EventBits_t next_paper_event_bits(void) {
@@ -275,6 +265,7 @@ void ballot_box_main_loop(void) {
 
         case STANDBY:
             go_to_standby();
+            flush_barcodes();
             CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
             break;
 
@@ -286,7 +277,6 @@ void ballot_box_main_loop(void) {
             }
             break;
 
-            // Requires: motor is running forward
         case FEED_BALLOT:
             // The next guard is the transition out of
             // this state: either we have a ballot with a barcode
@@ -297,7 +287,7 @@ void ballot_box_main_loop(void) {
                     CHANGE_STATE(the_state, L, BARCODE_DETECTED);
                 } else {
                     display_this_text(no_barcode_text, strlen(no_barcode_text));
-                    CHANGE_STATE(the_state, L, ERROR);
+                    CHANGE_STATE(the_state, L, EJECT);
                 }
             }
             break;
@@ -323,7 +313,7 @@ void ballot_box_main_loop(void) {
                 debug_printf("invalid barcode detected");
                 display_this_text(invalid_barcode_text,
                                   strlen(invalid_barcode_text));
-                CHANGE_STATE(the_state, L, ERROR);
+                CHANGE_STATE(the_state, L, EJECT);
             }
             break;
 
@@ -331,7 +321,7 @@ void ballot_box_main_loop(void) {
             if ( cast_or_spoil_timeout_expired() ) {
                 spoil_button_light_off();
                 cast_button_light_off();
-                CHANGE_STATE(the_state, L, ERROR);
+                CHANGE_STATE(the_state, L, EJECT);
             } else if ( is_cast_button_pressed() ) {
                 CHANGE_STATE(the_state, L, CAST);
             } else if ( is_spoil_button_pressed() ) {
@@ -344,33 +334,22 @@ void ballot_box_main_loop(void) {
                               strlen(casting_ballot_text));
             cast_ballot();
             CHANGE_STATE(the_state, L, STANDBY);
-            flush_barcodes();
             break;
 
         case SPOIL:
-            spoil_button_light_off();
-            cast_button_light_off();
-            display_this_text(spoiling_ballot_text,
-                              strlen(spoiling_ballot_text));
             spoil_ballot();
-            await_ballot_removal();
-            CHANGE_STATE(the_state, L, STANDBY);
-            flush_barcodes();
+            CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
             break;
 
-        case ERROR:
-            // abakst I think this needs a timeout & then head to an abort state?
-            if ( true /* ballot_inserted() || ballot_detected() */ ) {
-                spoil_ballot(); // unconditionally eject a ballot in the error state
-                await_ballot_removal();
+        case EJECT:
+            eject_ballot();
+            CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
+            break;
+
+        case AWAIT_REMOVAL:
+            display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+            if ( !ballot_detected() ) {
                 CHANGE_STATE(the_state, L, STANDBY);
-                flush_barcodes();
-                // the above is a temporary workaround
-            } else {
-                stop_motor();
-                await_ballot_removal();
-                CHANGE_STATE(the_state, L, STANDBY);
-                flush_barcodes();
             }
             break;
 
