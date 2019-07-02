@@ -9,7 +9,6 @@ int main()
     unsigned char dst[46];
     unsigned char from_encoded_dst[33];
     unsigned char src_encoded[45]="ZGVwZW5kaW5nb253aGV0aGVydGhlb2JqZWN0cG9pbnQ=";
-    unsigned char src_str[33];
     size_t olen;
     size_t olen1;
     int r;
@@ -28,8 +27,7 @@ int main()
     printf("required decoder dlen=%zu\n", olen1);
 
     r = mbedtls_base64_decode (from_encoded_dst,32, &olen1, src_encoded, 44);
-    memcpy(src_str, from_encoded_dst, 32);
-    printf("Decoded: %s\n", src_str);
+
     printf("actual decode olen=%zu\n", olen);
     printf("r=%d\n", r);
     if ( r == 0) {
