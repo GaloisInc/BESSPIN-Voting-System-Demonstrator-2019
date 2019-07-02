@@ -20,6 +20,7 @@
  */
 
 #include "base64.h"
+#include <assert.h>
 
 size_t len;
 
@@ -59,6 +60,10 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
     size_t i, n;
     int C1, C2, C3;
     unsigned char *p;
+
+    /* Precondition check, but allow for special case where dlen == 0 */
+    assert (dlen == 0 ||
+            dlen == (((slen % 3) == 0) ? (4 * (slen / 3)) : (4 * ((slen / 3) + 1))) + 2);
 
     if( slen == 0 )
     {
@@ -113,6 +118,9 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
 
     *olen = p - dst;
     *p = 0;
+
+    /* Postcondition check */
+    assert (*olen == (dlen - 2));
 
     return( 0 );
 }
@@ -185,6 +193,10 @@ int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
         return( MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL );
     }
 
+    /* Precondition check. Case where dlen == 0 has already been dealt with above */
+    assert ((slen % 4) == 0);
+    assert (dlen == (3 * (slen / 4)));
+
    for( j = 3, n = x = 0, p = dst; i > 0; i--, src++ )
    {
         if( *src == '\r' || *src == '\n' || *src == ' ' )
@@ -203,6 +215,10 @@ int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
     }
 
     *olen = p - dst;
+
+    /* Postcondition check */
+    assert (*olen <= dlen);
+    assert (*olen >= (dlen - 2));
 
     return( 0 );
 }
