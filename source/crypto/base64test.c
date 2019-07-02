@@ -26,9 +26,9 @@ int main()
     r = mbedtls_base64_decode (NULL,0, &olen1, src_encoded, 44);
     printf("required decoder dlen=%zu\n", olen1);
 
-    r = mbedtls_base64_decode (from_encoded_dst,33, &olen1, src_encoded, 44);
+    r = mbedtls_base64_decode (from_encoded_dst, 33, &olen1, src_encoded, 44);
 
-    printf("actual decode olen=%zu\n", olen);
+    printf("actual decode olen=%zu\n", olen1);
     printf("r=%d\n", r);
     if ( r == 0) {
         printf("%s\n", "Success!");
