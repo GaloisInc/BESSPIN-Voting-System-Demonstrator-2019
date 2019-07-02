@@ -81,12 +81,12 @@ void display_this_text(const char *the_text, uint8_t its_length) {
     //@ assert false;
 }
 
-void display_this_2_line_text(const char *line_1, uint8_t length_1, 
+void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2) {
     assert(false);
     //@ assert false;
 }
-                              
+
 bool ballot_detected(void) {
     assert(false);
     //@ assert false;
