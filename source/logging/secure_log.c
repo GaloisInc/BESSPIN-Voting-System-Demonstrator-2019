@@ -9,6 +9,7 @@
 #include "secure_log.h"
 #include "../crypto/crypto.h"
 #include "../crypto/base64.h"
+#include <assert.h>
 
 // Local constants
 
@@ -61,6 +62,8 @@ void create_secure_log(Log_Handle *secure_log,
 {
     Log_FS_Result create_result, write_result, sync_result;
     secure_log_entry initial_entry;
+    size_t olen;
+    int r;
 
     // Initial/Draft pseudo-code by RCC
 
@@ -69,6 +72,13 @@ void create_secure_log(Log_Handle *secure_log,
 
     // 2. call initial_log_entry above to create the first block
     initial_entry = initial_log_entry(test_key, a_log_entry_type);
+
+    // dragan added 
+    for (size_t i = AES_BLOCK_LENGTH_BYTES; i < SHA256_DIGEST_LENGTH_BYTES; i++)
+    {
+        initial_entry.the_digest[i] = 0x00;
+    }
+
 
     // 2.1 @dragan keep the first hash
     /*@
@@ -81,13 +91,19 @@ void create_secure_log(Log_Handle *secure_log,
     {
         secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
-
-    /*dragan added create base64_secure_log_entry*/
-    base64_secure_log_entry base_64_current_entry;
-    size_t len = *obtain_encode_buffer_size(&initial_entry.the_digest[0]);
-    encode(&initial_entry.the_digest[0], &base_64_current_entry.the_digest[0], len);
-    
   
+    base64_secure_log_entry base_64_current_entry;
+    r = mbedtls_base64_encode (&base_64_current_entry.the_digest[0], 
+      SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen, &initial_entry.the_digest[0], 
+      AES256_KEY_LENGTH_BYTES);
+    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
+  
+   /*@
+      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == initial_entry.the_entry[i];
+      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+      loop variant LOG_ENTRY_LENGTH - i;
+  */
     for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
     {
         base_64_current_entry.the_entry[i] = initial_entry.the_entry[i];
@@ -120,6 +136,8 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
     sha256_digest new_hash;
     uint8_t msg[SECURE_LOG_ENTRY_LENGTH]; // appended message
     size_t index = 0;
+    size_t olen;
+    int r;
 
     // 0. Assume a_log_entry is already padded with zeroes
 
@@ -185,11 +203,17 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
         the_secure_log->previous_hash[i] = new_hash[i];
     }
 
-    /*dragan added create base64_secure_log_entry*/
     base64_secure_log_entry base_64_current_entry;
-    size_t len = *obtain_encode_buffer_size(&current_entry.the_digest[0]);
-    encode(&current_entry.the_digest[0], &base_64_current_entry.the_digest[0], len);
-    
+    r = mbedtls_base64_encode (&base_64_current_entry.the_digest[0], 
+      SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen, &current_entry.the_digest[0], 
+      AES256_KEY_LENGTH_BYTES);
+    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
+    /*@
+      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == current_entry.the_entry[i];
+      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+      loop variant LOG_ENTRY_LENGTH - i;
+  */
     for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
     {
         base_64_current_entry.the_entry[i] = current_entry.the_entry[i];
