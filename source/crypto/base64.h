@@ -52,6 +52,14 @@
  * \note           Call this function with dlen = 0 to obtain the
  *                 required buffer size in *olen
  */
+/*@ requires \valid_read (src + (0 .. slen - 1));
+  @ requires \valid (dst + (0 .. dlen - 1));
+  @ requires \separated (dst, src, olen, slen);
+  @ requires dlen == (((slen % 3) == 0) ? (4 * (slen / 3)) : (4 * ((slen / 3) + 1))) + 2;
+  @ assigns dst[0 .. dlen - 1];
+  @ assigns *olen;
+  @ ensures *olen == dlen - 2;
+*/
 int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
                    const unsigned char *src, size_t slen );
 
@@ -75,15 +83,5 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
 /*dragan contract missing*/
 int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
                    const unsigned char *src, size_t slen );
-
-
-size_t * obtain_encode_buffer_size( unsigned char * src_string);
-
-size_t * obtain_decode_buffer_size( unsigned char * src_string);
-
-void decode( unsigned char * src_string, unsigned char * dst_string);
-
-void encode( unsigned char * src_string, unsigned char * dst_string, int dst_buf_size);
-
 
 #endif /* base64.h */
