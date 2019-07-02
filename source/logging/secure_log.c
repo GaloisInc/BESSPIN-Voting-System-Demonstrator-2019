@@ -8,7 +8,6 @@
 // Subsystem includes
 #include "secure_log.h"
 #include "../crypto/crypto.h"
-#include "../crypto/base64.h"
 #include <assert.h>
 
 // Local constants
@@ -311,7 +310,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
     if (valid_first_entry(the_secure_log))
     {
         size_t num_entries;
-        num_entries = Log_IO_Num_Entries(the_secure_log);
+        num_entries = Log_IO_Num_Base64_Entries(the_secure_log);
         switch (num_entries)
         {
         case 0:
@@ -326,7 +325,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
 
         default:
             // Fetch the root entry and keep a copy of it Hash in prev_hash
-            root_entry = Log_IO_Read_Entry(the_secure_log, 0);
+            root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
 
             // whole array assignment  prev_hash = root_entry.the_digest;
             memcpy(&prev_hash[0], &root_entry.the_digest[0],
@@ -342,7 +341,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
             {
                 // In the file, entries are numbered starting at 0, so we want the
                 // (i - 1)'th entry...
-                this_entry = Log_IO_Read_Entry(the_secure_log, (i - 1));
+                this_entry = Log_IO_Read_Base64_Entry(the_secure_log, (i - 1));
 
                 if (valid_log_entry(this_entry, prev_hash))
                 {

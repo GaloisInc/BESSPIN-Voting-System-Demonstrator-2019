@@ -21,7 +21,7 @@ int main(void)
 
     Log_IO_Open_Read(&r_log, "test5log.txt");
 
-    secure_log_entry _secure_log_entry = Log_IO_Read_Entry(&r_log, 0);
+    secure_log_entry _secure_log_entry = Log_IO_Read_Base64_Entry(&r_log, 0);
     uint8_t index = 0;
     // check digest
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
@@ -55,7 +55,7 @@ int main(void)
     index = 0;
 
     index = 0;
-    secure_log_entry _secure_log_entry1 = Log_IO_Read_Entry(&r_log, 1);
+    secure_log_entry _secure_log_entry1 = Log_IO_Read_Base64_Entry(&r_log, 1);
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
         if (_secure_log_entry1.the_digest[i] == (uint8_t)(255 - i))

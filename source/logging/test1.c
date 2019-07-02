@@ -10,7 +10,7 @@ int main(void)
 
     create_log(&my_log, "test1log.txt");
 
-    num = Log_IO_Num_Entries(&my_log);
+    num = Log_IO_Num_Base64_Entries(&my_log);
 
     printf("Num entries in the files is %d\n", (int)num);
 

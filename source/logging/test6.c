@@ -37,7 +37,7 @@ int main(void)
 
     Log_IO_Open_Read(&r_log_first, "test61log.txt");
 
-    if (Log_IO_Num_Entries(&r_log_first) == 2)
+    if (Log_IO_Num_Base64_Entries(&r_log_first) == 2)
     {
         printf("number of entries=%d - test passed successfully!\n", 2);
     }
@@ -49,7 +49,7 @@ int main(void)
 
     Log_IO_Open_Read(&r_log_second, "test62log.txt");
 
-    if (Log_IO_Num_Entries(&r_log_second) == 2)
+    if (Log_IO_Num_Base64_Entries(&r_log_second) == 2)
     {
         printf("number of entries=%d - test passed successfully!\n", 2);
     }

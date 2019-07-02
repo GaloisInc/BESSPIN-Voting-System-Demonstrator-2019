@@ -244,7 +244,7 @@ size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
     }
 }
 
-base64_secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
+secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
 {
     // If a log has N log entries, they are numbered 0 .. (N - 1), so
     // we need to ask for the (N - 1)'th
@@ -259,11 +259,11 @@ base64_secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
     }
     else
     {
-        return null_base64_secure_log_entry;
+        return null_secure_log_entry;
     }
 }
 
-base64_secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
+secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                    size_t n)           // IN
 {
     FRESULT res1;
@@ -271,6 +271,9 @@ base64_secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     size_t byte_offset_of_entry_n;
     static const char *space;
     static const char *new_line;
+    secure_log_entry secure_log_entry_result;
+    size_t olen;
+    int r;
 
     // Entry 0 is at byte offset 0, so...
     byte_offset_of_entry_n = n * size_of_one_base64_block_log_entry;
@@ -306,16 +309,32 @@ base64_secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
             bytes_sha_digest == SHA256_DIGEST_LENGTH_BYTES &&
             space_length == 1 && new_line_char_length == 1)
         {
-            return result;
+            // decode, create secure log entry  and return
+            r = mbedtls_base64_decode (&secure_log_entry_result.the_digest[0], 
+                SHA256_DIGEST_LENGTH_BYTES + 1 , 
+                &olen, &result.the_digest[0], 
+                SHA256_BASE_64_DIGEST_LENGTH_BYTES);
+
+            /*@
+              loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+              loop invariant \forall size_t j; 0 <= j < i ==> secure_log_entry_result.the_entry[i] == result.the_entry[i];
+              loop assigns i, secure_log_entry_result.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+              loop variant LOG_ENTRY_LENGTH - i;
+           */
+            for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+            {
+                secure_log_entry_result.the_entry[i] = result.the_entry[i];
+            }
+            return secure_log_entry_result;
         }
         else
         {
-            return null_base64_secure_log_entry;
+            return null_secure_log_entry;
         }
     }
     else
     {
-        return null_base64_secure_log_entry;
+        return null_secure_log_entry;
     }
 }
 
@@ -562,11 +581,14 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     }
 }
 
-base64_secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
+secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                    size_t n)           // IN
 {
     static const char *space;
     static const char *new_line;
+    secure_log_entry secure_log_entry_result;
+    size_t olen;
+    int r;
 
     fseek(&stream->the_file, 0, SEEK_SET);
     off_t original_offset;
@@ -594,9 +616,25 @@ base64_secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
         ret_digest == SHA256_BASE_64_DIGEST_LENGTH_BYTES &&
         ret_space == 1 && ret_new_line == 1)
     {
-        return result;
+        // decode, create secure_log_entry and return
+        r = mbedtls_base64_decode (&secure_log_entry_result.the_digest[0], 
+            SHA256_DIGEST_LENGTH_BYTES + 1 , 
+            &olen, &result.the_digest[0], 
+            SHA256_BASE_64_DIGEST_LENGTH_BYTES);
+
+        /*@
+          loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+          loop invariant \forall size_t j; 0 <= j < i ==> secure_log_entry_result.the_entry[i] == result.the_entry[i];
+          loop assigns i, secure_log_entry_result.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+          loop variant LOG_ENTRY_LENGTH - i;
+       */
+        for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+        {
+            secure_log_entry_result.the_entry[i] = result.the_entry[i];
+        }
+        return secure_log_entry_result;
     }
-    return null_base64_secure_log_entry;
+    return null_secure_log_entry;
 }
 
 size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
@@ -608,7 +646,7 @@ size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
     return N;
 }
 
-base64_secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
+secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
 {
     size_t N;
     N = Log_IO_Num_Base64_Entries(stream);
@@ -620,7 +658,7 @@ base64_secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
     }
     else
     {
-        return null_base64_secure_log_entry;
+        return null_secure_log_entry;
     }
 }
 

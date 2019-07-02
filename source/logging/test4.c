@@ -21,7 +21,7 @@ int main(void)
 
     Log_IO_Open_Read(&r_log, "test4log.txt");
 
-    if (Log_IO_Num_Entries(&r_log) == 2)
+    if (Log_IO_Num_Base64_Entries(&r_log) == 2)
     {
         printf("number of entries=%d - test passed successfully!\n", 2);
     }

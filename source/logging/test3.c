@@ -27,7 +27,7 @@ int main(void)
     write_entry(&my_log, second_entry);
     write_entry(&my_log, third_entry);
 
-    num = Log_IO_Num_Entries(&my_log);
+    num = Log_IO_Num_Base64_Entries(&my_log);
 
     printf("Num entries in the files is %d\n", (int)num);
 

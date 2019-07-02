@@ -2,6 +2,7 @@
 #define __SECURE_LOG_T__
 
 #include "../crypto/crypto_t.h"
+#include "../crypto/base64.h"
 #include "log_t.h"
 #define SECURE_LOG_ENTRY_LENGTH (LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES)
 
