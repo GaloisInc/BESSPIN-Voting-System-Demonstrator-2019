@@ -57,7 +57,7 @@ typedef enum { INITIALIZE = BARCODE_PRESENT_AND_RECORDED+1,
                SPOIL,
                ERROR,
                ABORT,
-             } logic_state;
+} logic_state;
 // @design kiniry START and STOP are the top-level (superposed) start
 // and stop state for all ASMs.
 typedef enum { START = ERROR+1,
@@ -67,29 +67,29 @@ typedef enum { START = ERROR+1,
 // @design kiniry The following defines all events that can trigger an
 // ASM state change in the SBB.
 typedef enum { //motor_ASM
-               MOTOR_OFF_E = STOP+1,
-               MOTOR_FORWARD_E,
-               MOTOR_BACKWARD_E,
-               //sd_card_ASM
-               CARD_PRESENT_E,
-               ERASE_CARD_E,
-               //barcode_ASM
-               INTERNAL_BARCODE_E,
-               //display_ASM
-               INTERNAL_DISPLAY_E,
-               DISPLAY_TEXT_E,
-               //paper_detect_ASM
-               INTERNAL_PAPER_DETECT_E,
-               //cast_spoil_ASM
-               SPOIL_E,
-               CAST_E,
-               INTERNAL_CAST_SPOIL_E,
-               //timer_ASM
-               INTERNAL_TIMER_E,
-               TIMER_TICK_UNDER_E,
-               TIMER_TICK_OVER_E,
-               RESET_TIMER_E,
-             } SBB_event;
+              MOTOR_OFF_E = STOP+1,
+              MOTOR_FORWARD_E,
+              MOTOR_BACKWARD_E,
+              //sd_card_ASM
+              CARD_PRESENT_E,
+              ERASE_CARD_E,
+              //barcode_ASM
+              INTERNAL_BARCODE_E,
+              //display_ASM
+              INTERNAL_DISPLAY_E,
+              DISPLAY_TEXT_E,
+              //paper_detect_ASM
+              INTERNAL_PAPER_DETECT_E,
+              //cast_spoil_ASM
+              SPOIL_E,
+              CAST_E,
+              INTERNAL_CAST_SPOIL_E,
+              //timer_ASM
+              INTERNAL_TIMER_E,
+              TIMER_TICK_UNDER_E,
+              TIMER_TICK_OVER_E,
+              RESET_TIMER_E,
+} SBB_event;
 
 // @design kiniry This is the record type that encodes the full
 // top-level set of states for the SBB.  Note that a C record type for
@@ -100,19 +100,19 @@ typedef enum { //motor_ASM
 // variables.  If we did have model variables, we would only have a
 // concrete instance of this type for the SBB hardware emulator build.
 typedef struct SBB_states {
-  sd_card_state C;
-  timer_state T;
-  motor_state M;
-  display_state D;
-  paper_detect_state P;
-  buttons_state B;
-  barcode_scanner_state BS;
-  start_stop_state S;
-  logic_state L;
-  // @design kiniry We encode button illumination state with a 2 bit
-  // wide struct bitfield.  This encoding will help test our clang and
-  // secure complication of such an out-of-the-ordinary C construct.
-  uint8_t button_illumination: 2;
+    sd_card_state C;
+    timer_state T;
+    motor_state M;
+    display_state D;
+    paper_detect_state P;
+    buttons_state B;
+    barcode_scanner_state BS;
+    start_stop_state S;
+    logic_state L;
+    // @design kiniry We encode button illumination state with a 2 bit
+    // wide struct bitfield.  This encoding will help test our clang and
+    // secure complication of such an out-of-the-ordinary C construct.
+    uint8_t button_illumination: 2;
 } SBB_state;
 
 #define cast_button_lit(s) (s.button_illumination & 0x0)

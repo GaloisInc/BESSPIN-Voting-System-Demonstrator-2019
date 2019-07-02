@@ -40,8 +40,8 @@ void load_or_create_logs(void);
 void log_system_message(const log_entry new_entry);
 
 #define CHANGE_STATE(_state, _field, _new_state)                        \
-  do { _state._field = _new_state;                                      \
-       const log_entry state_change_entry = "State change: " #_field " := " #_new_state; \
-       debug_printf(state_change_entry); \
-       log_system_message(state_change_entry); } while (0)
+    do { _state._field = _new_state;                                    \
+         const log_entry state_change_entry = "State change: " #_field " := " #_new_state; \
+         debug_printf(state_change_entry);                               \
+         log_system_message(state_change_entry); } while (0)
 #endif
