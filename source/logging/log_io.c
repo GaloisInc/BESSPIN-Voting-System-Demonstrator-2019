@@ -5,7 +5,7 @@ const secure_log_entry null_secure_log_entry = {{0}, {0}};
 const size_t size_of_one_log_entry =
     LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES;
 
-/*dragan added*/ 
+/*dragan added*/
 const base64_secure_log_entry null_base64_secure_log_entry = {{0}, {0}};
 const size_t size_of_one_base64_block_log_entry = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
 
@@ -326,7 +326,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,         // IN
     static const char new_line ='\n';
 
     FRESULT write_entry_status, write_digest_status;
-    
+
     UINT bytes_written1, bytes_written2, space_written, new_line_char_written;
     write_entry_status = f_write(&stream->the_file, &the_entry.the_entry[0], LOG_ENTRY_LENGTH,
                    &bytes_written1);
@@ -338,8 +338,8 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,         // IN
 
     new_line_char_written = f_putc(new_line, &stream->the_file);
 
-    if (write_entry_status == FR_OK && 
-        write_digest_status == FR_OK && 
+    if (write_entry_status == FR_OK &&
+        write_digest_status == FR_OK &&
         space_written == 1 && new_line_char_written == 1 &&
         bytes_written1 == LOG_ENTRY_LENGTH &&
         bytes_written2 == SHA256_DIGEST_LENGTH_BYTES)
@@ -350,7 +350,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,         // IN
     {
         return LOG_FS_ERROR;
     }
-} 
+}
 #else
 
 ////////////////////////////////////////////
@@ -526,9 +526,9 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream)
         return null_secure_log_entry;
     }
 }
-/*dragan added*/ 
+/*dragan added*/
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
-                                 base64_secure_log_entry the_entry) 
+                                 base64_secure_log_entry the_entry)
 {
     static const char space =' ';
     static const char new_line ='\n';
@@ -539,14 +539,16 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
         fwrite(&the_entry.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
 
     printf("Going for the space write\n");
-    written += fputc(space, &stream->the_file);
-    
+    fputc(space, &stream->the_file);
+    written++;
+
     printf("Going for the second write\n");
     written += fwrite(&the_entry.the_digest[0], 1, SHA256_BASE_64_DIGEST_LENGTH_BYTES,
                       &stream->the_file);
 
     printf("Going for the new line write\n");
-     written += fputc(new_line, &stream->the_file);
+    fputc(new_line, &stream->the_file);
+    written++;
 
     printf("Bytes written is %zu\n", written);
 
@@ -572,9 +574,9 @@ base64_secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     byte_offset_of_entry_n = n * size_of_one_base64_block_log_entry;
     original_offset = ftell(&stream->the_file);
     fseek(&stream->the_file, byte_offset_of_entry_n, SEEK_CUR);
-    
+
     base64_secure_log_entry result;
-    
+
     size_t ret_entry =
         fread(&result.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
 
@@ -582,14 +584,14 @@ base64_secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
 
     size_t ret_digest = fread(&result.the_digest[0], 1,
                               SHA256_BASE_64_DIGEST_LENGTH_BYTES, &stream->the_file);
-    
+
     size_t ret_new_line = fread((char*)new_line, 1, 1, &stream->the_file);
 
     // Restore the original offset
     fseek(&stream->the_file, original_offset, SEEK_SET);
-    
+
     if (ret_entry == LOG_ENTRY_LENGTH &&
-        ret_digest == SHA256_BASE_64_DIGEST_LENGTH_BYTES && 
+        ret_digest == SHA256_BASE_64_DIGEST_LENGTH_BYTES &&
         ret_space == 1 && ret_new_line == 1)
     {
         return result;
