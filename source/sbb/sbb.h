@@ -195,7 +195,7 @@ void display_this_text(const char* the_text, uint8_t its_length);
   @ ensures the_state.D == SHOWING_TEXT;
   @ ensures ASM_transition(\old(the_state), DISPLAY_TEXT_E, the_state);
 */
-void display_this_2_line_text(const char *line_1, uint8_t length_1, 
+void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2);
 
 /*@ assigns \nothing;

@@ -66,7 +66,7 @@ void update_paper_state(bool paper_in_pressed,
     if ( paper_in_released && paper_out_released ) {
       // see todo above
       CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
-    } else if ( paper_in_released ) { 
+    } else if ( paper_in_released ) {
       CHANGE_STATE(the_state, P, LATE_PAPER_DETECTED);
     } else if ( paper_out_released ) {
       CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
@@ -217,7 +217,7 @@ void update_sensor_state(void) {
   waitEvents |= next_button_event_bits();
   waitEvents |= next_barcode_event_bits();
   if ( waitEvents == 0 ) {
-	  return;
+    return;
   }
 
   // @todo the demo has a timeout of 100msec when waiting for a barcode..does that matter?
@@ -226,7 +226,7 @@ void update_sensor_state(void) {
                                                   waitEvents,
                                                   pdTRUE,  /* Clear events on return        */
                                                   pdFALSE, /* Wait for *any* event, not all */
-                                                  pdMS_TO_TICKS(100) ); 
+                                                  pdMS_TO_TICKS(100) );
   log_event_group_result(ux_Returned);
 
   /* "Run" the internal paper ASM transition */
@@ -253,13 +253,13 @@ void ballot_box_main_loop(void) {
   char this_barcode[BARCODE_MAX_LENGTH] = {0};
   the_state.L = INITIALIZE;
   logic_state old = 0;
-  
+
   for(;;) {
     if (the_state.L != old) {
         debug_printf("logic state changed to %d", the_state.L);
         old = the_state.L;
     }
-    
+
     switch ( the_state.L ) {
 
     case INITIALIZE:
@@ -384,4 +384,3 @@ void ballot_box_main_loop(void) {
     update_sensor_state();
   }
 }
-
