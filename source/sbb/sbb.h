@@ -209,6 +209,12 @@ bool ballot_detected(void);
 */
 bool ballot_inserted(void);
 
+/*@ requires (the_state.M == MOTORS_OFF);
+  @ assigns the_state.M;
+  @ ensures the_state == \old(the_state);
+*/
+void eject_ballot(void);
+
 /*@ requires spoil_button_lit(the_state);
   @ requires the_state.P == EARLY_AND_LATE_DETECTED;
   @ assigns the_state.button_illumination,

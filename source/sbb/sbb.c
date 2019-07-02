@@ -170,7 +170,7 @@ bool ballot_inserted(void) {
     return (the_state.P == EARLY_AND_LATE_DETECTED);
 }
 
-void spoil_ballot(void) {
+void eject_ballot(void) {
     move_motor_back();
     // run the motor for a bit to get the paper back over the switch
     TickType_t spoil_timeout =
@@ -180,6 +180,14 @@ void spoil_ballot(void) {
     }
 
     stop_motor();
+}
+
+void spoil_ballot(void) {
+    spoil_button_light_off();
+    cast_button_light_off();
+    display_this_text(spoiling_ballot_text,
+                      strlen(spoiling_ballot_text));
+    eject_ballot();
 }
 
 void cast_ballot(void) {
