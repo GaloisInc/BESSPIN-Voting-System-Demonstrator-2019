@@ -468,14 +468,10 @@ Log_FS_Result Log_IO_Write_Entry(Log_Handle *stream,         // IN
 {
     size_t written;
 
-    printf("Going for the first write\n");
     written =
         fwrite(&the_entry.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
-    printf("Going for the second write\n");
     written += fwrite(&the_entry.the_digest[0], 1, SHA256_DIGEST_LENGTH_BYTES,
                       &stream->the_file);
-
-    printf("Bytes written is %zu\n", written);
 
     if (written == (LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES))
     {
@@ -556,23 +552,17 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     static const char new_line = '\n';
     size_t written;
 
-    printf("Going for the first write\n");
     written =
         fwrite(&the_entry.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
 
-    printf("Going for the space write\n");
     fputc(space, &stream->the_file);
     written++;
 
-    printf("Going for the second write\n");
     written += fwrite(&the_entry.the_digest[0], 1,
                       SHA256_BASE_64_DIGEST_LENGTH_BYTES, &stream->the_file);
 
-    printf("Going for the new line write\n");
     fputc(new_line, &stream->the_file);
     written++;
-
-    printf("Bytes written is %zu\n", written);
 
     if (written == (BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH))
     {
