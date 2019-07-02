@@ -36,6 +36,8 @@ static secure_log_entry initial_log_entry(const aes256_key key, // IN
     // done by the caller.
 
     // 2. Form "aes_cbc_mac msg"
+    // The MAC occupies the first 16 bytes of initial_entry.the_digest, while
+    // the remaining bytes are all 0x00 as initialized above.
     aes_cbc_mac((message)msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0]);
 
     // 3. Copy the msg data
@@ -73,13 +75,6 @@ void create_secure_log(Log_Handle *secure_log,
     // 2. call initial_log_entry above to create the first block
     initial_entry = initial_log_entry(test_key, a_log_entry_type);
 
-    // dragan added 
-    for (size_t i = AES_BLOCK_LENGTH_BYTES; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-    {
-        initial_entry.the_digest[i] = 0x00;
-    }
-
-
     // 2.1 @dragan keep the first hash
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
@@ -91,13 +86,13 @@ void create_secure_log(Log_Handle *secure_log,
     {
         secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
-  
+
     base64_secure_log_entry base_64_current_entry;
-    r = mbedtls_base64_encode (&base_64_current_entry.the_digest[0], 
-      SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen, &initial_entry.the_digest[0], 
-      AES256_KEY_LENGTH_BYTES);
+    r = mbedtls_base64_encode (&base_64_current_entry.the_digest[0],
+      SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen, &initial_entry.the_digest[0],
+      SHA256_DIGEST_LENGTH_BYTES);
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
-  
+
    /*@
       loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
       loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == initial_entry.the_entry[i];
@@ -204,9 +199,9 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
     }
 
     base64_secure_log_entry base_64_current_entry;
-    r = mbedtls_base64_encode (&base_64_current_entry.the_digest[0], 
-      SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen, &current_entry.the_digest[0], 
-      AES256_KEY_LENGTH_BYTES);
+    r = mbedtls_base64_encode (&base_64_current_entry.the_digest[0],
+      SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen, &current_entry.the_digest[0],
+      SHA256_DIGEST_LENGTH_BYTES);
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
     /*@
       loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
