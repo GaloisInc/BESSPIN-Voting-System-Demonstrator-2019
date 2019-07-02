@@ -301,6 +301,7 @@ static void prvBarcodeScannerTask(void *pvParameters)
 static void prvInputTask(void *pvParameters) {
     (void)pvParameters;
     EventBits_t uxReturned;
+    TickType_t paper_in_timestamp;
 
     printf("Starting prvInputTask\r\n");
 
@@ -332,13 +333,15 @@ static void prvInputTask(void *pvParameters) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
-            } else {
+                paper_in_timestamp = xTaskGetTickCount();
+                paper_sensor_in_input_last = paper_sensor_in_input;
+            } else if ( paper_in_timestamp + PAPER_SENSOR_DEBOUNCE < xTaskGetTickCount() ) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
+                paper_sensor_in_input_last = paper_sensor_in_input;
             }
             printf("uxReturned = 0x%lx\r\n",uxReturned);
-            paper_sensor_in_input_last = paper_sensor_in_input;
         }
 
         /* Paper sensor out */
