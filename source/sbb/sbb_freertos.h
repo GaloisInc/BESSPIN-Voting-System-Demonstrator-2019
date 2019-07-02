@@ -21,8 +21,8 @@ extern EventGroupHandle_t xSBBEventGroup;
 /* The number of bytes of storage in the stream buffers */
 #define sbSTREAM_BUFFER_LENGTH_BYTES	( ( size_t ) BARCODE_MAX_LENGTH )
 /* The trigger level sets the number of bytes that must be present in the
-stream buffer before a task that is blocked on the stream buffer is moved out of
-the Blocked state so it can read the bytes. */
+   stream buffer before a task that is blocked on the stream buffer is moved out of
+   the Blocked state so it can read the bytes. */
 #define sbTRIGGER_LEVEL_1			( 1 )
 /* How long we wait to send scanned barcode */
 #define SCANNER_BUFFER_TX_BLOCK_TIME_MS pdMS_TO_TICKS(5000)
@@ -42,14 +42,14 @@ the Blocked state so it can read the bytes. */
 #define ebSPOIL_BUTTON_RELEASED       ( 0x100 )
 #define ebALL_EVENTS                  ( 0x1FF )
 
-#define ebALL_PAPER_SENSOR_EVENTS     ( ebPAPER_SENSOR_IN_PRESSED   | \
-                                        ebPAPER_SENSOR_IN_RELEASED  | \
-                                        ebPAPER_SENSOR_OUT_RELEASED | \
+#define ebALL_PAPER_SENSOR_EVENTS     ( ebPAPER_SENSOR_IN_PRESSED   |   \
+                                        ebPAPER_SENSOR_IN_RELEASED  |   \
+                                        ebPAPER_SENSOR_OUT_RELEASED |   \
                                         ebPAPER_SENSOR_OUT_RELEASED   )
 
-#define ebALL_BUTTON_EVENTS ( ebCAST_BUTTON_RELEASED  | \
-                              ebCAST_BUTTON_PRESSED   | \
-                              ebSPOIL_BUTTON_RELEASED | \
+#define ebALL_BUTTON_EVENTS ( ebCAST_BUTTON_RELEASED  |   \
+                              ebCAST_BUTTON_PRESSED   |   \
+                              ebSPOIL_BUTTON_RELEASED |   \
                               ebSPOIL_BUTTON_PRESSED    )
 
 

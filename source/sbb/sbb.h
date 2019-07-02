@@ -84,7 +84,7 @@ void    gpio_clear(uint8_t i);
 // sound.
 
 /*@ assigns the_firmware_state;
-*/
+ */
 // @todo Should immediately transition to `go_to_standby()`.
 // @assurance kiniry The implementation of `initialize` must have a
 // the C label `DevicesInitialized` on its final statement.
@@ -171,8 +171,8 @@ void move_motor_forward(void);
 void move_motor_back(void);
 
 /*@ assigns the_state.M,
-            gpio_mem[MOTOR_0],
-            gpio_mem[MOTOR_1];
+  gpio_mem[MOTOR_0],
+  gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_OFF;
   @ ensures ASM_transition(\old(the_state), MOTOR_OFF_E, the_state);
 */
