@@ -10,14 +10,6 @@
 #
 #-----------------------------------------------------------------------------#
 before_script:
-    - which ssh-agent || ( apt-get update -y && apt-get install openssh-client git -y )
-    - eval $(ssh-agent -s)
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
-    - mkdir -p ~/.ssh
-    - chmod 700 ~/.ssh
-    - ssh-keyscan gitlab-ext.galois.com >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - export USER=gitlab-runner
     - git submodule init
     - git submodule update
 
