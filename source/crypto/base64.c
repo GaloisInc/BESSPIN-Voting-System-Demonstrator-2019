@@ -22,8 +22,6 @@
 #include "base64.h"
 #include <assert.h>
 
-size_t len;
-
 /* This table has been modified from the original for
    RFC 4648 "filename safe" encoding */
 static const unsigned char base64_enc_map[64] =
