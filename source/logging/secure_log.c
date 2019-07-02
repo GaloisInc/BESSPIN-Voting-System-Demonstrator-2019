@@ -13,21 +13,16 @@
 
 // Local constants
 
-const aes256_key test_key = {0};
-
 // Local persistent state
 
 // Local functions
 
 // Refines Cryptol initialLogEntry
 /*@
-    requires \valid_read (key + (0 .. AES256_KEY_LENGTH_BYTES - 1));
     requires \valid_read (msg + (0 .. LOG_ENTRY_LENGTH - 1));
-    requires \separated (key, msg);
     assigns \nothing;
 */
-static secure_log_entry initial_log_entry(const aes256_key key, // IN
-                                          const log_entry msg)  // IN
+static secure_log_entry initial_log_entry(const log_entry msg)  // IN
 {
     secure_log_entry initial_entry = {.the_entry = {0}, .the_digest = {0}};
 
@@ -73,7 +68,7 @@ void create_secure_log(Log_Handle *secure_log,
     create_result = Log_IO_Create_New(secure_log, the_secure_log_name);
 
     // 2. call initial_log_entry above to create the first block
-    initial_entry = initial_log_entry(test_key, a_log_entry_type);
+    initial_entry = initial_log_entry(a_log_entry_type);
 
     // 2.1 @dragan keep the first hash
     /*@
