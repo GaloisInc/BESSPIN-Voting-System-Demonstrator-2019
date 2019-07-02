@@ -2,8 +2,13 @@
 #define __SECURE_LOG_T__
 
 #include "../crypto/crypto_t.h"
+#include "../crypto/base64.h"
 #include "log_t.h"
 #define SECURE_LOG_ENTRY_LENGTH (LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES)
+
+#define SHA256_BASE_64_DIGEST_LENGTH_BYTES 44
+typedef uint8_t sha256_base64_digest[SHA256_BASE_64_DIGEST_LENGTH_BYTES];
+#define BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH (LOG_ENTRY_LENGTH + SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2)
 
 typedef struct secure_log_entries
 {
@@ -52,5 +57,12 @@ typedef struct secure_log_security_policies
     access_control ACL;
     non_repudiation NR;
 } secure_log_security_policy;
+
+/*dragan added*/
+typedef struct base64_secure_log_entries
+{
+    log_entry the_entry;
+    sha256_base64_digest the_digest;
+} base64_secure_log_entry;
 
 #endif

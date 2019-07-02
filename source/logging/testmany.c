@@ -13,7 +13,7 @@ int main(void)
         "iiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmm"
         "mmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
 
-    const log_entry third_entry =
+    log_entry next_entry =
         "hello rod   "
         "xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddee"
         "eeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiii"
@@ -22,12 +22,22 @@ int main(void)
 
     Log_IO_Initialize();
 
-    create_log(&my_log, "test3log.txt");
+    create_log(&my_log, "testmanylog.txt");
 
     write_entry(&my_log, second_entry);
-    write_entry(&my_log, third_entry);
+    write_entry(&my_log, next_entry);
+    next_entry[9] = '2';
+    write_entry(&my_log, next_entry);
+    next_entry[9] = '3';
+    write_entry(&my_log, next_entry);
+    next_entry[9] = '4';
+    write_entry(&my_log, next_entry);
+    next_entry[9] = '5';
+    write_entry(&my_log, next_entry);
+    next_entry[9] = '6';
+    write_entry(&my_log, next_entry);
 
-    num = Log_IO_Num_Base64_Entries(&my_log);
+    num = Log_IO_Num_Entries(&my_log);
 
     printf("Num entries in the files is %d\n", (int)num);
 

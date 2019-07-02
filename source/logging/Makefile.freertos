@@ -72,6 +72,7 @@ DEMO_SRC = \
     log_io.c \
     debug_io.c \
     ../crypto/aes.c \
+    ../crypto/base64.c \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c \
     ../crypto/sha2-openbsd.c \

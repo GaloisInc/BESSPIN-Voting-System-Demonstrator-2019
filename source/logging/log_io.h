@@ -177,4 +177,19 @@ secure_log_entry Log_IO_Read_Entry(Log_Handle *stream, // IN
  */
 secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
+
+
+/*dragan added  - contract missing*/ 
+Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,          // IN
+                                 base64_secure_log_entry the_entry); // IN
+
+
+size_t Log_IO_Num_Base64_Entries(Log_Handle *stream);
+
+
+secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
+                                   size_t n);          // IN
+
+secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream);
+
 #endif /* __LOG_IO_H__ */

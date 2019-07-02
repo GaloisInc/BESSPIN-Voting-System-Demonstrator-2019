@@ -80,13 +80,14 @@ DEMO_SRC = \
     ../logging/application_log.c \
     ../logging/log_io.c \
     ../logging/debug_io.c \
+    ../crypto/base64.c \
     ../crypto/crypto.c \
     ../crypto/sha2-openbsd.c \
     ../crypto/aes.c \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
  
- APP_SRC = \
+APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
 	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
 	$(FREERTOS_DEMO_DIR)/bsp/syscalls.c \
@@ -175,15 +176,15 @@ $(info ARFLAGS=$(ARFLAGS))
 
 all: $(PROG).elf
 
-$(PROG).elf  : $(OBJS) Makefile 
+$(PROG).elf  : $(OBJS) Makefile
 	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
-	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm	
+	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
 	@echo Completed $@
 
 clean :
 	@rm -f $(OBJS)
-	@rm -f $(PROG).elf 
+	@rm -f $(PROG).elf
 	@rm -f $(PROG).map
 	@rm -f $(PROG).asm
 

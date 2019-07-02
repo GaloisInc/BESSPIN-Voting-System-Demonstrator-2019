@@ -15,11 +15,11 @@ int main(void)
 
     Log_IO_Initialize();
 
-    create_log(&my_log, "test4log.txt");
+    create_log(&my_log, "test8log.txt");
     write_entry(&my_log, second_entry);
     Log_IO_Close(&my_log);
 
-    Log_IO_Open_Read(&r_log, "test4log.txt");
+    Log_IO_Open_Read(&r_log, "test8log.txt");
 
     if (Log_IO_Num_Base64_Entries(&r_log) == 2)
     {
@@ -27,7 +27,7 @@ int main(void)
     }
     else
     {
-        printf("%s\n", "test4 failed.");
+        printf("%s\n", "test8 failed.");
     }
     Log_IO_Close(&r_log);
 }

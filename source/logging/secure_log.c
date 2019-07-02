@@ -8,10 +8,9 @@
 // Subsystem includes
 #include "secure_log.h"
 #include "../crypto/crypto.h"
+#include <assert.h>
 
 // Local constants
-
-const aes256_key test_key = {0};
 
 // Local persistent state
 
@@ -19,13 +18,10 @@ const aes256_key test_key = {0};
 
 // Refines Cryptol initialLogEntry
 /*@
-    requires \valid_read (key + (0 .. AES256_KEY_LENGTH_BYTES - 1));
     requires \valid_read (msg + (0 .. LOG_ENTRY_LENGTH - 1));
-    requires \separated (key, msg);
     assigns \nothing;
 */
-static secure_log_entry initial_log_entry(const aes256_key key, // IN
-                                          const log_entry msg)  // IN
+static secure_log_entry initial_log_entry(const log_entry msg) // IN
 {
     secure_log_entry initial_entry = {.the_entry = {0}, .the_digest = {0}};
 
@@ -34,6 +30,8 @@ static secure_log_entry initial_log_entry(const aes256_key key, // IN
     // done by the caller.
 
     // 2. Form "aes_cbc_mac msg"
+    // The MAC occupies the first 16 bytes of initial_entry.the_digest, while
+    // the remaining bytes are all 0x00 as initialized above.
     aes_cbc_mac((message)msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0]);
 
     // 3. Copy the msg data
@@ -60,6 +58,8 @@ void create_secure_log(Log_Handle *secure_log,
 {
     Log_FS_Result create_result, write_result, sync_result;
     secure_log_entry initial_entry;
+    size_t olen;
+    int r;
 
     // Initial/Draft pseudo-code by RCC
 
@@ -67,7 +67,7 @@ void create_secure_log(Log_Handle *secure_log,
     create_result = Log_IO_Create_New(secure_log, the_secure_log_name);
 
     // 2. call initial_log_entry above to create the first block
-    initial_entry = initial_log_entry(test_key, a_log_entry_type);
+    initial_entry = initial_log_entry(a_log_entry_type);
 
     // 2.1 @dragan keep the first hash
     /*@
@@ -81,8 +81,26 @@ void create_secure_log(Log_Handle *secure_log,
         secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
 
+    base64_secure_log_entry base_64_current_entry;
+    r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
+                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
+                              &initial_entry.the_digest[0],
+                              SHA256_DIGEST_LENGTH_BYTES);
+    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
+
+    /*@
+      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == initial_entry.the_entry[i];
+      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+      loop variant LOG_ENTRY_LENGTH - i;
+  */
+    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+    {
+        base_64_current_entry.the_entry[i] = initial_entry.the_entry[i];
+    }
+    write_result = Log_IO_Write_Base64_Entry(secure_log, base_64_current_entry);
     // 3. Write that new block to the file.
-    write_result = Log_IO_Write_Entry(secure_log, initial_entry);
+    //write_result = Log_IO_Write_Entry(secure_log, initial_entry);
 
     // TBD - what to do with the_policy parameter?
     //       awaiting requirements on this.
@@ -108,6 +126,8 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
     sha256_digest new_hash;
     uint8_t msg[SECURE_LOG_ENTRY_LENGTH]; // appended message
     size_t index = 0;
+    size_t olen;
+    int r;
 
     // 0. Assume a_log_entry is already padded with zeroes
 
@@ -173,10 +193,27 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
         the_secure_log->previous_hash[i] = new_hash[i];
     }
 
+    base64_secure_log_entry base_64_current_entry;
+    r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
+                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
+                              &current_entry.the_digest[0],
+                              SHA256_DIGEST_LENGTH_BYTES);
+    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
+    /*@
+      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == current_entry.the_entry[i];
+      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+      loop variant LOG_ENTRY_LENGTH - i;
+  */
+    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+    {
+        base_64_current_entry.the_entry[i] = current_entry.the_entry[i];
+    }
     // 4. Write the log_entry message to the_secure_log
 
-    write_result = Log_IO_Write_Entry(the_secure_log, current_entry);
-
+    //write_result = Log_IO_Write_Entry(the_secure_log, current_entry);
+    write_result =
+        Log_IO_Write_Base64_Entry(the_secure_log, base_64_current_entry);
     // 5. Write the hash block
 
     // 6. Sync the file.
@@ -276,7 +313,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
     if (valid_first_entry(the_secure_log))
     {
         size_t num_entries;
-        num_entries = Log_IO_Num_Entries(the_secure_log);
+        num_entries = Log_IO_Num_Base64_Entries(the_secure_log);
         switch (num_entries)
         {
         case 0:
@@ -291,7 +328,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
 
         default:
             // Fetch the root entry and keep a copy of it Hash in prev_hash
-            root_entry = Log_IO_Read_Entry(the_secure_log, 0);
+            root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
 
             // whole array assignment  prev_hash = root_entry.the_digest;
             memcpy(&prev_hash[0], &root_entry.the_digest[0],
@@ -307,7 +344,7 @@ bool verify_secure_log_security(const secure_log the_secure_log)
             {
                 // In the file, entries are numbered starting at 0, so we want the
                 // (i - 1)'th entry...
-                this_entry = Log_IO_Read_Entry(the_secure_log, (i - 1));
+                this_entry = Log_IO_Read_Base64_Entry(the_secure_log, (i - 1));
 
                 if (valid_log_entry(this_entry, prev_hash))
                 {

@@ -62,7 +62,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
   // open and read the log
   Log_IO_Open_Read(&r_log,log_file);
   
-  secure_log_entry sle  = Log_IO_Read_Last_Entry(&r_log);
+  secure_log_entry sle  = Log_IO_Read_Last_Base64_Entry(&r_log);
 
   // read compare hashes
   for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)

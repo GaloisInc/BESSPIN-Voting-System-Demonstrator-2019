@@ -2,9 +2,9 @@
 
 export CC := clang
 
-all: hosttest1 hosttest2 hosttest3 hosttest4 hosttest5
+all: hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 base64test
 
-SOURCES = aes.c cbc.c mode_wrappers.c sha2-openbsd.c crypto.c
+SOURCES = aes.c cbc.c mode_wrappers.c sha2-openbsd.c crypto.c base64.c
 CFLAGS = -g -Wall -DNO_MEMSET_S -Wno-macro-redefined
 
 hosttest1: hosttest1.c $(SOURCES)
@@ -22,5 +22,7 @@ hosttest4: hosttest4.c $(SOURCES)
 hosttest5: hosttest5.c $(SOURCES)
 	$(CC) $(CFLAGS) -o hosttest5 hosttest5.c $(SOURCES)
 
+base64test: base64test.c $(SOURCES)
+	$(CC) $(CFLAGS) -o base64test base64test.c $(SOURCES)
 clean:
-	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 *.o
+	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 base64test *.o
