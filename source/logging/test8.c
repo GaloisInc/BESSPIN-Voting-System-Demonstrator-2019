@@ -27,7 +27,7 @@ int main(void)
     }
     else
     {
-        printf("%s\n", "test4 failed.");
+        printf("%s\n", "test8 failed.");
     }
     Log_IO_Close(&r_log);
 }
