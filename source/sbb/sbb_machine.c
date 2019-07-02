@@ -34,42 +34,6 @@ void update_paper_state(bool paper_in_pressed,
     switch (the_state.P) {
     case NO_PAPER_DETECTED:
         if ( paper_in_pressed ) {
-<<<<<<< HEAD
-            CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
-        }
-        break;
-
-    case EARLY_PAPER_DETECTED:
-        if ( paper_in_released && paper_out_pressed ) {
-            CHANGE_STATE(the_state, P, LATE_PAPER_DETECTED);
-        } else if ( paper_in_released ) {
-            // see todo above
-            CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
-        } else if ( paper_out_pressed ) {
-            CHANGE_STATE(the_state, P, EARLY_AND_LATE_DETECTED);
-        }
-        break;
-
-    case LATE_PAPER_DETECTED:
-        if ( paper_in_pressed && paper_out_released ) {
-            CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
-        } else if ( paper_in_pressed ) {
-            CHANGE_STATE(the_state, P, EARLY_AND_LATE_DETECTED);
-        } else if ( paper_out_released ) {
-            // see todo above
-            CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
-        }
-        break;
-
-    case EARLY_AND_LATE_DETECTED:
-        if ( paper_in_released && paper_out_released ) {
-            // see todo above
-            CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
-        } else if ( paper_in_released ) {
-            CHANGE_STATE(the_state, P, LATE_PAPER_DETECTED);
-        } else if ( paper_out_released ) {
-            CHANGE_STATE(the_state, P, EARLY_PAPER_DETECTED);
-=======
             CHANGE_STATE(the_state, P, PAPER_DETECTED);
         }
         break;
@@ -77,7 +41,6 @@ void update_paper_state(bool paper_in_pressed,
     case PAPER_DETECTED:
         if ( paper_in_released ) {
             CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
->>>>>>> Remove SBB references to second paper sensor.
         }
         break;
     }
@@ -143,19 +106,9 @@ void flush_barcodes() {
 EventBits_t next_paper_event_bits(void) {
     switch ( the_state.P ) {
     case NO_PAPER_DETECTED:
-<<<<<<< HEAD
-        return (ebPAPER_SENSOR_IN_PRESSED);
-    case EARLY_PAPER_DETECTED:
-        return (ebPAPER_SENSOR_IN_RELEASED | ebPAPER_SENSOR_OUT_PRESSED);
-    case LATE_PAPER_DETECTED:
-        return (ebPAPER_SENSOR_IN_PRESSED | ebPAPER_SENSOR_OUT_RELEASED);
-    case EARLY_AND_LATE_DETECTED:
-        return (ebPAPER_SENSOR_IN_RELEASED | ebPAPER_SENSOR_OUT_RELEASED);
-=======
         return ebPAPER_SENSOR_IN_PRESSED;
     case PAPER_DETECTED:
         return ebPAPER_SENSOR_IN_RELEASED;
->>>>>>> Remove SBB references to second paper sensor.
     default:
         break;
     }
@@ -346,16 +299,17 @@ void ballot_box_main_loop(void) {
 
         case SPOIL:
             spoil_ballot();
+            display_this_text(remove_ballot_text, strlen(remove_ballot_text));
             CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
             break;
 
         case EJECT:
             eject_ballot();
+            display_this_text(remove_ballot_text, strlen(remove_ballot_text));
             CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
             break;
 
         case AWAIT_REMOVAL:
-            display_this_text(remove_ballot_text, strlen(remove_ballot_text));
             if ( !ballot_detected() ) {
                 CHANGE_STATE(the_state, L, STANDBY);
             }
