@@ -33,10 +33,7 @@
  *    buffers.
  * 2. Calls to the assert() macro have also been added to check the
  *    pre- and post-condition at run-time, where possible.
- *
- * TO BE DONE
- *
- * 3. Change to use RFC 4648 "Filename safe" encoding for values 62 and 63
+ * 3. Changed to use RFC 4648 "Filename safe" encoding for values 62 and 63
  *
  */
 
