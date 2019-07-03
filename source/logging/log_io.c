@@ -577,8 +577,8 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
 secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                           size_t n)           // IN
 {
-    static const char space;
-    static const char new_line;
+    char space;
+    char new_line;
     secure_log_entry secure_log_entry_result;
     size_t olen;
     int r;
