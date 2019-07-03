@@ -71,6 +71,6 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
   @ complete behaviors failure, success;
   @ disjoint behaviors failure, success;
   @*/
-bool verify_secure_log_security(const secure_log the_secure_log);
+bool verify_secure_log_security(secure_log the_secure_log);
 
 #endif /* __SECURE_LOG__ */
