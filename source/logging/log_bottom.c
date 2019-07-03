@@ -37,11 +37,11 @@ void export_log(const log_file the_log, log_io_stream a_target)
     return;
 }
 
-log_file import_log(const log_name the_log_name)
+bool import_log(log_file the_log_file)
 {
     assert(false);
     //@ assert false;
-    return NULL;
+    return false;
 }
 
 bool verify_log_well_formedness(const log_file the_log)

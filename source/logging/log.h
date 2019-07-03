@@ -15,6 +15,12 @@
 #include "log_io.h"
 #include "log_t.h"
 
+/*@
+  predicate
+    Log_Is_Wellformed{L}(log_file f) = \true; // abstract
+*/
+
+
 /*@ requires \valid(new_log_file);
   @ requires valid_string(the_log_name);
   @ requires \separated(new_log_file, the_log_name);
@@ -50,14 +56,33 @@ bool verify_log_entry_well_formedness(const log_entry a_log_entry);
   @*/
 void export_log(const log_file the_log, const log_io_stream a_target);
 
-/*@ requires \valid(the_log_name);
-  @ assigns  \result \from fs, the_log_name;
-  @*/
-log_file import_log(const log_name the_log_name);
 
 /*@ requires \valid(the_log);
   @ assigns  \result \from fs, the_log;
+  @ ensures  \result <==> Log_Is_Wellformed (the_log);
   @*/
-bool verify_log_well_formedness(const log_file the_log);
+bool verify_log_well_formedness(log_file the_log);
+
+
+
+/*@ requires \valid(the_log_file);
+  @ requires File_Is_Open (the_log_file);
+  @
+  @ assigns *the_log_file \from fs;
+  @
+  @ behavior log_ok:
+  @   assumes Log_Is_Wellformed (the_log_file);
+  @   ensures \result == true;
+  @   ensures \valid (the_log_file);
+  @   ensures File_Is_Open (the_log_file);
+  @
+  @ behavior log_bad:
+  @   assumes !Log_Is_Wellformed (the_log_file);
+  @   ensures \result == false;
+  @
+  @ complete behaviors;
+  @ disjoint behaviors;
+  @*/
+bool import_log(log_file the_log_file);
 
 #endif /* __LOG_H__ */

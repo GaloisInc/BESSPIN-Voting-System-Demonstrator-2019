@@ -1,14 +1,17 @@
 #include "log_io.h"
+#include "debug_io.h"
 
 // Local constants
 const secure_log_entry null_secure_log_entry = {{0}, {0}};
 const size_t size_of_one_log_entry =
     LOG_ENTRY_LENGTH + SHA256_DIGEST_LENGTH_BYTES;
 
-/*dragan added*/
 const base64_secure_log_entry null_base64_secure_log_entry = {{0}, {0}};
 const size_t size_of_one_base64_block_log_entry =
     BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
+
+static const char space = ' ';
+static const char new_line = '\n';
 
 #ifdef TARGET_OS_FreeRTOS
 
@@ -44,6 +47,7 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
                                 const char *name)   // IN
 {
     FRESULT res;
+
     res = f_open(&stream->the_file, name, FA_WRITE | FA_CREATE_ALWAYS);
 
     if (res == FR_OK)
@@ -56,11 +60,14 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     }
 }
 
-Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
-                               const char *name)   // IN
+Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
+                          const char *name)   // IN
 {
     FRESULT res;
-    res = f_open(&stream->the_file, name, FA_READ | FA_OPEN_EXISTING);
+
+    // Note we open for read/write/append so that a log file can be both
+    // verified by reading back its contents, but also appended to.
+    res = f_open(&stream->the_file, name, FA_READ | FA_WRITE | FA_OPEN_APPEND);
 
     if (res == FR_OK)
     {
@@ -270,8 +277,7 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     FRESULT res1;
     FSIZE_t original_offset;
     size_t byte_offset_of_entry_n;
-    static const char *space;
-    static const char *new_line;
+    char dummy_char;
     secure_log_entry secure_log_entry_result;
     size_t olen;
     int r;
@@ -296,13 +302,13 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                        LOG_ENTRY_LENGTH, &bytes_log_entry);
 
         read_space_status =
-            f_read(&stream->the_file, (char *)space, 1, &space_length);
+            f_read(&stream->the_file, &dummy_char, 1, &space_length);
 
         read_digest_status =
             f_read(&stream->the_file, &result.the_digest[0],
-                   SHA256_DIGEST_LENGTH_BYTES, &bytes_sha_digest);
+                   SHA256_BASE_64_DIGEST_LENGTH_BYTES, &bytes_sha_digest);
 
-        read_new_line_char_status = f_read(&stream->the_file, (char *)new_line,
+        read_new_line_char_status = f_read(&stream->the_file, &dummy_char,
                                            1, &new_line_char_length);
 
         // Restore the original offset
@@ -310,7 +316,7 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
         if (read_log_entry_status == FR_OK && read_digest_status == FR_OK &&
             restore_offset_status == FR_OK &&
             bytes_log_entry == LOG_ENTRY_LENGTH &&
-            bytes_sha_digest == SHA256_DIGEST_LENGTH_BYTES &&
+            bytes_sha_digest == SHA256_BASE_64_DIGEST_LENGTH_BYTES &&
             space_length == 1 && new_line_char_length == 1)
         {
             // decode, create secure log entry  and return
@@ -345,9 +351,6 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,                // IN
                                         base64_secure_log_entry the_entry) // IN
 {
-    static const char space = ' ';
-    static const char new_line = '\n';
-
     FRESULT write_entry_status, write_digest_status;
 
     UINT bytes_written1, bytes_written2, space_written, new_line_char_written;
@@ -397,41 +400,36 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     local_stream_ptr = fopen(name, "w");
     if (local_stream_ptr == NULL)
     {
-        printf("fopen() failed in Log_IO_Create_New\n");
+        debug_printf("fopen() failed in Log_IO_Create_New\n");
         return LOG_FS_ERROR;
     }
     else
     {
-        printf("sizeof(FILE) is %lu\n", sizeof(FILE));
-
         // RCC - this is dodgy - possibly undefined behaviour to attempt to
         // copy a FILE struct like this.
-
-        printf("Copying the FILE structure\n");
         memcpy(&stream->the_file, local_stream_ptr, sizeof(FILE));
-        printf("Done copying\n");
     }
 
     return LOG_FS_OK;
 }
 
-Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
-                               const char *name)   // IN
+Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
+                          const char *name)   // IN
 {
     FILE *local_stream_ptr;
 
     // POSIX fopen allocates for us, unlike FreeRTOS there the caller passed in a
     // pointer to memory that it has allocated. This is rather ugly.
-    local_stream_ptr = fopen(name, "r");
+    // Note we open for read/write/append so that a log file can be both
+    // verified by reading back its contents, but also appended to.
+    local_stream_ptr = fopen(name, "a+");
     if (local_stream_ptr == NULL)
     {
-        printf("fopen() failed in Log_IO_Open_Read\n");
+        debug_printf("fopen() failed in Log_IO_Open\n");
         return LOG_FS_ERROR;
     }
     else
     {
-        printf("sizeof(FILE) is %lu\n", sizeof(FILE));
-
         // RCC - as above
         memcpy(&stream->the_file, local_stream_ptr, sizeof(FILE));
     }
@@ -544,12 +542,10 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream)
         return null_secure_log_entry;
     }
 }
-/*dragan added*/
+
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
                                         base64_secure_log_entry the_entry)
 {
-    static const char space = ' ';
-    static const char new_line = '\n';
     size_t written;
 
     written =
@@ -577,9 +573,8 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
 secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                           size_t n)           // IN
 {
-    static const char *space;
-    static const char *new_line;
     secure_log_entry secure_log_entry_result;
+    char dummy_char;
     size_t olen;
     int r;
 
@@ -595,13 +590,13 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     size_t ret_entry =
         fread(&result.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
 
-    size_t ret_space = fread((char *)space, 1, 1, &stream->the_file);
+    size_t ret_space = fread(&dummy_char, 1, 1, &stream->the_file);
 
     size_t ret_digest =
         fread(&result.the_digest[0], 1, SHA256_BASE_64_DIGEST_LENGTH_BYTES,
               &stream->the_file);
 
-    size_t ret_new_line = fread((char *)new_line, 1, 1, &stream->the_file);
+    size_t ret_new_line = fread(&dummy_char, 1, 1, &stream->the_file);
 
     // Restore the original offset
     fseek(&stream->the_file, original_offset, SEEK_SET);

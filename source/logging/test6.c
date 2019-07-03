@@ -35,7 +35,7 @@ int main(void)
     Log_IO_Close(&my_log_first);
     Log_IO_Close(&my_log_second);
 
-    Log_IO_Open_Read(&r_log_first, "test61log.txt");
+    Log_IO_Open(&r_log_first, "test61log.txt");
 
     if (Log_IO_Num_Base64_Entries(&r_log_first) == 2)
     {
@@ -47,7 +47,7 @@ int main(void)
     }
     Log_IO_Close(&r_log_first);
 
-    Log_IO_Open_Read(&r_log_second, "test62log.txt");
+    Log_IO_Open(&r_log_second, "test62log.txt");
 
     if (Log_IO_Num_Base64_Entries(&r_log_second) == 2)
     {

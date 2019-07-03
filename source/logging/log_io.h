@@ -51,10 +51,15 @@ typedef enum
   logic
     size_t File_Num_Entries{L}(Log_Handle *f) = (size_t) 0; // abstract
 
-  predicate 
+  predicate
     valid_secure_log_entry(secure_log_entry sle)=
       \valid_read((uint8_t*)sle.the_entry[0 .. LOG_ENTRY_LENGTH - 1]) &&
       \valid_read((uint8_t*)sle.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1]);
+
+  predicate
+    valid_base64_secure_log_entry(base64_secure_log_entry sle)=
+      \valid_read((uint8_t*)sle.the_entry[0 .. LOG_ENTRY_LENGTH - 1]) &&
+      \valid_read((uint8_t*)sle.the_digest[0 .. SHA256_BASE_64_DIGEST_LENGTH_BYTES - 1]);
 
   global invariant log_file_is_not_empty:
    \forall log_file f; File_Num_Entries(f) > 0 ;
@@ -110,6 +115,7 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
       ensures \result == LOG_FS_OK;
       ensures \valid (stream);
       ensures File_Is_Open (stream);
+      // ensures stream is open for read AND write AND append modes
 
     behavior failure:
       ensures \result == LOG_FS_ERROR;
@@ -118,8 +124,9 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     complete behaviors;
     disjoint behaviors;
  */
-Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
-                               const char *name);  // IN
+Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
+                          const char *name);  // IN
+
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
@@ -127,6 +134,7 @@ Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
     ensures !File_Is_Open (stream);
  */
 Log_FS_Result Log_IO_Close(Log_Handle *stream); // IN
+
 
 /* Forces any internal buffers out to disk. Call this after Write */
 /*@ requires Log_IO_Initialized;
@@ -177,19 +185,36 @@ secure_log_entry Log_IO_Read_Entry(Log_Handle *stream, // IN
  */
 secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
-
-
-/*dragan added  - contract missing*/ 
+/*@ requires Log_IO_Initialized;
+    requires \valid(stream);
+    requires valid_base64_secure_log_entry(the_entry);
+    requires File_Is_Open (stream);
+    assigns fs \from fs, stream, the_entry;
+ */
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,          // IN
                                  base64_secure_log_entry the_entry); // IN
 
-
+/*@ requires Log_IO_Initialized;
+    requires \valid(stream);
+    requires File_Is_Open (stream);
+    assigns \result \from *stream, fs;
+ */
 size_t Log_IO_Num_Base64_Entries(Log_Handle *stream);
 
-
+/*@ requires Log_IO_Initialized;
+    requires \valid(stream);
+    requires File_Is_Open (stream);
+    requires n >= 0;
+    requires n <  File_Num_Entries (stream);
+    assigns \result \from *stream, n, fs;
+ */
 secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                    size_t n);          // IN
-
+/*@ requires Log_IO_Initialized;
+    requires \valid(stream);
+    requires File_Is_Open (stream);
+    assigns \result \from *stream, fs;
+ */
 secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream);
 
 #endif /* __LOG_IO_H__ */

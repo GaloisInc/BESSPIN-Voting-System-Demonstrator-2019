@@ -8,6 +8,7 @@
 // Subsystem includes
 #include "secure_log.h"
 #include "../crypto/crypto.h"
+#include "debug_io.h"
 #include <assert.h>
 
 // Local constants
@@ -51,7 +52,7 @@ static secure_log_entry initial_log_entry(const log_entry msg) // IN
 
 // Exported functions
 
-void create_secure_log(Log_Handle *secure_log,
+void create_secure_log(Log_Handle *new_secure_log,
                        const secure_log_name the_secure_log_name,
                        const log_entry a_log_entry_type,
                        const secure_log_security_policy the_policy)
@@ -64,7 +65,7 @@ void create_secure_log(Log_Handle *secure_log,
     // Initial/Draft pseudo-code by RCC
 
     // 1. Create new file, open for writing only.
-    create_result = Log_IO_Create_New(secure_log, the_secure_log_name);
+    create_result = Log_IO_Create_New(new_secure_log, the_secure_log_name);
 
     // 2. call initial_log_entry above to create the first block
     initial_entry = initial_log_entry(a_log_entry_type);
@@ -72,13 +73,13 @@ void create_secure_log(Log_Handle *secure_log,
     // 2.1 @dragan keep the first hash
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant \forall size_t k; 0 <= k < i ==> secure_log -> previous_hash[k] == initial_entry.the_digest[k];
-      loop assigns secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+      loop invariant \forall size_t k; 0 <= k < i ==> new_secure_log -> previous_hash[k] == initial_entry.the_digest[k];
+      loop assigns new_secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
   */
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
-        secure_log->previous_hash[i] = initial_entry.the_digest[i];
+        new_secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
 
     base64_secure_log_entry base_64_current_entry;
@@ -98,15 +99,15 @@ void create_secure_log(Log_Handle *secure_log,
     {
         base_64_current_entry.the_entry[i] = initial_entry.the_entry[i];
     }
-    write_result = Log_IO_Write_Base64_Entry(secure_log, base_64_current_entry);
+
     // 3. Write that new block to the file.
-    //write_result = Log_IO_Write_Entry(secure_log, initial_entry);
+    write_result = Log_IO_Write_Base64_Entry(new_secure_log, base_64_current_entry);
 
     // TBD - what to do with the_policy parameter?
     //       awaiting requirements on this.
 
     // 4. sync the file.
-    sync_result = Log_IO_Sync(secure_log);
+    sync_result = Log_IO_Sync(new_secure_log);
 
     // TBDs - what about error cases?
     //   What if the file already exists? Perhaps a pre-condition here that it doesn't
@@ -223,30 +224,30 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
 }
 
 // Refinces Cryptol validFirstEntry
-bool valid_first_entry(const secure_log the_secure_log)
+bool valid_first_entry(secure_log_entry root_entry)
 {
-    sha256_digest new_hmac = {0};
-    secure_log_entry root_entry;
+    sha256_digest new_mac = {0};
 
-    // 1. Fetch the root block from the file
-    root_entry = Log_IO_Read_Entry(the_secure_log, 0);
+    // 2. Form the AES CBC MAC of the message part of root_entry
+    aes_cbc_mac(root_entry.the_entry, LOG_ENTRY_LENGTH, &new_mac[0]);
 
-    // 2. Form "hmac key log.msg"
-    aes_cbc_mac(root_entry.the_entry, LOG_ENTRY_LENGTH, &new_hmac[0]);
-
-    // 3. new_hmac and root_entry.the_digest should match
+    // 3. new_mac and root_entry.the_digest should match, but only
+    //    comparing the first AES_BLOCK_LENGTH_BYTES which are
+    //    significant
     /*@
-      loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
+      loop invariant 0 <= i <= AES_BLOCK_LENGTH_BYTES;
       loop assigns \nothing;
-      loop variant SHA256_DIGEST_LENGTH_BYTES - i;
+      loop variant AES_BLOCK_LENGTH_BYTES - i;
   */
-    for (int i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
+    for (int i = 0; i < AES_BLOCK_LENGTH_BYTES; i++)
     {
-        if (root_entry.the_digest[i] != new_hmac[i])
+        if (root_entry.the_digest[i] != new_mac[i])
         {
-            return false;
+          debug_printf ("valid_first_entry - MACs do not match");
+          return false;
         }
     }
+    debug_printf ("valid_first_entry - MACs match OK");
     return true;
 }
 
@@ -264,7 +265,7 @@ bool valid_log_entry(const secure_log_entry this_entry,
       loop invariant 0 <= index <= SECURE_LOG_ENTRY_LENGTH;
       loop assigns *msg, index;
       loop variant LOG_ENTRY_LENGTH - i;
-  */
+    */
     for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
     {
         msg[index] = this_entry.the_entry[i];
@@ -276,7 +277,7 @@ bool valid_log_entry(const secure_log_entry this_entry,
       loop invariant 0 <= index <= SECURE_LOG_ENTRY_LENGTH;
       loop assigns *msg, index;
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-  */
+    */
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
         msg[index] = prev_hash[i];
@@ -295,76 +296,110 @@ bool valid_log_entry(const secure_log_entry this_entry,
     {
         if (this_entry.the_digest[i] != new_hash[i])
         {
+            debug_printf ("valid_log_entry - hashes do not match");
             return false;
         }
     }
+    debug_printf ("valid_log_entry - hashes match OK");
     return true;
 }
 
 // Refines Cryptol validLogFile
-bool verify_secure_log_security(const secure_log the_secure_log)
+bool verify_secure_log_security(secure_log the_secure_log)
 {
     // A log file is valid if the first (root) entry is valid AND
     // all the subsequent entries are valid.
-    secure_log_entry root_entry;
+    secure_log_entry root_entry = {.the_entry = {0}, .the_digest = {0}};
     sha256_digest prev_hash;
     secure_log_entry this_entry;
+    size_t num_entries;
 
-    if (valid_first_entry(the_secure_log))
-    {
-        size_t num_entries;
-        num_entries = Log_IO_Num_Base64_Entries(the_secure_log);
-        switch (num_entries)
-        {
-        case 0:
-            // a valid first entry, but apparently zero entries... something
-            // must be wrong, so
-            return false;
-            break;
-        case 1:
-            // One entry must be the first entry and we already know it's OK, so
+    num_entries = Log_IO_Num_Base64_Entries(the_secure_log);
+    switch (num_entries)
+      {
+      case 0:
+        // Apparently zero entries... something must be wrong, so
+        return false;
+        break;
+      case 1:
+        debug_printf ("valid_secure_log_security - checking only entry MAC");
+
+        // Fetch the root entry
+        root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
+
+        if (valid_first_entry(root_entry))
+          {
+            // If all is well, then save the hash of the root entry for later,
+            // additional entries to use.
+
+            // whole array assignment  the_secure_log->previous_hash = root_entry.the_digest;
+            memcpy (&the_secure_log->previous_hash[0], &root_entry.the_digest[0],
+                    SHA256_DIGEST_LENGTH_BYTES);
             return true;
-            break;
+          }
+        else
+          {
+            return false;
+          }
+        break;
 
-        default:
-            // Fetch the root entry and keep a copy of it Hash in prev_hash
-            root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
+      default:
 
+        debug_printf ("valid_secure_log_security - checking first entry MAC");
+
+        // Fetch the root entry
+        root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
+
+        if (valid_first_entry(root_entry))
+          {
+            // If all is well, then save the hash of the root entry to verify
+            // the next one.
             // whole array assignment  prev_hash = root_entry.the_digest;
             memcpy(&prev_hash[0], &root_entry.the_digest[0],
                    SHA256_DIGEST_LENGTH_BYTES);
 
-            // Two or more entries
             /*@
-	    loop invariant 2 <= i <= (num_entries + 1);
-	    loop assigns this_entry, *prev_hash;
-	    loop variant num_entries - i;
-	  */
+              loop invariant 2 <= i <= (num_entries + 1);
+              loop assigns this_entry, *prev_hash;
+              loop variant num_entries - i;
+            */
             for (size_t i = 2; i <= num_entries; i++)
-            {
+              {
                 // In the file, entries are numbered starting at 0, so we want the
                 // (i - 1)'th entry...
                 this_entry = Log_IO_Read_Base64_Entry(the_secure_log, (i - 1));
 
+                debug_printf ("valid_secure_log_security - checking validity of entry %zu", i);
+
                 if (valid_log_entry(this_entry, prev_hash))
-                {
+                  {
                     // whole array assignment  prev_hash = this_entry.the_digest;
                     memcpy(&prev_hash[0], &this_entry.the_digest[0],
                            SHA256_DIGEST_LENGTH_BYTES);
-                }
+                  }
                 else
-                {
+                  {
                     return false;
-                }
-            }
-            // Loop must have successfully verified all entries, so
+                  }
+              }
+
+            // All entries are OK if we've reached this point, so save the
+            // final hash into the_secure_log->previous_hash so that more
+            // entries can be appended later.
+            //
+            // whole array assignment  the_secure_log->previous_hash = prev_hash;
+            memcpy (&the_secure_log->previous_hash[0], &prev_hash[0],
+                    SHA256_DIGEST_LENGTH_BYTES);
+
             return true;
-            break;
-        }
-    }
-    else
-    {
-        // First block is invalid, so
-        return false;
-    }
+          }
+        else
+          {
+            // First entry is not valid, so
+            return false;
+          }
+
+        break;
+
+      }
 }
