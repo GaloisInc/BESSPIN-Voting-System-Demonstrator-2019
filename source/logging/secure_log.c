@@ -227,7 +227,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
 bool valid_first_entry(secure_log_entry root_entry)
 {
     sha256_digest new_mac = {0};
-    
+
     // 2. Form the AES CBC MAC of the message part of root_entry
     aes_cbc_mac(root_entry.the_entry, LOG_ENTRY_LENGTH, &new_mac[0]);
 
@@ -312,51 +312,59 @@ bool verify_secure_log_security(secure_log the_secure_log)
     secure_log_entry root_entry = {.the_entry = {0}, .the_digest = {0}};
     sha256_digest prev_hash;
     secure_log_entry this_entry;
+    size_t num_entries;
 
-    debug_printf ("valid_secure_log_security - checking first entry MAC");
-    
-    // Fetch the root entry and keep a copy of it Hash in prev_hash
-    root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
+    num_entries = Log_IO_Num_Base64_Entries(the_secure_log);
+    switch (num_entries)
+      {
+      case 0:
+        // Apparently zero entries... something must be wrong, so
+        return false;
+        break;
+      case 1:
+        debug_printf ("valid_secure_log_security - checking only entry MAC");
 
-    // whole array assignment  prev_hash = root_entry.the_digest;
-    memcpy(&prev_hash[0], &root_entry.the_digest[0],
-           SHA256_DIGEST_LENGTH_BYTES);
+        // Fetch the root entry
+        root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
 
-    if (valid_first_entry(root_entry))
-    {
-        size_t num_entries;
-        num_entries = Log_IO_Num_Base64_Entries(the_secure_log);
-        switch (num_entries)
-        {
-        case 0:
-            // a valid first entry, but apparently zero entries... something
-            // must be wrong, so
-            return false;
-            break;
-        case 1:
-            // One entry must be the first entry and we already know it's OK, so
-            /*@
-              loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-              loop invariant \forall size_t k; 0 <= k < i ==> the_secure_log->previous_hash[k] == prev_hash[k];
-              loop assigns the_secure_log->previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-              loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-            */
-            for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-            {
-              the_secure_log->previous_hash[i] = prev_hash[i];
-            }
+        if (valid_first_entry(root_entry))
+          {
+            // If all is well, then save the hash of the root entry for later,
+            // additional entries to use.
+
+            // whole array assignment  the_secure_log->previous_hash = root_entry.the_digest;
+            memcpy (&the_secure_log->previous_hash[0], &root_entry.the_digest[0],
+                    SHA256_DIGEST_LENGTH_BYTES);
             return true;
-            break;
+          }
+        else
+          {
+            return false;
+          }
+        break;
 
-        default:
-            // Two or more entries
+      default:
+
+        debug_printf ("valid_secure_log_security - checking first entry MAC");
+
+        // Fetch the root entry
+        root_entry = Log_IO_Read_Base64_Entry(the_secure_log, 0);
+
+        if (valid_first_entry(root_entry))
+          {
+            // If all is well, then save the hash of the root entry to verify
+            // the next one.
+            // whole array assignment  prev_hash = root_entry.the_digest;
+            memcpy(&prev_hash[0], &root_entry.the_digest[0],
+                   SHA256_DIGEST_LENGTH_BYTES);
+
             /*@
-	    loop invariant 2 <= i <= (num_entries + 1);
-	    loop assigns this_entry, *prev_hash;
-	    loop variant num_entries - i;
-	  */
+              loop invariant 2 <= i <= (num_entries + 1);
+              loop assigns this_entry, *prev_hash;
+              loop variant num_entries - i;
+            */
             for (size_t i = 2; i <= num_entries; i++)
-            {
+              {
                 // In the file, entries are numbered starting at 0, so we want the
                 // (i - 1)'th entry...
                 this_entry = Log_IO_Read_Base64_Entry(the_secure_log, (i - 1));
@@ -364,38 +372,34 @@ bool verify_secure_log_security(secure_log the_secure_log)
                 debug_printf ("valid_secure_log_security - checking validity of entry %zu", i);
 
                 if (valid_log_entry(this_entry, prev_hash))
-                {
+                  {
                     // whole array assignment  prev_hash = this_entry.the_digest;
                     memcpy(&prev_hash[0], &this_entry.the_digest[0],
                            SHA256_DIGEST_LENGTH_BYTES);
-                }
-                else
-                {
-                    return false;
-                }
-                if (i == num_entries) {
-                  //record the final hash into the_log_file->previous_hash
-                  /*@
-                    loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-                    loop invariant \forall size_t k; 0 <= k < i ==> the_secure_log->previous_hash[k] == prev_hash[k];
-                    loop assigns the_secure_log->previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-                    loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-                  */
-                  for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-                  {
-                    the_secure_log->previous_hash[i] = prev_hash[i];
                   }
+                else
+                  {
+                    return false;
+                  }
+              }
 
-                }
-            }
-            // Loop must have successfully verified all entries, so
+            // All entries are OK if we've reached this point, so save the
+            // final hash into the_secure_log->previous_hash so that more
+            // entries can be appended later.
+            //
+            // whole array assignment  the_secure_log->previous_hash = prev_hash;
+            memcpy (&the_secure_log->previous_hash[0], &prev_hash[0],
+                    SHA256_DIGEST_LENGTH_BYTES);
+
             return true;
-            break;
-        }
-    }
-    else
-    {
-        // First block is invalid, so
-        return false;
-    }
+          }
+        else
+          {
+            // First entry is not valid, so
+            return false;
+          }
+
+        break;
+
+      }
 }
