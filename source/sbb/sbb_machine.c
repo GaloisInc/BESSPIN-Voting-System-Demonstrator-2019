@@ -214,13 +214,18 @@ void ballot_box_main_loop(void) {
         switch ( the_state.L ) {
 
         case INITIALIZE:
+            // Factor this out into its own function, or move the tests into initialize()
             initialize();
-            Log_FS_Result logresult = Log_IO_Initialize();
-            if ( logresult != LOG_FS_OK ) {
-                CHANGE_STATE(the_state, L, ABORT);
+            if ( LOG_FS_OK == Log_IO_Initialize() ) {
+                if ( load_or_create_logs() ) {
+                    CHANGE_STATE(the_state, L, STANDBY);
+                } else {
+                    debug_printf("Failed to import logs.");
+                    CHANGE_STATE(the_state, L, ABORT);
+                }
             } else {
-                load_or_create_logs();
-                CHANGE_STATE(the_state, L, STANDBY);
+                debug_printf("Failed to initialize logging system.");
+                CHANGE_STATE(the_state, L, ABORT);
             }
             break;
 
