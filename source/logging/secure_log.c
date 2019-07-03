@@ -322,7 +322,7 @@ bool verify_secure_log_security(secure_log the_secure_log)
     memcpy(&prev_hash[0], &root_entry.the_digest[0],
            SHA256_DIGEST_LENGTH_BYTES);
 
-    if (valid_first_entry(the_secure_log))
+    if (valid_first_entry(root_entry))
     {
         size_t num_entries;
         num_entries = Log_IO_Num_Base64_Entries(the_secure_log);
