@@ -51,7 +51,7 @@ static log_io_stream generate_log_io_stream(void) {
 Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, log_io_stream stream)
 {
   Log_Handle r_log;
-   
+
   // check that first log exists
   if (!Log_IO_File_Exists(log_file)) {
     debug_printf("Failure - log file does not exist.");
@@ -61,14 +61,14 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
 
   // open and read the log
   Log_IO_Open_Read(&r_log,log_file);
-  
+
   secure_log_entry sle  = Log_IO_Read_Last_Base64_Entry(&r_log);
 
   // read compare hashes
   for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
   {
 
-      if (sle.the_digest[i] != second_log->previous_hash[i]) 
+      if (sle.the_digest[i] != second_log->previous_hash[i])
       {
         debug_printf("Failure - the hashes are not equal.");
         debug_log_printf(stream, "Failure - the hashes are not equal.");
@@ -97,10 +97,14 @@ void Import_Export_Empty_Log(const log_name the_log_name,
   Log_IO_Initialize();
   create_log(&first_log, the_log_name);
   verify_log_well_formedness(&first_log);
-  export_log(&first_log, a_target);
-  log_file second_log = import_log(the_log_name);
-  verify_log_well_formedness(second_log);
-  compare_logs_by_hash(the_log_name, second_log, a_target);
+
+  // RCC this test will be completed with both import and export are implemented
+  //
+  // export_log(&first_log, a_target);
+  // log_file second_log = import_log(the_log_name);
+  // verify_log_well_formedness(second_log);
+  // compare_logs_by_hash(the_log_name, second_log, a_target);
+
   Log_IO_Close (&first_log);
   return;
 }
@@ -127,16 +131,20 @@ void Import_Export_Non_Empty_Log(const log_name the_log_name,
   write_entry (&test_log, test02_entry);
   verify_log_well_formedness(&test_log);
   export_log(&test_log,a_target);
-  log_file second_test_log = import_log(the_log_name);
-  verify_log_well_formedness(second_test_log);
-  compare_logs_by_hash(the_log_name, second_test_log, a_target);
+
+  // RCC this test will be completed with both import and export are implemented
+  //
+  // log_file second_test_log = import_log(the_log_name);
+  // verify_log_well_formedness(second_test_log);
+  // compare_logs_by_hash(the_log_name, second_test_log, a_target);
+
   Log_IO_Close (&test_log);
   return;
 }
 
 int main(int argc, char* argv[]) {
   log_name generated_name = generate_log_name();
-  
+
   // @todo kiniry The use of `stderr` and `printf` needs to be
   // refactored to use appropriate calls on FreeRTOS when building to
   // that target.
