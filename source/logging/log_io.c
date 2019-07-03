@@ -1,4 +1,5 @@
 #include "log_io.h"
+#include "debug_io.h"
 
 // Local constants
 const secure_log_entry null_secure_log_entry = {{0}, {0}};
@@ -395,19 +396,14 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     local_stream_ptr = fopen(name, "w");
     if (local_stream_ptr == NULL)
     {
-        printf("fopen() failed in Log_IO_Create_New\n");
+        debug_printf("fopen() failed in Log_IO_Create_New\n");
         return LOG_FS_ERROR;
     }
     else
     {
-        printf("sizeof(FILE) is %lu\n", sizeof(FILE));
-
         // RCC - this is dodgy - possibly undefined behaviour to attempt to
         // copy a FILE struct like this.
-
-        printf("Copying the FILE structure\n");
         memcpy(&stream->the_file, local_stream_ptr, sizeof(FILE));
-        printf("Done copying\n");
     }
 
     return LOG_FS_OK;
@@ -423,13 +419,11 @@ Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
     local_stream_ptr = fopen(name, "r");
     if (local_stream_ptr == NULL)
     {
-        printf("fopen() failed in Log_IO_Open_Read\n");
+        debug_printf("fopen() failed in Log_IO_Open_Read\n");
         return LOG_FS_ERROR;
     }
     else
     {
-        printf("sizeof(FILE) is %lu\n", sizeof(FILE));
-
         // RCC - as above
         memcpy(&stream->the_file, local_stream_ptr, sizeof(FILE));
     }
