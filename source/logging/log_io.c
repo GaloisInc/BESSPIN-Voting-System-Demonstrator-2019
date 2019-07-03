@@ -270,8 +270,8 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     FRESULT res1;
     FSIZE_t original_offset;
     size_t byte_offset_of_entry_n;
-    static const char *space;
-    static const char *new_line;
+    static const char space;
+    static const char new_line;
     secure_log_entry secure_log_entry_result;
     size_t olen;
     int r;
@@ -296,13 +296,13 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                        LOG_ENTRY_LENGTH, &bytes_log_entry);
 
         read_space_status =
-            f_read(&stream->the_file, (char *)space, 1, &space_length);
+            f_read(&stream->the_file, &space, 1, &space_length);
 
         read_digest_status =
             f_read(&stream->the_file, &result.the_digest[0],
-                   SHA256_DIGEST_LENGTH_BYTES, &bytes_sha_digest);
+                   SHA256_BASE_64_DIGEST_LENGTH_BYTES, &bytes_sha_digest);
 
-        read_new_line_char_status = f_read(&stream->the_file, (char *)new_line,
+        read_new_line_char_status = f_read(&stream->the_file, &new_line,
                                            1, &new_line_char_length);
 
         // Restore the original offset
@@ -310,7 +310,7 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
         if (read_log_entry_status == FR_OK && read_digest_status == FR_OK &&
             restore_offset_status == FR_OK &&
             bytes_log_entry == LOG_ENTRY_LENGTH &&
-            bytes_sha_digest == SHA256_DIGEST_LENGTH_BYTES &&
+            bytes_sha_digest == SHA256_BASE_64_DIGEST_LENGTH_BYTES &&
             space_length == 1 && new_line_char_length == 1)
         {
             // decode, create secure log entry  and return
@@ -577,8 +577,8 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
 secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                           size_t n)           // IN
 {
-    static const char *space;
-    static const char *new_line;
+    static const char space;
+    static const char new_line;
     secure_log_entry secure_log_entry_result;
     size_t olen;
     int r;
@@ -595,13 +595,13 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     size_t ret_entry =
         fread(&result.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
 
-    size_t ret_space = fread((char *)space, 1, 1, &stream->the_file);
+    size_t ret_space = fread(&space, 1, 1, &stream->the_file);
 
     size_t ret_digest =
         fread(&result.the_digest[0], 1, SHA256_BASE_64_DIGEST_LENGTH_BYTES,
               &stream->the_file);
 
-    size_t ret_new_line = fread((char *)new_line, 1, 1, &stream->the_file);
+    size_t ret_new_line = fread(&new_line, 1, 1, &stream->the_file);
 
     // Restore the original offset
     fseek(&stream->the_file, original_offset, SEEK_SET);
