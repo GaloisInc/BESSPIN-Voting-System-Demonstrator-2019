@@ -75,12 +75,13 @@ Log_FS_Result Test_Log_IO_Read_Last_Base64_Entry(const char * test_file_name) {
 int main(int argc, char* argv[]) {
 	if (argc == 1)
 	{
-		printf("%s\n", "Failure.Please enter the log file name.");
+          printf("%s\n", "Failure.Please enter the log file name.");
 	}
 	else if (argc == 2 )
 	{
-		Test_Log_IO_Read_Base64_Entry(argv[1]);
-		Test_Log_IO_Read_Last_Base64_Entry(argv[1]);
+          Log_IO_Initialize();
+          Test_Log_IO_Read_Base64_Entry(argv[1]);
+          Test_Log_IO_Read_Last_Base64_Entry(argv[1]);
 	}
     return 0;
 }

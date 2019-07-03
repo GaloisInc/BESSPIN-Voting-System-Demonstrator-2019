@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
 {
     if (argc == 2)
     {
+        Log_IO_Initialize();
         if (Log_IO_File_Exists(argv[1]))
         {
             test_secure_log_security(argv[1]);
