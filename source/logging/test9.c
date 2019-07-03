@@ -30,43 +30,45 @@ Log_FS_Result Test_Log_IO_Read_Base64_Entry(const char * test_file_name) {
 Log_FS_Result Test_Log_IO_Read_Last_Base64_Entry(const char * test_file_name) {
 	Log_Handle r_log;
 	secure_log_entry current_entry;
-	size_t N;
+	size_t N = 0;
 
 	Log_IO_Open_Read(&r_log, test_file_name);
-	if (!Log_IO_File_Exists(test_file_name)) {
+	
+	if (!Log_IO_File_Exists(test_file_name)) 
+	{
     	printf("Failure - log file %s does not exist.\n", test_file_name);
-    	 return LOG_FS_ERROR;
+    	return LOG_FS_ERROR;
   	}
 
   	N = Log_IO_Num_Base64_Entries(&r_log);
 
+    if (N == 0) 
+    {
+    	printf("Failure. Log file %s cannot be empty.\n", test_file_name);
+    	return LOG_FS_ERROR;
+    }
+
 	printf("Number of entries=%zu\n", N);
+	current_entry = Log_IO_Read_Last_Base64_Entry(&r_log);
+		printf("The last entry:%s\n", current_entry.the_entry );
+		printf("Hash starts with: %2X %2X %2X %2X\n", current_entry.the_digest[0], 
+		  	current_entry.the_digest[1], current_entry.the_digest[2], 
+		  	current_entry.the_digest[3]);
+    
     if ( N == 1) 
     {
-    	current_entry = Log_IO_Read_Last_Base64_Entry(&r_log);
-		printf("The last entry:%s\n", current_entry.the_entry );
+    	return LOG_FS_OK;
+    }
+    
+	for (size_t i = 1; i <=  N - 1  ; i++)
+	{
+		current_entry = Log_IO_Read_Base64_Entry(&r_log, N - 1 - i);
+		printf("The entry:%s\n", current_entry.the_entry );
 		printf("Hash starts with: %2X %2X %2X %2X\n", current_entry.the_digest[0], 
 		  	current_entry.the_digest[1], current_entry.the_digest[2], 
 		  	current_entry.the_digest[3]);
-    }
-    else 
-    {
-    	current_entry = Log_IO_Read_Last_Base64_Entry(&r_log);
-		printf("The last entry:%s\n", current_entry.the_entry );
-		printf("Hash starts with: %2X %2X %2X %2X\n", current_entry.the_digest[0], 
-		  	current_entry.the_digest[1], current_entry.the_digest[2], 
-		  	current_entry.the_digest[3]);
-
-    	for (size_t i = 1; i <=  N - 1  ; i++)
-		{
-			current_entry = Log_IO_Read_Base64_Entry(&r_log, N - 1 - i);
-			printf("The entry:%s\n", current_entry.the_entry );
-			printf("Hash starts with: %2X %2X %2X %2X\n", current_entry.the_digest[0], 
-			  	current_entry.the_digest[1], current_entry.the_digest[2], 
-			  	current_entry.the_digest[3]);
-		}
-    }
-
+	}
+    
 	return LOG_FS_OK;
 }
 
