@@ -94,7 +94,7 @@ void initialize(void);
 // held ballot is a legal ballot for the election, as soon as the crypto
 // spec is ready for use.
 /*@ requires \valid(the_barcode + (0 .. its_length - 1));
-  @ requires the_state.P == EARLY_AND_LATE_DETECTED;
+  @ requires the_state.P == PAPER_DETECTED;
   @ assigns \nothing;
 */
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
@@ -109,7 +109,7 @@ bool is_cast_button_pressed(void);
 */
 bool is_spoil_button_pressed(void);
 
-/*@ requires the_state.P == EARLY_AND_LATE_DETECTED;
+/*@ requires the_state.P == PAPER_DETECTED;
   @ assigns \nothing;
   @ ensures \result == (the_state.BS == BARCODE_PRESENT_AND_RECORDED);
 */
@@ -199,15 +199,15 @@ void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2);
 
 /*@ assigns \nothing;
-  @ ensures \result == (the_state.P == EARLY_PAPER_DETECTED);
+  @ ensures \result == (the_state.P == PAPER_DETECTED);
 */
 bool ballot_detected(void);
 
-/*@ requires (the_state.P == EARLY_PAPER_DETECTED);
-  @ assigns \nothing;
-  @ ensures \result == (the_state.P == EARLY_AND_LATE_DETECTED);
+/*@ requires (the_state.M == MOTORS_OFF);
+  @ assigns the_state.M;
+  @ ensures the_state == \old(the_state);
 */
-bool ballot_inserted(void);
+void eject_ballot(void);
 
 /*@ requires (the_state.M == MOTORS_OFF);
   @ assigns the_state.M;
@@ -216,7 +216,7 @@ bool ballot_inserted(void);
 void eject_ballot(void);
 
 /*@ requires spoil_button_lit(the_state);
-  @ requires the_state.P == EARLY_AND_LATE_DETECTED;
+  @ requires the_state.P == PAPER_DETECTED;
   @ assigns the_state.button_illumination,
   @         the_state.P;
   @ ensures no_buttons_lit(the_state);
@@ -226,7 +226,7 @@ void eject_ballot(void);
 void spoil_ballot(void);
 
 /*@ requires cast_button_lit(the_state);
-  @ requires the_state.P == EARLY_AND_LATE_DETECTED;
+  @ requires the_state.P == PAPER_DETECTED;
   @ assigns the_state.button_illumination,
   @         the_state.P;
   @ ensures no_buttons_lit(the_state);
@@ -234,11 +234,6 @@ void spoil_ballot(void);
   @ ensures ASM_transition(\old(the_state), CAST_E, the_state);
 */
 void cast_ballot(void);
-
-/*@ assigns the_state.P;
-  @ ensures \result == the_state.P == EARLY_PAPER_DETECTED;
-*/
-bool ballot_spoiled(void);
 
 // Semi-equivalent to initialize() without firmware initialization.
 // @review Shouldn't calling this function clear the paper path?

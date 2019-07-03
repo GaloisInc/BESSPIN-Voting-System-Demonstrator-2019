@@ -100,14 +100,8 @@
   @                                       SBB_event E,
   @                                       SBB_state postS) =
   @    ((E == INTERNAL_PAPER_DETECT_E) ==>
-  @     ((preS.P == NO_PAPER_DETECTED && postS.P == EARLY_PAPER_DETECTED) ||
-  @      ((preS.P == EARLY_PAPER_DETECTED ||
-  @        preS.P == LATE_PAPER_DETECTED  ||
-  @        preS.P == EARLY_AND_LATE_DETECTED) &&
-  @       (postS.P == EARLY_PAPER_DETECTED ||
-  @        postS.P == LATE_PAPER_DETECTED  ||
-  @        postS.P == EARLY_AND_LATE_DETECTED) &&
-  @       preS.P != postS.P)));
+  @      ((preS.P == NO_PAPER_DETECTED && postS.P == PAPER_DETECTED) ||
+  @       (preS.P == PAPER_DETECTED    && postS.P == NO_PAPER_DETECTED)));
   @ }
   @ axiomatic SBB_timer_ASM {
   @   predicate timer_ASM_transition(SBB_state preS,

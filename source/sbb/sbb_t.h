@@ -39,10 +39,8 @@ typedef enum { INITIALIZATION = MOTORS_TURNING_BACKWARD+1,
                INITIALIZED_DISPLAY,
                SHOWING_TEXT } display_state;
 typedef enum { NO_PAPER_DETECTED = SHOWING_TEXT+1,
-               EARLY_PAPER_DETECTED,
-               LATE_PAPER_DETECTED,
-               EARLY_AND_LATE_DETECTED } paper_detect_state;
-typedef enum { ALL_BUTTONS_UP=EARLY_AND_LATE_DETECTED+1,
+               PAPER_DETECTED } paper_detect_state;
+typedef enum { ALL_BUTTONS_UP=PAPER_DETECTED+1,
                SPOIL_BUTTON_DOWN,
                CAST_BUTTON_DOWN } buttons_state;
 typedef enum { BARCODE_NOT_PRESENT = CAST_BUTTON_DOWN+1,
