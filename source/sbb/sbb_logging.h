@@ -28,13 +28,16 @@ extern log_entry barcode_scanned_msg;
 extern log_entry barcode_received_event_msg;
 extern log_entry empty_barcode_received_event_msg;
 
+// The file must be open
+bool import_and_verify(log_file the_file);
+
 //@ requires true;
-void load_or_create(log_file the_file, const log_name the_name);
+bool load_or_create(log_file the_file, const log_name the_name);
 
 // For now, overwite the existing log
 // @todo check for errors once it is possible to do so
 //@ requires true;
-void load_or_create_logs(void);
+bool load_or_create_logs(void);
 
 //@ requires true;
 void log_system_message(const log_entry new_entry);
@@ -50,6 +53,6 @@ void log_app_event(app_event event);
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \
         const log_entry state_change_entry = "State change: " #_field " := " #_new_state; \
-        debug_printf(state_change_entry);                               \
+        debug_printf((char *)state_change_entry);                       \
         log_system_message(state_change_entry); } while (0)
 #endif
