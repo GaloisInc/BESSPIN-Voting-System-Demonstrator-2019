@@ -220,7 +220,6 @@ int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
 
     /* Postcondition check */
     assert (*olen <= dlen);
-    assert (*olen >= (dlen - 2));
 
     return( 0 );
 }

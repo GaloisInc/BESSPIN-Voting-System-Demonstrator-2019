@@ -130,7 +130,7 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
  *
  * The actual number of characters in the decoded string is reported in
  * *olen, which MUST be evaluated by the caller. *olen will lie in the range
- * (dlen - 2) .. dlen
+ * 0 .. dlen
  */
 
 /*@ requires \valid_read (src + (0 .. slen - 1));
@@ -141,7 +141,6 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
   @ assigns dst[0 .. dlen - 1];
   @ assigns *olen;
   @ ensures *olen <= dlen;
-  @ ensures *olen >= (dlen - 2);
 */
 int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
                    const unsigned char *src, size_t slen );
