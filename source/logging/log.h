@@ -61,7 +61,7 @@ void export_log(const log_file the_log, const log_io_stream a_target);
   @ assigns  \result \from fs, the_log;
   @ ensures  \result <==> Log_Is_Wellformed (the_log);
   @*/
-bool verify_log_well_formedness(const log_file the_log);
+bool verify_log_well_formedness(log_file the_log);
 
 
 

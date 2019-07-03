@@ -41,9 +41,18 @@ bool verify_log_entry_well_formedness(const log_entry a_log_entry)
 
 void export_log(const log_file the_log, log_io_stream a_target) { return; }
 
-bool import_log(log_file the_log_file) { return true; }
 
-bool verify_log_well_formedness(const log_file the_log)
+bool verify_log_well_formedness(log_file the_log)
 {
     return verify_secure_log_security(the_log);
+}
+
+
+bool import_log(log_file the_log_file)
+{
+  // Just verify that the file is well-formed.
+  // If this returns TRUE, then the file is left open
+  // with the file pointer at the END for subsequent
+  // appending of further log entries.
+  return verify_log_well_formedness(the_log_file);
 }
