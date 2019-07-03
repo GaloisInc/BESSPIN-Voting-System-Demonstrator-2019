@@ -248,6 +248,7 @@ void ballot_box_main_loop(void) {
                     CHANGE_STATE(the_state, L, BARCODE_DETECTED);
                 } else {
                     display_this_text(no_barcode_text, strlen(no_barcode_text));
+                    log_app_event(APP_EVENT_BALLOT_SPOIL_INVALID_BARCODE);
                     CHANGE_STATE(the_state, L, EJECT);
                 }
             }
@@ -282,10 +283,13 @@ void ballot_box_main_loop(void) {
             if ( cast_or_spoil_timeout_expired() ) {
                 spoil_button_light_off();
                 cast_button_light_off();
+                log_app_event(APP_EVENT_BALLOT_SPOIL_TIMEOUT);
                 CHANGE_STATE(the_state, L, EJECT);
             } else if ( is_cast_button_pressed() ) {
+                log_app_event(APP_EVENT_BALLOT_USER_CAST);
                 CHANGE_STATE(the_state, L, CAST);
             } else if ( is_spoil_button_pressed() ) {
+                log_app_event(APP_EVENT_BALLOT_USER_SPOIL);
                 CHANGE_STATE(the_state, L, SPOIL);
             }
             break;

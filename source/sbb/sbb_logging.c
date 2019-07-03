@@ -9,6 +9,11 @@ const log_name app_log_file_name    = "application_log.txt";
 Log_Handle app_log_handle;
 Log_Handle system_log_handle;
 
+const log_entry app_event_entries[] = { "Ballot cast.",
+                                        "Ballot spoiled by user.",
+                                        "Ballot spoiled (invalid barcode).",
+                                        "Ballot spoiled (decision timeout)." };
+
 void load_or_create(log_file the_file, const log_name the_name) {
     // @todo There is no API for opening a file for write, so we will overwrite for now
     if ( false && Log_IO_File_Exists(the_name) ) {
@@ -30,4 +35,9 @@ void load_or_create_logs(void) {
 
 void log_system_message(const log_entry new_entry) {
     write_entry(&system_log_handle, new_entry);
+}
+
+// @design abakst I think this is going to change as the logging implementation is fleshed out
+void log_app_event(app_event event) {
+    write_entry(&app_log_handle, app_event_entries[event]);
 }

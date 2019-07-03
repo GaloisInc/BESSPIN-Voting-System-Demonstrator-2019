@@ -39,6 +39,14 @@ void load_or_create_logs(void);
 //@ requires true;
 void log_system_message(const log_entry new_entry);
 
+// @design abakst What information do we want to log here? The barcode?
+typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
+               APP_EVENT_BALLOT_USER_SPOIL,
+               APP_EVENT_BALLOT_SPOIL_INVALID_BARCODE,
+               APP_EVENT_BALLOT_SPOIL_TIMEOUT,
+               APP_EVENT_NUM_EVENTS } app_event;
+void log_app_event(app_event event);
+
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \
         const log_entry state_change_entry = "State change: " #_field " := " #_new_state; \
