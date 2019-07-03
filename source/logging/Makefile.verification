@@ -47,10 +47,10 @@ SOFTWARE_SPECS := log.h secure_log.h system_log.h application_log.h debug_io.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := log.c secure_log.c log_main.c log_io.c debug_io.c
+FRAMA_C_SOURCES := log.c secure_log.c log_main.c debug_io.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) log.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) log_io.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 # MAIN_ENTRY_POINT := log_main_loop
@@ -59,7 +59,7 @@ SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) log.c
 BC_OBJS  = $(FRAMA_C_SOURCES:.c=.bc)
 LL_OBJS  = $(FRAMA_C_SOURCES:.c=.ll)
 
-all: verify ide 
+all: verify ide
 
 ide: TAGS metrics
 
@@ -129,7 +129,7 @@ gui:
 bytecode/all.bc: $(BC_OBJS)
 	$(LLVM_LINK) -o=bytecode/all.bc $^
 	rm -f $^
-	
+
 bytecode/all.ll: $(LL_OBJS)
 	mv $(LL_OBJS) bytecode
 
@@ -161,4 +161,3 @@ clean:
 	rm -f *.log
 	rm -f *x86 *riscv
 	rm -rf metrics
-
