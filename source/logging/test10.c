@@ -7,7 +7,7 @@ void test_secure_log_security(const char *test_file_name)
     Log_Handle r_log;
     size_t N;
 
-    Log_IO_Open_Read(&r_log, test_file_name);
+    Log_IO_Open(&r_log, test_file_name);
 
     N = Log_IO_Num_Base64_Entries(&r_log);
 

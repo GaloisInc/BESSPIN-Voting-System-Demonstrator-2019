@@ -47,6 +47,7 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
                                 const char *name)   // IN
 {
     FRESULT res;
+
     res = f_open(&stream->the_file, name, FA_WRITE | FA_CREATE_ALWAYS);
 
     if (res == FR_OK)
@@ -59,11 +60,14 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     }
 }
 
-Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
-                               const char *name)   // IN
+Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
+                          const char *name)   // IN
 {
     FRESULT res;
-    res = f_open(&stream->the_file, name, FA_READ | FA_OPEN_EXISTING);
+
+    // Note we open for read/write/append so that a log file can be both
+    // verified by reading back its contents, but also appended to.
+    res = f_open(&stream->the_file, name, FA_READ | FA_WRITE | FA_OPEN_APPEND);
 
     if (res == FR_OK)
     {
@@ -409,17 +413,19 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     return LOG_FS_OK;
 }
 
-Log_FS_Result Log_IO_Open_Read(Log_Handle *stream, // OUT
-                               const char *name)   // IN
+Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
+                          const char *name)   // IN
 {
     FILE *local_stream_ptr;
 
     // POSIX fopen allocates for us, unlike FreeRTOS there the caller passed in a
     // pointer to memory that it has allocated. This is rather ugly.
-    local_stream_ptr = fopen(name, "r");
+    // Note we open for read/write/append so that a log file can be both
+    // verified by reading back its contents, but also appended to.
+    local_stream_ptr = fopen(name, "a+");
     if (local_stream_ptr == NULL)
     {
-        debug_printf("fopen() failed in Log_IO_Open_Read\n");
+        debug_printf("fopen() failed in Log_IO_Open\n");
         return LOG_FS_ERROR;
     }
     else

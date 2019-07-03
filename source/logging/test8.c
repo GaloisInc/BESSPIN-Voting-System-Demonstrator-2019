@@ -19,7 +19,7 @@ int main(void)
     write_entry(&my_log, second_entry);
     Log_IO_Close(&my_log);
 
-    Log_IO_Open_Read(&r_log, "test8log.txt");
+    Log_IO_Open(&r_log, "test8log.txt");
 
     if (Log_IO_Num_Base64_Entries(&r_log) == 2)
     {
