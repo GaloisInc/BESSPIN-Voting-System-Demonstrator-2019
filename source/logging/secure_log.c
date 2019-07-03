@@ -52,7 +52,7 @@ static secure_log_entry initial_log_entry(const log_entry msg) // IN
 
 // Exported functions
 
-void create_secure_log(Log_Handle *secure_log,
+void create_secure_log(Log_Handle *new_secure_log,
                        const secure_log_name the_secure_log_name,
                        const log_entry a_log_entry_type,
                        const secure_log_security_policy the_policy)
@@ -65,7 +65,7 @@ void create_secure_log(Log_Handle *secure_log,
     // Initial/Draft pseudo-code by RCC
 
     // 1. Create new file, open for writing only.
-    create_result = Log_IO_Create_New(secure_log, the_secure_log_name);
+    create_result = Log_IO_Create_New(new_secure_log, the_secure_log_name);
 
     // 2. call initial_log_entry above to create the first block
     initial_entry = initial_log_entry(a_log_entry_type);
@@ -73,13 +73,13 @@ void create_secure_log(Log_Handle *secure_log,
     // 2.1 @dragan keep the first hash
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant \forall size_t k; 0 <= k < i ==> secure_log -> previous_hash[k] == initial_entry.the_digest[k];
-      loop assigns secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+      loop invariant \forall size_t k; 0 <= k < i ==> new_secure_log -> previous_hash[k] == initial_entry.the_digest[k];
+      loop assigns new_secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
   */
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
-        secure_log->previous_hash[i] = initial_entry.the_digest[i];
+        new_secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
 
     base64_secure_log_entry base_64_current_entry;
@@ -99,15 +99,15 @@ void create_secure_log(Log_Handle *secure_log,
     {
         base_64_current_entry.the_entry[i] = initial_entry.the_entry[i];
     }
-    write_result = Log_IO_Write_Base64_Entry(secure_log, base_64_current_entry);
+
     // 3. Write that new block to the file.
-    //write_result = Log_IO_Write_Entry(secure_log, initial_entry);
+    write_result = Log_IO_Write_Base64_Entry(new_secure_log, base_64_current_entry);
 
     // TBD - what to do with the_policy parameter?
     //       awaiting requirements on this.
 
     // 4. sync the file.
-    sync_result = Log_IO_Sync(secure_log);
+    sync_result = Log_IO_Sync(new_secure_log);
 
     // TBDs - what about error cases?
     //   What if the file already exists? Perhaps a pre-condition here that it doesn't
