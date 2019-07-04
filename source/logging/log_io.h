@@ -187,12 +187,12 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
-    requires valid_base64_secure_log_entry(the_entry);
+    requires valid_secure_log_entry(the_entry);
     requires File_Is_Open (stream);
     assigns fs \from fs, stream, the_entry;
  */
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,          // IN
-                                 base64_secure_log_entry the_entry); // IN
+                                 secure_log_entry the_entry); // IN
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);

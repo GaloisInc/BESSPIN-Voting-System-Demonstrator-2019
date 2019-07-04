@@ -9,7 +9,6 @@
 #include "secure_log.h"
 #include "../crypto/crypto.h"
 #include "debug_io.h"
-#include <assert.h>
 
 // Local constants
 
@@ -59,8 +58,6 @@ void create_secure_log(Log_Handle *new_secure_log,
 {
     Log_FS_Result create_result, write_result, sync_result;
     secure_log_entry initial_entry;
-    size_t olen;
-    int r;
 
     // Initial/Draft pseudo-code by RCC
 
@@ -82,26 +79,8 @@ void create_secure_log(Log_Handle *new_secure_log,
         new_secure_log->previous_hash[i] = initial_entry.the_digest[i];
     }
 
-    base64_secure_log_entry base_64_current_entry;
-    r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
-                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
-                              &initial_entry.the_digest[0],
-                              SHA256_DIGEST_LENGTH_BYTES);
-    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
-
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == initial_entry.the_entry[i];
-      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-  */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        base_64_current_entry.the_entry[i] = initial_entry.the_entry[i];
-    }
-
     // 3. Write that new block to the file.
-    write_result = Log_IO_Write_Base64_Entry(new_secure_log, base_64_current_entry);
+    write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
 
     // TBD - what to do with the_policy parameter?
     //       awaiting requirements on this.
@@ -127,8 +106,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
     sha256_digest new_hash;
     uint8_t msg[SECURE_LOG_ENTRY_LENGTH]; // appended message
     size_t index = 0;
-    size_t olen;
-    int r;
+    
 
     // 0. Assume a_log_entry is already padded with zeroes
 
@@ -194,27 +172,10 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
         the_secure_log->previous_hash[i] = new_hash[i];
     }
 
-    base64_secure_log_entry base_64_current_entry;
-    r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
-                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
-                              &current_entry.the_digest[0],
-                              SHA256_DIGEST_LENGTH_BYTES);
-    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == current_entry.the_entry[i];
-      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-  */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        base_64_current_entry.the_entry[i] = current_entry.the_entry[i];
-    }
     // 4. Write the log_entry message to the_secure_log
 
     //write_result = Log_IO_Write_Entry(the_secure_log, current_entry);
-    write_result =
-        Log_IO_Write_Base64_Entry(the_secure_log, base_64_current_entry);
+    write_result = Log_IO_Write_Base64_Entry(the_secure_log, current_entry);
     // 5. Write the hash block
 
     // 6. Sync the file.

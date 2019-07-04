@@ -1,5 +1,6 @@
 #include "log_io.h"
 #include "debug_io.h"
+#include <assert.h>
 
 // Local constants
 const secure_log_entry null_secure_log_entry = {{0}, {0}};
@@ -349,17 +350,35 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
 }
 
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,                // IN
-                                        base64_secure_log_entry the_entry) // IN
+                                        secure_log_entry the_entry) // IN
 {
+    size_t olen;
+    int r;
     FRESULT write_entry_status, write_digest_status;
+    base64_secure_log_entry base_64_current_entry;
+    r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
+                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
+                              &the_entry.the_digest[0],
+                              SHA256_DIGEST_LENGTH_BYTES);
+    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
+    /*@
+      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == the_entry.the_entry[i];
+      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+      loop variant LOG_ENTRY_LENGTH - i;
+  */
+    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+    {
+        base_64_current_entry.the_entry[i] = the_entry.the_entry[i];
+    }
 
     UINT bytes_written1, bytes_written2, space_written, new_line_char_written;
-    write_entry_status = f_write(&stream->the_file, &the_entry.the_entry[0],
+    write_entry_status = f_write(&stream->the_file, &base_64_current_entry.the_entry[0],
                                  LOG_ENTRY_LENGTH, &bytes_written1);
 
     space_written = f_putc(space, &stream->the_file);
 
-    write_digest_status = f_write(&stream->the_file, &the_entry.the_digest[0],
+    write_digest_status = f_write(&stream->the_file, &base_64_current_entry.the_digest[0],
                                   SHA256_DIGEST_LENGTH_BYTES, &bytes_written2);
 
     new_line_char_written = f_putc(new_line, &stream->the_file);
@@ -544,17 +563,35 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream)
 }
 
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
-                                        base64_secure_log_entry the_entry)
+                                        secure_log_entry the_entry)
 {
+    size_t olen;
+    int r;
     size_t written;
+    base64_secure_log_entry base_64_current_entry;
+    r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
+                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
+                              &the_entry.the_digest[0],
+                              SHA256_DIGEST_LENGTH_BYTES);
+    assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
+    /*@
+      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == the_entry.the_entry[i];
+      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+      loop variant LOG_ENTRY_LENGTH - i;
+  */
+    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+    {
+        base_64_current_entry.the_entry[i] = the_entry.the_entry[i];
+    }
 
     written =
-        fwrite(&the_entry.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
+        fwrite(&base_64_current_entry.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
 
     fputc(space, &stream->the_file);
     written++;
 
-    written += fwrite(&the_entry.the_digest[0], 1,
+    written += fwrite(&base_64_current_entry.the_digest[0], 1,
                       SHA256_BASE_64_DIGEST_LENGTH_BYTES, &stream->the_file);
 
     fputc(new_line, &stream->the_file);
