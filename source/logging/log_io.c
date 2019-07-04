@@ -361,16 +361,9 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,                // IN
                               &the_entry.the_digest[0],
                               SHA256_DIGEST_LENGTH_BYTES);
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == the_entry.the_entry[i];
-      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-  */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        base_64_current_entry.the_entry[i] = the_entry.the_entry[i];
-    }
+    
+    memcpy (&base_64_current_entry.the_entry[0], &the_entry.the_entry[0],
+                    LOG_ENTRY_LENGTH);
 
     UINT bytes_written1, bytes_written2, space_written, new_line_char_written;
     write_entry_status = f_write(&stream->the_file, &base_64_current_entry.the_entry[0],
@@ -574,16 +567,8 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
                               &the_entry.the_digest[0],
                               SHA256_DIGEST_LENGTH_BYTES);
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant \forall size_t j; 0 <= j < i ==> base_64_current_entry.the_entry[i] == the_entry.the_entry[i];
-      loop assigns i, base_64_current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-  */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        base_64_current_entry.the_entry[i] = the_entry.the_entry[i];
-    }
+    memcpy (&base_64_current_entry.the_entry[0], &the_entry.the_entry[0],
+                    LOG_ENTRY_LENGTH);
 
     written =
         fwrite(&base_64_current_entry.the_entry[0], 1, LOG_ENTRY_LENGTH, &stream->the_file);
