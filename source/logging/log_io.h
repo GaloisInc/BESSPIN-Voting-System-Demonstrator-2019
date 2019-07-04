@@ -56,11 +56,6 @@ typedef enum
       \valid_read((uint8_t*)sle.the_entry[0 .. LOG_ENTRY_LENGTH - 1]) &&
       \valid_read((uint8_t*)sle.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1]);
 
-  predicate
-    valid_base64_secure_log_entry(base64_secure_log_entry sle)=
-      \valid_read((uint8_t*)sle.the_entry[0 .. LOG_ENTRY_LENGTH - 1]) &&
-      \valid_read((uint8_t*)sle.the_digest[0 .. SHA256_BASE_64_DIGEST_LENGTH_BYTES - 1]);
-
   global invariant log_file_is_not_empty:
    \forall log_file f; File_Num_Entries(f) > 0 ;
 
