@@ -1,0 +1,29 @@
+/*
+  Copyright (c) 2018, Galois Inc.
+  www.cryptol.net
+  You can freely use this source code for educational purposes.
+ */
+
+
+module MEE_CBC where
+
+// Using blocks of bytes for greatest compatibility with both EasyCrypt
+// and other external descriptions of these algorithms
+type Key size = [size][8]
+
+cbc_enc : {n, block, key} (fin n) =>
+  (key -> [block][8] -> [block][8]) ->
+  key ->
+  [block][8] ->
+  [n][block][8] ->
+  [n][block][8]
+cbc_enc enc k iv ps = cs
+ where cs = [ enc k (p ^ c') | p <- ps | c' <- [iv] # cs ]
+
+cbc_dec : {n, block, key} (fin n) =>
+  (key -> [block][8] -> [block][8]) ->
+  key ->
+  [block][8] ->
+  [n][block][8] ->
+  [n][block][8]
+cbc_dec dec k iv cs = [ (dec k c) ^ c' | c <- cs | c' <- [iv] # cs ]
