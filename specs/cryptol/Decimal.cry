@@ -1,0 +1,37 @@
+module Decimal where
+
+toBase : {digits, bits, base, d}
+  (fin base, fin bits, fin digits, base >= 1, base^^digits >= 2^^bits) =>
+  [base]d -> [bits] -> [digits]d
+toBase alphabet number = toBase'`{max (width base) bits} (zero # number)
+  where
+    toBase' : {x} (fin x, base >= 1, x >= width base) => [x] -> [digits]d
+    toBase' n =
+      if n == zero
+      then repeat (head alphabet)
+      else updateEnd (toBase' (n / `base) <<< 1)
+                     (zero : [0])
+                     (alphabet @ (n % `base))
+
+fromBase : {digits, bits, base, d}
+  (fin base, fin bits, fin digits, fin d,
+   base >= 1, bits >= width base, 2^^bits >= base^^digits) =>
+  [base][d] -> [digits][d] -> [bits]
+fromBase alphabet digits =
+  sum (zipWith (*) (values @@ digits) (reverse exponents))
+  where
+    values : [2^^d][bits]
+    values = updates (repeat (error "fromBase: invalid digit")) alphabet [0..base-1]
+
+    exponents : [digits][bits]
+    exponents = map (\e -> `base^^e) (take (iterate (\i -> i + 1) 0))
+
+toDecimal : {digits, bits}
+  (fin bits, fin digits, 10^^digits >= 2^^bits) =>
+  [bits] -> [digits][8]
+toDecimal = toBase ['0'..'9']
+
+fromDecimal : {digits, bits}
+  (fin bits, fin digits, bits >= 4, 2^^bits >= 10^^digits) =>
+  [digits][8] -> [bits]
+fromDecimal = fromBase ['0'..'9']
