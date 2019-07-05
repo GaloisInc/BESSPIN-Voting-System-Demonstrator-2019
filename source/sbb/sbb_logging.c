@@ -9,6 +9,7 @@ const log_name app_log_file_name    = "application_log.txt";
 Log_Handle app_log_handle;
 Log_Handle system_log_handle;
 
+// Each entry should be a 0-padded 256 uint8_t array according to the c specification.
 const log_entry app_event_entries[] = { "Ballot cast.",
                                         "Ballot spoiled by user.",
                                         "Ballot spoiled (invalid barcode).",
@@ -56,6 +57,7 @@ void log_system_message(const log_entry new_entry) {
 }
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out
+// For example, we should be logging time stamps as well.
 void log_app_event(app_event event) {
     write_entry(&app_log_handle, app_event_entries[event]);
 }
