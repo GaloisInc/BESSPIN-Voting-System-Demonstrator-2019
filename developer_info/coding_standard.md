@@ -47,7 +47,7 @@ This section is largely a summary of the guidance in "An Introduction to Pure-Ca
 1. Do not cast pointers.
 2. Do not do arithmetic with pointers.
 3. If you absolutely must cast a pointer to/from an integer type, then you must cast to/from `uintptr_r`, defined in C99's `<stdint.h>`.
-4. Do not declare a "struct" datatype that includes a pointer to other fields within the same stuct, or to the enclosing struct itself.
+4. Do not declare a `struct` datatype that includes a pointer to other fields within the same `struct`, or to the enclosing `struct` itself.
 5. Do not use "memcpy()" to copy data that includes pointer values.
 6. Functions must have fully defined prototypes, stating the type of each formal parameter. This rule will be checked by the -Wstrict-prototypes compiler flag.
 
