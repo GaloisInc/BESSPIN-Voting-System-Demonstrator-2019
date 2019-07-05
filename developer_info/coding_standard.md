@@ -40,10 +40,17 @@ The known-width primitive types in C99, defined in `<stdint.h>`, should be used 
 
 ## CheriABI compatibility
 
-This section will expand to cover coding rules that are required for compatibility with the Cambridge team's CheriABI and modified LLVM.
+This section will expand to cover coding rules that are required for compatibility with the Cambridge team's CHERI C and modified LLVM.
+
+This section is largely a summary of the guidiance in "An Introduction to Pure-Capability CHERI C/C++ Programming (DRAFT)" by Robert Watsno et. al.  This report is in the BESSPIN Group library within Zotero.
 
 1. Do not cast pointers.
-2. If you absolutely must cast a pointer to an integer type, then you must cast to `intptr_r`, defined in C99's `<stdint.h>`.
+2. Do not do arithmetic with pointers.
+3. If you absolutely must cast a pointer to/from an integer type, then you must cast to/from `uintptr_r`, defined in C99's `<stdint.h>`.
+4. Do not declare a "struct" datatype that includes a pointer to other fields within the same stuct, or to the enclosing struct itself.
+5. Do not use "memcpy()" to copy data that includes pointer values.
+6. Functions must have fully defined prototypes, stating the type of each formal parameter. This rule will be checked by the -Wstrict-prototypes compiler flag.
+
 
 ## Style and Formatting
 
