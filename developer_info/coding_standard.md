@@ -42,7 +42,7 @@ The known-width primitive types in C99, defined in `<stdint.h>`, should be used 
 
 This section will expand to cover coding rules that are required for compatibility with the Cambridge team's CHERI C and modified LLVM.
 
-This section is largely a summary of the guidiance in "An Introduction to Pure-Capability CHERI C/C++ Programming (DRAFT)" by Robert Watsno et. al.  This report is in the BESSPIN Group library within Zotero.
+This section is largely a summary of the guidance in "An Introduction to Pure-Capability CHERI C/C++ Programming (DRAFT)" by Robert Watson et al.  This report is in the BESSPIN Group library within Zotero.
 
 1. Do not cast pointers.
 2. Do not do arithmetic with pointers.
