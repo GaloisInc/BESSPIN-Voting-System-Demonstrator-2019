@@ -30,3 +30,6 @@ log_entry spoil_button_released_msg        = HW_EVENT("Spoil button released");
 log_entry barcode_scanned_msg              = HW_EVENT("Barcode scanned");
 log_entry barcode_received_event_msg       = HW_EVENT("Received barcode");
 log_entry empty_barcode_received_event_msg = HW_EVENT("Received empty barcode");
+
+log_entry invalid_barcode_received_event_msg = HW_EVENT("Barcode is invalid");
+log_entry decision_timeout_event_msg         = HW_EVENT("User cast/spoil decision timeout");

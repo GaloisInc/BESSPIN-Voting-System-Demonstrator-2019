@@ -11,9 +11,7 @@ Log_Handle system_log_handle;
 
 // Each entry should be a 0-padded 256 uint8_t array according to the c specification.
 const log_entry app_event_entries[] = { "Ballot cast.",
-                                        "Ballot spoiled by user.",
-                                        "Ballot spoiled (invalid barcode).",
-                                        "Ballot spoiled (decision timeout)." };
+                                        "Ballot spoiled by user." };
 
 bool import_and_verify(log_file the_file) {
     bool b_success = false;

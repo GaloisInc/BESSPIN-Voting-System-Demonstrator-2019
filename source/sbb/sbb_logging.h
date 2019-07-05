@@ -28,6 +28,9 @@ extern log_entry barcode_scanned_msg;
 extern log_entry barcode_received_event_msg;
 extern log_entry empty_barcode_received_event_msg;
 
+extern log_entry invalid_barcode_received_event_msg;
+extern log_entry decision_timeout_event_msg;
+
 // The file must be open
 bool import_and_verify(log_file the_file);
 
@@ -45,8 +48,6 @@ void log_system_message(const log_entry new_entry);
 // @design abakst What information do we want to log here? The barcode?
 typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
                APP_EVENT_BALLOT_USER_SPOIL,
-               APP_EVENT_BALLOT_SPOIL_INVALID_BARCODE,
-               APP_EVENT_BALLOT_SPOIL_TIMEOUT,
                APP_EVENT_NUM_EVENTS } app_event;
 void log_app_event(app_event event);
 
