@@ -82,8 +82,8 @@ decodeBallot authKey ballotKey iv encodedBallot =
 
 // Proofs that ballot encoding is correct
 
-// ballot_roundtrip :
-//   {contests, maxPositions} (fin contests, fin maxPositions) =>
-//   Ballot contests maxPositions -> Bool
-// property ballot_roundtrip ballot =
-//   decodeBallot (encodeBallot ballot) == ballot
+ballot_roundtrip :
+  {contests, maxPositions} (fin contests, fin maxPositions) =>
+  Ballot contests maxPositions -> Bool
+property ballot_roundtrip authKey ballotKey iv ballot =
+  decodeBallot authKey ballotKey iv (encodeBallot authKey ballotKey iv ballot) == ballot
