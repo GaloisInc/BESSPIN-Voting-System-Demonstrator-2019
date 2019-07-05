@@ -1,0 +1,69 @@
+module BallotWireFormat where
+
+import Base64 (encodeBase64, decodeBase64, padWith, Base64)
+import `AES (aesEncrypt, aesDecrypt)
+import MEE_CBC (cbc_enc, cbc_dec)
+
+encrypt : {n} (fin n) => [32][8] -> [16][8] -> [n][8] -> [16 * (n /^ 16)][8]
+encrypt key iv plain =
+  join (cbc_enc blockEncrypt key iv (groupBy`{16} (padWith`{mod=16} zero plain)))
+  where
+    blockEncrypt k b =
+      groupBy`{8} (aesEncrypt (join b, join k))
+
+decrypt : {n} (fin n) => [32][8] -> [16][8] -> [16 * (n /^ 16)][8] -> [n][8]
+decrypt key iv cipher =
+  take`{n} (join (cbc_dec blockDecrypt key iv (groupBy`{16} cipher)))
+  where
+    blockDecrypt k b =
+      groupBy`{8} (aesDecrypt (join b, join k))
+
+cbcMAC : {n} (fin n, n >= 1) => [32][8] -> [16][8] -> [n][8] -> [16][8]
+cbcMAC key iv plain = last (groupBy`{16} (encrypt key iv plain))
+
+// Ballot encoding
+
+type time = 32
+type seq  = 64
+
+type Ballot contests maxPositions
+  = { time     : [time],
+      number   : [seq],
+      contests : [contests][maxPositions] }
+
+encodeBallot :
+  {contests, maxPositions} (fin contests, fin maxPositions) =>
+  [32][8] ->
+  [32][8] ->
+  [16][8] ->
+  Ballot contests maxPositions ->
+  Base64 (time / 8 + 16 + 16 * ((seq + time + contests * maxPositions) /^ 8 /^ 16))
+encodeBallot authKey ballotKey iv ballot =
+  encodeBase64 (encryptedBallot # timeBytes # auth)
+  where
+    numberBytes     = groupBy`{8} ballot.number
+    timeBytes       = groupBy`{8} ballot.time
+    contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
+    ballotBytes     = numberBytes # timeBytes # contestsBytes
+    encryptedBallot = encrypt ballotKey iv ballotBytes
+    auth = cbcMAC authKey zero (encryptedBallot # timeBytes)
+
+decodeBallot :
+  {contests, maxPositions} (fin contests, fin maxPositions) =>
+  Base64 ((seq + time + contests * maxPositions) /^ 8) ->
+  Ballot contests maxPositions
+decodeBallot chars =
+  if padding == zero
+  then { number = num, time = time, contests = split (contests) }
+  else error "Non-zero padding in ballot encoding"
+  where
+    num # time # contests # padding =
+      join (decodeBase64`{(seq + time + contests * maxPositions) /^ 8} chars)
+
+// Proofs that ballot encoding is correct
+
+// ballot_roundtrip :
+//   {contests, maxPositions} (fin contests, fin maxPositions) =>
+//   Ballot contests maxPositions -> Bool
+// property ballot_roundtrip ballot =
+//   decodeBallot (encodeBallot ballot) == ballot

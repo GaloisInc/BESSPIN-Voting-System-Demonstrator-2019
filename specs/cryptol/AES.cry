@@ -95,12 +95,12 @@ InvSubBytes state = [ [ InvSubByte b | b <- row ] | row <- state ]
 // The ShiftRows transform and its inverse
 ShiftRows : State -> State
 ShiftRows state = [ row <<< shiftAmount | row <- state
-                                        | shiftAmount <- ([0 .. 3] : [4][2])
+                                        | shiftAmount <- [0 .. 3]
                   ]
 
 InvShiftRows : State -> State
 InvShiftRows state = [ row >>> shiftAmount | row <- state
-                                           | shiftAmount <- ([0 .. 3] : [4][2])
+                                           | shiftAmount <- [0 .. 3]
                      ]
 
 // The MixColumns transform and its inverse
@@ -135,7 +135,7 @@ NextWord : ([8],[4][8],[4][8]) -> [4][8]
 NextWord(i, prev, old) = old ^ mask
    where mask = if i % `Nk == 0
                 then SubWord(RotWord(prev)) ^ Rcon (i / `Nk)
-                else if ((`Nk : [width (max 6 Nk)]) > 6) /\ (i % `Nk == 4)
+                else if (`Nk > 6) /\ (i % `Nk == 4)
                      then SubWord(prev)
                      else prev
 
@@ -152,9 +152,7 @@ keyWS seed    = xs
                        ]
 
 ExpandKey : [AESKeySize] -> KeySchedule
-ExpandKey key = (keys @ 0,
-                 keys @@ ([1 .. (Nr - 1)] : [Nr - 1][width (5 + Nk)]),
-                 keys @ (`Nr : [width Nr]))
+ExpandKey key = (keys @ 0, keys @@ [1 .. (Nr - 1)], keys @ `Nr)
   where   seed : [Nk][4][8]
           seed = split (split key)
           keys = ExpandKeyForever seed
