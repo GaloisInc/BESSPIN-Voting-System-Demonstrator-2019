@@ -214,13 +214,18 @@ void ballot_box_main_loop(void) {
         switch ( the_state.L ) {
 
         case INITIALIZE:
+            // Factor this out into its own function, or move the tests into initialize()
             initialize();
-            Log_FS_Result logresult = Log_IO_Initialize();
-            if ( logresult != LOG_FS_OK ) {
-                CHANGE_STATE(the_state, L, ABORT);
+            if ( LOG_FS_OK == Log_IO_Initialize() ) {
+                if ( load_or_create_logs() ) {
+                    CHANGE_STATE(the_state, L, STANDBY);
+                } else {
+                    debug_printf("Failed to import logs.");
+                    CHANGE_STATE(the_state, L, ABORT);
+                }
             } else {
-                load_or_create_logs();
-                CHANGE_STATE(the_state, L, STANDBY);
+                debug_printf("Failed to initialize logging system.");
+                CHANGE_STATE(the_state, L, ABORT);
             }
             break;
 
@@ -274,6 +279,7 @@ void ballot_box_main_loop(void) {
                 debug_printf("invalid barcode detected");
                 display_this_text(invalid_barcode_text,
                                   strlen(invalid_barcode_text));
+                log_system_message(invalid_barcode_received_event_msg);
                 CHANGE_STATE(the_state, L, EJECT);
             }
             break;
@@ -282,10 +288,13 @@ void ballot_box_main_loop(void) {
             if ( cast_or_spoil_timeout_expired() ) {
                 spoil_button_light_off();
                 cast_button_light_off();
+                log_system_message(decision_timeout_event_msg);
                 CHANGE_STATE(the_state, L, EJECT);
             } else if ( is_cast_button_pressed() ) {
+                log_app_event(APP_EVENT_BALLOT_USER_CAST);
                 CHANGE_STATE(the_state, L, CAST);
             } else if ( is_spoil_button_pressed() ) {
+                log_app_event(APP_EVENT_BALLOT_USER_SPOIL);
                 CHANGE_STATE(the_state, L, SPOIL);
             }
             break;

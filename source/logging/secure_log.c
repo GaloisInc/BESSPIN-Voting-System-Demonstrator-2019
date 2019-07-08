@@ -51,10 +51,10 @@ static secure_log_entry initial_log_entry(const log_entry msg) // IN
 
 // Exported functions
 
-void create_secure_log(Log_Handle *new_secure_log,
-                       const secure_log_name the_secure_log_name,
-                       const log_entry a_log_entry_type,
-                       const secure_log_security_policy the_policy)
+Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
+                                const secure_log_name the_secure_log_name,
+                                const log_entry a_log_entry_type,
+                                const secure_log_security_policy the_policy)
 {
     Log_FS_Result create_result, write_result, sync_result;
     secure_log_entry initial_entry;
@@ -95,10 +95,11 @@ void create_secure_log(Log_Handle *new_secure_log,
     //    that if not directly supported by ff.h
     //   What if the file create fails?
     //   What is the file write fails?
+    return LOG_FS_OK;
 }
 
-void write_entry_to_secure_log(const secure_log the_secure_log,
-                               const log_entry a_log_entry)
+Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
+                                        const log_entry a_log_entry)
 {
 
     Log_FS_Result write_result, sync_result;
@@ -181,7 +182,7 @@ void write_entry_to_secure_log(const secure_log the_secure_log,
     // 6. Sync the file.
     sync_result = Log_IO_Sync(the_secure_log);
 
-    return;
+    return LOG_FS_OK;
 }
 
 // Refinces Cryptol validFirstEntry

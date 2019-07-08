@@ -11,14 +11,14 @@
 // Subsystem includes
 #include "secure_log.h"
 
-void create_secure_log(Log_Handle *secure_log,
-                       const secure_log_name the_secure_log_name,
-                       const log_entry a_log_entry_type,
-                       const secure_log_security_policy the_policy)
+Log_FS_Result create_secure_log(Log_Handle *secure_log,
+                                const secure_log_name the_secure_log_name,
+                                const log_entry a_log_entry_type,
+                                const secure_log_security_policy the_policy)
 {
     assert(false);
     //@ assert false;
-    return;
+    return LOG_FS_ERROR;
 }
 
 secure_log_entry secure_log_entry_kind(const secure_log_name a_secure_log_name)
@@ -29,12 +29,12 @@ secure_log_entry secure_log_entry_kind(const secure_log_name a_secure_log_name)
     return result;
 }
 
-void write_entry_to_secure_log(const secure_log the_secure_log,
-                               const log_entry a_log_entry)
+Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
+                                        const log_entry a_log_entry)
 {
     assert(false);
     //@ assert false;
-    return;
+    return LOG_FS_ERROR;
 }
 
 bool verify_secure_log_entry_security(

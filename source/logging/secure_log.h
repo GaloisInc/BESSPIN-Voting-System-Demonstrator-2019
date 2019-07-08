@@ -30,10 +30,10 @@ typedef log_io_stream secure_log_io_stream;
   @ ensures File_Is_Open (secure_log);
   @ ensures \valid(secure_log);
   @*/
-void create_secure_log(Log_Handle *secure_log,
-                       const secure_log_name the_secure_log_name,
-                       const log_entry a_log_entry_type,
-                       const secure_log_security_policy the_policy);
+Log_FS_Result create_secure_log(Log_Handle *secure_log,
+                                const secure_log_name the_secure_log_name,
+                                const log_entry a_log_entry_type,
+                                const secure_log_security_policy the_policy);
 
 // TBD and Unimplemented at present
 // /*@ requires \valid_read(((char*)a_secure_log_name) + (0 .. LOG_ENTRY_LENGTH -1));
@@ -47,8 +47,8 @@ void create_secure_log(Log_Handle *secure_log,
   @ ensures File_Is_Open (the_secure_log);
   @ ensures \valid(the_secure_log);
   @*/
-void write_entry_to_secure_log(const secure_log the_secure_log,
-                               const log_entry a_log_entry);
+Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
+                                        const log_entry a_log_entry);
 
 // TBD and Unimplemented at present
 // /*@ requires \valid_read(the_secure_log_entry.the_entry  + (0 .. LOG_ENTRY_LENGTH - 1));

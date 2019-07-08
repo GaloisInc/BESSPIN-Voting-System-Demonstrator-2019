@@ -9,18 +9,18 @@
 // Subsystem includes
 #include "log.h"
 
-void create_log(Log_Handle *new_log_file, const log_name the_log_name)
+Log_FS_Result create_log(Log_Handle *new_log_file, const log_name the_log_name)
 {
     assert(false);
     //@ assert false;
-    return;
+    return LOG_FS_ERROR;
 }
 
-void write_entry(const log_file the_log, const log_entry a_log_entry)
+Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry)
 {
     assert(false);
     //@ assert false;
-    return;
+    return LOG_FS_ERROR;
 }
 
 bool verify_log_entry_well_formedness(const log_entry a_log_entry)
