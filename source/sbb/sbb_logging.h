@@ -43,13 +43,13 @@ bool load_or_create(log_file the_file, const log_name the_name);
 bool load_or_create_logs(void);
 
 //@ requires true;
-void log_system_message(const log_entry new_entry);
+bool log_system_message(const log_entry new_entry);
 
 // @design abakst What information do we want to log here? The barcode?
 typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
                APP_EVENT_BALLOT_USER_SPOIL,
                APP_EVENT_NUM_EVENTS } app_event;
-void log_app_event(app_event event);
+bool log_app_event(app_event event);
 
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \

@@ -10,7 +10,7 @@
 #include "log.h"
 #include "secure_log.h"
 
-void create_log(Log_Handle *new_log_file, const log_name the_log_name)
+Log_FS_Result create_log(Log_Handle *new_log_file, const log_name the_log_name)
 {
     const log_entry first_entry =
         "hello "
@@ -21,17 +21,19 @@ void create_log(Log_Handle *new_log_file, const log_name the_log_name)
 
     const secure_log_security_policy first_policy = {
         hashchain_sha2_256, no_provenance,     no_confidentiality,
-        hmac_sha2_256,      no_access_control, no_non_repudiation};
+        aes_cbc,            no_access_control, no_non_repudiation};
 
-    create_secure_log(new_log_file, the_log_name, first_entry, first_policy);
+    Log_FS_Result create_result = create_secure_log(new_log_file, the_log_name, first_entry, first_policy);
+
+    return create_result;
 }
 
-void write_entry(const log_file the_log, const log_entry a_log_entry)
+Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry)
 {
 
-    write_entry_to_secure_log(the_log, a_log_entry);
+    Log_FS_Result write_result = write_entry_to_secure_log(the_log, a_log_entry);
 
-    return;
+    return write_result;
 }
 
 bool verify_log_entry_well_formedness(const log_entry a_log_entry)

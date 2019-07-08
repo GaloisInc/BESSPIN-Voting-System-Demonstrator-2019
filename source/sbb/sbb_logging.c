@@ -30,9 +30,10 @@ bool load_or_create(log_file the_file, const log_name the_name) {
     if ( Log_IO_File_Exists(the_name) &&
          LOG_FS_OK == Log_IO_Open(the_file, the_name) ) {
         b_success = import_and_verify(the_file);
+    } else if ( LOG_FS_OK == create_log(the_file, the_name) ) {
+        b_success = true;
     } else {
-        // @todo Can this fail?
-        create_log(the_file, the_name);
+        b_success = false;
     }
 
     return b_success;
@@ -50,12 +51,16 @@ bool load_or_create_logs(void) {
     return b_success;
 }
 
-void log_system_message(const log_entry new_entry) {
-    write_entry(&system_log_handle, new_entry);
+bool log_system_message(const log_entry new_entry) {
+   Log_FS_Result res = write_entry(&system_log_handle, new_entry);
+
+   return (res == LOG_FS_OK);
 }
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out
 // For example, we should be logging time stamps as well.
-void log_app_event(app_event event) {
-    write_entry(&app_log_handle, app_event_entries[event]);
+bool log_app_event(app_event event) {
+    Log_FS_Result res = write_entry(&app_log_handle, app_event_entries[event]);
+
+    return (res == LOG_FS_OK);
 }

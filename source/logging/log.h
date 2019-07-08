@@ -26,14 +26,14 @@
   @ requires \separated(new_log_file, the_log_name);
   @ assigns *new_log_file \from the_log_name, fs;
   @*/
-void create_log(log_file new_log_file, const log_name the_log_name);
+Log_FS_Result create_log(log_file new_log_file, const log_name the_log_name);
 
 /*@ requires \valid(the_log);
   @ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires \separated(the_log, a_log_entry);
   @ assigns  fs \from fs, the_log, a_log_entry;
   @*/
-void write_entry(const log_file the_log, const log_entry a_log_entry);
+Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry);
 
 /*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ assigns  \result \from a_log_entry;
