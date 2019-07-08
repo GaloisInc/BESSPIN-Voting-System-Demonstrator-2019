@@ -150,7 +150,12 @@ void log_single_event( EventBits_t bits,
                        EventBits_t bit,
                        const log_entry event_entry ) {
     if ( bits && bit ) {
-        log_system_message(event_entry);
+        bool b_log_ok = log_system_message(event_entry);
+
+        if (!b_log_ok) {
+            debug_printf("Failed to write to system log.");
+            the_state.L = ABORT;
+        }
     }
 }
 
@@ -198,10 +203,129 @@ void update_sensor_state(void) {
     update_barcode_state( (ux_Returned & ebBARCODE_SCANNED) );
 }
 
+void run_await_removal(void) {
+    if ( !ballot_detected() ) {
+        CHANGE_STATE(the_state, L, STANDBY);
+    }
+}
+
+void run_eject(void) {
+    eject_ballot();
+    display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+    CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
+}
+
+void run_spoil(void) {
+    spoil_ballot();
+    display_this_text(remove_ballot_text, strlen(remove_ballot_text));
+    CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
+}
+
+void run_cast(void) {
+    display_this_text(casting_ballot_text,
+                      strlen(casting_ballot_text));
+    cast_ballot();
+    CHANGE_STATE(the_state, L, STANDBY);
+}
+
+void run_wait_for_decision(void) {
+    if ( cast_or_spoil_timeout_expired() ) {
+        spoil_button_light_off();
+        cast_button_light_off();
+        log_system_message(decision_timeout_event_msg);
+        CHANGE_STATE(the_state, L, EJECT);
+    } else if ( is_cast_button_pressed() ) {
+        if ( !log_app_event(APP_EVENT_BALLOT_USER_CAST) ) {
+            debug_printf("Failed to write to app log.");
+            CHANGE_STATE(the_state, L, ABORT);
+        } else {
+            CHANGE_STATE(the_state, L, CAST);
+        }
+    } else if ( is_spoil_button_pressed() ) {
+        if ( !log_app_event(APP_EVENT_BALLOT_USER_SPOIL) ) {
+            debug_printf("Failed to write to app log.");
+            CHANGE_STATE(the_state, L, ABORT);
+        } else {
+            CHANGE_STATE(the_state, L, SPOIL);
+        }
+    } else {
+        // pass
+    }
+}
+
+void run_barcode_detected(void) {
+    char this_barcode[BARCODE_MAX_LENGTH] = {0};
+    display_this_text(barcode_detected_text,
+                      strlen(barcode_detected_text));
+    what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
+    if ( is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH) ) {
+        // Prompt the user for a decision
+        debug_printf("valid barcode detected");
+        cast_button_light_on();
+        spoil_button_light_on();
+        cast_or_spoil_timeout_reset();
+        display_this_2_line_text(cast_or_spoil_line_1_text,
+                                 strlen(cast_or_spoil_line_1_text),
+                                 cast_or_spoil_line_2_text,
+                                 strlen(cast_or_spoil_line_2_text));
+        // Go to the waiting state
+        CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
+    } else {
+        debug_printf("invalid barcode detected");
+        display_this_text(invalid_barcode_text,
+                          strlen(invalid_barcode_text));
+        log_system_message(invalid_barcode_received_event_msg);
+        CHANGE_STATE(the_state, L, EJECT);
+    }
+}
+
+void run_feed_ballot(void) {
+    // We want to stop the motor if we've run it for too long
+    // or if we no longer detect any paper. Then we see if we got a barcode
+    // to determine which state to transition to.
+    if ( !ballot_detected() || ballot_detect_timeout_expired() ) {
+        stop_motor();
+        if ( has_a_barcode() ) {
+            CHANGE_STATE(the_state, L, BARCODE_DETECTED);
+        } else {
+            display_this_text(no_barcode_text, strlen(no_barcode_text));
+            CHANGE_STATE(the_state, L, EJECT);
+        }
+    }
+}
+
+void run_wait_for_ballot(void) {
+    if ( ballot_detected() ) {
+        ballot_detect_timeout_reset();
+        move_motor_forward();
+        CHANGE_STATE(the_state, L, FEED_BALLOT);
+    }
+}
+
+void run_initialize(void) {
+    initialize();
+    if ( LOG_FS_OK == Log_IO_Initialize() ) {
+        if ( load_or_create_logs() ) {
+            CHANGE_STATE(the_state, L, STANDBY);
+        } else {
+            debug_printf("Failed to import logs.");
+            CHANGE_STATE(the_state, L, ABORT);
+        }
+    } else {
+        debug_printf("Failed to initialize logging system.");
+        CHANGE_STATE(the_state, L, ABORT);
+    }
+}
+
+void run_standby(void) {
+    go_to_standby();
+    flush_barcodes();
+    CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
+}
+
 // This main loop for the SBB never terminates until the system is
 // turned off.
 void ballot_box_main_loop(void) {
-    char this_barcode[BARCODE_MAX_LENGTH] = {0};
     the_state.L = INITIALIZE;
     logic_state old = 0;
 
@@ -214,119 +338,48 @@ void ballot_box_main_loop(void) {
         switch ( the_state.L ) {
 
         case INITIALIZE:
-            // Factor this out into its own function, or move the tests into initialize()
-            initialize();
-            if ( LOG_FS_OK == Log_IO_Initialize() ) {
-                if ( load_or_create_logs() ) {
-                    CHANGE_STATE(the_state, L, STANDBY);
-                } else {
-                    debug_printf("Failed to import logs.");
-                    CHANGE_STATE(the_state, L, ABORT);
-                }
-            } else {
-                debug_printf("Failed to initialize logging system.");
-                CHANGE_STATE(the_state, L, ABORT);
-            }
+            run_initialize();
             break;
 
         case STANDBY:
-            go_to_standby();
-            flush_barcodes();
-            CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
+            run_standby();
             break;
 
         case WAIT_FOR_BALLOT:
-            if ( ballot_detected() ) {
-                ballot_detect_timeout_reset();
-                move_motor_forward();
-                CHANGE_STATE(the_state, L, FEED_BALLOT);
-            }
+            run_wait_for_ballot();
             break;
 
         case FEED_BALLOT:
-            // We want to stop the motor if we've run it for too long
-            // or if we no longer detect any paper. Then we see if we got a barcode
-            // to determine which state to transition to.
-            if ( !ballot_detected() || ballot_detect_timeout_expired() ) {
-                stop_motor();
-                if ( has_a_barcode() ) {
-                    CHANGE_STATE(the_state, L, BARCODE_DETECTED);
-                } else {
-                    display_this_text(no_barcode_text, strlen(no_barcode_text));
-                    CHANGE_STATE(the_state, L, EJECT);
-                }
-            }
+            run_feed_ballot();
             break;
 
             // Requires: has_a_barcode
         case BARCODE_DETECTED:
-            display_this_text(barcode_detected_text,
-                              strlen(barcode_detected_text));
-            what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
-            if ( is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH) ) {
-                // Prompt the user for a decision
-                debug_printf("valid barcode detected");
-                cast_button_light_on();
-                spoil_button_light_on();
-                cast_or_spoil_timeout_reset();
-                display_this_2_line_text(cast_or_spoil_line_1_text,
-                                         strlen(cast_or_spoil_line_1_text),
-                                         cast_or_spoil_line_2_text,
-                                         strlen(cast_or_spoil_line_2_text));
-                // Go to the waiting state
-                CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
-            } else {
-                debug_printf("invalid barcode detected");
-                display_this_text(invalid_barcode_text,
-                                  strlen(invalid_barcode_text));
-                log_system_message(invalid_barcode_received_event_msg);
-                CHANGE_STATE(the_state, L, EJECT);
-            }
+            run_barcode_detected();
             break;
 
         case WAIT_FOR_DECISION:
-            if ( cast_or_spoil_timeout_expired() ) {
-                spoil_button_light_off();
-                cast_button_light_off();
-                log_system_message(decision_timeout_event_msg);
-                CHANGE_STATE(the_state, L, EJECT);
-            } else if ( is_cast_button_pressed() ) {
-                log_app_event(APP_EVENT_BALLOT_USER_CAST);
-                CHANGE_STATE(the_state, L, CAST);
-            } else if ( is_spoil_button_pressed() ) {
-                log_app_event(APP_EVENT_BALLOT_USER_SPOIL);
-                CHANGE_STATE(the_state, L, SPOIL);
-            }
+            run_wait_for_decision();
             break;
 
         case CAST:
-            display_this_text(casting_ballot_text,
-                              strlen(casting_ballot_text));
-            cast_ballot();
-            CHANGE_STATE(the_state, L, STANDBY);
+            run_cast();
             break;
 
         case SPOIL:
-            spoil_ballot();
-            display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-            CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
+            run_spoil();
             break;
 
         case EJECT:
-            eject_ballot();
-            display_this_text(remove_ballot_text, strlen(remove_ballot_text));
-            CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
+            run_eject();
             break;
 
         case AWAIT_REMOVAL:
-            if ( !ballot_detected() ) {
-                CHANGE_STATE(the_state, L, STANDBY);
-            }
+            run_await_removal();
             break;
 
         case ABORT:
             break;
-
             //default:
             //assert(false);
         }

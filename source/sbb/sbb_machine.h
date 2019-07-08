@@ -60,3 +60,48 @@ EventBits_t next_barcode_event_bits(void);
   @      && (the_state == s2 || ASM_transition(s2, INTERNAL_BARCODE_E, the_state));
 */
 void update_sensor_state(void);
+
+/*@ assigns the_state.BS;
+  @ ensures the_state.BS == BARCODE_NOT_PRESENT;
+ */
+void flush_barcodes(void);
+
+/*@ requires the_state.L == AWAIT_REMOVAL;
+ */
+void run_await_removal(void);
+
+/*@ requires the_state.L == EJECT;
+ */
+void run_eject(void);
+
+/*@ requires the_state.L == SPOIL;
+ */
+void run_spoil(void);
+
+/*@ requires the_state.L == CAST;
+ */
+void run_cast(void);
+
+/*@ requires the_state.L == WAIT_FOR_DECISION;
+ */
+void run_wait_for_decision(void);
+
+/*@ requires the_state.L == BARCODE_DETECTED;
+ */
+void run_barcode_detected(void);
+
+/*@ requires the_state.L == FEED_BALLOT;
+ */
+void run_feed_ballot(void);
+
+/*@ requires the_state.L == WAIT_FOR_BALLOT;
+ */
+void run_wait_for_ballot(void);
+
+/*@ requires the_state.L == INITIALIZE;
+ */
+void run_initialize(void);
+
+/*@ requires the_state.L == STANDBY;
+ */
+void run_standby(void);

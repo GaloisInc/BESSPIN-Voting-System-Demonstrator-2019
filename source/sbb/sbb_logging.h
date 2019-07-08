@@ -51,9 +51,19 @@ typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
                APP_EVENT_NUM_EVENTS } app_event;
 bool log_app_event(app_event event);
 
+/*@ requires \valid(the_state);
+  @ assigns the_state->L;
+  @ behavior log_error:
+  @   ensures the_state->L == ABORT;
+  @ behavior log_ok:
+  @   ensures the_state->L == \old(the_state)->L;
+  @ complete behaviors log_error, log_ok;
+*/
+void log_or_abort(SBB_state *the_state, const log_entry the_entry);
+
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \
         const log_entry state_change_entry = "State change: " #_field " := " #_new_state; \
-        debug_printf((char *)state_change_entry);                       \
-        log_system_message(state_change_entry); } while (0)
+        log_or_abort(&(_state), state_change_entry);                    \
+    } while (0)
 #endif

@@ -64,3 +64,10 @@ bool log_app_event(app_event event) {
 
     return (res == LOG_FS_OK);
 }
+
+void log_or_abort(SBB_state *the_state, const log_entry the_entry) {
+    debug_printf((char *)the_entry);
+    if (!log_system_message(the_entry)) {
+        the_state->L = ABORT;
+    }
+}
