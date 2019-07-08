@@ -79,6 +79,7 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     requires valid_string(name);
     requires \separated(stream, name);
     assigns *stream \from log_fs, name, endpoint;
+    assigns \result \from log_fs, name, endpoint;
     behavior success:
       ensures \result == LOG_FS_OK;
       ensures \valid (stream);
@@ -156,7 +157,6 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
-    requires valid_secure_log_entry(the_entry);
     requires File_Is_Open (stream);
     assigns log_fs \from log_fs, stream, the_entry;
  */
