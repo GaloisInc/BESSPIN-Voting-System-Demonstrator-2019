@@ -14,7 +14,9 @@
 #include "sbb.acsl"
 #include "sbb_logging.h"
 
+/* FreeRTOS kernel includes. */
 #include <FreeRTOS.h>
+#include <task.h>
 
 // Display strings
 extern const char *welcome_text;
@@ -272,12 +274,6 @@ bool ballot_detected(void);
   @ ensures the_state.M == MOTORS_OFF;
   @ ensures the_state.L == ABORT || the_state.L == \old(the_state).L;
   @ ensures SBB_Invariant;
-*/
-void eject_ballot(void);
-
-/*@ requires (the_state.M == MOTORS_OFF);
-  @ assigns the_state.M;
-  @ ensures the_state == \old(the_state);
 */
 void eject_ballot(void);
 
