@@ -26,7 +26,7 @@ typedef log_io_stream secure_log_io_stream;
 
 /*@ requires \valid(secure_log);
   @ requires \valid_read(a_log_entry_type + (0 .. LOG_ENTRY_LENGTH - 1));
-  @ assigns *secure_log \from fs, the_secure_log_name, a_log_entry_type, the_policy;
+  @ assigns *secure_log \from log_fs, the_secure_log_name, a_log_entry_type, the_policy;
   @ ensures File_Is_Open (secure_log);
   @ ensures \valid(secure_log);
   @*/
@@ -43,7 +43,7 @@ Log_FS_Result create_secure_log(Log_Handle *secure_log,
 /*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires \valid(the_secure_log);
   @ requires \separated(the_secure_log, a_log_entry);
-  @ assigns fs \from fs, the_secure_log, a_log_entry;
+  @ assigns log_fs \from log_fs, the_secure_log, a_log_entry;
   @ ensures File_Is_Open (the_secure_log);
   @ ensures \valid(the_secure_log);
   @*/
@@ -57,7 +57,7 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
 // bool verify_secure_log_entry_security(const secure_log_entry the_secure_log_entry);
 
 /*@ requires \valid_read(the_secure_log);
-  @ assigns \result \from fs, the_secure_log;
+  @ assigns \result \from log_fs, the_secure_log;
   @
   @ behavior failure:
   @ assumes File_Num_Entries(the_secure_log) ==0;
@@ -65,7 +65,7 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
   @ ensures !\result;
   @
   @ behavior success:
-  @ assumes File_Num_Entries(the_secure_log)>=1; 
+  @ assumes File_Num_Entries(the_secure_log)>=1;
   @ ensures \result;
   @
   @ complete behaviors failure, success;

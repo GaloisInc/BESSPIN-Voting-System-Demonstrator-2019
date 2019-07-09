@@ -24,14 +24,14 @@
 /*@ requires \valid(new_log_file);
   @ requires valid_string(the_log_name);
   @ requires \separated(new_log_file, the_log_name);
-  @ assigns *new_log_file \from the_log_name, fs;
+  @ assigns *new_log_file \from the_log_name, log_fs;
   @*/
 Log_FS_Result create_log(log_file new_log_file, const log_name the_log_name);
 
 /*@ requires \valid(the_log);
   @ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires \separated(the_log, a_log_entry);
-  @ assigns  fs \from fs, the_log, a_log_entry;
+  @ assigns  log_fs \from log_fs, the_log, a_log_entry;
   @*/
 Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry);
 
@@ -58,7 +58,7 @@ void export_log(const log_file the_log, const log_io_stream a_target);
 
 
 /*@ requires \valid(the_log);
-  @ assigns  \result \from fs, the_log;
+  @ assigns  \result \from log_fs, the_log;
   @ ensures  \result <==> Log_Is_Wellformed (the_log);
   @*/
 bool verify_log_well_formedness(log_file the_log);
@@ -68,7 +68,7 @@ bool verify_log_well_formedness(log_file the_log);
 /*@ requires \valid(the_log_file);
   @ requires File_Is_Open (the_log_file);
   @
-  @ assigns *the_log_file \from fs;
+  @ assigns *the_log_file \from log_fs;
   @
   @ behavior log_ok:
   @   assumes Log_Is_Wellformed (the_log_file);

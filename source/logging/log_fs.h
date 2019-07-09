@@ -67,6 +67,8 @@ Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
 Log_FS_Result Log_FS_Open(Log_Handle *stream, // OUT
                           const char *name);  // IN
 
+bool Log_FS_File_Exists(const char *name);  // IN
+
 Log_FS_Result Log_FS_Close(Log_Handle *stream); // IN
 
 Log_FS_Result Log_FS_Sync(Log_Handle *stream); // IN

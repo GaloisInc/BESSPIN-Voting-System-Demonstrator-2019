@@ -4,7 +4,7 @@
 log_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 log_hosttest_test4 log_hosttest_test5 log_hosttest_test6 \
 	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport
 
-LSOURCES = log.c secure_log.c log_io.c debug_io.c
+LSOURCES = log.c secure_log.c log_io.c log_fs.c debug_io.c
 CSOURCES = ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c ../crypto/base64.c
 
 log_hosttest_test1:

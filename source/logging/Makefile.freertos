@@ -7,6 +7,7 @@ DEMO_SRC = \
     log.c \
     secure_log.c \
     log_io.c \
+    log_fs.c \
     debug_io.c \
     ../crypto/aes.c \
     ../crypto/base64.c \
