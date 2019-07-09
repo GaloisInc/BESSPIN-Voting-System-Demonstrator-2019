@@ -6,12 +6,20 @@ Starting Point
 BASICS
 ------
 
-2. Install Homebrew
+2. Install Homebrew (https://brew.sh/) and install a variety of missing packages
+
+   brew install pkg-config gtksourceview libgnomecanvas libxml2 autoconf
+   setenv PKG_CONFIG_PATH `echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'`
+
+   (pkg-config doesn't know, by default, to look for all these 'opt'
+   packages; the environment variable fixes this. This command is for
+   csh/tcsh; do something equivalent for bash)
 
 OPAM
 ----
 
-3. Install and initalize opam
+3a. Install and initalize opam
+
 
    brew install opam
    opam init  (respond 'y' and 'y' to two questions)
@@ -20,7 +28,15 @@ Frama-C
 -------
 
 4. Install Frama-C using opam
+
+  opam install frama-c --unlock-base (because OCaml is newer than Frama-C?
+				      This installs an older version of OCaml) 
+  
 5. Check Frama-C realy is version 18.0 (Argon)
+
+  (By default, the instructions above seem to get you Frama-C version 19,
+  which *seems* to be just fine.)
+  
 
 LLVM (including clang)
 ----------------------
@@ -59,15 +75,22 @@ Even if not usign Coq for formal proofs, it is needed to build the BESSPIN Book.
 9. opam install coq
    opam install coqide
 
+Apparently this will recompile Frama-C.
+
 Z3 4.7.1
 --------
 
 Z3 (precisely version 4.7.1) is a pre-requisite for Cryptol.
 
 Download the package for x64-osx-10.11.6 from https://github.com/Z3Prover/z3/releases
+(or really, https://github.com/Z3Prover/z3/releases/tag/z3-4.7.1)
+
 Extract the ZIP file and move the extracted directory to $HOME/tools
 
 Edit $HOME/.bash_profile to add $HOME/tools/z3*/bin to your PATH
+
+(dwallach notes: running 'brew install cryptol' installed Z3 version 4.8.5
+automatically, so maybe this whole Z3 step is unnecessary?)
 
 Yices 2.6.1
 -----------
@@ -76,7 +99,8 @@ Another pre-requisute for Cryptol
 
 Relase 2.6.1 is required, but is available on HomeBrew, so:
 
- brew install yices2
+ brew install SRI-CSL/sri-csl/yices2
+
 
 Cryptol 2.7.0
 -------------
@@ -86,6 +110,9 @@ Grab the tarball of Cryptol 2.7.0 for OSX-64 from https://github.com/GaloisInc/c
 Decompress the untar the tarball, and move the resulting directory to $HOME/tools
 
 Edit $HOME/.bash_profile to add $HOME/tools/cryptol*/bin to your PATH
+
+(dwallach notes: running 'brew install cryptol' gets version 2.7.0)
+
 
 SAW
 ---
@@ -98,6 +125,14 @@ Download, decompress and untar that file.
 Move the resulting directory to $HOME/tools
 
 Add $HOME/tools/saw-0.3-OSX-64/bin to your PATH
+
+GIT SUBMODULES
+--------------
+
+git submodule update --init
+
+(Brings in FreeRTOS dependencies and toolsuite)
+
 
 NIX
 ---
