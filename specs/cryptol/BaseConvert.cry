@@ -1,4 +1,4 @@
-module Decimal where
+module BaseConvert where
 
 toBase : {digits, bits, base, d}
   (fin base, fin bits, fin digits, base >= 2, base^^digits >= 2^^bits) =>
@@ -15,13 +15,15 @@ toBase alphabet number = toBase'`{max (width base) bits} (zero # number)
 
 fromBase : {digits, bits, base, d}
   (fin base, fin bits, fin digits, fin d,
-   base >= 2, bits >= width base, 2^^bits >= base^^digits) =>
+   base >= 2, bits >= width base, bits >= width (base^^digits)) =>
   [base][d] -> [digits][d] -> [bits]
 fromBase alphabet digits =
   sum (zipWith (*) (values @@ digits) (reverse exponents))
   where
     values : [2^^d][bits]
-    values = updates (repeat (error "fromBase: invalid digit")) alphabet [0..base-1]
+    values = updates (repeat badDigit) alphabet [0..base-1]
+
+    badDigit = error "fromBase: digit not present in given base alphabet"
 
     exponents : [digits][bits]
     exponents = map (\e -> `base^^e) (take (iterate (\i -> i + 1) 0))
@@ -40,4 +42,5 @@ octal       = take`{8}  hexadecimal
 nonary      = take`{9}  hexadecimal
 decimal     = take`{10} hexadecimal
 duodecimal  = take`{12} hexadecimal
+hexadecimal : [16][8]
 hexadecimal = ['0'..'9'] # ['A'..'F']

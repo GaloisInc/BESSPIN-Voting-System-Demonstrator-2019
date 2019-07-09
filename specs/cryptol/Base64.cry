@@ -1,5 +1,7 @@
 module Base64 where
 
+import Padding
+
 // Base64 encoding
 
 /** This choice of characters corresponds to IETF RFC 4648 §5:
@@ -28,15 +30,7 @@ unBase64 =
     allUndefined =
       map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0.. 255]
 
-/** Pad an n-length sequence until it is a multiple of m long
-*/
-padWith :
-  {mod, n, a} (fin n, fin mod, mod >= 1) =>
-  a -> [n]a -> [mod * (n /^ mod)]a
-padWith pad items = items # repeat pad
-
-type Base64Length n = 4 * ((8 * n) /^ 6 /^ 4)
-type Base64 n = [Base64Length n][8]
+type Base64 n = [4 * ((8 * n) /^ 6 /^ 4)][8]
 
 /** Encode n bytes as Base64, padding to 4-byte chunks */
 encodeBase64 : {n} (fin n) => [n][8] -> Base64 n
