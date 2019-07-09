@@ -3,7 +3,7 @@ module BaseConvert where
 toBase : {digits, bits, base, d}
   (fin base, fin bits, fin digits, base >= 2, base^^digits >= 2^^bits) =>
   [base]d -> [bits] -> [digits]d
-toBase alphabet num = toBase'`{max (width base) bits} (zero # num)
+toBase alphabet number = toBase'`{max (width base) bits} (zero # number)
   where
     toBase' : {x} (fin x, base >= 1, x >= width base) => [x] -> [digits]d
     toBase' n =

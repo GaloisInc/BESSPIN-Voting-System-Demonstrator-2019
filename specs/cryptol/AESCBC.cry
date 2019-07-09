@@ -4,19 +4,23 @@ import `AES (aesEncrypt, aesDecrypt)
 import MEE_CBC (cbc_enc, cbc_dec)
 import Padding
 
-encrypt : {n} (fin n) => [32][8] -> [16][8] -> [16 * n][8] -> [16 * n][8]
+encrypt : {n} (fin n) => [32][8] -> [16][8] -> [n][8] -> [16 * (n /^ 16)][8]
 encrypt key iv plain =
-  join (cbc_enc blockEncrypt key iv (groupBy`{16} plain))
+  join (cbc_enc blockEncrypt key iv (groupBy`{16} (padWith`{mod=16} zero plain)))
   where
     blockEncrypt k b =
       groupBy`{8} (aesEncrypt (join b, join k))
 
-decrypt : {n} (fin n) => [32][8] -> [16][8] -> [16 * n][8] -> [16 * n][8]
+decrypt : {n} (fin n) => [32][8] -> [16][8] -> [16 * (n /^ 16)][8] -> [n][8]
 decrypt key iv cipher =
-  join (cbc_dec blockDecrypt key iv (groupBy`{16} cipher))
+  if padding == zero
+  then decrypted
+  else error "Non-zero padding during AES decryption: did you ask for too few bytes?"
   where
+    decrypted # padding =
+      join (cbc_dec blockDecrypt key iv (groupBy`{16} cipher))
     blockDecrypt k b =
       groupBy`{8} (aesDecrypt (join b, join k))
 
-cbcMAC : {n} (fin n, n >= 1) => [32][8] -> [16][8] -> [16 * n][8] -> [16][8]
+cbcMAC : {n} (fin n, n >= 1) => [32][8] -> [16][8] -> [n][8] -> [16][8]
 cbcMAC key iv plain = last (groupBy`{16} (encrypt key iv plain))
