@@ -5,7 +5,7 @@
 
 void Log_NET_Initialize() {
 	debug_printf("FreeRTOS_IPInit\r\n");
-	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, ucMACAddress);
+	FreeRTOS_IPInit(uIPAddress, uNetMask, uGatewayAddress, uDNSServerAddress, uMACAddress);
 }
 
 void Log_NET_Send(base64_secure_log_entry secure_log_entry) {
