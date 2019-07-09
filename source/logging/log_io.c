@@ -17,7 +17,12 @@ static const uint8_t new_line = '\n';
 // Common Implementation, built on log_fs.h //
 //////////////////////////////////////////////
 
-Log_FS_Result Log_IO_Initialize() { return Log_FS_Initialize(); }
+Log_FS_Result Log_IO_Initialize()
+{
+    return Log_FS_Initialize();
+
+    // TBD - also call Log_Net_Initialize() here if required
+}
 
 Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
                                 const char *name)   // IN
@@ -50,21 +55,32 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     int r;
     size_t written;
     base64_secure_log_entry base_64_current_entry;
+
+    // Step 1 - Form the Base64 encoding of the hash
     r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
                               SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
                               &the_entry.the_digest[0],
                               SHA256_DIGEST_LENGTH_BYTES);
     (void)r; // suppress warning on r unused.
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
+
+    // Step 2 - Copy the data block
     memcpy(&base_64_current_entry.the_entry[0], &the_entry.the_entry[0],
            LOG_ENTRY_LENGTH);
 
+
+    // Step 3 - Write (data # space # base64_hash # new_line) to file
     written = Log_FS_Write(stream, &base_64_current_entry.the_entry[0],
                            LOG_ENTRY_LENGTH);
     written += Log_FS_Write(stream, &space, 1);
     written += Log_FS_Write(stream, &base_64_current_entry.the_digest[0],
                             SHA256_BASE_64_DIGEST_LENGTH_BYTES);
     written += Log_FS_Write(stream, &new_line, 1);
+
+    // Step 4 - Write same data over network to the Reporting System
+    //
+    // TBD - Calling Log_Net functions as appropriate.
+
 
     if (written == (BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH))
     {
