@@ -14,10 +14,6 @@
 #include "sbb.acsl"
 #include "sbb_logging.h"
 
-/* FreeRTOS kernel includes. */
-#include <FreeRTOS.h>
-#include <task.h>
-
 // Display strings
 extern const char *welcome_text;
 extern const char *insert_ballot_text;
@@ -35,8 +31,6 @@ extern const char *error_line_1_text;
 extern const char *error_line_2_text;
 
 extern SBB_state the_state;
-extern TickType_t cast_or_spoil_timeout;
-extern TickType_t ballot_detect_timeout;
 
 /*@ axiomatic SBB {
 
@@ -329,13 +323,11 @@ void go_to_standby(void);
 // @design kiniry These next four functions should also probably move
 // out of this API, right Michal?
 
-//@ assigns ballot_detect_timeout;
 void ballot_detect_timeout_reset(void);
 
 //@ assigns \nothing;
 bool ballot_detect_timeout_expired(void);
 
-//@ assigns cast_or_spoil_timeout;
 void cast_or_spoil_timeout_reset(void);
 
 //@ assigns \nothing;

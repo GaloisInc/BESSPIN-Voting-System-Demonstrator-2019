@@ -230,6 +230,7 @@ void go_to_standby(void) {
     CHANGE_STATE(the_state, B, ALL_BUTTONS_UP);
 }
 
+//@ assigns ballot_detect_timeout;
 void ballot_detect_timeout_reset(void) {
     ballot_detect_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(BALLOT_DETECT_TIMEOUT_MS);
@@ -239,6 +240,7 @@ bool ballot_detect_timeout_expired(void) {
     return (xTaskGetTickCount() > ballot_detect_timeout);
 }
 
+//@ assigns cast_or_spoil_timeout;
 void cast_or_spoil_timeout_reset(void) {
     cast_or_spoil_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(CAST_OR_SPOIL_TIMEOUT_MS);
