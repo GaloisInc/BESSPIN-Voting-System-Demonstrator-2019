@@ -19,14 +19,19 @@ void Log_NET_Initialize() {
 }
 
 void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) {
-	// create header
+	
 	size_t len = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
     size_t FIXED_MESSAGE_SIZE = 134;
     char *log_file_name = file_name;
 
     size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + strlen(log_file_name) + len;
-
     char message[MESSAGE_SIZE];
+
+    int sockfd, bytes, sent, total;
+    char *host = "localhost";
+    struct hostent *server;
+    struct sockaddr_in serv_addr;
+    int PORT_NUMBER = 8066;
 
     char* REQUEST_LINE_1 = "POST /";
     char* REQUEST_LINE_2 = log_file_name;
@@ -42,6 +47,40 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
              REQUEST_LINE_1, REQUEST_LINE_2, REQUEST_LINE_3, HEADER_1,
              HEADER_2, HEADER_3, HEADER_4, HEADER_5_1,
              HEADER_5_2, DOUBLE_CRLF);
+
+    // add base64_secure_log_entry to the message
+
+    // create socket
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        debug_printf("ERROR opening socket");
+    }
+    // lookup the ip address
+    server = gethostbyname(host);
+    if (server == NULL) {
+        debug_printf("ERROR, no such host");
+    }
+    memset(&serv_addr,0,sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(PORT_NUMBER);
+    memcpy(&serv_addr.sin_addr.s_addr,server->h_addr,server->h_length);
+
+    // connect the socket
+    if (connect(sockfd,(struct sockaddr *)&serv_addr,sizeof(serv_addr)) < 0) {
+        debug_printf("ERROR connecting the socket");
+    }
+    total = MESSAGE_SIZE;
+    sent = 0;
+    do{
+        bytes = write(sockfd,message + sent,total - sent);
+        if (bytes < 0){
+            debug_printf("ERROR writing message to socket");
+        }
+        if (bytes == 0) {
+            break;
+        }
+        sent += bytes;
+    } while (sent < total);
 	return;
 }
 
