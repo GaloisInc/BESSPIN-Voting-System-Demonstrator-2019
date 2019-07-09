@@ -29,7 +29,8 @@ type Ballot contests positions
 encodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions, fin timeDigits, fin seqDigits,
-   encodedLength == 16 + timeDigits + 16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)) =>
+   encodedLength == 16 + timeDigits +
+     16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
   [16][8] ->
@@ -48,7 +49,8 @@ encodeBallot authKey ballotKey iv ballot =
 decodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions,
-   encodedLength == 16 + timeDigits + 16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)) =>
+   encodedLength == 16 + timeDigits +
+     16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
   [16][8] ->
@@ -70,29 +72,30 @@ decodeBallot authKey ballotKey iv encodedBallot =
   else
   { number = number, time = time, contests = split (contests) }
   where
-    encryptedBallot : [16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)][8]
+    encryptedBallot :
+      [16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)][8]
     outerTimeDigits : [timeDigits][8]
     auth            : [16][8]
 
     encryptedBallot # outerTimeDigits # auth =
       decodeBase64`{encodedLength} encodedBallot
 
-    numberBits : [seqDigits * 8]
+    numberBits : [seqDigits  * 8]
     timeBits   : [timeDigits * 8]
-    contests : [contests * positions]
+    contests   : [contests * positions]
 
     numberBits # timeBits # contests # padding =
       join (decrypt`{timeDigits + seqDigits + (contests * positions) /^ 8}
                     ballotKey iv encryptedBallot)
 
-    number          : [seqBytes  * 8]
-    time, outerTime : [timeBytes * 8]
-    numPadding                    : [width (10 ^^ seqDigits) - seqBytes * 8]
+    number                        : [seqBytes  * 8]
+    time, outerTime               : [timeBytes * 8]
+    numPadding                    : [width (10 ^^ seqDigits)  - seqBytes  * 8]
     timePadding, outerTimePadding : [width (10 ^^ timeDigits) - timeBytes * 8]
 
-    numPadding       # number    = fromBase decimal (groupBy`{8} numberBits)
-    timePadding      # time      = fromBase decimal (groupBy`{8} timeBits)
-    outerTimePadding # outerTime = fromBase decimal outerTimeDigits
+    numPadding       # number     = fromBase decimal (groupBy`{8} numberBits)
+    timePadding      # time       = fromBase decimal (groupBy`{8} timeBits)
+    outerTimePadding # outerTime  = fromBase decimal outerTimeDigits
 
 // Proofs that ballot encoding is correct
 
