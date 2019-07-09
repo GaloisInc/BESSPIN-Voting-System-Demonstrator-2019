@@ -9,7 +9,7 @@ INCLUDES = -I. \
 # Build the bottom target
 log_bottom:
 	cd $(LOG_DIR); \
-	$(CC)  -D__riscv_xlen=32 log_main.c log_bottom.c secure_log_bottom.c log_io.c debug_io.c ../crypto/base64.c -o secure_log_bottom.elf; \
+	$(CC)  -D__riscv_xlen=32 log_main.c log_bottom.c secure_log_bottom.c log_io.c log_fs.c log_net.c debug_io.c ../crypto/base64.c -o secure_log_bottom.elf; \
 	rm -f *.o
 
 log_bottom_clean:

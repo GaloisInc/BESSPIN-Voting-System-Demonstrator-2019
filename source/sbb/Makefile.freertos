@@ -13,6 +13,7 @@ DEMO_SRC = \
     ../logging/system_log.c \
     ../logging/application_log.c \
     ../logging/log_io.c \
+    ../logging/log_fs.c \
     ../logging/debug_io.c \
     ../crypto/base64.c \
     ../crypto/crypto.c \
@@ -21,7 +22,61 @@ DEMO_SRC = \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
 
-CFLAGS += -I$(LOGGING_DIR) 
+
+APP_SRC = \
+	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
+	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
+	$(FREERTOS_DEMO_DIR)/bsp/syscalls.c \
+	$(FREERTOS_DEMO_DIR)/bsp/uart.c \
+	$(FREERTOS_DEMO_DIR)/bsp/iic.c \
+	$(FREERTOS_DEMO_DIR)/bsp/gpio.c \
+	$(FREERTOS_DEMO_DIR)/bsp/spi.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_stats.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_options.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_l.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bd.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bdring.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_control.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_master.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_stats.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_options.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_extra.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xbasic_types.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_io.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c \
+	$(FREERTOS_DEMO_DIR)/devices/serLcd.c \
+	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
+	$(FREERTOS_DEMO_DIR)/devices/ff.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
+
+CFLAGS += -I$(LOGGING_DIR)
 
 #
 # Define all object files.
