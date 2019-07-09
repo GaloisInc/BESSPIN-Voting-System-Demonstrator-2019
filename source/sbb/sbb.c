@@ -98,10 +98,6 @@ bool is_spoil_button_pressed(void) {
 void just_received_barcode(void) {
 }
 
-/*@ requires \valid_read(the_barcode + (0 .. its_length));
-  @ requires \valid(barcode + (0..its_length));
-  @ assigns barcode[0 .. its_length];
- */
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
     configASSERT(its_length <= BARCODE_MAX_LENGTH);
     memcpy(barcode, the_barcode, its_length);

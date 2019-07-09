@@ -14,6 +14,8 @@
 #include "sbb.acsl"
 #include "sbb_logging.h"
 
+extern char barcode[BARCODE_MAX_LENGTH];
+
 // Display strings
 extern const char *welcome_text;
 extern const char *insert_ballot_text;
@@ -130,6 +132,12 @@ void initialize(void);
   @ assigns \nothing;
 */
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
+
+/*@ requires \valid_read(the_barcode + (0 .. its_length));
+  @ requires \valid(barcode + (0..its_length));
+  @ assigns barcode[0 .. its_length];
+*/
+void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.B == CAST_BUTTON_DOWN);

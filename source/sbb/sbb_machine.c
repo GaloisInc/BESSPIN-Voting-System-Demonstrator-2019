@@ -25,8 +25,6 @@ SBB_state the_state = { .S = START };
 // can talk about the state of memory-mapped firmware.
 firmware_state the_firmware_state;
 
-// @todo abakst refactor or expose this
-extern void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
 void update_paper_state(bool paper_in_pressed,
                         bool paper_in_released)
@@ -51,6 +49,8 @@ void update_button_state(bool cast_button_pressed,
                          bool spoil_button_pressed,
                          bool spoil_button_released) {
     switch ( the_state.B ) {
+    default:
+        break;
     case ALL_BUTTONS_UP:
         if ( cast_button_pressed ) {
             CHANGE_STATE(the_state, B, CAST_BUTTON_DOWN);
