@@ -49,7 +49,9 @@ bool log_system_message(const log_entry new_entry);
 typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
                APP_EVENT_BALLOT_USER_SPOIL,
                APP_EVENT_NUM_EVENTS } app_event;
-bool log_app_event(app_event event);
+bool log_app_event(app_event event,
+                   barcode_t barcode,
+                   barcode_length_t barcode_length);
 
 /*@ requires \valid(the_state);
   @ assigns the_state->L;
@@ -60,6 +62,8 @@ bool log_app_event(app_event event);
   @ complete behaviors log_error, log_ok;
 */
 void log_or_abort(SBB_state *the_state, const log_entry the_entry);
+
+bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length);
 
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \

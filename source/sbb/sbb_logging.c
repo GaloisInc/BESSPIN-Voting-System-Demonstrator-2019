@@ -75,7 +75,9 @@ bool log_system_message(const log_entry new_entry) {
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out
 // For example, we should be logging time stamps as well.
-bool log_app_event(app_event event) {
+bool log_app_event(app_event event,
+                   barcode_t barcode,
+                   barcode_length_t barcode_length) {
     #ifdef SIMULATION
     debug_printf("LOG: %s\r\n", app_event_entries[event]);
     return true;
@@ -94,4 +96,8 @@ void log_or_abort(SBB_state *the_state, const log_entry the_entry) {
         the_state->L = ABORT;
     }
     #endif
+}
+
+bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
+    return false;
 }

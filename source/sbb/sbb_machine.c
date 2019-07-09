@@ -235,14 +235,16 @@ void run_wait_for_decision(void) {
         log_system_message(decision_timeout_event_msg);
         CHANGE_STATE(the_state, L, EJECT);
     } else if ( is_cast_button_pressed() ) {
-        if ( !log_app_event(APP_EVENT_BALLOT_USER_CAST) ) {
+        if ( !log_app_event(APP_EVENT_BALLOT_USER_CAST,
+                            NULL,
+                            0) ) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
             CHANGE_STATE(the_state, L, CAST);
         }
     } else if ( is_spoil_button_pressed() ) {
-        if ( !log_app_event(APP_EVENT_BALLOT_USER_SPOIL) ) {
+        if ( !log_app_event(APP_EVENT_BALLOT_USER_SPOIL, NULL, 0) ) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
@@ -270,6 +272,10 @@ void run_barcode_detected(void) {
                                  strlen(cast_or_spoil_line_2_text));
         // Go to the waiting state
         CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
+    } else if ( barcode_cast_or_spoiled(this_barcode, BARCODE_MAX_LENGTH) ) {
+        // Eject Ballot
+        debug_printf("previously seen barcode detected");
+        CHANGE_STATE(the_state, L, EJECT);
     } else {
         debug_printf("invalid barcode detected");
         display_this_text(invalid_barcode_text,
