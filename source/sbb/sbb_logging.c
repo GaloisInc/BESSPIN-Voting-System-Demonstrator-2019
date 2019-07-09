@@ -1,6 +1,7 @@
 /**
  * Smart Ballot Box Logging Implementation
  */
+#include "sbb_t.h"
 #include "sbb_logging.h"
 
 const log_name system_log_file_name = "system_log.txt";

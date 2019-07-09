@@ -8,6 +8,8 @@
 #include "log.h"
 #include "debug_io.h"
 
+extern SBB_state the_state;
+
 // @design abakst these are handles to the app and system logs
 extern Log_Handle app_log_handle;
 extern Log_Handle system_log_handle;
@@ -85,7 +87,7 @@ bool log_app_event(app_event event,
   @ assigns log_fs \from log_fs, the_message, system_log_handle;
   @
   @ ensures Log_IO_Initialized;
-  @ ensures the_state->L == \old(the_state)->L || the_state->L == ABORT;
+  @ ensures the_state->L != ABORT ==> the_state->L == \old(the_state->L);
 */
 void log_or_abort(SBB_state *the_state, const char *the_message);
 

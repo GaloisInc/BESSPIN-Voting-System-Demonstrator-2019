@@ -53,15 +53,12 @@ extern SBB_state the_state;
     SBB_String(system_log_file_name)
     ;
 
-  predicate SBB_Invariant_init =
-    SBB_Strings_Invariant &&
-    motor_ASM_valid(the_state);
-
   predicate SBB_Invariant =
-    (the_state.L != ABORT) ==>
-    (the_state.M == INITIALIZED_DISPLAY || the_state.M == SHOWING_TEXT) &&
     Log_IO_Initialized &&
-    SBB_Invariant_init;
+    SBB_Strings_Invariant &&
+    (the_state.D == INITIALIZED_DISPLAY || the_state.D == SHOWING_TEXT) &&
+    motor_ASM_valid(the_state)
+    ;
   }
 */
 
@@ -190,7 +187,7 @@ void cast_button_light_on(void);
 void cast_button_light_off(void);
 
 /*@ requires SBB_Invariant;
-  @ requires the_state.L != ABORT;
+  @ requires the_state.M != MOTORS_TURNING_BACKWARD;
   @ assigns the_state.M, the_state.L, log_fs,
   @         gpio_mem[MOTOR_0],
   @         gpio_mem[MOTOR_1];
@@ -202,7 +199,7 @@ void cast_button_light_off(void);
 void move_motor_forward(void);
 
 /*@ requires SBB_Invariant;
-  @ requires the_state.L != ABORT;
+  @ requires the_state.M != MOTORS_TURNING_FORWARD;
   @ assigns the_state.M, the_state.L, log_fs,
   @         gpio_mem[MOTOR_0],
   @         gpio_mem[MOTOR_1];
@@ -214,12 +211,12 @@ void move_motor_forward(void);
 void move_motor_back(void);
 
 /*@ requires SBB_Invariant;
-  @ requires the_state.L != ABORT;
-  @ assigns the_state.M, the_state.L,
+  @ requires the_state.M != MOTORS_OFF;
+  @ assigns the_state.M, the_state.L, log_fs,
             gpio_mem[MOTOR_0],
             gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_OFF;
-  @ ensures the_state.L == ABORT || the_state.L == \old(the_state).L;
+  @ ensures the_state.L == ABORT || the_state.L == \old(the_state.L);
   @ ensures SBB_Invariant;
   @ ensures ASM_transition(\old(the_state), MOTOR_OFF_E, the_state);
 */
@@ -230,7 +227,6 @@ void stop_motor(void);
 // the display.
 
 /*@ requires \valid_read(the_text + (0 .. its_length - 1));
-  @ requires the_state.L != ABORT;
   @ requires SBB_Invariant;
   @ assigns the_state.D, the_state.L;
   @ assigns log_fs;
@@ -243,7 +239,6 @@ void display_this_text(const char* the_text, uint8_t its_length);
 
 /*@ requires \valid_read(line_1 + (0 .. length_1 - 1));
   @ requires \valid_read(line_2 + (0 .. length_2 - 1));
-  @ requires the_state.L != ABORT;
   @ requires SBB_Invariant;
   @ assigns the_state.D, the_state.L;
   @ assigns log_fs;
@@ -261,7 +256,6 @@ void display_this_2_line_text(const char *line_1, uint8_t length_1,
 bool ballot_detected(void);
 
 /*@ requires (the_state.M == MOTORS_OFF);
-  @ requires the_state.L != ABORT;
   @ requires SBB_Invariant;
   @ assigns the_state.M, the_state.L, log_fs,
   @         gpio_mem[MOTOR_0], gpio_mem[MOTOR_1];
@@ -273,28 +267,28 @@ void eject_ballot(void);
 
 /*@ requires spoil_button_lit(the_state);
   @ requires SBB_Invariant;
-  @ requires the_state.L != ABORT;
+  @ requires the_state.M == MOTORS_OFF;
   @ requires the_state.P == PAPER_DETECTED;
   @ assigns the_state.button_illumination, log_fs, gpio_mem[BUTTON_CAST_LED], gpio_mem[BUTTON_SPOIL_LED],
   @         gpio_mem[MOTOR_0], gpio_mem[MOTOR_1],
-  @         the_state.P, the_state.L, the_state.M;
+  @         the_state.L, the_state.M, the_state.D;
   @ ensures no_buttons_lit(the_state);
-  @ ensures the_state.P == NO_PAPER_DETECTED;
-  @ ensures ASM_transition(\old(the_state), SPOIL_E, the_state);
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
+  @ ensures the_state.D == SHOWING_TEXT;
   @ ensures SBB_Invariant;
 */
 void spoil_ballot(void);
 
 /*@ requires cast_button_lit(the_state);
+  @ requires !spoil_button_lit(the_state);
   @ requires SBB_Invariant;
-  @ requires the_state.L != ABORT;
+  @ requires the_state.M == MOTORS_OFF;
   @ assigns the_state.button_illumination,
   @         gpio_mem[BUTTON_CAST_LED], gpio_mem[MOTOR_0], gpio_mem[MOTOR_1],
   @         the_state.M, the_state.L, log_fs;
   @ ensures no_buttons_lit(the_state);
   @ ensures the_state.M == MOTORS_OFF;
-  @ ensures the_state.L == ABORT || the_state.L == \old(the_state).L;
+  @ ensures the_state.L == ABORT || the_state.L == \old(the_state.L);
   @ ensures SBB_Invariant;
 */
 void cast_ballot(void);
@@ -303,7 +297,6 @@ void cast_ballot(void);
 // @review Shouldn't calling this function clear the paper path?
 // @todo kiniry `insert_ballot_text` should be displayed.
 /*@ requires SBB_Invariant;
-  @ requires the_state.L != ABORT;
   @ assigns the_state.M, the_state.D, the_state.P, the_state.BS, the_state.S, the_state.L,
   @         the_state.B, the_state.button_illumination, log_fs,
   @         gpio_mem[BUTTON_CAST_LED], gpio_mem[BUTTON_SPOIL_LED],

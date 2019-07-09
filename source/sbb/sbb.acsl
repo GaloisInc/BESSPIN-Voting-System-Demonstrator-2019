@@ -80,7 +80,7 @@
   @                                  SBB_state postS) =
   @     ((E == MOTOR_OFF_E) ==>
   @       (preS.M == MOTORS_OFF && postS.M == MOTORS_OFF) ||
-  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) &&
+  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) ||
   @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_OFF)) &&
   @     ((E == MOTOR_FORWARD_E) ==>
   @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_FORWARD) ||

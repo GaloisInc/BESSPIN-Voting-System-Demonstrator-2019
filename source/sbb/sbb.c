@@ -217,7 +217,9 @@ void cast_ballot(void) {
 }
 
 void go_to_standby(void) {
-    stop_motor();
+    if ( the_state.M != MOTORS_OFF ) {
+        stop_motor();
+    }
     cast_button_light_off();
     spoil_button_light_off();
     display_this_2_line_text(welcome_text, strlen(welcome_text),
@@ -228,6 +230,7 @@ void go_to_standby(void) {
     CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
     CHANGE_STATE(the_state, S, INNER);
     CHANGE_STATE(the_state, B, ALL_BUTTONS_UP);
+    CHANGE_STATE(the_state, L, STANDBY);
 }
 
 //@ assigns ballot_detect_timeout;
