@@ -46,6 +46,7 @@ Log_FS_Result Log_IO_Initialize(void);
     requires valid_string(name);
     assigns \result \from *name, log_fs;
     ensures \result <==> File_Exists (name);
+    ensures \result == true || \result == false;
  */
 bool Log_IO_File_Exists(const char *name);
 

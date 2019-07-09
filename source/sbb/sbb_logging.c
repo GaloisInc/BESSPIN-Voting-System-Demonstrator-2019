@@ -23,7 +23,7 @@ bool import_and_verify(log_file the_file) {
     #else
     bool b_success = false;
 
-    if ( import_log(the_file) ) {
+    if (  import_log(the_file) ) {
         b_success = verify_log_well_formedness(the_file);
     }
 

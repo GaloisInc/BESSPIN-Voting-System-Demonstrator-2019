@@ -70,6 +70,11 @@
   @    ((preS.D == INITIALIZED_DISPLAY || preS.D == SHOWING_TEXT) && postS.D == SHOWING_TEXT));
   @ }
   @ axiomatic SBB_motor_ASM {
+  @   predicate motor_ASM_valid(SBB_state S) =
+  @     S.M == MOTORS_OFF ||
+  @     S.M == MOTORS_TURNING_FORWARD ||
+  @     S.M == MOTORS_TURNING_BACKWARD;
+  @
   @   predicate motor_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
   @                                  SBB_state postS) =

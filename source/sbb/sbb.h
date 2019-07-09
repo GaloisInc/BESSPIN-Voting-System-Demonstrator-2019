@@ -32,6 +32,30 @@ extern const char *error_line_2_text;
 
 extern SBB_state the_state;
 
+/*@ axiomatic SBB {
+  predicate SBB_String(char *s) =
+    0 <= strlen(s) && strlen(s) <= 255 && valid_read_string(s);
+
+  predicate SBB_Strings_Invariant =
+  SBB_String(welcome_text) &&
+  SBB_String(insert_ballot_text) &&
+  SBB_String(barcode_detected_text) &&
+  SBB_String(cast_or_spoil_line_1_text) &&
+  SBB_String(cast_or_spoil_line_2_text) &&
+  SBB_String(casting_ballot_text) &&
+  SBB_String(spoiling_ballot_text) &&
+  SBB_String(invalid_barcode_text) &&
+  SBB_String(no_barcode_text) &&
+  SBB_String(remove_ballot_text) &&
+  SBB_String(error_line_1_text) &&
+  SBB_String(error_line_2_text);
+
+  predicate SBB_Invariant =
+    SBB_Strings_Invariant &&
+    motor_ASM_valid(the_state);
+  }
+*/
+
 // @todo kiniry This is a placeholder state representation so that we
 // can talk about the state of memory-mapped firmware.  It should
 // probably be refined to a separate memory-mapped region (or more

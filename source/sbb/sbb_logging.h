@@ -32,36 +32,61 @@ extern const char *invalid_barcode_received_event_msg;
 extern const char *decision_timeout_event_msg;
 
 // The file must be open
+/*@ requires \valid(the_file);
+  @ requires File_Is_Open(the_file);
+  @ ensures \result == true || \result == false;
+*/
 bool import_and_verify(log_file the_file);
 
-//@ requires true;
 bool load_or_create(log_file the_file,
                     const log_name the_name,
                     const http_endpoint endpoint);
 
-// For now, overwite the existing log
-// @todo check for errors once it is possible to do so
-//@ requires true;
+/*@ requires Log_IO_Initialized;
+  @ requires valid_string(app_log_file_name);
+  @ requires valid_string(system_log_file_name);
+  @ assigns app_log_handle, system_log_handle \from fs;
+  @ ensures Log_IO_Initialized;
+*/
 bool load_or_create_logs(void);
 
-//@ requires true;
+/*@ requires Log_IO_Initialized;
+  @ requires valid_read_string(system_log_file_name);
+  @ requires \separated(&system_log_handle, new_entry);
+  @ requires \valid_read(new_entry + (0 .. LOG_ENTRY_LENGTH - 1));
+  @ assigns fs \from fs, new_entry, system_log_handle;
+  @ ensures Log_IO_Initialized;
+  @ ensures \result == true || \result == false;
+*/
 bool log_system_message(const char *the_message);
 
 // @design abakst What information do we want to log here? The barcode?
 typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
                APP_EVENT_BALLOT_USER_SPOIL,
                APP_EVENT_NUM_EVENTS } app_event;
+
+/*@ requires Log_IO_Initialized;
+  @ requires 0 <= event && event < APP_EVENT_NUM_EVENTS;
+  @ assigns fs;
+  @ ensures Log_IO_Initialized;
+  @ ensures \result == true || \result == false;
+*/
 bool log_app_event(app_event event,
                    barcode_t barcode,
                    barcode_length_t barcode_length);
 
-/*@ requires \valid(the_state);
+/*@ requires Log_IO_Initialized;
+  @ requires \valid_read(the_entry + (0 .. LOG_ENTRY_LENGTH - 1));
+  @ requires valid_read_string(system_log_file_name);
+  @ requires \separated(&system_log_handle, the_entry);
+  @ requires \valid(&the_state->L);
+  @ requires the_state->L != ABORT;
+  @
   @ assigns the_state->L;
-  @ behavior log_error:
-  @   ensures the_state->L == ABORT;
-  @ behavior log_ok:
-  @   ensures the_state->L == \old(the_state)->L;
-  @ complete behaviors log_error, log_ok;
+  @ assigns fs \from fs, the_entry, system_log_handle;
+  @
+  @ ensures Log_IO_Initialized;
+  @ ensures the_state->L == \old(the_state)->L || the_state->L == ABORT;
 */
 void log_or_abort(SBB_state *the_state, const char *the_message);
 

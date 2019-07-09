@@ -40,6 +40,7 @@ Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry);
 
 /*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ assigns  \result \from a_log_entry;
+  @ ensures \result == false || \result == true;
   @*/
 bool verify_log_entry_well_formedness(const log_entry a_log_entry);
 
@@ -63,6 +64,7 @@ void export_log(const log_file the_log, const log_io_stream a_target);
 /*@ requires \valid(the_log);
   @ assigns  \result \from log_fs, the_log;
   @ ensures  \result <==> Log_Is_Wellformed (the_log);
+  @ ensures  \result == false || \result == true;
   @*/
 bool verify_log_well_formedness(log_file the_log);
 
