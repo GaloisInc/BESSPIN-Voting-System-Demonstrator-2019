@@ -66,8 +66,7 @@ void initialize(void) {
     gpio_set_as_output(MOTOR_1);
     gpio_set_as_output(BUTTON_CAST_LED);
     gpio_set_as_output(BUTTON_SPOIL_LED);
-
-    barcode_mutex = xSemaphoreCreateMutex();
+    the_state.button_illumination = 0;
  DevicesInitialized: return;
 }
 
@@ -97,19 +96,16 @@ bool is_spoil_button_pressed(void) {
 }
 
 void just_received_barcode(void) {
-    if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
-        barcode_present = true;
-        xSemaphoreGive(barcode_mutex);
-    }
 }
 
+/*@ requires \valid_read(the_barcode + (0 .. its_length));
+  @ requires \valid(barcode + (0..its_length));
+  @ assigns barcode[0 .. its_length];
+ */
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
     configASSERT(its_length <= BARCODE_MAX_LENGTH);
-    if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
-        memcpy(barcode, the_barcode, its_length);
-        barcode_length = its_length;
-        xSemaphoreGive(barcode_mutex);
-    }
+    memcpy(barcode, the_barcode, its_length);
+    barcode_length = its_length;
 }
 
 bool has_a_barcode(void) {
@@ -122,13 +118,25 @@ barcode_length_t what_is_the_barcode(barcode_t the_barcode) {
     return barcode_length;
 }
 
-void spoil_button_light_on(void) { gpio_write(BUTTON_SPOIL_LED); }
+void spoil_button_light_on(void) {
+    gpio_write(BUTTON_SPOIL_LED);
+    the_state.button_illumination |= spoil_button_mask;
+}
 
-void spoil_button_light_off(void) { gpio_clear(BUTTON_SPOIL_LED); }
+void spoil_button_light_off(void) {
+    gpio_clear(BUTTON_SPOIL_LED);
+    the_state.button_illumination &= ~spoil_button_mask;
+}
 
-void cast_button_light_on(void) { gpio_write(BUTTON_CAST_LED); }
+void cast_button_light_on(void) {
+    gpio_write(BUTTON_CAST_LED);
+    the_state.button_illumination |= cast_button_mask;
+}
 
-void cast_button_light_off(void) { gpio_clear(BUTTON_CAST_LED); }
+void cast_button_light_off(void) {
+    gpio_clear(BUTTON_CAST_LED);
+    the_state.button_illumination &= ~cast_button_mask;
+}
 
 void move_motor_forward(void) {
     gpio_clear(MOTOR_0);
@@ -153,6 +161,7 @@ void display_this_text(const char *the_text, uint8_t its_length) {
     #ifdef SIMULATION
     debug_printf("DISPLAY: %s\r\n", the_text);
     #else
+    CHANGE_STATE(the_state,D,SHOWING_TEXT);
     serLcdPrintf(the_text, its_length);
     #endif
 }
@@ -162,6 +171,7 @@ void display_this_2_line_text(const char *line_1, uint8_t length_1,
     #ifdef SIMULATION
     debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", line_1, line_2);
     #else
+    CHANGE_STATE(the_state,D,SHOWING_TEXT);
     serLcdPrintTwoLines(line_1, length_1, line_2, length_2);
     #endif
 }
@@ -175,6 +185,7 @@ void eject_ballot(void) {
     // run the motor for a bit to get the paper back over the switch
     TickType_t spoil_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(SPOIL_EJECT_TIMEOUT_MS);
+    /*@ loop assigns \nothing; */
     while (xTaskGetTickCount() < spoil_timeout) {
         // wait for the motor to run a while
     }
@@ -191,11 +202,13 @@ void spoil_ballot(void) {
 }
 
 void cast_ballot(void) {
+    cast_button_light_off();
     move_motor_forward();
 
     // run the motor for a bit to get the paper into the box
     TickType_t cast_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(CAST_INGEST_TIMEOUT_MS);
+    /*@ loop assigns \nothing; */
     while (xTaskGetTickCount() < cast_timeout) {
         // wait for the motor to run a while
     }

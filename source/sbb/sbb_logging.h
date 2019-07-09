@@ -45,16 +45,16 @@ bool load_or_create(log_file the_file,
 /*@ requires Log_IO_Initialized;
   @ requires valid_string(app_log_file_name);
   @ requires valid_string(system_log_file_name);
-  @ assigns app_log_handle, system_log_handle \from fs;
+  @ assigns app_log_handle, system_log_handle \from log_fs;
   @ ensures Log_IO_Initialized;
 */
 bool load_or_create_logs(void);
 
 /*@ requires Log_IO_Initialized;
   @ requires valid_read_string(system_log_file_name);
-  @ requires \separated(&system_log_handle, new_entry);
-  @ requires \valid_read(new_entry + (0 .. LOG_ENTRY_LENGTH - 1));
-  @ assigns fs \from fs, new_entry, system_log_handle;
+  @ requires \separated(&system_log_handle, the_message);
+  @ requires \valid_read(the_message + (0 .. LOG_ENTRY_LENGTH - 1));
+  @ assigns log_fs \from log_fs, the_message, system_log_handle;
   @ ensures Log_IO_Initialized;
   @ ensures \result == true || \result == false;
 */
@@ -67,7 +67,7 @@ typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
 
 /*@ requires Log_IO_Initialized;
   @ requires 0 <= event && event < APP_EVENT_NUM_EVENTS;
-  @ assigns fs;
+  @ assigns log_fs;
   @ ensures Log_IO_Initialized;
   @ ensures \result == true || \result == false;
 */
@@ -76,14 +76,13 @@ bool log_app_event(app_event event,
                    barcode_length_t barcode_length);
 
 /*@ requires Log_IO_Initialized;
-  @ requires \valid_read(the_entry + (0 .. LOG_ENTRY_LENGTH - 1));
+  @ requires \valid_read(the_message + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires valid_read_string(system_log_file_name);
-  @ requires \separated(&system_log_handle, the_entry);
+  @ requires \separated(&system_log_handle, the_message);
   @ requires \valid(&the_state->L);
-  @ requires the_state->L != ABORT;
   @
   @ assigns the_state->L;
-  @ assigns fs \from fs, the_entry, system_log_handle;
+  @ assigns log_fs \from log_fs, the_message, system_log_handle;
   @
   @ ensures Log_IO_Initialized;
   @ ensures the_state->L == \old(the_state)->L || the_state->L == ABORT;

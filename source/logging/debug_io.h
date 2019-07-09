@@ -7,7 +7,7 @@
 
 #include "log_io.h"
 
-/*@ requires \valid(the_format);
+/*@ // requires \valid(the_format);
   @ // requires \strlen(the_format) >= 0; // it's really a string
   @ assigns \nothing; // TBD
   @*/
