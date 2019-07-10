@@ -252,7 +252,6 @@ void run_wait_for_decision(void) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
-            spoil_button_light_off();
             CHANGE_STATE(the_state, L, CAST);
         }
     } else if ( is_spoil_button_pressed() ) {
@@ -260,7 +259,6 @@ void run_wait_for_decision(void) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
-            cast_button_light_off();
             CHANGE_STATE(the_state, L, SPOIL);
         }
     } else {

@@ -212,6 +212,7 @@ void spoil_ballot(void) {
 }
 
 void cast_ballot(void) {
+    spoil_button_light_off();
     cast_button_light_off();
     move_motor_forward();
 

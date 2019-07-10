@@ -138,28 +138,38 @@
   @ }
   @ axiomatic SBB_States_Invariants {
   @   predicate Wait_For_Ballot_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF;
+  @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
   @   predicate Feed_Ballot_Inv(SBB_state S) =
-  @     S.M == MOTORS_TURNING_FORWARD;
+  @     S.M == MOTORS_TURNING_FORWARD &&
+  @     !cast_button_lit(S)           &&
+  @     !spoil_button_lit(S);
   @   predicate Barcode_Detected_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF &&
-  @     S.BS == BARCODE_PRESENT_AND_RECORDED;
+  @     S.M == MOTORS_OFF                    &&
+  @     S.BS == BARCODE_PRESENT_AND_RECORDED &&
+  @     !cast_button_lit(S)                  &&
+  @     !spoil_button_lit(S);
   @   predicate Wait_For_Decision_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF &&
+  @     S.M == MOTORS_OFF  &&
   @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
   @   predicate Cast_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF &&
+  @     S.M == MOTORS_OFF   &&
   @     cast_button_lit(S) &&
-  @     !spoil_button_lit(S);
+  @     spoil_button_lit(S);
   @   predicate Spoil_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF &&
-  @     !cast_button_lit(S) &&
+  @     S.M == MOTORS_OFF   &&
+  @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
   @   predicate Eject_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF;
+  @     S.M == MOTORS_OFF    &&
+  @     !cast_button_lit(S)  &&
+  @     !spoil_button_lit(S);
   @   predicate Await_Removal_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF;
+  @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
   @ }
   @*/
 

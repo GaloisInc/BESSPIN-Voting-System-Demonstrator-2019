@@ -105,7 +105,6 @@ void    gpio_write(uint8_t i);
 /*@ assigns gpio_mem[i]; */
 void    gpio_clear(uint8_t i);
 
-
 // @design kiniry I am presuming that this function must be called
 // prior to any other function and guarantees that all devices are put
 // in their initial state.
@@ -285,8 +284,7 @@ bool ballot_detected(void);
 */
 void eject_ballot(void);
 
-/*@ requires spoil_button_lit(the_state);
-  @ requires SBB_Invariant;
+/*@ requires SBB_Invariant;
   @ requires the_state.M == MOTORS_OFF;
   @ assigns the_state.button_illumination, log_fs, gpio_mem[BUTTON_CAST_LED], gpio_mem[BUTTON_SPOIL_LED],
   @         gpio_mem[MOTOR_0], gpio_mem[MOTOR_1],
@@ -299,12 +297,11 @@ void eject_ballot(void);
 */
 void spoil_ballot(void);
 
-/*@ requires cast_button_lit(the_state);
-  @ requires !spoil_button_lit(the_state);
-  @ requires SBB_Invariant;
+/*@ requires SBB_Invariant;
   @ requires the_state.M == MOTORS_OFF;
   @ assigns the_state.button_illumination,
-  @         gpio_mem[BUTTON_CAST_LED], gpio_mem[MOTOR_0], gpio_mem[MOTOR_1],
+  @         gpio_mem[BUTTON_SPOIL_LED], gpio_mem[BUTTON_CAST_LED],
+  @         gpio_mem[MOTOR_0], gpio_mem[MOTOR_1],
   @         the_state.M, the_state.L, log_fs;
   @ ensures no_buttons_lit(the_state);
   @ ensures the_state.M == MOTORS_OFF;
