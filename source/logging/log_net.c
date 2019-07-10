@@ -97,6 +97,8 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, http_endpoint endpoi
         }
         sent += bytes;
     } while (sent < total);
+    
+    close(sockfd);
     return;
 }
 
