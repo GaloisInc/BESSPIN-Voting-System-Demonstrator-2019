@@ -2,9 +2,10 @@
 
 # Build the bottom target
 log_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 log_hosttest_test4 log_hosttest_test5 log_hosttest_test6 \
-	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport
+	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport log_hosttest_remotetest11
 
-LSOURCES = log.c secure_log.c log_io.c log_fs.c debug_io.c
+
+LSOURCES = log.c secure_log.c log_io.c log_fs.c debug_io.c log_net.c
 CSOURCES = ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c ../crypto/base64.c
 
 log_hosttest_test1:
@@ -59,6 +60,9 @@ log_hosttest_testimport:
 	cd $(LOG_DIR); \
 	$(CC) $(HOSTTEST_CFLAGS) -o testimport testimport.c $(LSOURCES) $(CSOURCES)
 
+log_hosttest_remotetest11:
+	$(CC) $(HOSTTEST_CFLAGS) -o remotetest11 remotetest11.c $(LSOURCES) $(CSOURCES)
+
 log_hosttest_clean:
 	cd $(LOG_DIR); \
-	rm -f test1 test2 test3 test4 test5 test6 test7 log_main test8 testmany test9 test10 testimport *.o
+	rm -f test1 test2 test3 test4 test5 test6 test7 log_main test8 testmany test9 test10 testimport remotetest11 *.o

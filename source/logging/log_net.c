@@ -1,6 +1,9 @@
 #include "log_net.h"
 #include "debug_io.h"
 
+static const char space = ' ';
+static const char new_line = '\n';
+
 #ifdef TARGET_OS_FreeRTOS
 
 void Log_NET_Initialize() {
@@ -23,8 +26,8 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
 	size_t len = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
     size_t FIXED_MESSAGE_SIZE = 134;
     char *log_file_name = file_name;
-
-    size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + strlen(log_file_name) + len;
+    size_t REQUEST_LINE_HEADER = FIXED_MESSAGE_SIZE + strlen(log_file_name);
+    size_t MESSAGE_SIZE = REQUEST_LINE_HEADER + len;
     char message[MESSAGE_SIZE];
 
     int sockfd, bytes, sent, total;
@@ -48,7 +51,13 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
              HEADER_2, HEADER_3, HEADER_4, HEADER_5_1,
              HEADER_5_2, DOUBLE_CRLF);
 
+    
     // add base64_secure_log_entry to the message
+    memcpy(&message[REQUEST_LINE_HEADER - 1], &secure_log_entry.the_entry[0], LOG_ENTRY_LENGTH);
+    strncat(message, &space,1);
+    memcpy(&message[REQUEST_LINE_HEADER + LOG_ENTRY_LENGTH - 1], &secure_log_entry.the_digest[0], 
+        SHA256_BASE_64_DIGEST_LENGTH_BYTES + 1);
+     strncat(message, &new_line, 1);
 
     // create socket
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -56,6 +65,7 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
         debug_printf("ERROR opening socket");
     }
     // lookup the ip address
+    // notice this is localhost at the moment
     server = gethostbyname(host);
     if (server == NULL) {
         debug_printf("ERROR, no such host");
@@ -81,7 +91,7 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
         }
         sent += bytes;
     } while (sent < total);
-	return;
+    return;
 }
 
 #endif
