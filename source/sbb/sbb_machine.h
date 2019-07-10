@@ -3,8 +3,8 @@
 #include <task.h>
 #include "log_t.h"
 
-void log_single_event( EventBits_t bits,
-                       EventBits_t bit,
+void log_single_event( EventBits_t event_bits,
+                       EventBits_t log_bit,
                        const log_entry event_entry );
 
 void log_event_group_result ( EventBits_t bits );

@@ -146,10 +146,10 @@ extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToSet );
 
 
-void log_single_event( EventBits_t bits,
-                       EventBits_t bit,
+void log_single_event( EventBits_t event_bits,
+                       EventBits_t log_bit,
                        const log_entry event_entry ) {
-    if ( bits & bit ) {
+    if ( event_bits & log_bit ) {
         bool b_log_ok = log_system_message(event_entry);
 
         if (!b_log_ok) {
