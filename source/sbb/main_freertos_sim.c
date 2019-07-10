@@ -60,9 +60,7 @@ void vApplicationTickHook(void);
 
 /* Smart Ballot Box Tasks and priorities*/
 #define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY + 2
-//#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+1
-//#define SBB_LOGGING_TASK_PRIORITY tskIDLE_PRIORITY+2
-#define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY + 3
+#define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY + 1
 
 static void prvBallotBoxMainTask(void *pvParameters);
 static void prvInputTask(void *pvParameters);
@@ -260,7 +258,6 @@ static void manual_input(void)
             printf("%s", help);
             break;
         }
-        msleep(10);
     }
 }
 /*-----------------------------------------------------------*/
@@ -419,7 +416,6 @@ static void prvInputTask(void *pvParameters)
             printf("%s", intro);
             break;
         }
-        msleep(10);
     }
 }
 
