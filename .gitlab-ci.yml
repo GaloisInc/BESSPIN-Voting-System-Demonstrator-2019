@@ -20,25 +20,25 @@ before_script:
 #-----------------------------------------------------------------------------#
 All-Bottom:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh bottom'
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=bottom make bottom_all'
   tags: ["voting-system"]
 
 All-Typecheck:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh typecheck'
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=verification make typecheck_all'
   tags: ["voting-system"]
 
 All-Verify:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh verify'
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=verification make verify_all'
   tags: ["voting-system"]
 
 All-Freertos:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh freertos'
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=freertos make freertos_all'
   tags: ["voting-system"]
 
 All-Tests:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run './top_level_make.sh tests'
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=hosttests make hosts_all'
   tags: ["voting-system"]
