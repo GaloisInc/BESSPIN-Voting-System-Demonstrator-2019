@@ -37,7 +37,6 @@ Log_FS_Result Test_Log_IO_Read_Base64_Entry_Send_Remotely
 
   printf("Number of entries=%zu\n", N);
 
-  Log_NET_Initialize();
   for (size_t i = 0; i < N; i++)
     {
       current_entry = Log_IO_Read_Base64_Entry(&r_log, N);

@@ -1,6 +1,7 @@
 #include "log_io.h"
 #include "debug_io.h"
 #include "log_fs.h"
+#include "log_net.h"
 #include <assert.h>
 #include <string.h>
 
@@ -19,9 +20,8 @@ static const uint8_t new_line = '\n';
 
 Log_FS_Result Log_IO_Initialize()
 {
+    Log_NET_Initialize();
     return Log_FS_Initialize();
-
-    // TBD - also call Log_Net_Initialize() here if required
 }
 
 Log_FS_Result Log_IO_Create_New(Log_Handle *stream,
@@ -81,9 +81,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     written += Log_FS_Write(stream, &new_line, 1);
 
     // Step 4 - Write same data over network to the Reporting System
-    //
-    // TBD - Calling Log_Net functions as appropriate.
-
+    Log_NET_Send (base_64_current_entry, stream->endpoint);
 
     if (written == (BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH))
     {
