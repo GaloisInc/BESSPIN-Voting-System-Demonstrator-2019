@@ -20,7 +20,7 @@ DEMO_SRC = \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
 
-CFLAGS += -I$(LOGGING_DIR)
+CFLAGS += -I$(LOGGING_DIR) -DSIMULATION
 
 #
 # Define all object files.
