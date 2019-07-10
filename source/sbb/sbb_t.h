@@ -58,7 +58,6 @@ typedef enum { INITIALIZE = BARCODE_PRESENT_AND_RECORDED+1,
                ABORT,
 } logic_state;
 // @design kiniry START and STOP are the top-level (superposed) start
-// and stop state for all ASMs.
 typedef enum { START = ABORT+1,
                INNER,
                STOP } start_stop_state;

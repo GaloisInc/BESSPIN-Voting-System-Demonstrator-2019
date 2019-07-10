@@ -63,10 +63,9 @@ extern SBB_state the_state;
     Log_IO_Initialized &&
     SBB_Strings_Invariant &&
     (the_state.D == INITIALIZED_DISPLAY || the_state.D == SHOWING_TEXT) &&
+    (the_state.BS == BARCODE_NOT_PRESENT || the_state.BS == BARCODE_PRESENT_AND_RECORDED) &&
     motor_ASM_valid(the_state) &&
-    sbb_L_ASM_valid(the_state) &&
-    SBB_States_Invariant(the_state)
-    ;
+    sbb_L_ASM_valid(the_state);
   }
 */
 
@@ -141,19 +140,22 @@ void initialize(void);
 */
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
 
-/*@ requires \valid_read(the_barcode + (0 .. its_length));
-  @ requires \valid(barcode + (0..its_length));
-  @ assigns barcode[0 .. its_length];
+/*@ requires \valid_read(the_barcode);
+  @ requires \valid_read(the_barcode + (1..its_length-1));
+  @ requires its_length <= BARCODE_MAX_LENGTH;
+  @ assigns barcode[0 .. its_length-1];
 */
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.B == CAST_BUTTON_DOWN);
+  @ ensures \result == true || \result == false;
 */
 bool is_cast_button_pressed(void);
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.B == SPOIL_BUTTON_DOWN);
+  @ ensures \result == true || \result == false;
 */
 bool is_spoil_button_pressed(void);
 
@@ -220,7 +222,7 @@ void move_motor_forward(void);
   @         gpio_mem[MOTOR_0],
   @         gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_TURNING_BACKWARD;
-  @ ensures the_state.L == ABORT || the_state.L == \old(the_state).L;
+  @ ensures the_state.L == ABORT || the_state.L == \old(the_state.L);
   @ ensures ASM_transition(\old(the_state), MOTOR_BACKWARD_E, the_state);
   @ ensures SBB_Invariant;
   @*/
@@ -285,13 +287,13 @@ void eject_ballot(void);
 /*@ requires spoil_button_lit(the_state);
   @ requires SBB_Invariant;
   @ requires the_state.M == MOTORS_OFF;
-  @ requires the_state.P == PAPER_DETECTED;
   @ assigns the_state.button_illumination, log_fs, gpio_mem[BUTTON_CAST_LED], gpio_mem[BUTTON_SPOIL_LED],
   @         gpio_mem[MOTOR_0], gpio_mem[MOTOR_1],
   @         the_state.L, the_state.M, the_state.D;
   @ ensures no_buttons_lit(the_state);
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures the_state.D == SHOWING_TEXT;
+  @ ensures the_state.M == MOTORS_OFF;
   @ ensures SBB_Invariant;
 */
 void spoil_ballot(void);
@@ -342,7 +344,9 @@ bool ballot_detect_timeout_expired(void);
 
 void cast_or_spoil_timeout_reset(void);
 
-//@ assigns \nothing;
+/*@ assigns \nothing;
+  @ ensures \result == true || \result == false;
+*/
 bool cast_or_spoil_timeout_expired(void);
 
 /*@ requires SBB_Strings_Invariant;

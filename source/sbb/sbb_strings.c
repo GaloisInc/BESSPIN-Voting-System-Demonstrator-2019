@@ -6,6 +6,7 @@
 #include "sbb.h"
 
 // String constant defines
+const char *welcome_text = "Welcome, Voter!";
 const char *insert_ballot_text = "Insert ballot...";
 const char *barcode_detected_text = "Barcode detected";
 const char *cast_or_spoil_line_1_text = " Cast or Spoil?";

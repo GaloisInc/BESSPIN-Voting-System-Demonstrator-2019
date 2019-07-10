@@ -136,16 +136,52 @@
   @     sd_card_ASM_transition(preS, E, postS)
   @     ;
   @ }
+  @ axiomatic SBB_States_Invariants {
+      predicate Wait_For_Ballot_Inv(SBB_state S) =
+        S.M == MOTORS_OFF;
+
+      predicate Feed_Ballot_Inv(SBB_state S) =
+        S.M == MOTORS_TURNING_FORWARD;
+
+      predicate Barcode_Detected_Inv(SBB_state S) =
+        S.M == MOTORS_OFF &&
+        S.BS == BARCODE_PRESENT_AND_RECORDED;
+
+      predicate Wait_For_Decision_Inv(SBB_state S) =
+        S.M == MOTORS_OFF &&
+        cast_button_lit(S) &&
+        spoil_button_lit(S);
+
+      predicate Cast_Inv(SBB_state S) =
+        S.M == MOTORS_OFF &&
+        cast_button_lit(S) &&
+        !spoil_button_lit(S);
+
+      predicate Spoil_Inv(SBB_state S) =
+        S.M == MOTORS_OFF &&
+        !cast_button_lit(S) &&
+        spoil_button_lit(S);
+
+      predicate Eject_Inv(SBB_state S) =
+        S.M == MOTORS_OFF;
+
+      predicate Await_Removal_Inv(SBB_state S) =
+        S.M == MOTORS_OFF;
+  @ }
   @*/
 
 /*@ predicate SBB_States_Invariant(SBB_state S) =
-     (S.L == WAIT_FOR_BALLOT  ==>
-       (S.M == MOTORS_OFF))             &&
-     (S.L == FEED_BALLOT      ==>
-       (S.M == MOTORS_TURNING_FORWARD)) &&
-     (S.L == BARCODE_DETECTED ==>
-       (S.BS == BARCODE_PRESENT_AND_RECORDED))
-      ;
+      (S.L == WAIT_FOR_BALLOT   && Wait_For_Ballot_Inv(S))   ||
+      (S.L == FEED_BALLOT       && Feed_Ballot_Inv(S))       || 
+      (S.L == BARCODE_DETECTED  && Barcode_Detected_Inv(S))  || 
+      (S.L == WAIT_FOR_DECISION && Wait_For_Decision_Inv(S)) || 
+      (S.L == CAST              && Cast_Inv(S))              || 
+      (S.L == SPOIL             && Spoil_Inv(S))             || 
+      (S.L == EJECT             && Eject_Inv(S))             || 
+      (S.L == AWAIT_REMOVAL     && Await_Removal_Inv(S))     ||
+      (S.L == ABORT             && true)                     ||
+      (S.L == STANDBY           && true)                     ||
+      (S.L == INITIALIZE        && true);
 */
 
 // @spec abakst should NO_PAPER_DETECTED be reachable from the other states?

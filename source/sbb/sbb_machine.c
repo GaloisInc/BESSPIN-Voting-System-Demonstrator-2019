@@ -77,11 +77,15 @@ void update_barcode_state( bool barcode_scanned ) {
     switch ( the_state.BS ) {
     case BARCODE_NOT_PRESENT:
         if ( barcode_scanned ) {
-            uint8_t barcode[BARCODE_MAX_LENGTH] = {0};
+            char barcode[BARCODE_MAX_LENGTH] = {0};
+            //@ assert \valid_read(barcode + (0 .. BARCODE_MAX_LENGTH-1));
+            //@ assert \valid(barcode + (0 .. BARCODE_MAX_LENGTH-1));
             barcode_length_t xReceiveLength = 0;
             xReceiveLength = xStreamBufferReceive(xScannerStreamBuffer,
                                                   (void *)barcode, sizeof(barcode),
                                                   SCANNER_BUFFER_RX_BLOCK_TIME_MS);
+            //@ assert \valid_read(barcode + (0 .. BARCODE_MAX_LENGTH-1));
+            //@ assert \valid(barcode + (0 .. BARCODE_MAX_LENGTH-1));
             if ( xReceiveLength > 0 ) {
                 set_received_barcode(barcode, xReceiveLength);
                 CHANGE_STATE(the_state, BS, BARCODE_PRESENT_AND_RECORDED);
@@ -96,6 +100,7 @@ void update_barcode_state( bool barcode_scanned ) {
 void flush_barcodes() {
     do {
         the_state.BS = BARCODE_NOT_PRESENT;
+        /*@ loop invariant SBB_Machine_Invariant; */
         update_sensor_state();
     } while (the_state.BS == BARCODE_PRESENT_AND_RECORDED);
 }
@@ -243,6 +248,7 @@ void run_wait_for_decision(void) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
+            spoil_button_light_off();
             CHANGE_STATE(the_state, L, CAST);
         }
     } else if ( is_spoil_button_pressed() ) {
@@ -250,6 +256,7 @@ void run_wait_for_decision(void) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
+            cast_button_light_off();
             CHANGE_STATE(the_state, L, SPOIL);
         }
     } else {
@@ -332,6 +339,7 @@ void run_standby(void) {
     go_to_standby();
     flush_barcodes();
     CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
+    //@ assert SBB_States_Invariant(the_state);
 }
 
 void run_abort(void) {
@@ -341,8 +349,8 @@ void run_abort(void) {
                              strlen(error_line_2_text));
 }
 
-/*@ requires SBB_Invariant;
-  @ ensures SBB_Invariant;
+/*@ requires SBB_Machine_Invariant;
+  @ ensures SBB_Machine_Invariant;
 */
 void take_step(void) {
     switch ( the_state.L ) {
@@ -365,7 +373,6 @@ void take_step(void) {
         run_barcode_detected();
         break;
 
-#if 0
     case WAIT_FOR_DECISION:
         run_wait_for_decision();
         break;
@@ -392,7 +399,6 @@ void take_step(void) {
         break;
         //default:
         //assert(false);
-#endif
     }
 }
 

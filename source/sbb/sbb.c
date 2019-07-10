@@ -43,7 +43,12 @@ SemaphoreHandle_t barcode_mutex;
 extern void serLcdPrintf(char *str, uint8_t len);
 //@ assigns \nothing;
 extern void serLcdPrintTwoLines(char* line_1, uint8_t len_1, char* line_2, uint8_t len_2);
-//@ assigns \nothing;
+
+/*@ requires \valid((char *)pvRxData + (0 .. xBufferLengthBytes-1));
+  @ assigns *((char *)pvRxData + (0 .. \result - 1));
+  @ ensures 0 <= \result;
+  @ ensures \result <= xBufferLengthBytes;
+*/
 extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,
                                    void *pvRxData,
                                    size_t xBufferLengthBytes,
