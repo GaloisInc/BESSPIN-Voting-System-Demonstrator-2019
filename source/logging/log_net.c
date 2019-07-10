@@ -4,6 +4,10 @@
 static const char space = ' ';
 static const char new_line = '\n';
 
+static const char *endpoint_filenames[2] =
+  { "app_log.txt",
+    "sys_log.txt" };
+
 #ifdef TARGET_OS_FreeRTOS
 
 void Log_NET_Initialize() {
@@ -21,11 +25,13 @@ void Log_NET_Initialize() {
 	return;
 }
 
-void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) {
-	
-	size_t len = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
+void Log_NET_Send(base64_secure_log_entry secure_log_entry, http_endpoint endpoint)
+{
+
+    const char *log_file_name = endpoint_filenames[endpoint];
+
+    size_t len = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
     size_t FIXED_MESSAGE_SIZE = 134;
-    char *log_file_name = file_name;
     size_t REQUEST_LINE_HEADER = FIXED_MESSAGE_SIZE + strlen(log_file_name);
     size_t MESSAGE_SIZE = REQUEST_LINE_HEADER + len;
     char message[MESSAGE_SIZE];
@@ -37,7 +43,7 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
     int PORT_NUMBER = 8066;
 
     char* REQUEST_LINE_1 = "POST /";
-    char* REQUEST_LINE_2 = log_file_name;
+    const char* REQUEST_LINE_2 = log_file_name;
     char* REQUEST_LINE_3 = " HTTP/1.1\r\n";
     char* HEADER_1 = "Host: 10.6.6.253\r\n";
     char* HEADER_2 = "User-Agent: sbb/2019\r\n";
@@ -51,11 +57,11 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
              HEADER_2, HEADER_3, HEADER_4, HEADER_5_1,
              HEADER_5_2, DOUBLE_CRLF);
 
-    
+
     // add base64_secure_log_entry to the message
     memcpy(&message[REQUEST_LINE_HEADER - 1], &secure_log_entry.the_entry[0], LOG_ENTRY_LENGTH);
     strncat(message, &space,1);
-    memcpy(&message[REQUEST_LINE_HEADER + LOG_ENTRY_LENGTH - 1], &secure_log_entry.the_digest[0], 
+    memcpy(&message[REQUEST_LINE_HEADER + LOG_ENTRY_LENGTH - 1], &secure_log_entry.the_digest[0],
         SHA256_BASE_64_DIGEST_LENGTH_BYTES + 1);
      strncat(message, &new_line, 1);
 
@@ -95,4 +101,3 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name file_name) 
 }
 
 #endif
-

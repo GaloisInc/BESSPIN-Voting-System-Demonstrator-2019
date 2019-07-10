@@ -2,6 +2,7 @@
 #define __LOG_NET_H__
 
 #include "secure_log_t.h"
+#include "log_net_t.h"
 
 #ifdef TARGET_OS_FreeRTOS
 
@@ -38,7 +39,7 @@
 #define configDNS_SERVER_ADDR2	2
 #define configDNS_SERVER_ADDR3	2
 
-// ucMACAddress 
+// ucMACAddress
 #define configMAC_ADDR0			0x00
 #define configMAC_ADDR1			0x12
 #define configMAC_ADDR2			0x13
@@ -66,14 +67,9 @@ uint8_t uMACAddress[6] = {configMAC_ADDR0, configMAC_ADDR1, configMAC_ADDR2, con
 #endif
 
 
-typedef enum { HTTP_Endpoint_App_Log, 
-			   HTTP_Endpoint_Sys_Log, 
-			   HTTP_Endpoint_None } http_endpoint;
-
 void Log_NET_Initialize(void);
 
-void Log_NET_Send(base64_secure_log_entry secure_log_entry, log_name host_name);
-
+void Log_NET_Send(base64_secure_log_entry secure_log_entry, http_endpoint endpoint);
 
 
 #endif /* __LOG_IO_H__ */
