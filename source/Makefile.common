@@ -5,7 +5,7 @@ export HOST  := $(shell uname -s)
 
 ifeq (${HOST},Linux)
     export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    export PLATFORM_INCLUDES := 
+    export PLATFORM_INCLUDES :=
 else
     # Assumed to be Host = Darwin
     export LLVM_LINK := llvm-link
@@ -77,6 +77,8 @@ export INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio \
 	-I$(FREERTOS_SOURCE_DIR)/include \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/include \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/compiler/GCC \
 	-I$(FREERTOS_DEMO_DIR)../Common/include \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \
