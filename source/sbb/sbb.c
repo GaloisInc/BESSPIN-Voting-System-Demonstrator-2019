@@ -154,12 +154,21 @@ void stop_motor(void) {
 
 
 void display_this_text(const char *the_text, uint8_t its_length) {
+    #ifdef SIMULATION
+    debug_printf("DISPLAY: %s\r\n", the_text);
+    #else
     serLcdPrintf(the_text, its_length);
+    #endif
 }
 
 void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2) {
+    #ifdef SIMULATION
+    debug_printf("DISPLAY: %s\r\n", line_1);
+    debug_printf("DISPLAY: %s\r\n", line_2);
+    #else
     serLcdPrintTwoLines(line_1, length_1, line_2, length_2);
+    #endif
 }
 
 bool ballot_detected(void) {

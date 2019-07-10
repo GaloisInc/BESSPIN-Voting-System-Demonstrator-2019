@@ -260,6 +260,7 @@ static void manual_input(void)
             printf("%s", help);
             break;
         }
+        msleep(10);
     }
 }
 /*-----------------------------------------------------------*/
@@ -418,6 +419,7 @@ static void prvInputTask(void *pvParameters)
             printf("%s", intro);
             break;
         }
+        msleep(10);
     }
 }
 
