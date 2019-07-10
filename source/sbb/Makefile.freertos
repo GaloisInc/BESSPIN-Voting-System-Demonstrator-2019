@@ -14,6 +14,7 @@ DEMO_SRC = \
     ../logging/application_log.c \
     ../logging/log_io.c \
     ../logging/log_fs.c \
+    ../logging/log_net.c \
     ../logging/debug_io.c \
     ../crypto/base64.c \
     ../crypto/crypto.c \
