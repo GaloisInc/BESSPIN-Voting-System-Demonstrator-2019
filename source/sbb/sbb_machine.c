@@ -149,7 +149,7 @@ extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
 void log_single_event( EventBits_t bits,
                        EventBits_t bit,
                        const log_entry event_entry ) {
-    if ( bits && bit ) {
+    if ( bits & bit ) {
         bool b_log_ok = log_system_message(event_entry);
 
         if (!b_log_ok) {
