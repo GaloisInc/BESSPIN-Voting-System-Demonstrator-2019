@@ -25,7 +25,7 @@ extern EventGroupHandle_t xSBBEventGroup;
    the Blocked state so it can read the bytes. */
 #define sbTRIGGER_LEVEL_1			( 1 )
 /* How long we wait to send scanned barcode */
-#define SCANNER_BUFFER_TX_BLOCK_TIME_MS pdMS_TO_TICKS(5000)
+#define SCANNER_BUFFER_TX_BLOCK_TIME_MS pdMS_TO_TICKS(15)
 /* How long we wait to receive a scanned barcode */
 #define SCANNER_BUFFER_RX_BLOCK_TIME_MS pdMS_TO_TICKS(15)
 /* How long to wait before we "see" a paper sensor "release" */

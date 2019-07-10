@@ -71,9 +71,8 @@ static void prvStatsTask(void *pvParameters);
 #endif /* configGENERATE_RUN_TIME_STATS */
 
 /* Smart Ballot Box Tasks and priorities*/
-#define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY+2
-#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+1
-#define SBB_LOGGING_TASK_PRIORITY tskIDLE_PRIORITY+2
+#define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY+1
+#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+2
 #define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+3
 
 static void prvBallotBoxMainTask(void *pvParameters);
@@ -259,41 +258,60 @@ static void prvBarcodeScannerTask(void *pvParameters)
 
     uint8_t idx = 0;
     char barcode[BARCODE_MAX_LENGTH] = {0};
+    char buffer[17] = {0};
+    buffer[16] = '\0';
+    int len;
 
     printf("Starting prvBarcodeScannerTask\r\n");
 
     for (;;)
+    {
+        /* explicitly ask for at most 16 characters, as that is the FIFO limit */
+        len = uart1_rxbuffer(buffer, 16);
+
+        if (len > 0)
         {
-            configASSERT(uart1_rxbuffer(&barcode[idx], 1) == 1);
-            if (barcode[idx] == 0xd)
+            for (int i = 0; i < len; i++)
+            {
+                if (buffer[i] == 0xd)
                 {
+                    /* Send the barcode */
                     /* Debug print below */
-                    printf("Barcode, idx=%u: ", idx);
-                    for (uint8_t i=0;i<idx;i++) {
-                        printf("%c",barcode[i]);
-                    }
-                    printf("\r\n");
+                    barcode[idx] = '\0';
+                    printf("Barcode, idx=%u: %s\r\n", idx, barcode);
                     /* We have a barcode, send it over stream buffer and fire the event */
-                    //configASSERT( xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS ) == idx);
-                    xStreamBufferSend( xScannerStreamBuffer, ( void * ) barcode, (size_t)idx, SCANNER_BUFFER_TX_BLOCK_TIME_MS );
+                    size_t bytes_available =
+                        xStreamBufferSpacesAvailable(xScannerStreamBuffer);
+                    if (bytes_available < idx)
+                    {
+                        /* reset buffer */
+                        configASSERT(xStreamBufferReset(xScannerStreamBuffer) ==
+                                     pdPASS);
+                    }
+                    configASSERT(xStreamBufferSend(xScannerStreamBuffer,
+                                                   (void *)barcode, (size_t)idx,
+                                                   0) == idx);
                     /* Broadcast the event */
-                    xEventGroupSetBits( xSBBEventGroup, ebBARCODE_SCANNED );
+                    xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
                     /* reset state */
                     idx = 0;
                     memset(barcode, 0, BARCODE_MAX_LENGTH);
                 }
-            else
+                else
                 {
+                    // copy over
+                    barcode[idx] = buffer[i];
                     idx++;
-                    if (idx >= BARCODE_MAX_LENGTH)
-                        {
-                            printf("Erasing idx\r\n");
-                            idx = 0;
-                        }
+                    idx %= sizeof(barcode);
                 }
-            //vTaskDelay(pdMS_TO_TICKS(1));
+            }
         }
+
+        /* Sleeping for 1 ms should be the right amount */
+        msleep(1);
+    }
 }
+
 
 /*-----------------------------------------------------------*/
 
