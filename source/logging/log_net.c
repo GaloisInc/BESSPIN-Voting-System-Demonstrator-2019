@@ -33,6 +33,111 @@ void Log_Net_Initialize()
 void Log_Net_Send(base64_secure_log_entry secure_log_entry,
                   http_endpoint endpoint, const char *remote_file_name)
 {
+    Socket_t xSocket;
+    struct freertos_sockaddr xRemoteAddress;
+    BaseType_t xAlreadyTransmitted = 0, xBytesSent = 0;
+    TaskHandle_t xRxTask = NULL; // it is defined from some reason ?
+    size_t xLenToSend;
+    size_t PORT_NUMBER = 8066;
+    size_t xTotalLengthToSend;
+
+    // request line and header
+    const size_t FIXED_MESSAGE_SIZE =
+        strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
+        strlen(HEADER_2) + strlen(HEADER_3) + strlen(HEADER_4) +
+        strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
+
+    const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
+                                strlen(remote_file_name) + data_block_length;
+
+    char pcBufferToTransmit[MESSAGE_SIZE];
+    debug_printf("MESSAGE_SIZE is %zu\n", MESSAGE_SIZE);
+
+    // If user or test case has requested no HTTP echo of this log file,
+    // then do nothing
+    if (endpoint == HTTP_Endpoint_None)
+    {
+        return;
+    }
+
+    // Initialize message to all 0x00 so we can dynamically calculate the
+    // length of the header
+    for (size_t i = 0; i < MESSAGE_SIZE; i++)
+    {
+        pcBufferToTransmit[i] = 0x00;
+    }
+
+    vsnprintf(pcBufferToTransmit, MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s", REQUEST_LINE_1,
+             remote_file_name, REQUEST_LINE_3, HEADER_1, HEADER_2, HEADER_3,
+             HEADER_4, HEADER_5_1, data_block_length, DOUBLE_CRLF);
+
+    // After the header has been written, we have N bytes of header,
+    // occupying bytes 0 .. (N-1) of pcBufferToTransmit. So.. the first byte of the
+    // data block will be at index N. We can use strlen to compute
+    // this since pcBufferToTransmit was previously populated with all 0x00 bytes.
+    size_t first_byte_of_data_index = strlen(pcBufferToTransmit);
+    debug_printf("Length of header block is %zu\n", first_byte_of_data_index);
+
+    // add base64_secure_log_entry to the pcBufferToTransmit
+    memcpy(&pcBufferToTransmit[first_byte_of_data_index], &secure_log_entry.the_entry[0],
+           LOG_ENTRY_LENGTH);
+
+    size_t space_index = first_byte_of_data_index + LOG_ENTRY_LENGTH;
+    debug_printf("space index is %zu\n", space_index);
+    pcBufferToTransmit[space_index] = space;
+
+    size_t hash_index = space_index + 1;
+    debug_printf("hash index is %zu\n", hash_index);
+    memcpy(&pcBufferToTransmit[hash_index], &secure_log_entry.the_digest[0],
+           SHA256_BASE_64_DIGEST_LENGTH_BYTES);
+
+    size_t new_line_index = hash_index + SHA256_BASE_64_DIGEST_LENGTH_BYTES;
+    debug_printf("new line index is %zu\n", new_line_index);
+    pcBufferToTransmit[new_line_index] = new_line;
+    // If the final byte is at offset N in pcBufferToTransmit, then the xTotalLengthToSend number
+    // of bytes to send is N + 1
+    xTotalLengthToSend = new_line_index + 1;
+
+    xRemoteAddress.sin_port = FreeRTOS_htons( PORT_NUMBER );
+    // IP address needs to be modified for the test purpose
+    // otherwise address can be taken from log_net.h uIPAddress
+    // for now it is hardcoded before test.
+    xRemoteAddress.sin_addr = FreeRTOS_inet_addr_quick( 10, 6, 6 253); 
+
+    // Create a socket.
+    xSocket = FreeRTOS_socket( FREERTOS_AF_INET,
+                               FREERTOS_SOCK_STREAM,
+                               FREERTOS_IPPROTO_TCP );
+    configASSERT( xSocket != FREERTOS_INVALID_SOCKET );
+    if( FreeRTOS_connect( xSocket, &xRemoteAddress, sizeof( xRemoteAddress ) ) == 0 )
+    {
+        xLenToSend=0;
+        do
+        { 
+            xBytesSent = FreeRTOS_send( /* The socket being sent to. */
+                                        xSocket,
+                                        /* The data being sent. */
+                                        pcBufferToTransmit + xLenToSend,
+                                        /* The remaining length of data to send. */
+                                        xTotalLengthToSend - xLenToSend,
+                                        /* ulFlags. */
+                                        0 );
+            if( xBytesSent < 0)
+            {
+                debug_printf("ERROR writing message to socket");
+            }
+
+            if( xBytesSent == 0 )
+            {
+                break;
+            }
+            xLenToSend += xBytesSent;
+        } while ( xLenToSend < xTotalLengthToSend );
+    }
+    /* Initiate graceful shutdown. */
+    FreeRTOS_shutdown( xSocket, FREERTOS_SHUT_RDWR );
+    /* The socket has shut down and is safe to close. */
+    FreeRTOS_closesocket( xSocket );
     return;
 }
 
