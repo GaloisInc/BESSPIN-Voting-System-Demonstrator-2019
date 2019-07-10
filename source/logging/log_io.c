@@ -89,7 +89,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     written += Log_FS_Write(stream, &new_line, 1);
 
     // Step 4 - Write same data over network to the Reporting System
-    Log_NET_Send (base_64_current_entry, stream->endpoint, stream->remote_file_name);
+    Log_Net_Send (base_64_current_entry, stream->endpoint, stream->remote_file_name);
 
     if (written == (BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH))
     {
