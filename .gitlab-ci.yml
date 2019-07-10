@@ -21,35 +21,35 @@ before_script:
 Bottom:
   script:
     - export TARGET=bottom
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make bottom_all'
+    - nix-shell --run 'make bottom_all'
   tags: ["voting-system"]
 
 Typecheck:
   script:
     - export TARGET=verification
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make typecheck_all'
+    - nix-shell --run 'make typecheck_all'
   tags: ["voting-system"]
 
 Verify:
   script:
     - export TARGET=verification
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make verify_all'
+    - nix-shell --run 'make verify_all'
   tags: ["voting-system"]
 
-Freertos:
+FreeRTOS:
   script:
     - export TARGET=freertos
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make freertos_all'
+    - nix-shell --run 'make freertos_all'
   tags: ["voting-system"]
 
 HostTests:
   script:
     - export TARGET=hosttests
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make hosts_all'
+    - nix-shell --run 'make hosts_all'
   tags: ["voting-system"]
 
 Simulator:
   script:
     - export TARGET=sim
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make sim_all'
+    - nix-shell --run 'make sim_all'
   tags: ["voting-system"]
