@@ -8,7 +8,6 @@
 #include "log_io.h"
 
 /*@ assigns \nothing; // TBD
-  @
 */
 int debug_printf(const char *the_format, ...);
 

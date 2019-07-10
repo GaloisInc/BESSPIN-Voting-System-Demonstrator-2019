@@ -53,6 +53,7 @@ void update_paper_state( bool paper_in_pressed,
   @      || ASM_transition(\old(the_state), SPOIL_E, the_state)
   @      || ASM_transition(\old(the_state), CAST_E, the_state);
   @ ensures SBB_Machine_Invariant;
+  @ ensures \old(the_state.L) == the_state.L || the_state.L == ABORT;
 */
 void update_button_state( bool cast_button_pressed,
                           bool cast_button_released,
@@ -67,6 +68,7 @@ void update_button_state( bool cast_button_pressed,
   @ ensures \old(the_state.BS) == the_state.BS
   @      || ASM_transition(\old(the_state), INTERNAL_BARCODE_E, the_state);
   @ ensures SBB_Machine_Invariant;
+  @ ensures \old(the_state.L) == the_state.L || the_state.L == ABORT;
 */
 void update_barcode_state( bool barcode_scanned );
 
@@ -98,12 +100,15 @@ EventBits_t next_barcode_event_bits(void);
   @   (the_state.P != \old(the_state).P) ==>
   @      ASM_transition(\old(the_state), INTERNAL_PAPER_DETECT_E, the_state);
   @
+  @ ensures the_state.L == ABORT || the_state.L == \old(the_state.L);
+  @
   @ ensures SBB_Machine_Invariant;
 */
 void update_sensor_state(void);
 
 // this is a workaround for multiple barcodes being "queued"
 /*@ requires SBB_Machine_Invariant;
+  @ requires the_state.L == STANDBY;
   @ ensures the_state.BS == BARCODE_NOT_PRESENT;
   @ ensures the_state.M  == \old(the_state.M);
   @ ensures SBB_Machine_Invariant;

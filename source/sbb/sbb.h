@@ -122,13 +122,14 @@ void    gpio_clear(uint8_t i);
 // in the implementation itself for compositional reasoning to be
 // sound.
 
-/*@ requires SBB_Strings_Invariant;
-  @ requires Log_IO_Initialized;
-  @ ensures SBB_Invariant;
- */
 // @todo Should immediately transition to `go_to_standby()`.
 // @assurance kiniry The implementation of `initialize` must have a
 // the C label `DevicesInitialized` on its final statement.
+/*@ requires SBB_Strings_Invariant;
+  @ requires Log_IO_Initialized;
+  @ requires the_state.L == INITIALIZE;
+  @ ensures SBB_Invariant;
+*/
 void initialize(void);
 
 // @review kiniry Needs a postcondition that states that the currently

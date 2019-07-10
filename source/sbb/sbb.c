@@ -61,6 +61,11 @@ extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
                                        TickType_t xTicksToWait);
 
 // main code
+/*@ assigns the_firmware_state; */
+extern void gpio_set_as_input(uint8_t);
+
+/*@ assigns the_firmware_state; */
+extern void gpio_set_as_output(uint8_t);
 
 void initialize(void) {
     gpio_set_as_input(BUTTON_CAST_IN);
@@ -72,8 +77,10 @@ void initialize(void) {
     gpio_set_as_output(BUTTON_CAST_LED);
     gpio_set_as_output(BUTTON_SPOIL_LED);
     the_state.button_illumination = 0;
+    the_state.M = MOTORS_OFF;
+    the_state.D = INITIALIZED_DISPLAY;
+    the_state.BS = BARCODE_NOT_PRESENT;
  DevicesInitialized:
-    go_to_standby();
     return;
 }
 

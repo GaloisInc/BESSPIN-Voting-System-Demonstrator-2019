@@ -98,9 +98,13 @@ void update_barcode_state( bool barcode_scanned ) {
 }
 
 void flush_barcodes() {
+    /*@ loop invariant SBB_Machine_Invariant;
+      @ loop invariant the_state.L == ABORT || the_state.L == STANDBY;
+      @ loop assigns the_state.BS, the_state.L, the_state.P,
+      @ the_state.B, fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
+      @*/
     do {
         the_state.BS = BARCODE_NOT_PRESENT;
-        /*@ loop invariant SBB_Machine_Invariant; */
         update_sensor_state();
     } while (the_state.BS == BARCODE_PRESENT_AND_RECORDED);
 }
@@ -336,8 +340,8 @@ void run_initialize(void) {
 }
 
 void run_standby(void) {
-    go_to_standby();
     flush_barcodes();
+    go_to_standby();
     CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
     //@ assert SBB_States_Invariant(the_state);
 }
@@ -402,6 +406,14 @@ void take_step(void) {
     }
 }
 
+// This exists to isolate the effect of the var_arg call (which we can't specify)
+/*@ assigns \nothing; */
+logic_state debug_state_change(logic_state then, logic_state now) {
+    if (then != now) {
+        debug_printf("logic state changed to %d", now);
+    }
+    return now;
+}
 // This main loop for the SBB never terminates until the system is
 // turned off.
 void ballot_box_main_loop(void) {
@@ -409,15 +421,11 @@ void ballot_box_main_loop(void) {
     logic_state old = 0;
     run_initialize();
 
-    /*@ loop invariant SBB_Invariant;
-      @ loop assigns the_state.BS, the_state.L, the_state.P, the_state.B, fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
-      @ loop assigns old;
+    /*@ loop invariant SBB_Machine_Invariant;
      */
     for(;;) {
-        if (the_state.L != old) {
-            //debug_printf("logic state changed to %d", the_state.L);
-            //   old = the_state.L;
-        }
+        debug_state_change(old, the_state.L);
+
         take_step();
 
         if (the_state.L != ABORT)

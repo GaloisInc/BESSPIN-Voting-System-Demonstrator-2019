@@ -90,6 +90,9 @@ typecheck: $(FRAMA_C_SOURCES)
 wp:
 	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES)
 
+wp.%:
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES) -wp-fct $*
+
 wp-verbose-report:
 	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp-verbose 0 $(FRAMA_C_SOURCES) -then -report
 
