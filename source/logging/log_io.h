@@ -55,7 +55,7 @@ bool Log_IO_File_Exists(const char *name);
     requires \valid(stream);
     requires \separated(stream, name);
     assigns log_fs \from log_fs, name;
-    assigns *stream \from log_fs, name;
+    assigns *stream \from log_fs, name, endpoint;
 
     behavior success:
       ensures \result == LOG_FS_OK;

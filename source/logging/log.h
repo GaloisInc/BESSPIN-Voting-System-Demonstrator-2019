@@ -25,7 +25,7 @@
 /*@ requires \valid(new_log_file);
   @ requires valid_string(the_log_name);
   @ requires \separated(new_log_file, the_log_name);
-  @ assigns *new_log_file \from the_log_name, log_fs;
+  @ assigns *new_log_file \from the_log_name, log_fs, endpoint;
   @*/
 Log_FS_Result create_log(log_file new_log_file,
                          const log_name the_log_name,

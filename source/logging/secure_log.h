@@ -26,7 +26,7 @@ typedef log_io_stream secure_log_io_stream;
 
 /*@ requires \valid(secure_log);
   @ requires \valid_read(a_log_entry_type + (0 .. LOG_ENTRY_LENGTH - 1));
-  @ assigns *secure_log \from log_fs, the_secure_log_name, a_log_entry_type, the_policy;
+  @ assigns *secure_log \from log_fs, the_secure_log_name, a_log_entry_type, the_policy, endpoint;
   @ ensures File_Is_Open (secure_log);
   @ ensures \valid(secure_log);
   @*/
