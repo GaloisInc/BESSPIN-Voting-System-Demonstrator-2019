@@ -20,30 +20,36 @@ before_script:
 #-----------------------------------------------------------------------------#
 Bottom:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=bottom make bottom_all'
+    - export TARGET=bottom
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make bottom_all'
   tags: ["voting-system"]
 
 Typecheck:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=verification make typecheck_all'
+    - export TARGET=verification
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make typecheck_all'
   tags: ["voting-system"]
 
 Verify:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=verification make verify_all'
+    - export TARGET=verification
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make verify_all'
   tags: ["voting-system"]
 
 Freertos:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=freertos make freertos_all'
+    - export TARGET=freertos
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make freertos_all'
   tags: ["voting-system"]
 
 HostTests:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=hosttests make hosts_all'
+    - export TARGET=hosttests
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make hosts_all'
   tags: ["voting-system"]
 
 Simulator:
   script:
-    - nix-shell tool-suite/nix/dev/gfe.nix --run 'export TARGET=sim make sim_all'
+    - export TARGET=sim
+    - nix-shell tool-suite/nix/dev/gfe.nix --run 'make sim_all'
   tags: ["voting-system"]
