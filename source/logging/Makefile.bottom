@@ -1,15 +1,17 @@
-# Makefile for Building the "bottom" variant of the logging subsystem.
-
-.PHONY: bottom bottom_clean
-
-# Assume clang is on PATH, but needs some special setup on Darwin to override
-# Apple's clang and use the HomeBrew one instead...
-export CC := clang
+INCLUDES = -I. \
+	-I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1 \
+	-I../../FreeRTOS-mirror/FreeRTOS/Source/include \
+	-I../../FreeRTOS-mirror/FreeRTOS/Source/portable/GCC/RISC-V \
+	-I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/demo \
+	-I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/bsp \
+	-I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/devices
 
 # Build the bottom target
-all:
-	$(CC) -I. -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1 -I../../FreeRTOS-mirror/FreeRTOS/Source/include -I../../FreeRTOS-mirror/FreeRTOS/Source/portable/GCC/RISC-V -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/demo -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/bsp -I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/devices -D__riscv_xlen=32 log_main.c log_bottom.c secure_log_bottom.c log_io.c debug_io.c ../crypto/base64.c -o secure_log_bottom.elf
+log_bottom:
+	cd $(LOG_DIR); \
+	$(CC)  -D__riscv_xlen=32 log_main.c log_bottom.c secure_log_bottom.c log_io.c debug_io.c ../crypto/base64.c -o secure_log_bottom.elf; \
 	rm -f *.o
 
-clean:
+log_bottom_clean:
+	cd $(LOG_DIR); \
 	rm -f secure_log_bottom.elf

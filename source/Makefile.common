@@ -1,0 +1,141 @@
+# All binaries necessary to run rules.
+# Assume clang is on PATH, but llvm-link needs special handing on Linux
+export CLANG := clang
+export HOST  := $(shell uname -s)
+
+ifeq (${HOST},Linux)
+    export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+    export PLATFORM_INCLUDES := 
+else
+    # Assumed to be Host = Darwin
+    export LLVM_LINK := llvm-link
+    export PLATFORM_INCLUDES = -I/usr/include
+endif
+
+RISCV_XLEN ?= 32
+RISCV_LIB  ?= elf
+CCPATH =
+ARCH 		= -march=rv32im
+ABI 		= -mabi=ilp32
+
+
+RISCV_TARGET=$(CCPATH)riscv$(RISCV_XLEN)-unknown-${RISCV_LIB}
+
+export GCC		= $(RISCV_TARGET)-gcc
+export OBJCOPY	= $(RISCV_TARGET)-objcopy
+export OBJDUMP	= $(RISCV_TARGET)-objdump
+export AR		= $(RISCV_TARGET)-ar
+export RANLIB	= $(RISCV_TARGET)-ranlib
+
+export FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
+export FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
+export FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
+export FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
+
+export WARNINGS= -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
+		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
+
+export CRT0 = $(FREERTOS_DEMO_DIR)/bsp/boot.S
+
+export FREERTOS_SRC = \
+	$(FREERTOS_SOURCE_DIR)/croutine.c \
+	$(FREERTOS_SOURCE_DIR)/list.c \
+	$(FREERTOS_SOURCE_DIR)/queue.c \
+	$(FREERTOS_SOURCE_DIR)/tasks.c \
+	$(FREERTOS_SOURCE_DIR)/timers.c \
+	$(FREERTOS_SOURCE_DIR)/event_groups.c \
+	$(FREERTOS_SOURCE_DIR)/stream_buffer.c \
+	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c
+
+export APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
+
+export PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
+export PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
+
+export INCLUDES = \
+    -I. \
+	-I$(FREERTOS_DEMO_DIR) \
+	-I$(FREERTOS_DEMO_DIR)/bsp \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550 \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio \
+	-I$(FREERTOS_SOURCE_DIR)/include \
+	-I$(FREERTOS_DEMO_DIR)../Common/include \
+	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
+	-I$(FREERTOS_DEMO_DIR)/demo \
+	-I$(FREERTOS_DEMO_DIR)/devices
+
+export ASFLAGS  += -g $(ARCH) $(ABI)  \
+    -Wa,-Ilegacy \
+    -I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
+    -DportasmHANDLE_INTERRUPT=external_interrupt_handler
+
+export CFLAGS = $(WARNINGS) $(INCLUDES)
+export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
+
+export APP_SRC = \
+	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
+	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
+	$(FREERTOS_DEMO_DIR)/bsp/syscalls.c \
+	$(FREERTOS_DEMO_DIR)/bsp/uart.c \
+	$(FREERTOS_DEMO_DIR)/bsp/iic.c \
+	$(FREERTOS_DEMO_DIR)/bsp/gpio.c \
+	$(FREERTOS_DEMO_DIR)/bsp/spi.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_stats.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_options.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_l.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bd.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bdring.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_control.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_master.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_stats.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_options.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_extra.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xbasic_types.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_io.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c \
+	$(FREERTOS_DEMO_DIR)/devices/serLcd.c \
+	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
+	$(FREERTOS_DEMO_DIR)/devices/ff.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
+
+export ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
+	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
+	-DportasmHANDLE_INTERRUPT=external_interrupt_handler
+
+export ARFLAGS=crsv
+
+export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib -defsym=_STACK_SIZE=4K
+export LIBS	 =  -lc -lgcc

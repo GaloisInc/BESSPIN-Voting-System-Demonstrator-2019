@@ -22,7 +22,7 @@
 #include "serLcd.h"
 
 // Timeouts
-#define BALLOT_DETECT_TIMEOUT_MS 6000
+#define BALLOT_DETECT_TIMEOUT_MS 10000
 #define CAST_OR_SPOIL_TIMEOUT_MS 30000
 #define SPOIL_EJECT_TIMEOUT_MS 6000
 #define CAST_INGEST_TIMEOUT_MS 6000
@@ -154,12 +154,20 @@ void stop_motor(void) {
 
 
 void display_this_text(const char *the_text, uint8_t its_length) {
+    #ifdef SIMULATION
+    debug_printf("DISPLAY: %s\r\n", the_text);
+    #else
     serLcdPrintf(the_text, its_length);
+    #endif
 }
 
 void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2) {
+    #ifdef SIMULATION
+    debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", line_1, line_2);
+    #else
     serLcdPrintTwoLines(line_1, length_1, line_2, length_2);
+    #endif
 }
 
 bool ballot_detected(void) {
