@@ -52,14 +52,20 @@ extern SBB_state the_state;
     SBB_String(remove_ballot_text) &&
     SBB_String(error_line_1_text) &&
     SBB_String(error_line_2_text) &&
-    SBB_String(system_log_file_name)
+    valid_string(system_log_file_name) &&
+    valid_string(app_log_file_name)
     ;
+
+  predicate sbb_L_ASM_valid(SBB_state the_state) =
+    INITIALIZE <= the_state.L && the_state.L <= ABORT;
 
   predicate SBB_Invariant =
     Log_IO_Initialized &&
     SBB_Strings_Invariant &&
     (the_state.D == INITIALIZED_DISPLAY || the_state.D == SHOWING_TEXT) &&
-    motor_ASM_valid(the_state)
+    motor_ASM_valid(the_state) &&
+    sbb_L_ASM_valid(the_state) &&
+    SBB_States_Invariant(the_state)
     ;
   }
 */
@@ -117,7 +123,9 @@ void    gpio_clear(uint8_t i);
 // in the implementation itself for compositional reasoning to be
 // sound.
 
-/* assigns the_firmware_state;
+/*@ requires SBB_Strings_Invariant;
+  @ requires Log_IO_Initialized;
+  @ ensures SBB_Invariant;
  */
 // @todo Should immediately transition to `go_to_standby()`.
 // @assurance kiniry The implementation of `initialize` must have a
@@ -128,8 +136,8 @@ void initialize(void);
 // held ballot is a legal ballot for the election, as soon as the crypto
 // spec is ready for use.
 /*@ requires \valid(the_barcode + (0 .. its_length - 1));
-  @ requires the_state.P == PAPER_DETECTED;
   @ assigns \nothing;
+  @ ensures \result == true || \result == false;
 */
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
 
@@ -149,9 +157,9 @@ bool is_cast_button_pressed(void);
 */
 bool is_spoil_button_pressed(void);
 
-/*@ requires the_state.P == PAPER_DETECTED;
-  @ assigns \nothing;
+/*@ assigns \nothing;
   @ ensures \result == (the_state.BS == BARCODE_PRESENT_AND_RECORDED);
+  @ ensures \result == true || \result == false;
 */
 bool has_a_barcode(void);
 
@@ -260,6 +268,7 @@ void display_this_2_line_text(const char *line_1, uint8_t length_1,
 
 /*@ assigns \nothing;
   @ ensures \result == (the_state.P == PAPER_DETECTED);
+  @ ensures \result == true || \result == false;
 */
 bool ballot_detected(void);
 
@@ -326,7 +335,9 @@ void go_to_standby(void);
 
 void ballot_detect_timeout_reset(void);
 
-//@ assigns \nothing;
+/*@ assigns \nothing;
+  @ ensures \result == true || \result == false;
+ */
 bool ballot_detect_timeout_expired(void);
 
 void cast_or_spoil_timeout_reset(void);
@@ -334,7 +345,7 @@ void cast_or_spoil_timeout_reset(void);
 //@ assigns \nothing;
 bool cast_or_spoil_timeout_expired(void);
 
-/*@ requires Log_IO_Initialized;
+/*@ requires SBB_Strings_Invariant;
   @ terminates \false;
   @ ensures    \false;
 */

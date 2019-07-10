@@ -49,6 +49,7 @@ bool load_or_create(log_file the_file,
   @ requires valid_string(system_log_file_name);
   @ assigns app_log_handle, system_log_handle \from log_fs;
   @ ensures Log_IO_Initialized;
+  @ ensures \result == true || \result == false;
 */
 bool load_or_create_logs(void);
 

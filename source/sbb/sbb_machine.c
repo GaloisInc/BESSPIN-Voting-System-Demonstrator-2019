@@ -93,7 +93,6 @@ void update_barcode_state( bool barcode_scanned ) {
     }
 }
 
-// this is a workaround for multiple barcodes being "queued"
 void flush_barcodes() {
     do {
         the_state.BS = BARCODE_NOT_PRESENT;
@@ -257,7 +256,6 @@ void run_wait_for_decision(void) {
         // pass
     }
 }
-
 void run_barcode_detected(void) {
     uint8_t this_barcode[BARCODE_MAX_LENGTH] = {0};
     display_this_text(barcode_detected_text,
@@ -343,69 +341,80 @@ void run_abort(void) {
                              strlen(error_line_2_text));
 }
 
+/*@ requires SBB_Invariant;
+  @ ensures SBB_Invariant;
+*/
+void take_step(void) {
+    switch ( the_state.L ) {
+    default:
+        break;
+
+    case STANDBY:
+        run_standby();
+        break;
+
+    case WAIT_FOR_BALLOT:
+        run_wait_for_ballot();
+        break;
+
+    case FEED_BALLOT:
+        run_feed_ballot();
+        break;
+
+    case BARCODE_DETECTED:
+        run_barcode_detected();
+        break;
+
+#if 0
+    case WAIT_FOR_DECISION:
+        run_wait_for_decision();
+        break;
+
+    case CAST:
+        run_cast();
+        break;
+
+    case SPOIL:
+        run_spoil();
+        break;
+
+    case EJECT:
+        run_eject();
+        break;
+
+    case AWAIT_REMOVAL:
+        run_await_removal();
+        break;
+
+    case ABORT:
+        run_abort();
+        configASSERT(false);
+        break;
+        //default:
+        //assert(false);
+#endif
+    }
+}
+
 // This main loop for the SBB never terminates until the system is
 // turned off.
 void ballot_box_main_loop(void) {
     the_state.L = INITIALIZE;
     logic_state old = 0;
+    run_initialize();
 
+    /*@ loop invariant SBB_Invariant;
+      @ loop assigns the_state.BS, the_state.L, the_state.P, the_state.B, fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
+      @ loop assigns old;
+     */
     for(;;) {
         if (the_state.L != old) {
-            debug_printf("logic state changed to %d", the_state.L);
-            old = the_state.L;
+            //debug_printf("logic state changed to %d", the_state.L);
+            //   old = the_state.L;
         }
+        take_step();
 
-        switch ( the_state.L ) {
-
-        case INITIALIZE:
-            run_initialize();
-            break;
-
-        case STANDBY:
-            run_standby();
-            break;
-
-        case WAIT_FOR_BALLOT:
-            run_wait_for_ballot();
-            break;
-
-        case FEED_BALLOT:
-            run_feed_ballot();
-            break;
-
-            // Requires: has_a_barcode
-        case BARCODE_DETECTED:
-            run_barcode_detected();
-            break;
-
-        case WAIT_FOR_DECISION:
-            run_wait_for_decision();
-            break;
-
-        case CAST:
-            run_cast();
-            break;
-
-        case SPOIL:
-            run_spoil();
-            break;
-
-        case EJECT:
-            run_eject();
-            break;
-
-        case AWAIT_REMOVAL:
-            run_await_removal();
-            break;
-
-        case ABORT:
-            run_abort();
-            configASSERT(false);
-            break;
-            //default:
-            //assert(false);
-        }
-
-        update_sensor_state();
+        if (the_state.L != ABORT)
+          update_sensor_state();
     }
 }

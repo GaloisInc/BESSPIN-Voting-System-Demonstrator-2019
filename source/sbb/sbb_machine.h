@@ -93,47 +93,72 @@ EventBits_t next_barcode_event_bits(void);
 void update_sensor_state(void);
 
 // this is a workaround for multiple barcodes being "queued"
-/*@ assigns the_state.BS;
+/*@ requires SBB_Invariant;
+  @ assigns the_state.BS;
   @ ensures the_state.BS == BARCODE_NOT_PRESENT;
+  @ ensures SBB_Invariant;
  */
 void flush_barcodes(void);
 
-/*@ requires the_state.L == AWAIT_REMOVAL;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == AWAIT_REMOVAL;
+  @ ensures SBB_Invariant;
  */
 void run_await_removal(void);
 
-/*@ requires the_state.L == EJECT;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == EJECT;
+  @ ensures SBB_Invariant;
  */
 void run_eject(void);
 
-/*@ requires the_state.L == SPOIL;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == SPOIL;
+  @ ensures SBB_Invariant;
  */
 void run_spoil(void);
 
-/*@ requires the_state.L == CAST;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == CAST;
+  @ ensures SBB_Invariant;
  */
 void run_cast(void);
 
-/*@ requires the_state.L == WAIT_FOR_DECISION;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == WAIT_FOR_DECISION;
+  @ ensures SBB_Invariant;
  */
 void run_wait_for_decision(void);
 
-/*@ requires the_state.L == BARCODE_DETECTED;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == BARCODE_DETECTED;
+  @ ensures SBB_Invariant;
  */
 void run_barcode_detected(void);
 
-/*@ requires the_state.L == FEED_BALLOT;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == FEED_BALLOT;
+  @ assigns the_state.L;
+  @ ensures SBB_Invariant;
  */
 void run_feed_ballot(void);
 
-/*@ requires the_state.L == WAIT_FOR_BALLOT;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == WAIT_FOR_BALLOT;
+  @ assigns the_state.L;
+  @ ensures SBB_Invariant;
  */
 void run_wait_for_ballot(void);
 
 /*@ requires the_state.L == INITIALIZE;
+  @ requires SBB_Strings_Invariant;
+  @ ensures SBB_Invariant;
  */
 void run_initialize(void);
 
-/*@ requires the_state.L == STANDBY;
+/*@ requires SBB_Invariant;
+  @ requires the_state.L == STANDBY;
+  @ assigns the_state.L;
+  @ ensures SBB_Invariant;
  */
 void run_standby(void);

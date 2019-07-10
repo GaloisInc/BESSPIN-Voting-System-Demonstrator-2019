@@ -67,7 +67,9 @@ void initialize(void) {
     gpio_set_as_output(BUTTON_CAST_LED);
     gpio_set_as_output(BUTTON_SPOIL_LED);
     the_state.button_illumination = 0;
- DevicesInitialized: return;
+ DevicesInitialized:
+    go_to_standby();
+    return;
 }
 
 /* global invariant Button_lighting_conditions_power_on:

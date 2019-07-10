@@ -138,6 +138,16 @@
   @ }
   @*/
 
+/*@ predicate SBB_States_Invariant(SBB_state S) =
+     (S.L == WAIT_FOR_BALLOT  ==>
+       (S.M == MOTORS_OFF))             &&
+     (S.L == FEED_BALLOT      ==>
+       (S.M == MOTORS_TURNING_FORWARD)) &&
+     (S.L == BARCODE_DETECTED ==>
+       (S.BS == BARCODE_PRESENT_AND_RECORDED))
+      ;
+*/
+
 // @spec abakst should NO_PAPER_DETECTED be reachable from the other states?
 // @spec abakst the diagram seems to indicate there is a skip transition from stopped to initialized
 
