@@ -52,7 +52,7 @@ Log_FS_Result Test_Log_IO_Read_Base64_Entry_Send_Remotely
       memcpy(&base_64_current_entry.the_entry[0], &current_entry.the_entry[0],
              LOG_ENTRY_LENGTH);
 
-      Log_NET_Send(base_64_current_entry, HTTP_Endpoint_App_Log);
+      Log_Net_Send(base_64_current_entry, HTTP_Endpoint_App_Log);
 
     }
   return LOG_FS_OK;

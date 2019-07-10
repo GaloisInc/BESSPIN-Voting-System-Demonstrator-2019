@@ -10,22 +10,22 @@ static const char *endpoint_filenames[2] =
 
 #ifdef TARGET_OS_FreeRTOS
 
-void Log_NET_Initialize() {
+void Log_Net_Initialize() {
 	debug_printf("FreeRTOS_IPInit\r\n");
 	FreeRTOS_IPInit(uIPAddress, uNetMask, uGatewayAddress, uDNSServerAddress, uMACAddress);
 }
 
-void Log_NET_Send(base64_secure_log_entry secure_log_entry) {
+void Log_Net_Send(base64_secure_log_entry secure_log_entry) {
 	return;
 }
 
 #else
 
-void Log_NET_Initialize() {
+void Log_Net_Initialize() {
 	return;
 }
 
-void Log_NET_Send(base64_secure_log_entry secure_log_entry, http_endpoint endpoint)
+void Log_Net_Send(base64_secure_log_entry secure_log_entry, http_endpoint endpoint)
 {
 
     const char *log_file_name = endpoint_filenames[endpoint];
@@ -97,7 +97,7 @@ void Log_NET_Send(base64_secure_log_entry secure_log_entry, http_endpoint endpoi
         }
         sent += bytes;
     } while (sent < total);
-    
+
     close(sockfd);
     return;
 }
