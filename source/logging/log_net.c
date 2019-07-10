@@ -30,7 +30,7 @@ void Log_Net_Initialize()
                     uMACAddress);
 }
 
-void Log_NET_Send(base64_secure_log_entry secure_log_entry,
+void Log_Net_Send(base64_secure_log_entry secure_log_entry,
                   http_endpoint endpoint, const char *remote_file_name)
 {
     return;
