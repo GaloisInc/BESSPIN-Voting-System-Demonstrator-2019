@@ -120,14 +120,14 @@ bool has_a_barcode(void);
 // what_is_the_barcode) is the underlying (non-public) functions
 // encoding the device driver/firmware for the barcode scanner
 // subsystem?
-/*@ requires \valid(the_barcode + (0 .. its_length - 1));
+/*@ requires \valid(the_barcode + (0 .. BARCODE_MAX_LENGTH-1));
   @ requires the_state.BS == BARCODE_PRESENT_AND_RECORDED;
-  @ assigns the_barcode[0 .. its_length];
+  @ assigns the_barcode[0 .. \result - 1];
 */
 // ensures (* the model barcode is written to the_barcode *)
 // @design kiniry Should this function return the number of bytes in
 // the resulting barcode?
-void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length);
+barcode_length_t what_is_the_barcode(barcode_t the_barcode);
 
 // @review kiniry We have no ASM for button light states.
 /*@ assigns the_state.button_illumination;
