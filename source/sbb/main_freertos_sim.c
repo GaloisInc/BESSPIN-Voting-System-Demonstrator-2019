@@ -246,6 +246,7 @@ static void manual_input(void)
             xStreamBufferSend(xScannerStreamBuffer, (void *)valid_barcode,
                               sizeof(valid_barcode),
                               SCANNER_BUFFER_TX_BLOCK_TIME_MS);
+            xEventGroupClearBits(xSBBEventGroup, ebBARCODE_SCANNED);
             break;
         case 'x':
             printf("Returning to main menu\r\n");
