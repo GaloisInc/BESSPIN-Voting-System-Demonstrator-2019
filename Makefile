@@ -1,4 +1,4 @@
-TARGET ?= freertos
+TARGET ?= bottom
 $(info TARGET=$(TARGET))
 
 # List all substems directories
@@ -120,7 +120,7 @@ ifeq ($(TARGET),hosttests)
 
 # Assume clang is on PATH, but needs some special setup on Darwin to override
 # Apple's clang and use the HomeBrew one instead...
-#CC := clang
+export CC := clang
 
 
 HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -Wno-macro-redefined
