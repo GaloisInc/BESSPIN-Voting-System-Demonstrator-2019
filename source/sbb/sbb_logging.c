@@ -26,17 +26,20 @@ bool import_and_verify(log_file the_file) {
     #endif
 }
 
-bool load_or_create(log_file the_file, const log_name the_name) {
+bool load_or_create(log_file the_file,
+                    const log_name the_name,
+                    const http_endpoint endpoint) {
     #ifdef SIMULATION
     return false;
     #else
+
     // @todo There is no API for opening a file for write, so we will overwrite for now
     bool b_success = true;
 
     if ( Log_IO_File_Exists(the_name) &&
          LOG_FS_OK == Log_IO_Open(the_file, the_name) ) {
         b_success = import_and_verify(the_file);
-    } else if ( LOG_FS_OK == create_log(the_file, the_name) ) {
+    } else if ( LOG_FS_OK == create_log(the_file, the_name, endpoint) ) {
         b_success = true;
     } else {
         b_success = false;
@@ -52,11 +55,17 @@ bool load_or_create_logs(void) {
     #else
     bool b_success = false;
 
-    if ( load_or_create(&app_log_handle, app_log_file_name) ) {
-        if ( load_or_create(&system_log_handle, system_log_file_name) ) {
+    if (load_or_create(&app_log_handle,
+                       app_log_file_name,
+                       HTTP_Endpoint_App_Log))
+      {
+        if (load_or_create(&system_log_handle,
+                           system_log_file_name,
+                           HTTP_Endpoint_Sys_Log))
+          {
             b_success = true;
-        }
-    }
+          }
+      }
 
     return b_success;
     #endif
