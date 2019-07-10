@@ -128,6 +128,9 @@ void    gpio_clear(uint8_t i);
   @ requires Log_IO_Initialized;
   @ requires the_state.L == INITIALIZE;
   @ ensures SBB_Invariant;
+  @ ensures the_state.M == MOTORS_OFF;
+  @ ensures the_state.L == INITIALIZE;
+  @ ensures no_buttons_lit(the_state);
 */
 void initialize(void);
 

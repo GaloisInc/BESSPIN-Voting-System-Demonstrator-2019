@@ -77,6 +77,7 @@ void initialize(void) {
     gpio_set_as_output(BUTTON_CAST_LED);
     gpio_set_as_output(BUTTON_SPOIL_LED);
     the_state.button_illumination = 0;
+    // Logging is not set up yet...we could do that here I suppose
     the_state.M = MOTORS_OFF;
     the_state.D = INITIALIZED_DISPLAY;
     the_state.BS = BARCODE_NOT_PRESENT;

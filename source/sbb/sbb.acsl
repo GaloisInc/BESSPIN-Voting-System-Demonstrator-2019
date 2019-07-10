@@ -175,12 +175,12 @@
 
 /*@ predicate SBB_States_Invariant(SBB_state S) =
       (S.L == WAIT_FOR_BALLOT   && Wait_For_Ballot_Inv(S))   ||
-      (S.L == FEED_BALLOT       && Feed_Ballot_Inv(S))       || 
-      (S.L == BARCODE_DETECTED  && Barcode_Detected_Inv(S))  || 
-      (S.L == WAIT_FOR_DECISION && Wait_For_Decision_Inv(S)) || 
-      (S.L == CAST              && Cast_Inv(S))              || 
-      (S.L == SPOIL             && Spoil_Inv(S))             || 
-      (S.L == EJECT             && Eject_Inv(S))             || 
+      (S.L == FEED_BALLOT       && Feed_Ballot_Inv(S))       ||
+      (S.L == BARCODE_DETECTED  && Barcode_Detected_Inv(S))  ||
+      (S.L == WAIT_FOR_DECISION && Wait_For_Decision_Inv(S)) ||
+      (S.L == CAST              && Cast_Inv(S))              ||
+      (S.L == SPOIL             && Spoil_Inv(S))             ||
+      (S.L == EJECT             && Eject_Inv(S))             ||
       (S.L == AWAIT_REMOVAL     && Await_Removal_Inv(S))     ||
       (S.L == ABORT             && true)                     ||
       (S.L == STANDBY           && true)                     ||
