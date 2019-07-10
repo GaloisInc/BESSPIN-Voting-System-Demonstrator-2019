@@ -30,13 +30,21 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream,
 {
     Log_FS_Result result = Log_FS_Create_New(stream, name);
     stream->endpoint = endpoint;
+    debug_printf ("Setting remote file name to %s\n", name);
+    stream->remote_file_name = (char *) name;
     return result;
 }
 
 Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
                           const char *name)   // IN
 {
-    return Log_FS_Open(stream, name);
+    Log_FS_Result result = Log_FS_Open(stream, name);
+
+    // TBD set endpoint here?
+
+    debug_printf ("Setting open remote file name to %s\n", name);
+    stream->remote_file_name = (char *) name;
+    return result;
 }
 
 Log_FS_Result Log_IO_Close(Log_Handle *stream) // IN
@@ -81,7 +89,13 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     written += Log_FS_Write(stream, &new_line, 1);
 
     // Step 4 - Write same data over network to the Reporting System
+<<<<<<< HEAD
     Log_Net_Send (base_64_current_entry, stream->endpoint);
+=======
+    debug_printf ("Debug - remote file name is %s\n", stream->remote_file_name);
+
+    Log_NET_Send (base_64_current_entry, stream->endpoint, stream->remote_file_name);
+>>>>>>> Record the filename in the Log_Handle struct for passing over HTTP to the reporting system. Do nothing if endpoint is HTTP_Endpoint_None. Add a test case for test1, but echoing to HTTP
 
     if (written == (BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH))
     {

@@ -69,7 +69,9 @@ uint8_t uMACAddress[6] = {configMAC_ADDR0, configMAC_ADDR1, configMAC_ADDR2, con
 
 void Log_Net_Initialize(void);
 
-void Log_Net_Send(base64_secure_log_entry secure_log_entry, http_endpoint endpoint);
+void Log_NET_Send(base64_secure_log_entry secure_log_entry,
+                  http_endpoint endpoint,
+                  const char *remote_file_name);
 
 
 #endif /* __LOG_IO_H__ */

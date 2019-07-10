@@ -1,9 +1,13 @@
 # Makefile for Building the logging subsystem "host" tests - e.g. tests that run on Linux or MacOS
 
 # Build the bottom target
+<<<<<<< HEAD
 log_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 log_hosttest_test4 log_hosttest_test5 log_hosttest_test6 \
 	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport log_hosttest_remotetest11
 
+=======
+all: test1 test1net test2 test3 test4 test5 test6 test7 log_main test8 testmany test9 test10 testimport remotetest11
+>>>>>>> Record the filename in the Log_Handle struct for passing over HTTP to the reporting system. Do nothing if endpoint is HTTP_Endpoint_None. Add a test case for test1, but echoing to HTTP
 
 LSOURCES = log.c secure_log.c log_io.c log_fs.c debug_io.c log_net.c
 CSOURCES = ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c ../crypto/base64.c
@@ -16,9 +20,17 @@ log_hosttest_test2:
 	cd $(LOG_DIR); \
 	$(CC) $(HOSTTEST_CFLAGS) -o test2 test2.c $(LSOURCES) $(CSOURCES)
 
+<<<<<<< HEAD
 log_hosttest_test3:
 	cd $(LOG_DIR); \
 	$(CC) $(HOSTTEST_CFLAGS) -o test3 test3.c $(LSOURCES) $(CSOURCES)
+=======
+test1net:
+	$(CC) $(CFLAGS) -o test1net test1net.c $(LSOURCES) $(CSOURCES)
+
+test2:
+	$(CC) $(CFLAGS) -o test2 test2.c $(LSOURCES) $(CSOURCES)
+>>>>>>> Record the filename in the Log_Handle struct for passing over HTTP to the reporting system. Do nothing if endpoint is HTTP_Endpoint_None. Add a test case for test1, but echoing to HTTP
 
 log_hosttest_test4:
 	cd $(LOG_DIR); \

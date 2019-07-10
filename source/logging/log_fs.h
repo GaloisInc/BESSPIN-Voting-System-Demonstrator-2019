@@ -25,6 +25,7 @@ typedef struct Log_Handles
   FIL the_file;
   sha256_digest previous_hash; // This should really be in secure_log
   http_endpoint endpoint;      // Endpoint to echo the log to over HTTP
+  char *remote_file_name;      // Filename for the log in the HTTP POST request
 } Log_Handle;
 
 #endif // TARGET_FS_LittleFS
@@ -43,6 +44,7 @@ typedef struct Log_Handles
   FILE the_file;
   sha256_digest previous_hash; // This should really be in secure_log
   http_endpoint endpoint;      // Endpoint to echo the log to over HTTP
+  char *remote_file_name;      // Filename for the log in the HTTP POST request
 } Log_Handle;
 #endif
 
