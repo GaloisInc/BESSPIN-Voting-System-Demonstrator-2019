@@ -5,50 +5,64 @@
 export CC := clang
 
 # Build the bottom target
-all: test1 test2 test3 test4 test5 test6 test7 log_main test8 testmany test9 test10 testimport
+log_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 log_hosttest_test4 log_hosttest_test5 log_hosttest_test6 \
+	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport
 
 LSOURCES = log.c secure_log.c log_io.c debug_io.c
 CSOURCES = ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c ../crypto/base64.c
-CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -Wno-macro-redefined
 
-test1:
-	$(CC) $(CFLAGS) -o test1 test1.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test1:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test1 test1.c $(LSOURCES) $(CSOURCES)
 
-test2:
-	$(CC) $(CFLAGS) -o test2 test2.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test2:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test2 test2.c $(LSOURCES) $(CSOURCES)
 
-test3:
-	$(CC) $(CFLAGS) -o test3 test3.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test3:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test3 test3.c $(LSOURCES) $(CSOURCES)
 
-test4:
-	$(CC) $(CFLAGS) -o test4 test4.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test4:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test4 test4.c $(LSOURCES) $(CSOURCES)
 
-test5:
-	$(CC) $(CFLAGS) -o test5 test5.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test5:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test5 test5.c $(LSOURCES) $(CSOURCES)
 
-test6:
-	$(CC) $(CFLAGS) -o test6 test6.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test6:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test6 test6.c $(LSOURCES) $(CSOURCES)
 
-test7:
-	$(CC) $(CFLAGS) -o test7 test7.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test7:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test7 test7.c $(LSOURCES) $(CSOURCES)
 
-log_main:
-	$(CC) $(CFLAGS) -o log_main log_main.c $(LSOURCES) $(CSOURCES)
+log_hosttest_log_main:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o log_main log_main.c $(LSOURCES) $(CSOURCES)
 
-test8:
-	$(CC) $(CFLAGS) -o test8 test8.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test8:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test8 test8.c $(LSOURCES) $(CSOURCES)
 
-testmany:
-	$(CC) $(CFLAGS) -o testmany testmany.c $(LSOURCES) $(CSOURCES)
+log_hosttest_testmany:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o testmany testmany.c $(LSOURCES) $(CSOURCES)
 
-test9:
-	$(CC) $(CFLAGS) -o test9 test9.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test9:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test9 test9.c $(LSOURCES) $(CSOURCES)
 
-test10:
-	$(CC) $(CFLAGS) -o test10 test10.c $(LSOURCES) $(CSOURCES)
+log_hosttest_test10:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o test10 test10.c $(LSOURCES) $(CSOURCES)
 
-testimport:
-	$(CC) $(CFLAGS) -o testimport testimport.c $(LSOURCES) $(CSOURCES)
+log_hosttest_testimport:
+	cd $(LOG_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -o testimport testimport.c $(LSOURCES) $(CSOURCES)
 
-clean:
+log_hosttest_clean:
+	cd $(LOG_DIR); \
 	rm -f test1 test2 test3 test4 test5 test6 test7 log_main test8 testmany test9 test10 testimport *.o

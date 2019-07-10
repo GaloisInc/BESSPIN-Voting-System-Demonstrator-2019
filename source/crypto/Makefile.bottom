@@ -1,15 +1,9 @@
-# Makefile for Building the "bottom" variant of the Crypto subsystem.
-
-.PHONY: bottom bottom_clean
-
-# Assume clang is on PATH, but needs some special setup on Darwin to override
-# Apple's clang and use the HomeBrew one instead...
-export CC := clang
-
 # Build the bottom target
-all:
-	$(CC) crypto_main.c crypto_bottom.c -o crypto_bottom.elf
+crypto_bottom:
+	cd $(CRYPTO_DIR); \
+	$(CC) crypto_main.c crypto_bottom.c -o crypto_bottom.elf; \
 	rm -f *.o
 
-clean:
+crypto_bottom_clean:
+	cd $(CRYPTO_DIR); \
 	rm -f crypto_bottom.elf

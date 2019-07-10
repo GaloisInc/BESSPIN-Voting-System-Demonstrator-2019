@@ -1,72 +1,6 @@
-RISCV_XLEN ?= 32
-RISCV_LIB  ?= elf
-CCPATH =
-ARCH 		= -march=rv32im
-ABI 		= -mabi=ilp32
-
-
-TARGET=$(CCPATH)riscv$(RISCV_XLEN)-unknown-${RISCV_LIB}
-
-GCC		= $(TARGET)-gcc
-OBJCOPY	= $(TARGET)-objcopy
-OBJDUMP	= $(TARGET)-objdump
-AR		= $(TARGET)-ar
-RANLIB	= $(TARGET)-ranlib
-
-# For debugging
-$(info $$PROG is [${PROG}])
-
-FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
-FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
-FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
-FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
-
-WARNINGS= -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
-		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
 
 PROG = main_ballot_box
-CRT0 = $(FREERTOS_DEMO_DIR)/bsp/boot.S
-
-FREERTOS_SRC = \
-	$(FREERTOS_SOURCE_DIR)/croutine.c \
-	$(FREERTOS_SOURCE_DIR)/list.c \
-	$(FREERTOS_SOURCE_DIR)/queue.c \
-	$(FREERTOS_SOURCE_DIR)/tasks.c \
-	$(FREERTOS_SOURCE_DIR)/timers.c \
-	$(FREERTOS_SOURCE_DIR)/event_groups.c \
-	$(FREERTOS_SOURCE_DIR)/stream_buffer.c \
-	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c
-
-APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
-
-PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
-PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
-
 LOGGING_DIR = ../logging
-
-INCLUDES = \
-    -I. \
-  -I$(LOGGING_DIR) \
-	-I$(FREERTOS_DEMO_DIR) \
-	-I$(FREERTOS_DEMO_DIR)/bsp \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550 \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi \
-	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio \
-	-I$(FREERTOS_SOURCE_DIR)/include \
-	-I$(FREERTOS_DEMO_DIR)../Common/include \
-	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
-	-I$(FREERTOS_DEMO_DIR)/demo \
-	-I$(FREERTOS_DEMO_DIR)/devices
-
-ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy -I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions -DportasmHANDLE_INTERRUPT=external_interrupt_handler
-
-CFLAGS = $(WARNINGS) $(INCLUDES)
-CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
 
 DEMO_SRC = \
     main_freertos.c \
@@ -86,65 +20,8 @@ DEMO_SRC = \
     ../crypto/aes.c \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
- 
-APP_SRC = \
-	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
-	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
-	$(FREERTOS_DEMO_DIR)/bsp/syscalls.c \
-	$(FREERTOS_DEMO_DIR)/bsp/uart.c \
-	$(FREERTOS_DEMO_DIR)/bsp/iic.c \
-	$(FREERTOS_DEMO_DIR)/bsp/gpio.c \
-	$(FREERTOS_DEMO_DIR)/bsp/spi.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_g.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_sinit.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_selftest.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_stats.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_options.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_intr.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_l.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bd.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bdring.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_selftest.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_g.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_sinit.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_control.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_g.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_sinit.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_g.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_sinit.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_selftest.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_master.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_intr.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_stats.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_g.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_sinit.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_selftest.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_options.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_extra.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_g.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_intr.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_selftest.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_sinit.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xbasic_types.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_io.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c \
-	$(FREERTOS_DEMO_DIR)/devices/serLcd.c \
-	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
-	$(FREERTOS_DEMO_DIR)/devices/ff.c \
-	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
-	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
 
-ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
-	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
-	-DportasmHANDLE_INTERRUPT=external_interrupt_handler
-
-ARFLAGS=crsv
+CFLAGS += -I$(LOGGING_DIR)
 
 #
 # Define all object files.
@@ -156,9 +33,6 @@ DEMO_OBJ = $(DEMO_SRC:.c=.o)
 PORT_ASM_OBJ = $(PORT_ASM:.S=.o)
 CRT0_OBJ = $(CRT0:.S=.o)
 OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(DEMO_OBJ) $(APP_OBJ)
-
-LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib -defsym=_STACK_SIZE=4K
-LIBS	 =  -lc -lgcc
 
 $(info ASFLAGS=$(ASFLAGS))
 $(info LDLIBS=$(LDLIBS))
@@ -176,7 +50,7 @@ $(info ARFLAGS=$(ARFLAGS))
 
 all: $(PROG).elf
 
-$(PROG).elf  : $(OBJS) Makefile
+$(PROG).elf  : $(OBJS)
 	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
 	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
