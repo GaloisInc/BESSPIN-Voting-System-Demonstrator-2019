@@ -22,7 +22,7 @@ int main(void)
 
     Log_IO_Initialize();
 
-    create_log(&my_log, "test3log.txt");
+    create_log(&my_log, "test3log.txt", HTTP_Endpoint_None);
 
     write_entry(&my_log, second_entry);
     write_entry(&my_log, third_entry);

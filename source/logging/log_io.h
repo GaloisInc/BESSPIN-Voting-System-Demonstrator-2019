@@ -70,7 +70,8 @@ bool Log_IO_File_Exists(const char *name);
     disjoint behaviors;
  */
 Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
-                                const char *name);  // IN
+                                const char *name,   // IN
+                                const http_endpoint endpoint);  // IN
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);

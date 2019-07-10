@@ -56,20 +56,20 @@ int main(void)
     Log_IO_Initialize();
 
     // L1
-    create_log(&l1, "test7l1.txt");
+    create_log(&l1, "test7l1.txt", HTTP_Endpoint_None);
     write_entry(&l1, m1);
     write_entry(&l1, m2);
     Log_IO_Close(&l1);
 
     // L2
-    create_log(&l2, "test7l2.txt");
+    create_log(&l2, "test7l2.txt", HTTP_Endpoint_None);
     write_entry(&l2, m3);
     write_entry(&l2, m4);
     Log_IO_Close(&l2);
 
     // Now L3 and L4 in parallel
-    create_log(&l3, "test7l3.txt");
-    create_log(&l4, "test7l4.txt");
+    create_log(&l3, "test7l3.txt", HTTP_Endpoint_None);
+    create_log(&l4, "test7l4.txt", HTTP_Endpoint_None);
     write_entry(&l3, m1);
     write_entry(&l4, m3);
     write_entry(&l3, m2);

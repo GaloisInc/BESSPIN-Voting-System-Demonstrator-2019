@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "secure_log_t.h"
+#include "log_net_t.h"
 
 #ifdef TARGET_OS_FreeRTOS
 
@@ -21,12 +22,12 @@ typedef FSIZE_t file_offset;
 
 typedef struct Log_Handles
 {
-    FIL the_file;
-    sha256_digest previous_hash; // This should really be in secure_log
+  FIL the_file;
+  sha256_digest previous_hash; // This should really be in secure_log
+  http_endpoint endpoint;      // Endpoint to echo the log to over HTTP
 } Log_Handle;
 
 #endif // TARGET_FS_LittleFS
-
 
 
 #else
@@ -39,8 +40,9 @@ typedef off_t file_offset;
 
 typedef struct Log_Handles
 {
-    FILE the_file;
-    sha256_digest previous_hash; // This should really be in secure_log
+  FILE the_file;
+  sha256_digest previous_hash; // This should really be in secure_log
+  http_endpoint endpoint;      // Endpoint to echo the log to over HTTP
 } Log_Handle;
 #endif
 

@@ -54,7 +54,8 @@ static secure_log_entry initial_log_entry(const log_entry msg) // IN
 Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
                                 const secure_log_name the_secure_log_name,
                                 const log_entry a_log_entry_type,
-                                const secure_log_security_policy the_policy)
+                                const secure_log_security_policy the_policy,
+                                const http_endpoint endpoint)
 {
     Log_FS_Result create_result, write_result, sync_result;
     secure_log_entry initial_entry;
@@ -62,7 +63,7 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
     // Initial/Draft pseudo-code by RCC
 
     // 1. Create new file, open for writing only.
-    create_result = Log_IO_Create_New(new_secure_log, the_secure_log_name);
+    create_result = Log_IO_Create_New(new_secure_log, the_secure_log_name, endpoint);
 
     // 2. call initial_log_entry above to create the first block
     initial_entry = initial_log_entry(a_log_entry_type);
@@ -107,7 +108,7 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
     sha256_digest new_hash;
     uint8_t msg[SECURE_LOG_ENTRY_LENGTH]; // appended message
     size_t index = 0;
-    
+
 
     // 0. Assume a_log_entry is already padded with zeroes
 

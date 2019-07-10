@@ -24,10 +24,13 @@ Log_FS_Result Log_IO_Initialize()
     // TBD - also call Log_Net_Initialize() here if required
 }
 
-Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
-                                const char *name)   // IN
+Log_FS_Result Log_IO_Create_New(Log_Handle *stream,
+                                const char *name,
+                                const http_endpoint endpoint)
 {
-    return Log_FS_Create_New(stream, name);
+    Log_FS_Result result = Log_FS_Create_New(stream, name);
+    stream->endpoint = endpoint;
+    return result;
 }
 
 Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT

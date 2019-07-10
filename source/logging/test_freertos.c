@@ -228,7 +228,7 @@ static void prvLoggingTask(void *pvParameters)
 
     Log_IO_Initialize();
 
-    create_log(&my_log, "test1log.txt");
+    create_log(&my_log, "test1log.txt", HTTP_Endpoint_None);
 
     Log_IO_Close(&my_log);
     printf("prvLoggingTask terminating\r\n");

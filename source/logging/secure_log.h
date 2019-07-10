@@ -33,7 +33,8 @@ typedef log_io_stream secure_log_io_stream;
 Log_FS_Result create_secure_log(Log_Handle *secure_log,
                                 const secure_log_name the_secure_log_name,
                                 const log_entry a_log_entry_type,
-                                const secure_log_security_policy the_policy);
+                                const secure_log_security_policy the_policy,
+                                const http_endpoint endpoint);
 
 // TBD and Unimplemented at present
 // /*@ requires \valid_read(((char*)a_secure_log_name) + (0 .. LOG_ENTRY_LENGTH -1));

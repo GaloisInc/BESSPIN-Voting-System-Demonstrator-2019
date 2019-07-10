@@ -13,6 +13,7 @@
 // Subsystem includes
 #include "log.acsl"
 #include "log_io.h"
+#include "log_net_t.h"
 #include "log_t.h"
 
 /*@
@@ -26,7 +27,9 @@
   @ requires \separated(new_log_file, the_log_name);
   @ assigns *new_log_file \from the_log_name, log_fs;
   @*/
-Log_FS_Result create_log(log_file new_log_file, const log_name the_log_name);
+Log_FS_Result create_log(log_file new_log_file,
+                         const log_name the_log_name,
+                         const http_endpoint endpoint);
 
 /*@ requires \valid(the_log);
   @ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));

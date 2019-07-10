@@ -10,7 +10,9 @@
 #include "log.h"
 #include "secure_log.h"
 
-Log_FS_Result create_log(Log_Handle *new_log_file, const log_name the_log_name)
+Log_FS_Result create_log(Log_Handle *new_log_file,
+                         const log_name the_log_name,
+                         const http_endpoint endpoint)
 {
     const log_entry first_entry =
         "hello "
@@ -23,7 +25,8 @@ Log_FS_Result create_log(Log_Handle *new_log_file, const log_name the_log_name)
         hashchain_sha2_256, no_provenance,     no_confidentiality,
         aes_cbc,            no_access_control, no_non_repudiation};
 
-    Log_FS_Result create_result = create_secure_log(new_log_file, the_log_name, first_entry, first_policy);
+    Log_FS_Result create_result =
+      create_secure_log(new_log_file, the_log_name, first_entry, first_policy, endpoint);
 
     return create_result;
 }

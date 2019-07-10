@@ -8,7 +8,7 @@ int main(void)
 
     Log_IO_Initialize();
 
-    create_log(&my_log, "test1log.txt");
+    create_log(&my_log, "test1log.txt", HTTP_Endpoint_None);
 
     num = Log_IO_Num_Base64_Entries(&my_log);
 
