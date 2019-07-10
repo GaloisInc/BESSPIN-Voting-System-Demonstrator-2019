@@ -122,7 +122,6 @@ ifeq ($(TARGET),hosttests)
 # Apple's clang and use the HomeBrew one instead...
 export CC := clang
 
-
 HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -Wno-macro-redefined
 
 include $(CRYPTO_DIR)/Makefile.hosttests
@@ -138,6 +137,8 @@ else
 #
 #####################################
 ifeq ($(TARGET),sim)
+
+sim_all: sim_sbb
 
 sim_sbb:
 	cd $(SBB_DIR) ; \
