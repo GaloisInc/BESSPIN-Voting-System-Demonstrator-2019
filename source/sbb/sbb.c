@@ -164,8 +164,7 @@ void display_this_text(const char *the_text, uint8_t its_length) {
 void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2) {
     #ifdef SIMULATION
-    debug_printf("DISPLAY: %s\r\n", line_1);
-    debug_printf("DISPLAY: %s\r\n", line_2);
+    debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", line_1, line_2);
     #else
     serLcdPrintTwoLines(line_1, length_1, line_2, length_2);
     #endif
