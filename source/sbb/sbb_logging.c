@@ -10,7 +10,7 @@ Log_Handle app_log_handle;
 Log_Handle system_log_handle;
 
 // Each entry should be a 0-padded 256 uint8_t array according to the c specification.
-const char app_event_entries[] = { 'C', 'S' };
+const uint8_t app_event_entries[] = { 'C', 'S' };
 
 bool import_and_verify(log_file the_file) {
     #ifdef SIMULATION
@@ -90,11 +90,11 @@ bool log_app_event(app_event event,
                    barcode_length_t barcode_length) {
     if ( barcode_length + 2 < LOG_ENTRY_LENGTH ) {
         log_entry event_entry;
-        event_entry[0] = (uint8_t)event;
+        event_entry[0] = app_event_entries[event];
         event_entry[1] = (uint8_t)barcode_length; // This is less than 256
         memcpy(&event_entry[2], barcode, barcode_length);
 #ifdef SIMULATION
-        debug_printf("LOG: %hhu %hhu", (uint8_t)event, (uint8_t)barcode_length);
+        debug_printf("LOG: %c %hhu", (char)app_event_entries[event], (uint8_t)barcode_length);
         for (size_t i = 0; i < barcode_length; ++i ) {
             debug_printf(" %hhx", (uint8_t)barcode[i]);
         }
