@@ -122,8 +122,10 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
     bool b_found = false;
     size_t n_entries = Log_IO_Num_Base64_Entries(&system_log_handle);
 
+    debug_printf("scanning for duplicates, there are %d entries", n_entries);
     /** Scan the log backwards. The 0th entry is not a real entry to consider. */
     for (size_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 1); --i_entry_no) {
+        debug_printf("scanning entry %d", i_entry_no);
         secure_log_entry secure_entry = Log_IO_Read_Base64_Entry(&system_log_handle, i_entry_no);
 
         if (secure_entry.the_entry[1] == (uint8_t)length) {
@@ -134,5 +136,6 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
         }
     }
 
+    debug_printf("barcode found in log: %d", b_found);
     return b_found;
 }
