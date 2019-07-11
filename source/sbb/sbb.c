@@ -32,6 +32,7 @@ TickType_t cast_or_spoil_timeout = 0;
 
 bool barcode_present = false;
 char barcode[BARCODE_MAX_LENGTH] = {0};
+barcode_length_t barcode_length  = 0;
 SemaphoreHandle_t barcode_mutex;
 
 
@@ -118,12 +119,9 @@ bool has_a_barcode(void) {
     return the_state.BS == BARCODE_PRESENT_AND_RECORDED;
 }
 
-void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length) {
-    configASSERT(its_length <= BARCODE_MAX_LENGTH);
-    if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
-        memcpy(the_barcode, barcode, its_length);
-        xSemaphoreGive(barcode_mutex);
-    }
+barcode_length_t what_is_the_barcode(barcode_t the_barcode) {
+    memcpy(the_barcode, barcode, barcode_length);
+    return barcode_length;
 }
 
 void spoil_button_light_on(void) { gpio_write(BUTTON_SPOIL_LED); }

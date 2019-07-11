@@ -229,20 +229,25 @@ void run_cast(void) {
 }
 
 void run_wait_for_decision(void) {
+    char this_barcode[BARCODE_MAX_LENGTH] = {0};
+    barcode_length_t its_length;
+    its_length = what_is_the_barcode(this_barcode);
     if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
         log_system_message(decision_timeout_event_msg);
         CHANGE_STATE(the_state, L, EJECT);
     } else if ( is_cast_button_pressed() ) {
-        if ( !log_app_event(APP_EVENT_BALLOT_USER_CAST) ) {
+        if ( !log_app_event(APP_EVENT_BALLOT_USER_CAST,
+                            this_barcode,
+                            its_length) ) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
             CHANGE_STATE(the_state, L, CAST);
         }
     } else if ( is_spoil_button_pressed() ) {
-        if ( !log_app_event(APP_EVENT_BALLOT_USER_SPOIL) ) {
+        if ( !log_app_event(APP_EVENT_BALLOT_USER_SPOIL, this_barcode, its_length) ) {
             debug_printf("Failed to write to app log.");
             CHANGE_STATE(the_state, L, ABORT);
         } else {
@@ -257,8 +262,8 @@ void run_barcode_detected(void) {
     char this_barcode[BARCODE_MAX_LENGTH] = {0};
     display_this_text(barcode_detected_text,
                       strlen(barcode_detected_text));
-    what_is_the_barcode(this_barcode, BARCODE_MAX_LENGTH);
-    if ( is_barcode_valid(this_barcode, BARCODE_MAX_LENGTH) ) {
+    barcode_length_t length = what_is_the_barcode(this_barcode);
+    if ( is_barcode_valid(this_barcode, length) ) {
         // Prompt the user for a decision
         debug_printf("valid barcode detected");
         cast_button_light_on();
@@ -270,6 +275,10 @@ void run_barcode_detected(void) {
                                  strlen(cast_or_spoil_line_2_text));
         // Go to the waiting state
         CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
+    } else if ( barcode_cast_or_spoiled(this_barcode, length) ) {
+        // Eject Ballot
+        debug_printf("previously seen barcode detected");
+        CHANGE_STATE(the_state, L, EJECT);
     } else {
         debug_printf("invalid barcode detected");
         display_this_text(invalid_barcode_text,
