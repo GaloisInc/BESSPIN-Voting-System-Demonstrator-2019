@@ -135,15 +135,18 @@
   @     timer_ASM_transition(preS, E, postS)        &&
   @     sd_card_ASM_transition(preS, E, postS)
   @     ;
+  @
   @ }
   @ axiomatic SBB_States_Invariants {
   @   predicate Initialize_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
   @     !cast_button_lit(S) &&
   @     !spoil_button_lit(S);
   @
-  @ predicate Standby_Inv(SBB_state S) =
-  @   !cast_button_lit(S) &&
-  @   !spoil_button_lit(S);
+  @   predicate Standby_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
   @
   @   predicate Wait_For_Ballot_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
@@ -187,10 +190,28 @@
   @     !spoil_button_lit(S);
   @
   @   predicate Abort_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
   @     !cast_button_lit(S) &&
   @     !spoil_button_lit(S);
   @ }
   @*/
+
+/*@ predicate Ballot_Present(SBB_state S) =
+  @   S.L == BARCODE_DETECTED ||
+  @   S.L == WAIT_FOR_DECISION ||
+  @   S.L == CAST ||
+  @   S.L == EJECT ||
+  @   S.L == SPOIL;
+*/
+
+// Since we only have one sensor, we consider paper to be present
+// in some cases beyond the sensor being active
+// (like if we have fed it far enough that the sensor is no longer active)
+// Moreover, since we are polling, this definition is when we _think_ there
+// is paper present (we don't allow the sensor to pre-empt the executing SBB task)
+/*@ predicate Paper_Present(SBB_state S) =
+  @   Ballot_Present(S) || S.L == FEED_BALLOT || S.L == AWAIT_REMOVAL;
+*/
 
 /*@ predicate SBB_States_Invariant(SBB_state S) =
       (S.L == WAIT_FOR_BALLOT   && Wait_For_Ballot_Inv(S))   ||

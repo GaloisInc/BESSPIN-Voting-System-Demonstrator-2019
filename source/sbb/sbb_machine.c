@@ -326,18 +326,11 @@ void run_initialize(void) {
     initialize();
     if ( LOG_FS_OK == Log_IO_Initialize() ) {
         if ( load_or_create_logs() ) {
-            //@assert SBB_States_Invariant(the_state);
-            //@assert SBB_Machine_Invariant;
             update_sensor_state();
-            //@assert SBB_Machine_Invariant;
             if ( ballot_detected() ) {
-                //@assert SBB_States_Invariant(the_state);
                 CHANGE_STATE(the_state, L, EJECT);
-                //@assert SBB_States_Invariant(the_state);
             } else {
-                //@assert SBB_States_Invariant(the_state);
                 CHANGE_STATE(the_state, L, STANDBY);
-                //@assert SBB_States_Invariant(the_state);
             }
         } else {
             debug_printf("Failed to import logs.");
