@@ -67,6 +67,9 @@ extern SBB_state the_state;
     motor_ASM_valid(the_state) &&
     sbb_L_ASM_valid(the_state);
   }
+
+  predicate SBB_Machine_Invariant =
+    SBB_Invariant && SBB_States_Invariant(the_state);
 */
 
 // @todo kiniry This is a placeholder state representation so that we

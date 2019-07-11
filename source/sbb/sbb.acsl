@@ -137,37 +137,56 @@
   @     ;
   @ }
   @ axiomatic SBB_States_Invariants {
+  @   predicate Initialize_Inv(SBB_state S) =
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
+  @
+  @ predicate Standby_Inv(SBB_state S) =
+  @   !cast_button_lit(S) &&
+  @   !spoil_button_lit(S);
+  @
   @   predicate Wait_For_Ballot_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
   @     !cast_button_lit(S) &&
   @     !spoil_button_lit(S);
+  @
   @   predicate Feed_Ballot_Inv(SBB_state S) =
   @     S.M == MOTORS_TURNING_FORWARD &&
   @     !cast_button_lit(S)           &&
   @     !spoil_button_lit(S);
+  @
   @   predicate Barcode_Detected_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF                    &&
   @     S.BS == BARCODE_PRESENT_AND_RECORDED &&
   @     !cast_button_lit(S)                  &&
   @     !spoil_button_lit(S);
+  @
   @   predicate Wait_For_Decision_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF  &&
   @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
+  @
   @   predicate Cast_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
   @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
+  @
   @   predicate Spoil_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
   @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
+  @
   @   predicate Eject_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF    &&
   @     !cast_button_lit(S)  &&
   @     !spoil_button_lit(S);
+  @
   @   predicate Await_Removal_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Abort_Inv(SBB_state S) =
   @     !cast_button_lit(S) &&
   @     !spoil_button_lit(S);
   @ }
@@ -182,9 +201,9 @@
       (S.L == SPOIL             && Spoil_Inv(S))             ||
       (S.L == EJECT             && Eject_Inv(S))             ||
       (S.L == AWAIT_REMOVAL     && Await_Removal_Inv(S))     ||
-      (S.L == ABORT             && true)                     ||
-      (S.L == STANDBY           && true)                     ||
-      (S.L == INITIALIZE        && true);
+      (S.L == ABORT             && Abort_Inv(S))             ||
+      (S.L == STANDBY           && Standby_Inv(S))           ||
+      (S.L == INITIALIZE        && Initialize_Inv(S));
 */
 
 // @spec abakst should NO_PAPER_DETECTED be reachable from the other states?

@@ -1,11 +1,10 @@
 /** Prototypes for non-public procedures used by sbb machine main loop */
+#ifndef __SBB_MACHINE__
+#define __SBB_MACHINE__
+
 #include <FreeRTOS.h>
 #include <task.h>
 #include "log_t.h"
-
-/*@ predicate SBB_Machine_Invariant =
-      SBB_Invariant && SBB_States_Invariant(the_state);
-*/
 
 /*@ requires SBB_Machine_Invariant;
   @ requires \valid_read(event_entry + (0 .. LOG_ENTRY_LENGTH - 1));
@@ -174,3 +173,5 @@ void run_initialize(void);
   @ ensures SBB_Machine_Invariant;
  */
 void run_standby(void);
+
+#endif
