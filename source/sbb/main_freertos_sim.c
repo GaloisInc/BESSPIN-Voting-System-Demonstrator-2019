@@ -89,7 +89,7 @@ StreamBufferHandle_t xScannerStreamBuffer;
 EventGroupHandle_t xSBBEventGroup;
 
 /*-----------------------------------------------------------*/
-extern void main_tcp(void);
+extern void sbb_tcp(void);
 
 /**
  * Main application entry
@@ -423,7 +423,7 @@ static void prvInputTask(void *pvParameters)
             manual_input();
             break;
         case 't':
-            main_tcp();
+            sbb_tcp();
             break;
         default:
             printf("Unknown command\r\n");
