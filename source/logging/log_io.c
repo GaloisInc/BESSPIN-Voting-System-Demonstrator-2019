@@ -324,7 +324,7 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
             r = mbedtls_base64_decode(&secure_log_entry_result.the_digest[0],
                                       SHA256_DIGEST_LENGTH_BYTES + 1, &olen,
                                       &result.the_digest[0],
-                                      SHA256_BASE_64_DIGEST_LENGTH_BYTES);
+                                      SHA256_BASE_64_DIGEST_BUFFER_LENGTH_BYTES);
 
             /*@
               loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
@@ -356,8 +356,9 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,                // IN
     int r;
     FRESULT write_entry_status, write_digest_status;
     base64_secure_log_entry base_64_current_entry;
+
     r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
-                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
+                              SHA256_BASE_64_DIGEST_BUFFER_LENGTH_BYTES, &olen,
                               &the_entry.the_digest[0],
                               SHA256_DIGEST_LENGTH_BYTES);
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
@@ -372,14 +373,14 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,                // IN
     space_written = f_putc(space, &stream->the_file);
 
     write_digest_status = f_write(&stream->the_file, &base_64_current_entry.the_digest[0],
-                                  SHA256_DIGEST_LENGTH_BYTES, &bytes_written2);
+                                  SHA256_BASE_64_DIGEST_LENGTH_BYTES, &bytes_written2);
 
     new_line_char_written = f_putc(new_line, &stream->the_file);
 
     if (write_entry_status == FR_OK && write_digest_status == FR_OK &&
         space_written == 1 && new_line_char_written == 1 &&
         bytes_written1 == LOG_ENTRY_LENGTH &&
-        bytes_written2 == SHA256_DIGEST_LENGTH_BYTES)
+        bytes_written2 == SHA256_BASE_64_DIGEST_LENGTH_BYTES)
     {
         return LOG_FS_OK;
     }
