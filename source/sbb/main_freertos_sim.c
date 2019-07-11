@@ -33,6 +33,15 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+/* IP stack includes. */
+#include "FreeRTOS_IP.h"
+#include "FreeRTOS_Sockets.h"
+
+/* Application includes */
+#include "SimpleUDPClientAndServer.h"
+#include "SimpleTCPEchoServer.h"
+#include "TCPEchoClient_SingleTasks.h"
+
 /* FreeRTOS includes */
 #include "event_groups.h"
 #include "stream_buffer.h"
@@ -80,6 +89,7 @@ StreamBufferHandle_t xScannerStreamBuffer;
 EventGroupHandle_t xSBBEventGroup;
 
 /*-----------------------------------------------------------*/
+extern void main_tcp(void);
 
 /**
  * Main application entry
@@ -411,6 +421,9 @@ static void prvInputTask(void *pvParameters)
             break;
         case '0':
             manual_input();
+            break;
+        case 't':
+            main_tcp();
             break;
         default:
             printf("Unknown command\r\n");

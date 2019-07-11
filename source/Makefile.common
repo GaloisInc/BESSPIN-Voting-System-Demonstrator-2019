@@ -45,7 +45,19 @@ export FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/timers.c \
 	$(FREERTOS_SOURCE_DIR)/event_groups.c \
 	$(FREERTOS_SOURCE_DIR)/stream_buffer.c \
-	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c
+	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_ARP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DNS.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DHCP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Sockets.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_UDP_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_WIN.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Stream_Buffer.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/BufferManagement/BufferAllocation_2.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/riscv_hal_eth.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/NetworkInterface.c 
 
 export APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
 
@@ -68,7 +80,11 @@ export INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)../Common/include \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \
-	-I$(FREERTOS_DEMO_DIR)/devices
+	-I$(FREERTOS_DEMO_DIR)/devices \
+	-I$(FREERTOS_TCP_SOURCE_DIR) \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/include \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP/include \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/Compiler/GCC 
 
 export ASFLAGS  += -g $(ARCH) $(ABI)  \
     -Wa,-Ilegacy \
@@ -86,6 +102,7 @@ export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/iic.c \
 	$(FREERTOS_DEMO_DIR)/bsp/gpio.c \
 	$(FREERTOS_DEMO_DIR)/bsp/spi.c \
+	$(FREERTOS_DEMO_DIR)/bsp/rand.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_g.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_sinit.c \
