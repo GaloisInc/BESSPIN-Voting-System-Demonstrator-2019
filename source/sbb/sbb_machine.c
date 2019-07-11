@@ -153,6 +153,18 @@ EventBits_t next_barcode_event_bits(void) {
 extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToSet );
 
+/*@ requires SBB_Machine_Invariant;
+  @ assigns the_state.L, the_state.M, the_state.button_illumination;
+  @ assigns fs, gpio_mem[..];
+  @ ensures the_state.L == ABORT;
+  @ ensures SBB_Machine_Invariant;
+*/
+void go_to_abort(void) {
+    cast_button_light_off();
+    spoil_button_light_off();
+    stop_motor();
+    the_state.L = ABORT;
+}
 
 void log_single_event( EventBits_t event_bits,
                        EventBits_t log_bit,
@@ -162,8 +174,13 @@ void log_single_event( EventBits_t event_bits,
 
         if (!b_log_ok) {
             debug_printf("Failed to write to system log.");
-            the_state.L = ABORT;
+            go_to_abort();
+            //@ assert SBB_Machine_Invariant;
+        } else {
+            //@ assert SBB_Machine_Invariant;
         }
+    } else {
+        //@ assert SBB_Machine_Invariant;
     }
 }
 

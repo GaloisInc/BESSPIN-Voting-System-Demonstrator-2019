@@ -235,14 +235,14 @@ void move_motor_forward(void);
 void move_motor_back(void);
 
 /*@ requires SBB_Invariant;
-  @ requires the_state.M != MOTORS_OFF;
   @ assigns the_state.M, the_state.L, log_fs,
             gpio_mem[MOTOR_0],
             gpio_mem[MOTOR_1];
   @ ensures the_state.M == MOTORS_OFF;
   @ ensures the_state.L == ABORT || the_state.L == \old(the_state.L);
   @ ensures SBB_Invariant;
-  @ ensures ASM_transition(\old(the_state), MOTOR_OFF_E, the_state);
+  @ ensures the_state.M != \old(the_state.M) ==>
+  @           ASM_transition(\old(the_state), MOTOR_OFF_E, the_state);
 */
 void stop_motor(void);
 

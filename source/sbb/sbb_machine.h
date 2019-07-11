@@ -8,7 +8,8 @@
 
 /*@ requires SBB_Machine_Invariant;
   @ requires \valid_read(event_entry + (0 .. LOG_ENTRY_LENGTH - 1));
-  @ assigns the_state.L, fs;
+  @ assigns fs, the_state.L, the_state.M, the_state.button_illumination;
+  @ assigns gpio_mem[..];
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures SBB_Machine_Invariant;
 */
@@ -17,7 +18,8 @@ void log_single_event( EventBits_t event_bits,
                        const log_entry event_entry );
 
 /*@ requires SBB_Machine_Invariant;
-  @ assigns the_state.L, fs;
+  @ assigns fs, the_state.L, the_state.M, the_state.button_illumination;
+  @ assigns gpio_mem[..];
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures SBB_Machine_Invariant;
 */
@@ -85,6 +87,8 @@ EventBits_t next_barcode_event_bits(void);
 
 /*@ requires SBB_Machine_Invariant;
   @ assigns the_state.BS, the_state.L, the_state.P, the_state.B, fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
+  @ assigns fs, the_state.L, the_state.M, the_state.button_illumination;
+  @ assigns gpio_mem[..];
   @ ensures
   @   (the_state.BS != \old(the_state).BS) ==>
   @     ASM_transition(\old(the_state), INTERNAL_BARCODE_E, the_state);
