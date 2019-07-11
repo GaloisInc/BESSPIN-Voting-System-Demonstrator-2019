@@ -18,7 +18,7 @@ const char *no_barcode_text = "No barcode.";
 const char *remove_ballot_text = "Remove ballot...";
 
 // HW event messages
-#define HW_EVENT(msg) "HW event:" msg "."
+#define HW_EVENT(msg) "HW event: " msg "."
 log_entry sensor_in_pressed_msg            = HW_EVENT("Sensor in pressed");
 log_entry sensor_in_released_msg           = HW_EVENT("Sensor in released");
 log_entry sensor_out_pressed_msg           = HW_EVENT("Sensor out pressed");

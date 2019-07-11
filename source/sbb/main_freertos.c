@@ -250,7 +250,6 @@ static void prvBallotBoxMainTask(void *pvParameters)
 {
     (void)pvParameters;
     printf("Starting prvBallotBoxMainTask\r\n");
-    debug_printf("DEBUG DEBUG DEBUG DEBUG!\r\n");
 
     ballot_box_main_loop();
 }
@@ -285,7 +284,7 @@ static void prvBarcodeScannerTask(void *pvParameters)
                     /* Send the barcode */
                     /* Debug print below */
                     barcode[idx] = '\0';
-                    printf("Barcode, idx=%u: %s\r\n", idx, barcode);
+                    debug_printf("Barcode, idx=%u: %s\r\n", idx, barcode);
                     /* We have a barcode, send it over stream buffer and fire the event */
                     size_t bytes_available =
                         xStreamBufferSpacesAvailable(xScannerStreamBuffer);
@@ -363,13 +362,13 @@ static void prvInputTask(void *pvParameters) {
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
                 paper_sensor_in_input_last = paper_sensor_in_input;
             }
-            printf("uxReturned = 0x%lx\r\n",uxReturned);
+            // printf("uxReturned = 0x%lx\r\n",uxReturned);
         }
 
         /* Cast button */
         cast_button_input = gpio_read(BUTTON_CAST_IN);
         if (cast_button_input != cast_button_input_last) {
-            printf("#cast_button_input changed: %u -> %u\r\n", cast_button_input_last, cast_button_input);
+            debug_printf("#cast_button_input changed: %u -> %u\r\n", cast_button_input_last, cast_button_input);
 
             /* Broadcast the event */
             if (cast_button_input == 1) {
@@ -381,14 +380,14 @@ static void prvInputTask(void *pvParameters) {
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_RELEASED );
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebCAST_BUTTON_PRESSED );
             }
-            printf("uxReturned = 0x%lx\r\n",uxReturned);
+            // printf("uxReturned = 0x%lx\r\n",uxReturned);
             cast_button_input_last = cast_button_input;
         }
 
         /* Spoil button */
         spoil_button_input = gpio_read(BUTTON_SPOIL_IN);
         if (spoil_button_input != spoil_button_input_last) {
-            printf("#spoil_button_input changed: %u -> %u\r\n", spoil_button_input_last, spoil_button_input);
+            debug_printf("#spoil_button_input changed: %u -> %u\r\n", spoil_button_input_last, spoil_button_input);
 
             /* Broadcast the event */
             if (spoil_button_input == 1) {
@@ -400,7 +399,7 @@ static void prvInputTask(void *pvParameters) {
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_RELEASED );
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebSPOIL_BUTTON_PRESSED );
             }
-            printf("uxReturned = 0x%lx\r\n",uxReturned);
+            // printf("uxReturned = 0x%lx\r\n",uxReturned);
             spoil_button_input_last = spoil_button_input;
         }
 
