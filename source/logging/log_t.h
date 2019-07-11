@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#include "../crypto/crypto_t.h"
 
 #define LOG_ENTRY_LENGTH 256
 

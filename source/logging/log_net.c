@@ -15,7 +15,7 @@ static const char *HEADER_4 = "Content-Type: application/octet-stream\r\n";
 static const char *HEADER_5_1 = "Content-Length: ";
 static const char *DOUBLE_CRLF = "\r\n\r\n";
 
-static const size_t data_block_length = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
+//static const size_t data_block_length = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
 static const uint16_t PORT_NUMBER = 8066;
 
 // We assume that a log entry data block can't be more than 9_999_999 bytes long, so
@@ -58,7 +58,10 @@ void Log_Net_Initialize()
 }
 
 void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
-                  http_endpoint endpoint, const char *remote_file_name)
+                  const size_t padded_log_entry_length,
+                  const size_t bytes_of_padding_required,
+                  const http_endpoint endpoint,
+                  const char *remote_file_name)
 {
     Socket_t xSocket;
     struct freertos_sockaddr xRemoteAddress;
@@ -74,7 +77,7 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
         strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
 
     const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
-                                strlen(remote_file_name) + data_block_length;
+                                strlen(remote_file_name) + padded_log_entry_length;
 
     char pcBufferToTransmit[MESSAGE_SIZE];
     debug_printf("MESSAGE_SIZE is %zu\n", MESSAGE_SIZE);
@@ -95,7 +98,7 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
 
     snprintf(pcBufferToTransmit, MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s",
              REQUEST_LINE_1, remote_file_name, REQUEST_LINE_3, HEADER_1,
-             HEADER_2, HEADER_3, HEADER_4, HEADER_5_1, data_block_length,
+             HEADER_2, HEADER_3, HEADER_4, HEADER_5_1, padded_log_entry_length,
              DOUBLE_CRLF);
 
     // After the header has been written, we have N bytes of header,
@@ -111,9 +114,13 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
 
     size_t space_index = first_byte_of_data_index + LOG_ENTRY_LENGTH;
     debug_printf("space index is %zu\n", space_index);
-    pcBufferToTransmit[space_index] = space;
+    for (size_t space_count = 0; space_count < bytes_of_padding_required; space_count++)
+      {
+        pcBufferToTransmit[space_index] = space;
+        space_index++;
+      }
 
-    size_t hash_index = space_index + 1;
+    size_t hash_index = space_index;
     debug_printf("hash index is %zu\n", hash_index);
     memcpy(&pcBufferToTransmit[hash_index], &the_secure_log_entry.the_digest[0],
            SHA256_BASE_64_DIGEST_LENGTH_BYTES);
@@ -188,7 +195,10 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
 void Log_Net_Initialize() { return; }
 
 void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
-                  http_endpoint endpoint, const char *remote_file_name)
+                  const size_t padded_log_entry_length,
+                  const size_t bytes_of_padding_required,
+                  const http_endpoint endpoint,
+                  const char *remote_file_name)
 {
     const size_t FIXED_MESSAGE_SIZE =
         strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
@@ -196,7 +206,7 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
         strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
 
     const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
-                                strlen(remote_file_name) + data_block_length;
+                                strlen(remote_file_name) + padded_log_entry_length;
 
     char message[MESSAGE_SIZE];
 
@@ -224,7 +234,7 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
 
     snprintf(message, MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s", REQUEST_LINE_1,
              remote_file_name, REQUEST_LINE_3, HEADER_1, HEADER_2, HEADER_3,
-             HEADER_4, HEADER_5_1, data_block_length, DOUBLE_CRLF);
+             HEADER_4, HEADER_5_1, padded_log_entry_length, DOUBLE_CRLF);
 
     // After the header has been written, we have N bytes of header,
     // occupying bytes 0 .. (N-1) of message. So.. the first byte of the
@@ -239,9 +249,13 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
 
     size_t space_index = first_byte_of_data_index + LOG_ENTRY_LENGTH;
     debug_printf("space index is %zu\n", space_index);
-    message[space_index] = space;
+    for (size_t space_count = 0; space_count < bytes_of_padding_required; space_count++)
+      {
+        message[space_index] = space;
+        space_index++;
+      }
 
-    size_t hash_index = space_index + 1;
+    size_t hash_index = space_index;
     debug_printf("hash index is %zu\n", hash_index);
     memcpy(&message[hash_index], &the_secure_log_entry.the_digest[0],
            SHA256_BASE_64_DIGEST_LENGTH_BYTES);
