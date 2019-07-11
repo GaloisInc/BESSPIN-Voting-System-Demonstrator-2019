@@ -304,3 +304,24 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 
 	return uxRand();
 }
+
+void reportIPStatus(void)
+{
+	uint32_t ulIPAddress, ulNetMask, ulGatewayAddress, ulDNSServerAddress;
+	char cBuffer[16];
+	static BaseType_t xTasksAlreadyCreated = pdFALSE;
+
+	FreeRTOS_GetAddressConfiguration(&ulIPAddress, &ulNetMask, &ulGatewayAddress, &ulDNSServerAddress);
+	FreeRTOS_inet_ntoa(ulIPAddress, cBuffer);
+	FreeRTOS_printf(("\r\n\r\nIP Address: %s\r\n", cBuffer));
+
+	FreeRTOS_inet_ntoa(ulNetMask, cBuffer);
+	FreeRTOS_printf(("Subnet Mask: %s\r\n", cBuffer));
+
+	FreeRTOS_inet_ntoa(ulGatewayAddress, cBuffer);
+	FreeRTOS_printf(("Gateway Address: %s\r\n", cBuffer));
+
+	FreeRTOS_inet_ntoa(ulDNSServerAddress, cBuffer);
+	FreeRTOS_printf(("DNS Server Address: %s\r\n\r\n\r\n", cBuffer));
+}
+

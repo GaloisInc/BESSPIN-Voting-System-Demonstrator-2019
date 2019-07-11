@@ -90,6 +90,7 @@ EventGroupHandle_t xSBBEventGroup;
 
 /*-----------------------------------------------------------*/
 extern void sbb_tcp(void);
+extern void reportIPStatus(void);
 
 /**
  * Main application entry
@@ -400,6 +401,9 @@ static void prvInputTask(void *pvParameters)
     printf("Starting prvInputTask\r\n");
     printf("%s", intro);
 
+    printf("IP Status\r\n");
+    sbb_tcp();
+
     for (;;)
     {
         char c = uart0_rxchar();
@@ -423,7 +427,7 @@ static void prvInputTask(void *pvParameters)
             manual_input();
             break;
         case 't':
-            sbb_tcp();
+            reportIPStatus();
             break;
         default:
             printf("Unknown command\r\n");
