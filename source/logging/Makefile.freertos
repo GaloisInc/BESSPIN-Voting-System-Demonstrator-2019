@@ -2,6 +2,7 @@
 PROG = test_freertos
 
 DEMO_SRC = \
+    ../sbb/sbb_tcp.c \
     test_freertos.c \
     log.c \
     secure_log.c \
