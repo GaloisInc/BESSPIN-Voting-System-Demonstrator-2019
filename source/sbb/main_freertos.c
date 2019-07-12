@@ -325,8 +325,7 @@ static void prvBarcodeScannerTask(void *pvParameters)
 static void prvInputTask(void *pvParameters) {
     (void)pvParameters;
     EventBits_t uxReturned;
-    TickType_t paper_in_0_timestamp;
-    TickType_t paper_in_1_timestamp;
+    TickType_t paper_in_timestamp;
     
     printf("Starting prvInputTask\r\n");
 
@@ -347,23 +346,21 @@ static void prvInputTask(void *pvParameters) {
     for(;;) {
         /* Paper sensor in */
         paper_sensor_in_input = gpio_read(PAPER_SENSOR_IN);
-        if (paper_sensor_in_input != paper_sensor_in_input_last) {
-            /* Broadcast the event */
-            if (paper_sensor_in_input == 0 && paper_in_1_timestamp + PAPER_SENSOR_DEBOUNCE < xTaskGetTickCount) {
+        if (paper_sensor_in_input != paper_sensor_in_input_last &&
+            paper_in_timestamp + PAPER_SENSOR_DEBOUNCE < xTaskGetTickCount()) {
+            if (paper_sensor_in_input == 0) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
-                debug_printf("#paper_sensor_in_input changed: %u -> %u\r\n", paper_sensor_in_input_last, paper_sensor_in_input);
+                debug_printf("#paper_sensor_in_input: paper_detected");
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
-                paper_in_0_timestamp = xTaskGetTickCount();
-                paper_sensor_in_input_last = paper_sensor_in_input;
-            } else if ( paper_sensor_in_input == 1 && paper_in_0_timestamp + PAPER_SENSOR_DEBOUNCE < xTaskGetTickCount() ) {
+            } else if (paper_sensor_in_input == 1) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
-                debug_printf("#paper_sensor_in_input changed: %u -> %u\r\n", paper_sensor_in_input_last, paper_sensor_in_input);
+                debug_printf("#paper_sensor_in_input: no paper detected");
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
-                paper_in_1_timestamp = xTaskGetTickCount();
-                paper_sensor_in_input_last = paper_sensor_in_input;
             }
+            paper_in_timestamp = xTaskGetTickCount();
+            paper_sensor_in_input_last = paper_sensor_in_input;
             // printf("uxReturned = 0x%lx\r\n",uxReturned);
         }
 
