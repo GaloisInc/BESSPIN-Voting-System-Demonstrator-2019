@@ -265,6 +265,10 @@ void run_barcode_detected(void) {
     barcode_length_t length = what_is_the_barcode(this_barcode);
     if ( barcode_cast_or_spoiled(this_barcode, length) ) {
         // Eject Ballot
+        display_this_2_line_text(duplicate_barcode_line_1_text,
+                                 strlen(duplicate_barcode_line_1_text),
+                                 duplicate_barcode_line_2_text,
+                                 strlen(duplicate_barcode_line_2_text));
         debug_printf("previously seen barcode detected");
         CHANGE_STATE(the_state, L, EJECT);
     } else if ( is_barcode_valid(this_barcode, length) ) {

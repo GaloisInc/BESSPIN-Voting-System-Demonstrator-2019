@@ -23,6 +23,8 @@ extern const char *cast_or_spoil_line_2_text;
 extern const char *casting_ballot_text;
 extern const char *spoiling_ballot_text;
 extern const char *invalid_barcode_text;
+extern const char *duplicate_barcode_line_1_text;
+extern const char *duplicate_barcode_line_2_text;
 extern const char *no_barcode_text;
 extern const char *remove_ballot_text;
 extern const char *error_line_1_text;
