@@ -89,7 +89,7 @@ StreamBufferHandle_t xScannerStreamBuffer;
 EventGroupHandle_t xSBBEventGroup;
 
 /*-----------------------------------------------------------*/
-extern void sbb_tcp(void);
+extern void main_tcp(void);
 extern void reportIPStatus(void);
 
 /**
@@ -98,6 +98,8 @@ extern void reportIPStatus(void);
 int main(void)
 {
     prvSetupHardware();
+    printf("TCP Setup\r\n");
+    main_tcp();
 
     /* Initialize stream buffers */
     xScannerStreamBuffer =
@@ -401,8 +403,6 @@ static void prvInputTask(void *pvParameters)
     printf("Starting prvInputTask\r\n");
     printf("%s", intro);
 
-    printf("IP Status\r\n");
-    sbb_tcp();
 
     for (;;)
     {
@@ -427,7 +427,7 @@ static void prvInputTask(void *pvParameters)
             manual_input();
             break;
         case 't':
-            reportIPStatus();
+	    reportIPStatus();
             break;
         default:
             printf("Unknown command\r\n");

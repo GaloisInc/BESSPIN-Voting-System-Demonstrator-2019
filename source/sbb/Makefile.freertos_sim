@@ -3,7 +3,7 @@ LOGGING_DIR = ../logging
 
 DEMO_SRC = \
     main_freertos_sim.c \
-    sbb_tcp.c \
+    main_tcp.c \
     sbb.c \
     sbb_strings.c \
     sbb_logging.c \
@@ -20,8 +20,6 @@ DEMO_SRC = \
     ../crypto/aes.c \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
-
-INCLUDES += ./
 
 CFLAGS += -I$(LOGGING_DIR) -DSIMULATION -DconfigUSE_DHCP
 

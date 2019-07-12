@@ -211,6 +211,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 	/* If the network has just come up...*/
 	if (eNetworkEvent == eNetworkUp)
 	{
+		xTasksAlreadyCreated = pdTRUE;
 
 		/* Print out the network configuration, which may have come from a DHCP
 		server. */
