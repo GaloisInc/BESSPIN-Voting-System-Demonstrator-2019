@@ -139,8 +139,8 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
 
     // The total length of the data block, spaces, hash, new_line sequence
     // should be as expected and should be a multiple of AES_BLOCK_LENGTH_BYTES
-    assert ((new_line_index - first_byte_of_data_index) + 1 == padded_log_entry_length);
-    assert (padded_log_entry_length % AES_BLOCK_LENGTH_BYTES == 0);
+    configASSERT ((new_line_index - first_byte_of_data_index) + 1 == padded_log_entry_length);
+    configASSERT (padded_log_entry_length % AES_BLOCK_LENGTH_BYTES == 0);
 
     // If the final byte is at offset N in Transmit_Buffer, then the current number
     // of bytes to send is N + 1
@@ -164,7 +164,7 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
                               AES_BLOCK_LENGTH_BYTES);
     (void)r; // suppress warning on r unused.
 
-    assert(BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
+    configASSERT (BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
 
     total = current + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
 
