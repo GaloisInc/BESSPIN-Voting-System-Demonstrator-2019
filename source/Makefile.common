@@ -57,7 +57,7 @@ export FREERTOS_SRC = \
 	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Stream_Buffer.c \
 	$(FREERTOS_TCP_SOURCE_DIR)/portable/BufferManagement/BufferAllocation_2.c \
 	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/riscv_hal_eth.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/NetworkInterface.c 
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/NetworkInterface.c
 
 export APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
 
@@ -77,15 +77,13 @@ export INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio \
 	-I$(FREERTOS_SOURCE_DIR)/include \
-	-I$(FREERTOS_TCP_SOURCE_DIR)/include \
-	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/compiler/GCC \
 	-I$(FREERTOS_DEMO_DIR)../Common/include \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \
 	-I$(FREERTOS_DEMO_DIR)/devices \
 	-I$(FREERTOS_TCP_SOURCE_DIR)/include \
 	-I$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP/include \
-	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/Compiler/GCC 
+	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/Compiler/GCC
 
 export ASFLAGS  += -g $(ARCH) $(ABI)  \
     -Wa,-Ilegacy \
