@@ -33,7 +33,7 @@ FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 
 LOGGING_DIR = ../logging
-CRYPTO_DIR = ..crypto
+CRYPTO_DIR = ../crypto
 
 FREERTOS_INCLUDES = \
   -I. \

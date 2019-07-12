@@ -77,7 +77,7 @@ void update_barcode_state( bool barcode_scanned ) {
     switch ( the_state.BS ) {
     case BARCODE_NOT_PRESENT:
         if ( barcode_scanned ) {
-            char barcode[BARCODE_MAX_LENGTH] = {0};
+            uint8_t barcode[BARCODE_MAX_LENGTH] = {0};
             barcode_length_t xReceiveLength = 0;
             xReceiveLength = xStreamBufferReceive(xScannerStreamBuffer,
                                                   (void *)barcode, sizeof(barcode),
@@ -229,7 +229,7 @@ void run_cast(void) {
 }
 
 void run_wait_for_decision(void) {
-    char this_barcode[BARCODE_MAX_LENGTH] = {0};
+    uint8_t this_barcode[BARCODE_MAX_LENGTH] = {0};
     barcode_length_t its_length;
     its_length = what_is_the_barcode(this_barcode);
     if ( cast_or_spoil_timeout_expired() ) {
@@ -259,7 +259,7 @@ void run_wait_for_decision(void) {
 }
 
 void run_barcode_detected(void) {
-    char this_barcode[BARCODE_MAX_LENGTH] = {0};
+    uint8_t this_barcode[BARCODE_MAX_LENGTH] = {0};
     display_this_text(barcode_detected_text,
                       strlen(barcode_detected_text));
     barcode_length_t length = what_is_the_barcode(this_barcode);
