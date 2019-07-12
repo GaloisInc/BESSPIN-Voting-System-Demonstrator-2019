@@ -9,6 +9,11 @@ const log_name app_log_file_name    = "application_log.txt";
 Log_Handle app_log_handle;
 Log_Handle system_log_handle;
 
+#ifndef FILESYSTEM_DUPLICATES
+uint8_t scanned_codes[1000][256];
+uint16_t num_scanned_codes = 0;
+#endif // FILESYSTEM_DUPLICATES
+
 // Each entry should be a 0-padded 256 uint8_t array according to the c specification.
 const uint8_t app_event_entries[] = { 'C', 'S' };
 
@@ -104,9 +109,18 @@ bool log_app_event(app_event event,
         // we're guaranteed there are no spaces in the Base64 barcode, so it runs from [2] to
         // the next space in the entry
         memcpy(&event_entry[2], barcode, barcode_length);
+#ifndef FILESYSTEM_DUPLICATES
+        for (size_t i = 0; i < barcode_length; i++) {
+            scanned_codes[num_scanned_codes][i] = (uint8_t)barcode[i];
+        }
+        for (size_t i = barcode_length; i < 256; i++) {
+            scanned_codes[num_scanned_codes][i] = 0;
+        }
+        num_scanned_codes = num_scanned_codes + 1;
+#endif
 #ifdef SIMULATION
         debug_printf("LOG: %c %hhu", (char)app_event_entries[event], (uint8_t)barcode_length);
-        for (size_t i = 0; i < barcode_length; ++i ) {
+        for (size_t i = 0; i < barcode_length; i++) {
             debug_printf(" %hhx", (uint8_t)barcode[i]);
         }
         debug_printf("\r\n");
@@ -122,13 +136,14 @@ bool log_app_event(app_event event,
 
 bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
     bool b_found = false;
+#ifdef FILESYSTEM_DUPLICATES
     size_t n_entries = Log_IO_Num_Base64_Entries(&app_log_handle);
 
     debug_printf("scanning for duplicates, there are %d entries", n_entries);
     /** Scan the log backwards. The 0th entry is not a real entry to consider. */
     // note uint32_t below because size_t is unsigned and subtraction 1 from it
     // yields a large positive number - hat tip to Haneef
-    for (int32_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 1); --i_entry_no) {
+    for (int32_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 1); i_entry_no--) {
         debug_printf("scanning entry %d", i_entry_no);
         secure_log_entry secure_entry = Log_IO_Read_Base64_Entry(&app_log_handle, i_entry_no);
         b_found = true;
@@ -136,7 +151,16 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
             b_found &= secure_entry.the_entry[2 + i_barcode_idx] == barcode[i_barcode_idx];
         }
     }
-
-    debug_printf("barcode found in log: %d", b_found);
+#else // FILESYSTEM_DUPLICATES
+    debug_printf("scanning for duplicates, there are %d entries", num_scanned_codes);
+    for (uint16_t i_entry_no = 0; !b_found && (i_entry_no < num_scanned_codes); i_entry_no++) {
+        debug_printf("scanning entry %d", i_entry_no);
+        b_found = true;
+        for (size_t i_barcode_idx = 0; b_found && (i_barcode_idx < length); i_barcode_idx++) {
+            b_found &= scanned_codes[i_entry_no][i_barcode_idx] == barcode[i_barcode_idx];
+        }
+    }
+    debug_printf("barcode is a duplicate: %d", b_found);
     return b_found;
+#endif // FILESYSTEM_DUPLICATES
 }
