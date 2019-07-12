@@ -99,9 +99,10 @@ bool log_app_event(app_event event,
                    barcode_length_t barcode_length) {
     if ( barcode_length + 2 < LOG_ENTRY_LENGTH ) {
         log_entry event_entry;
-        memset(&event_entry, 0, sizeof(log_entry));
+        memset(&event_entry, 0x20, sizeof(log_entry)); // pad with spaces
         event_entry[0] = app_event_entries[event];
-        event_entry[1] = (uint8_t)barcode_length; // This is less than 256
+        // we're guaranteed there are no spaces in the Base64 barcode, so it runs from [2] to
+        // the next space in the entry
         memcpy(&event_entry[2], barcode, barcode_length);
 #ifdef SIMULATION
         debug_printf("LOG: %c %hhu", (char)app_event_entries[event], (uint8_t)barcode_length);
@@ -130,12 +131,9 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
     for (int32_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 1); --i_entry_no) {
         debug_printf("scanning entry %d", i_entry_no);
         secure_log_entry secure_entry = Log_IO_Read_Base64_Entry(&app_log_handle, i_entry_no);
-
-        if (secure_entry.the_entry[1] == (uint8_t)length) {
-            b_found = true;
-            for (size_t i_barcode_idx = 0; b_found && (i_barcode_idx < length); i_barcode_idx++) {
-                b_found &= secure_entry.the_entry[2 + i_barcode_idx] == barcode[i_barcode_idx];
-            }
+        b_found = true;
+        for (size_t i_barcode_idx = 0; b_found && (i_barcode_idx < length); i_barcode_idx++) {
+            b_found &= secure_entry.the_entry[2 + i_barcode_idx] == barcode[i_barcode_idx];
         }
     }
 
