@@ -22,7 +22,7 @@ int main(void)
 
     Log_IO_Initialize();
 
-    create_log(&my_log, "testmanylog.txt");
+    create_log(&my_log, "testmanylog.txt", HTTP_Endpoint_None);
 
     write_entry(&my_log, second_entry);
     write_entry(&my_log, next_entry);
@@ -37,7 +37,7 @@ int main(void)
     next_entry[9] = '6';
     write_entry(&my_log, next_entry);
 
-    num = Log_IO_Num_Entries(&my_log);
+    num = Log_IO_Num_Base64_Entries(&my_log);
 
     printf("Num entries in the files is %d\n", (int)num);
 

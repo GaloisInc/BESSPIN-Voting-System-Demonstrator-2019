@@ -19,14 +19,14 @@
   @ requires \separated(the_plaintext, the_ciphertext);
   @ assigns the_ciphertext[0 .. AES_BLOCK_LENGTH_BYTES - 1];
   @*/
-void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext);
+void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext);
 
 /*@ requires \valid_read(the_ciphertext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @ requires \valid(the_plaintext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @ requires \separated(the_plaintext, the_ciphertext);
   @ assigns the_plaintext[0 .. AES_BLOCK_LENGTH_BYTES - 1];
   @*/
-void decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext);
+void aes_decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext);
 
 /*@ requires \valid_read(the_message + (0 .. the_message_size - 1));
   @ requires \valid(the_digest + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));

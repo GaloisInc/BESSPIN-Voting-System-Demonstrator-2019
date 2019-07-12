@@ -9,7 +9,9 @@
 // Subsystem includes
 #include "log.h"
 
-Log_FS_Result create_log(Log_Handle *new_log_file, const log_name the_log_name)
+Log_FS_Result create_log(log_file new_log_file,
+                         const log_name the_log_name,
+                         const http_endpoint endpoint)
 {
     assert(false);
     //@ assert false;

@@ -35,7 +35,9 @@ extern log_entry decision_timeout_event_msg;
 bool import_and_verify(log_file the_file);
 
 //@ requires true;
-bool load_or_create(log_file the_file, const log_name the_name);
+bool load_or_create(log_file the_file,
+                    const log_name the_name,
+                    const http_endpoint endpoint);
 
 // For now, overwite the existing log
 // @todo check for errors once it is possible to do so

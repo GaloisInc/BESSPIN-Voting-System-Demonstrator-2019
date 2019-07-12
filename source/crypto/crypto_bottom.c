@@ -9,14 +9,14 @@
 // Subsystem includes
 #include "crypto.h"
 
-void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext)
+void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext)
 {
     assert(false);
     //@ assert false;
     return;
 }
 
-void decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext)
+void aes_decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext)
 {
     assert(false);
     //@ assert false;

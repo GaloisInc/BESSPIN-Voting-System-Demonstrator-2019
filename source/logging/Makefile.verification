@@ -43,14 +43,14 @@ INCLUDES = \
 FRAMA_C_INCLUDES=-cpp-extra-args="$(INCLUDES) -D__riscv_xlen=32"
 
 # These lists will grow as the software is developed and modules are added.
-SOFTWARE_SPECS := log.h secure_log.h system_log.h application_log.h debug_io.h
+SOFTWARE_SPECS := log.h secure_log.h system_log.h application_log.h debug_io.h log_io.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
 FRAMA_C_SOURCES := log.c secure_log.c log_main.c debug_io.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) log_io.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) log_io.c log_fs.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 # MAIN_ENTRY_POINT := log_main_loop
