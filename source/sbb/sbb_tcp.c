@@ -72,6 +72,7 @@
 /* FreeRTOS  includes. */
 #include "FreeRTOS.h"
 #include "task.h"
+#include "sbb.h"
 
 /* IP stack includes. */
 #include "FreeRTOS_IP.h"
@@ -178,6 +179,7 @@ const uint8_t ucMACAddress[6] = {configMAC_ADDR0, configMAC_ADDR1, configMAC_ADD
 
 void sbb_tcp(void);
 void reportIPStatus(void);
+BaseType_t SBB_Network_status;
 
 /*-----------------------------------------------------------*/
 
@@ -209,37 +211,11 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 	/* If the network has just come up...*/
 	if (eNetworkEvent == eNetworkUp)
 	{
+		SBB_Network_status = pdTRUE;
 		/* Create the tasks that use the IP stack if they have not already been
 		created. */
 		if (xTasksAlreadyCreated == pdFALSE)
 		{
-/* See the comments above the definitions of these pre-processor
-			macros at the top of this file for a description of the individual
-			demo tasks. */
-#if (mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS == 1)
-			{
-				printf("\r\n");
-				printf("mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS=1\r\n");
-				vStartSimpleUDPClientServerTasks(mainSIMPLE_UDP_CLIENT_SERVER_STACK_SIZE, mainSIMPLE_UDP_CLIENT_SERVER_PORT, mainSIMPLE_UDP_CLIENT_SERVER_TASK_PRIORITY);
-			}
-#endif /* mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS */
-
-#if (mainCREATE_TCP_ECHO_TASKS_SINGLE == 1)
-			{
-				printf("\r\n");
-				printf("mainCREATE_TCP_ECHO_TASKS_SINGLE=1\r\n");
-				vStartTCPEchoClientTasks_SingleTasks(mainECHO_CLIENT_TASK_STACK_SIZE, mainECHO_CLIENT_TASK_PRIORITY);
-			}
-#endif /* mainCREATE_TCP_ECHO_TASKS_SINGLE */
-
-#if (mainCREATE_TCP_ECHO_SERVER_TASK == 1)
-			{
-				printf("\r\n");
-				printf("mainCREATE_TCP_ECHO_SERVER_TASK=1\r\n");
-				vStartSimpleTCPServerTasks(mainECHO_SERVER_TASK_STACK_SIZE, mainECHO_SERVER_TASK_PRIORITY);
-			}
-#endif
-
 			xTasksAlreadyCreated = pdTRUE;
 		}
 
@@ -257,6 +233,10 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 
 		FreeRTOS_inet_ntoa(ulDNSServerAddress, cBuffer);
 		FreeRTOS_printf(("DNS Server Address: %s\r\n\r\n\r\n", cBuffer));
+	}
+	else
+	{
+		SBB_Network_status = pdFALSE;
 	}
 }
 /*-----------------------------------------------------------*/
