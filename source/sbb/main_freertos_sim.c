@@ -33,6 +33,10 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+/* IP stack includes. */
+#include "FreeRTOS_IP.h"
+#include "FreeRTOS_Sockets.h"
+
 /* FreeRTOS includes */
 #include "event_groups.h"
 #include "stream_buffer.h"
@@ -80,6 +84,8 @@ StreamBufferHandle_t xScannerStreamBuffer;
 EventGroupHandle_t xSBBEventGroup;
 
 /*-----------------------------------------------------------*/
+extern void sbb_tcp(void);
+extern void reportIPStatus(void);
 
 /**
  * Main application entry
@@ -87,6 +93,8 @@ EventGroupHandle_t xSBBEventGroup;
 int main(void)
 {
     prvSetupHardware();
+    printf("TCP Setup\r\n");
+    sbb_tcp();
 
     /* Initialize stream buffers */
     xScannerStreamBuffer =
@@ -390,6 +398,7 @@ static void prvInputTask(void *pvParameters)
     printf("Starting prvInputTask\r\n");
     printf("%s", intro);
 
+
     for (;;)
     {
         char c = uart0_rxchar();
@@ -411,6 +420,9 @@ static void prvInputTask(void *pvParameters)
             break;
         case '0':
             manual_input();
+            break;
+        case 't':
+	    reportIPStatus();
             break;
         default:
             printf("Unknown command\r\n");

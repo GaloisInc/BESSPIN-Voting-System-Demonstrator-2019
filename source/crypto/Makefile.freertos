@@ -1,6 +1,7 @@
 PROG = test_freertos
 
 DEMO_SRC = \
+    ../sbb/sbb_tcp.c \
     test_freertos.c \
     crypto.c \
     cbc.c \

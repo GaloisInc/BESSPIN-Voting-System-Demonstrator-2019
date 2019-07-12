@@ -3,6 +3,7 @@ LOGGING_DIR = ../logging
 
 DEMO_SRC = \
     main_freertos_sim.c \
+    sbb_tcp.c \
     sbb.c \
     sbb_strings.c \
     sbb_logging.c \
@@ -20,7 +21,7 @@ DEMO_SRC = \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
 
-CFLAGS += -I$(LOGGING_DIR) -DSIMULATION
+CFLAGS += -I$(LOGGING_DIR) -DSIMULATION -DconfigUSE_DHCP
 
 #
 # Define all object files.
@@ -50,7 +51,6 @@ $(info ARFLAGS=$(ARFLAGS))
 all: $(PROG).elf
 
 $(PROG).elf  : $(OBJS)
-	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
 	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
 	@echo Completed $@

@@ -33,6 +33,10 @@
 #include <FreeRTOS.h>
 #include <task.h>
 
+/* FreeRTOS TCP Stack includes */
+#include "FreeRTOS_IP.h"
+#include "FreeRTOS_Sockets.h"
+
 /* FreeRTOS includes */
 #include "stream_buffer.h"
 #include "event_groups.h"
@@ -128,6 +132,9 @@ uint32_t port_get_current_mtime(void)
 int main(void)
 {
     prvSetupHardware();
+
+    // Setup TCP IP
+    sbb_tcp();
 
     /* Initialize stream buffers */
     xScannerStreamBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
