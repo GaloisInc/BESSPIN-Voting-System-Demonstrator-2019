@@ -21,7 +21,7 @@ DEMO_SRC = \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
 
-CFLAGS += -I$(LOGGING_DIR) -DConfigUSE_DHCP
+CFLAGS += -I$(LOGGING_DIR) 
 
 #
 # Define all object files.
