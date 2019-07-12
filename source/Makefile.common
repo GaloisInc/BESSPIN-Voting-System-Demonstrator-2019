@@ -68,6 +68,7 @@ export PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
 export PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
 
 export INCLUDES = \
+	-I$(VOTING_SYSTEM_SOURCE_DIR)/protocols/include \
 	-I$(VOTING_SYSTEM_SOURCE_DIR)/logging \
 	-T$(VOTING_SYSTEM_SOURCE_DIR)/crypto \
 	-I$(VOTING_SYSTEM_SOURCE_DIR)/sbb \

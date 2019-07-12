@@ -42,6 +42,13 @@
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 
+#include "peekpoke.h"
+
+
+/* Define a name that will be used for LLMNR and NBNS searches. */
+#define mainHOST_NAME "RTOSDemo"
+#define mainDEVICE_NICK_NAME "fpga_demo"
+
 /*
  * Just seeds the simple pseudo random number generator.
  */
@@ -152,6 +159,11 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 
 		FreeRTOS_inet_ntoa(ulDNSServerAddress, cBuffer);
 		FreeRTOS_printf(("DNS Server Address: %s\r\n\r\n\r\n", cBuffer));
+
+		/* 
+		 * Creates a task for the "peek/poke" embedded web server.
+		 */
+		peekPokeServerTaskCreate();
 	}
 	else
 	{

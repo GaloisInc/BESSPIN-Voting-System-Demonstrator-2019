@@ -58,6 +58,9 @@
 #include "sbb_freertos.h"
 #include "../logging/debug_io.h"
 
+/* "Peek/poke" embedded web server */
+#include "peekpoke.h"
+
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented
    within this file.  See https://www.freertos.org/a00016.html */
 void vApplicationMallocFailedHook(void);
@@ -142,6 +145,8 @@ uint32_t port_get_current_mtime(void)
     return (uint32_t)(get_cycle_count() / (configCPU_CLOCK_HZ / 1000000));
 }
 
+extern void sbb_tcp( void ); // should have been declared elsewhere...
+
 /**
  * Main application entry
  */
@@ -163,6 +168,12 @@ int main(void)
 #if configGENERATE_RUN_TIME_STATS
     xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY, NULL);
 #endif
+
+    /* 
+	 * Tells the peekPokeServer what its priority will be. The task won't
+	 * launch until peekPokeServerTaskCreate() is called.
+	 */
+    peekPokeServerTaskPriority( SBB_MAIN_TASK_PRIORITY );
 
     /* If all is well, the scheduler will now be running, and the following
        line will never be reached.  If the following line does execute, then
