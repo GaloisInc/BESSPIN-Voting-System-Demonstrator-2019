@@ -18,6 +18,8 @@ const char *duplicate_barcode_line_1_text = "Ballot already ";
 const char *duplicate_barcode_line_2_text = "cast or spoiled.";
 const char *no_barcode_text = "No ballot found.";
 const char *remove_ballot_text = "Remove ballot...";
+const char *error_line_1_text = " A fatal error";
+const char *error_line_2_text = "    occurred";
 
 // HW event messages
 #define HW_EVENT(msg) "HW event: " msg "."

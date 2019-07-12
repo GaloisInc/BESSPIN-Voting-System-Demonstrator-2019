@@ -336,6 +336,13 @@ void run_standby(void) {
     CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
 }
 
+void run_abort(void) {
+    display_this_2_line_text(error_line_1_text,
+                             strlen(error_line_1_text),
+                             error_line_2_text,
+                             strlen(error_line_2_text));
+}
+
 // This main loop for the SBB never terminates until the system is
 // turned off.
 void ballot_box_main_loop(void) {
@@ -392,6 +399,8 @@ void ballot_box_main_loop(void) {
             break;
 
         case ABORT:
+            run_abort();
+            configASSERT(false);
             break;
             //default:
             //assert(false);
