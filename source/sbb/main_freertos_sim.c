@@ -37,11 +37,6 @@
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 
-/* Application includes */
-#include "SimpleUDPClientAndServer.h"
-#include "SimpleTCPEchoServer.h"
-#include "TCPEchoClient_SingleTasks.h"
-
 /* FreeRTOS includes */
 #include "event_groups.h"
 #include "stream_buffer.h"
@@ -89,7 +84,7 @@ StreamBufferHandle_t xScannerStreamBuffer;
 EventGroupHandle_t xSBBEventGroup;
 
 /*-----------------------------------------------------------*/
-extern void main_tcp(void);
+extern void sbb_tcp(void);
 extern void reportIPStatus(void);
 
 /**
@@ -99,7 +94,7 @@ int main(void)
 {
     prvSetupHardware();
     printf("TCP Setup\r\n");
-    main_tcp();
+    sbb_tcp();
 
     /* Initialize stream buffers */
     xScannerStreamBuffer =

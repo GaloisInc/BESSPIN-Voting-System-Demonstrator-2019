@@ -99,9 +99,6 @@
 #define mainHOST_NAME "RTOSDemo"
 #define mainDEVICE_NICK_NAME "fpga_demo"
 
-/* Request IP address via DHCP */
-#define ipconfigUSE_HDCP
-
 /* Set the following constants to 1 or 0 to define which tasks to include and
 exclude:
 
@@ -180,6 +177,7 @@ const uint8_t ucMACAddress[6] = {configMAC_ADDR0, configMAC_ADDR1, configMAC_ADD
 /*-----------------------------------------------------------*/
 
 void sbb_tcp(void);
+void reportIPStatus(void);
 
 /*-----------------------------------------------------------*/
 
@@ -211,7 +209,39 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 	/* If the network has just come up...*/
 	if (eNetworkEvent == eNetworkUp)
 	{
-		xTasksAlreadyCreated = pdTRUE;
+		/* Create the tasks that use the IP stack if they have not already been
+		created. */
+		if (xTasksAlreadyCreated == pdFALSE)
+		{
+/* See the comments above the definitions of these pre-processor
+			macros at the top of this file for a description of the individual
+			demo tasks. */
+#if (mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS == 1)
+			{
+				printf("\r\n");
+				printf("mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS=1\r\n");
+				vStartSimpleUDPClientServerTasks(mainSIMPLE_UDP_CLIENT_SERVER_STACK_SIZE, mainSIMPLE_UDP_CLIENT_SERVER_PORT, mainSIMPLE_UDP_CLIENT_SERVER_TASK_PRIORITY);
+			}
+#endif /* mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS */
+
+#if (mainCREATE_TCP_ECHO_TASKS_SINGLE == 1)
+			{
+				printf("\r\n");
+				printf("mainCREATE_TCP_ECHO_TASKS_SINGLE=1\r\n");
+				vStartTCPEchoClientTasks_SingleTasks(mainECHO_CLIENT_TASK_STACK_SIZE, mainECHO_CLIENT_TASK_PRIORITY);
+			}
+#endif /* mainCREATE_TCP_ECHO_TASKS_SINGLE */
+
+#if (mainCREATE_TCP_ECHO_SERVER_TASK == 1)
+			{
+				printf("\r\n");
+				printf("mainCREATE_TCP_ECHO_SERVER_TASK=1\r\n");
+				vStartSimpleTCPServerTasks(mainECHO_SERVER_TASK_STACK_SIZE, mainECHO_SERVER_TASK_PRIORITY);
+			}
+#endif
+
+			xTasksAlreadyCreated = pdTRUE;
+		}
 
 		/* Print out the network configuration, which may have come from a DHCP
 		server. */
@@ -306,12 +336,14 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 	return uxRand();
 }
 
+//
 void reportIPStatus(void)
 {
 	uint32_t ulIPAddress, ulNetMask, ulGatewayAddress, ulDNSServerAddress;
 	char cBuffer[16];
-	static BaseType_t xTasksAlreadyCreated = pdFALSE;
 
+	/* Print out the network configuration, which may have come from a DHCP
+	   server. */
 	FreeRTOS_GetAddressConfiguration(&ulIPAddress, &ulNetMask, &ulGatewayAddress, &ulDNSServerAddress);
 	FreeRTOS_inet_ntoa(ulIPAddress, cBuffer);
 	FreeRTOS_printf(("\r\n\r\nIP Address: %s\r\n", cBuffer));
@@ -325,4 +357,3 @@ void reportIPStatus(void)
 	FreeRTOS_inet_ntoa(ulDNSServerAddress, cBuffer);
 	FreeRTOS_printf(("DNS Server Address: %s\r\n\r\n\r\n", cBuffer));
 }
-

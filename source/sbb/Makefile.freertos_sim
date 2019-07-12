@@ -3,7 +3,7 @@ LOGGING_DIR = ../logging
 
 DEMO_SRC = \
     main_freertos_sim.c \
-    main_tcp.c \
+    sbb_tcp.c \
     sbb.c \
     sbb_strings.c \
     sbb_logging.c \
