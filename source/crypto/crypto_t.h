@@ -26,10 +26,6 @@ typedef uint8_t aes256_key[AES256_KEY_LENGTH_BYTES];
 #define SHA256_DIGEST_LENGTH_BYTES (SHA256_DIGEST_LENGTH_BITS / 8)
 typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
 
-// 32 bytes encoded in Base64 comes out as 44 bytes
-#define SHA256_BASE_64_DIGEST_LENGTH_BYTES 44
-typedef uint8_t sha256_base64_digest[SHA256_BASE_64_DIGEST_LENGTH_BYTES];
-
 typedef uint8_t *block;
 typedef block plaintext_block;
 typedef block ciphertext_block;
