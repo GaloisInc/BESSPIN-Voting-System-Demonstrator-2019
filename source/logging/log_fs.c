@@ -49,7 +49,7 @@ Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
 
     if (res == FR_OK)
     {
-        return LOG_FS_OK;
+        return Log_FS_Sync(stream);
     }
     else
     {
@@ -67,7 +67,7 @@ Log_FS_Result Log_FS_Open(Log_Handle *stream, const char *name)
 
     if (res == FR_OK)
     {
-        return LOG_FS_OK;
+        return Log_FS_Sync(stream);
     }
     else
     {
@@ -129,6 +129,7 @@ size_t Log_FS_Write(Log_Handle *stream, const uint8_t *data, size_t length)
 
     if ((write_status == FR_OK) && ((size_t)bytes_written == length))
     {
+        Log_FS_Sync(stream); // best effort
         return length;
     }
     else
