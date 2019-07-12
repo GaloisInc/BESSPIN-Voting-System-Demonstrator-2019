@@ -348,19 +348,17 @@ static void prvInputTask(void *pvParameters) {
         /* Paper sensor in */
         paper_sensor_in_input = gpio_read(PAPER_SENSOR_IN);
         if (paper_sensor_in_input != paper_sensor_in_input_last) {
-            debug_printf("#paper_sensor_in_input changed: %u -> %u\r\n", paper_sensor_in_input_last, paper_sensor_in_input);
-
             /* Broadcast the event */
             if (paper_sensor_in_input == 0 && paper_in_1_timestamp + PAPER_SENSOR_DEBOUNCE < xTaskGetTickCount) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
-                debug_printf("#paper_sensor_in debounced, change has effect");
+                debug_printf("#paper_sensor_in_input changed: %u -> %u\r\n", paper_sensor_in_input_last, paper_sensor_in_input);
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
                 paper_in_0_timestamp = xTaskGetTickCount();
                 paper_sensor_in_input_last = paper_sensor_in_input;
             } else if ( paper_sensor_in_input == 1 && paper_in_0_timestamp + PAPER_SENSOR_DEBOUNCE < xTaskGetTickCount() ) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
-                debug_printf("#paper_sensor_in debounced, change has effect");
+                debug_printf("#paper_sensor_in_input changed: %u -> %u\r\n", paper_sensor_in_input_last, paper_sensor_in_input);
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
                 paper_in_1_timestamp = xTaskGetTickCount();
