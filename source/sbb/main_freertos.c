@@ -325,7 +325,7 @@ static void prvBarcodeScannerTask(void *pvParameters)
 static void prvInputTask(void *pvParameters) {
     (void)pvParameters;
     EventBits_t uxReturned;
-    TickType_t paper_in_timestamp;
+    TickType_t paper_in_timestamp = 0;
     
     printf("Starting prvInputTask\r\n");
 
