@@ -53,7 +53,7 @@ static uint8_t This_SBB_MAC_Address[6] = {0x00, 0x12, 0x13, 0x10, 0x15, 0x11};
 
 void Log_Net_Initialize()
 {
-    debug_printf("FreeRTOS_IPInit\r\n");
+    debug_printf("FreeRTOS_IPInit");
     FreeRTOS_IPInit(This_SBB_IP_Address, SBB_NetMask, SBB_GatewayAddress,
                     SBB_DNSServerAddress, This_SBB_MAC_Address);
 }
@@ -67,22 +67,22 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
     Socket_t xSocket;
     struct freertos_sockaddr xRemoteAddress;
     BaseType_t xBytesSent = 0;
-
     size_t xLenToSend;
-    size_t xTotalLengthToSend, current;
+    size_t total, current;
 
-    // request line and header
+    // Calculate the length of the fixed parts of the HTTP POST Header
     const size_t FIXED_MESSAGE_SIZE =
         strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
         strlen(HEADER_2) + strlen(HEADER_3) + strlen(HEADER_4) +
         strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
 
-    const size_t content_length = padded_log_entry_length + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+    const size_t content_length = padded_log_entry_length +
+                                  BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+
     const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
                                 strlen(remote_file_name) + content_length;
 
-    char pcBufferToTransmit[MESSAGE_SIZE];
-    debug_printf("MESSAGE_SIZE is %zu\n", MESSAGE_SIZE);
+    uint8_t Transmit_Buffer[MESSAGE_SIZE];
 
     // If user or test case has requested no HTTP echo of this log file,
     // then do nothing
@@ -91,73 +91,91 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
         return;
     }
 
-    // Initialize message to all 0x00 so we can dynamically calculate the
+    debug_printf("Transmit_Buffer size is %zu", MESSAGE_SIZE);
+
+    // Initialize Transmit_Buffer to all 0x00 so we can dynamically calculate the
     // length of the header
     for (size_t i = 0; i < MESSAGE_SIZE; i++)
     {
-        pcBufferToTransmit[i] = 0x00;
+        Transmit_Buffer[i] = 0x00;
     }
 
-    snprintf(pcBufferToTransmit, MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s",
+    snprintf((char *) Transmit_Buffer,
+             MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s",
              REQUEST_LINE_1, remote_file_name, REQUEST_LINE_3, HEADER_1,
              HEADER_2, HEADER_3, HEADER_4, HEADER_5_1, content_length,
              DOUBLE_CRLF);
 
     // After the header has been written, we have N bytes of header,
-    // occupying bytes 0 .. (N-1) of pcBufferToTransmit. So.. the first byte of the
+    // occupying bytes 0 .. (N-1) of Transmit_Buffer. So.. the first byte of the
     // data block will be at index N. We can use strlen to compute
-    // this since pcBufferToTransmit was previously populated with all 0x00 bytes.
-    size_t first_byte_of_data_index = strlen(pcBufferToTransmit);
-    size_t index_for_aes_cbc_mac = first_byte_of_data_index;
-    debug_printf("Length of header block is %zu\n", first_byte_of_data_index);
+    // this since Transmit_Buffer was previously populated with all 0x00 bytes.
+    size_t first_byte_of_data_index = strlen((char *) Transmit_Buffer);
+    debug_printf("Length of header block is %zu", first_byte_of_data_index);
 
-    // add base64_secure_log_entry to the pcBufferToTransmit
-    memcpy(&pcBufferToTransmit[first_byte_of_data_index],
+    // Add the_secure_log_entry.the_entry to the Transmit_Buffer
+    memcpy(&Transmit_Buffer[first_byte_of_data_index],
            &the_secure_log_entry.the_entry[0], LOG_ENTRY_LENGTH);
 
+    // Add just the right number of spaces to make the data block,
+    // spaces, hash and new_line an exact multiple of 16 bytes long.
     size_t space_index = first_byte_of_data_index + LOG_ENTRY_LENGTH;
-    debug_printf("space index is %zu\n", space_index);
+    debug_printf("space index is %zu", space_index);
     for (size_t space_count = 0; space_count < bytes_of_padding_required; space_count++)
       {
-        pcBufferToTransmit[space_index] = space;
+        Transmit_Buffer[space_index] = space;
         space_index++;
       }
 
+    // Add the Base64 encoded hash value from the_secure_log_entry.the_digest
     size_t hash_index = space_index;
-    debug_printf("hash index is %zu\n", hash_index);
-    memcpy(&pcBufferToTransmit[hash_index], &the_secure_log_entry.the_digest[0],
+    debug_printf("hash index is %zu", hash_index);
+    memcpy(&Transmit_Buffer[hash_index], &the_secure_log_entry.the_digest[0],
            SHA256_BASE_64_DIGEST_LENGTH_BYTES);
 
     size_t new_line_index = hash_index + SHA256_BASE_64_DIGEST_LENGTH_BYTES;
-    debug_printf("new line index is %zu\n", new_line_index);
-    pcBufferToTransmit[new_line_index] = new_line;
-    // If the final byte is at offset N in pcBufferToTransmit, then the current number
+    debug_printf("new line index is %zu", new_line_index);
+    Transmit_Buffer[new_line_index] = new_line;
+
+    // The total length of the data block, spaces, hash, new_line sequence
+    // should be as expected and should be a multiple of AES_BLOCK_LENGTH_BYTES
+    assert ((new_line_index - first_byte_of_data_index) + 1 == padded_log_entry_length);
+    assert (padded_log_entry_length % AES_BLOCK_LENGTH_BYTES == 0);
+
+    // If the final byte is at offset N in Transmit_Buffer, then the current number
     // of bytes to send is N + 1
     current = new_line_index + 1;
 
-    // base64_encode of aes_cbc_mac data block 
-    typedef uint8_t dbm[padded_log_entry_length];
-    dbm data_block_message;
-    uint8_t output_buffer[BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH];
-    uint8_t aes_cbc_mac_message[AES_BLOCK_LENGTH_BYTES];
+    // Compute the AES_CBC_MAC of the whole block
+    uint8_t binary_mac[AES_BLOCK_LENGTH_BYTES];
+    aes_cbc_mac(&Transmit_Buffer[first_byte_of_data_index],
+                padded_log_entry_length,
+                &binary_mac[0]);
+
+
+    // Turn that MAC into Base64 format
+    uint8_t base64_mac[BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH];
     size_t olen;
     int r;
-    memcpy(&data_block_message[0], &pcBufferToTransmit[index_for_aes_cbc_mac],
-           padded_log_entry_length);
-    
-    aes_cbc_mac(data_block_message, padded_log_entry_length, &aes_cbc_mac_message[0]);
-    
-    r = mbedtls_base64_encode(&output_buffer[0],
-                              BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 2, &olen,
-                              &aes_cbc_mac_message[0],
+    r = mbedtls_base64_encode(&base64_mac[0],
+                              BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 2,
+                              &olen,
+                              &binary_mac[0],
                               AES_BLOCK_LENGTH_BYTES);
     (void)r; // suppress warning on r unused.
-    
-    xTotalLengthToSend = current + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH; 
 
-    memcpy(&pcBufferToTransmit[current], &output_buffer[0],
+    assert(BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
+
+    total = current + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+
+    // And append that MAC to the data to be sent
+    memcpy(&Transmit_Buffer[current], &base64_mac[0],
            BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH);
 
+    debug_printf("total bytes to send is %zu", total);
+
+    // Socket creating and initialization.
+    // From here on, this code is specific to FreeRTOS
 
     xRemoteAddress.sin_port = FreeRTOS_htons(PORT_NUMBER);
     // IP address needs to be modified for the test purpose
@@ -180,14 +198,14 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
                 FreeRTOS_send(/* The socket being sent to. */
                               xSocket,
                               /* The data being sent. */
-                              pcBufferToTransmit + xLenToSend,
+                              Transmit_Buffer + xLenToSend,
                               /* The remaining length of data to send. */
-                              xTotalLengthToSend - xLenToSend,
+                              total - xLenToSend,
                               /* ulFlags. */
                               0);
             if (xBytesSent < 0)
             {
-                debug_printf("ERROR writing message to socket");
+                debug_printf("ERROR writing Transmit_Buffer to socket");
             }
 
             if (xBytesSent == 0)
@@ -195,7 +213,7 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
                 break;
             }
             xLenToSend += xBytesSent;
-        } while (xLenToSend < xTotalLengthToSend);
+        } while (xLenToSend < total);
     }
     /* Initiate graceful shutdown. */
     FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
@@ -228,24 +246,25 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
                   const http_endpoint endpoint,
                   const char *remote_file_name)
 {
-    const size_t FIXED_MESSAGE_SIZE =
-        strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
-        strlen(HEADER_2) + strlen(HEADER_3) + strlen(HEADER_4) +
-        strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
-
-    const size_t content_length = padded_log_entry_length + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
-    const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
-                                strlen(remote_file_name) + content_length;
-
-    char message[MESSAGE_SIZE];
-    
     int sockfd;
     int bytes, sent, current, total;
     char *host = "localhost";
     struct hostent *server;
     struct sockaddr_in serv_addr;
 
-    debug_printf("MESSAGE_SIZE is %zu\n", MESSAGE_SIZE);
+    // Calculate the length of the fixed parts of the HTTP POST Header
+    const size_t FIXED_MESSAGE_SIZE =
+        strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
+        strlen(HEADER_2) + strlen(HEADER_3) + strlen(HEADER_4) +
+        strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
+
+    const size_t content_length = padded_log_entry_length +
+                                  BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+
+    const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
+                                strlen(remote_file_name) + content_length;
+
+    uint8_t Transmit_Buffer[MESSAGE_SIZE];
 
     // If user or test case has requested no HTTP echo of this log file,
     // then do nothing
@@ -254,75 +273,91 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
         return;
     }
 
-    // Initialize message to all 0x00 so we can dynamically calculate the
+    debug_printf("Transmit_Buffer is %zu", MESSAGE_SIZE);
+
+    // Initialize Transmit_Buffer to all 0x00 so we can dynamically calculate the
     // length of the header
     for (size_t i = 0; i < MESSAGE_SIZE; i++)
     {
-        message[i] = 0x00;
+        Transmit_Buffer[i] = 0x00;
     }
 
-    snprintf(message, MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s", REQUEST_LINE_1,
-             remote_file_name, REQUEST_LINE_3, HEADER_1, HEADER_2, HEADER_3,
-             HEADER_4, HEADER_5_1, content_length, DOUBLE_CRLF);
+    snprintf((char *) Transmit_Buffer,
+             MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s",
+             REQUEST_LINE_1, remote_file_name, REQUEST_LINE_3, HEADER_1,
+             HEADER_2, HEADER_3, HEADER_4, HEADER_5_1, content_length,
+             DOUBLE_CRLF);
 
     // After the header has been written, we have N bytes of header,
-    // occupying bytes 0 .. (N-1) of message. So.. the first byte of the
+    // occupying bytes 0 .. (N-1) of Transmit_Buffer. So.. the first byte of the
     // data block will be at index N. We can use strlen to compute
-    // this since message was previously populated with all 0x00 bytes.
-    size_t first_byte_of_data_index = strlen(message);
-    size_t index_for_aes_cbc_mac = first_byte_of_data_index;
-    debug_printf("Length of header block is %zu\n", first_byte_of_data_index);
+    // this since Transmit_Buffer was previously populated with all 0x00 bytes.
+    size_t first_byte_of_data_index = strlen((char *) Transmit_Buffer);
+    debug_printf("Length of header block is %zu", first_byte_of_data_index);
 
-    // add base64_secure_log_entry to the message
-    memcpy(&message[first_byte_of_data_index],
+    // add the_secure_log_entry.the_entry to the Transmit_Buffer
+    memcpy(&Transmit_Buffer[first_byte_of_data_index],
            &the_secure_log_entry.the_entry[0], LOG_ENTRY_LENGTH);
 
+    // Add just the right number of spaces to make the data block,
+    // spaces, hash and new_line an exact multiple of 16 bytes long.
     size_t space_index = first_byte_of_data_index + LOG_ENTRY_LENGTH;
-    debug_printf("space index is %zu\n", space_index);
+    debug_printf("space index is %zu", space_index);
     for (size_t space_count = 0; space_count < bytes_of_padding_required; space_count++)
       {
-        message[space_index] = space;
+        Transmit_Buffer[space_index] = space;
         space_index++;
       }
 
+    // Add the Base64 encoded hash value from the_secure_log_entry.the_digest
     size_t hash_index = space_index;
-    debug_printf("hash index is %zu\n", hash_index);
-    memcpy(&message[hash_index], &the_secure_log_entry.the_digest[0],
+    debug_printf("hash index is %zu", hash_index);
+    memcpy(&Transmit_Buffer[hash_index], &the_secure_log_entry.the_digest[0],
            SHA256_BASE_64_DIGEST_LENGTH_BYTES);
 
     size_t new_line_index = hash_index + SHA256_BASE_64_DIGEST_LENGTH_BYTES;
-    debug_printf("new line index is %zu\n", new_line_index);
-    message[new_line_index] = new_line;
+    debug_printf("new line index is %zu", new_line_index);
+    Transmit_Buffer[new_line_index] = new_line;
 
-    // If the final byte is at offset N in message, then the current number
+    // The total length of the data block, spaces, hash, new_line sequence
+    // should be as expected and should be a multiple of AES_BLOCK_LENGTH_BYTES
+    assert ((new_line_index - first_byte_of_data_index) + 1 == padded_log_entry_length);
+    assert (padded_log_entry_length % AES_BLOCK_LENGTH_BYTES == 0);
+
+    // If the final byte is at offset N in Transmit_Buffer, then the current number
     // of bytes is N + 1
     current = new_line_index + 1;
 
-    // base64_encode of aes_cbc_mac data block 
-    typedef uint8_t dbm[padded_log_entry_length];
-    dbm data_block_message;
-    uint8_t output_buffer[BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH];
-    uint8_t aes_cbc_mac_message[AES_BLOCK_LENGTH_BYTES];
+    // Compute the AES_CBC_MAC of the whole block
+    uint8_t binary_mac[AES_BLOCK_LENGTH_BYTES];
+    aes_cbc_mac(&Transmit_Buffer[first_byte_of_data_index],
+                padded_log_entry_length,
+                &binary_mac[0]);
+
+    // Turn that MAC into Base64 format
+    uint8_t base64_mac[BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH];
     size_t olen;
     int r;
-    memcpy(&data_block_message[0], &message[index_for_aes_cbc_mac],
-           padded_log_entry_length);
-    
-    aes_cbc_mac(data_block_message, padded_log_entry_length, &aes_cbc_mac_message[0]);
-    
-    r = mbedtls_base64_encode(&output_buffer[0],
-                              BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 2, &olen,
-                              &aes_cbc_mac_message[0],
+    r = mbedtls_base64_encode(&base64_mac[0],
+                              BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 2,
+                              &olen,
+                              &binary_mac[0],
                               AES_BLOCK_LENGTH_BYTES);
     (void)r; // suppress warning on r unused.
-    assert(BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
-    
-    total = current + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH; 
 
-    memcpy(&message[current], &output_buffer[0],
+    assert(BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
+
+    total = current + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+
+    // And append that MAC to the data to be sent
+    memcpy(&Transmit_Buffer[current], &base64_mac[0],
            BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH);
 
-    // create socket
+    debug_printf("total bytes to send is %zu", total);
+
+    // Socket creating and initialization.
+    // From here on, this code is specific to POSIX
+
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0)
     {
@@ -349,10 +384,10 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
     sent = 0;
     do
     {
-        bytes = write(sockfd, message + sent, total - sent);
+        bytes = write(sockfd, Transmit_Buffer + sent, total - sent);
         if (bytes < 0)
         {
-            debug_printf("ERROR writing message to socket");
+            debug_printf("ERROR writing Transmit_Buffer to socket");
         }
         if (bytes == 0)
         {
