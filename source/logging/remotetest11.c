@@ -53,7 +53,7 @@ Log_FS_Result Test_Log_IO_Read_Base64_Entry_Send_Remotely
              LOG_ENTRY_LENGTH);
 
 
-      Log_Net_Send(base_64_current_entry, 304, 3, HTTP_Endpoint_App_Log, test_file_name);
+      //Log_Net_Send(base_64_current_entry, 304, 3, HTTP_Endpoint_App_Log, test_file_name);
     }
   return LOG_FS_OK;
 }

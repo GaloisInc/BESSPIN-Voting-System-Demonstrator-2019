@@ -26,7 +26,7 @@ static const key256 mock_key = {0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff,
                                 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff,
                                 0x00, 0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0xff};
 
-void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext)
+void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext)
 {
     AES_KEY key_schedule;
 
@@ -35,7 +35,7 @@ void encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext)
     AES_encrypt(the_plaintext, the_ciphertext, &key_schedule);
 }
 
-void decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext)
+void aes_decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext)
 {
     AES_KEY key_schedule;
 
