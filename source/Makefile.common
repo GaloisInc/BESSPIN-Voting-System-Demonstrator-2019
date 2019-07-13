@@ -30,6 +30,7 @@ export RANLIB	= $(RISCV_TARGET)-ranlib
 export FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
 export FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
 export FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
+export VOTING_SYSTEM_SOURCE_DIR = ..
 export FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 
 export WARNINGS= -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
@@ -65,7 +66,9 @@ export PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
 export PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
 
 export INCLUDES = \
-    -I. \
+	-I$(VOTING_SYSTEM_SOURCE_DIR)/logging \
+	-T$(VOTING_SYSTEM_SOURCE_DIR)/crypto \
+	-I$(VOTING_SYSTEM_SOURCE_DIR)/sbb \
 	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
