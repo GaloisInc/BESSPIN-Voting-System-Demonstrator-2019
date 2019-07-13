@@ -68,6 +68,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <time.h>
+#include <stdbool.h>
 
 /* FreeRTOS  includes. */
 #include "FreeRTOS.h"
@@ -177,9 +178,9 @@ the real network connection to use. */
 const uint8_t ucMACAddress[6] = {configMAC_ADDR0, configMAC_ADDR1, configMAC_ADDR2, configMAC_ADDR3, configMAC_ADDR4, configMAC_ADDR5};
 /*-----------------------------------------------------------*/
 
+bool the_network_status = false;
 void sbb_tcp(void);
 void reportIPStatus(void);
-BaseType_t SBB_Network_status;
 
 /*-----------------------------------------------------------*/
 
@@ -211,7 +212,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 	/* If the network has just come up...*/
 	if (eNetworkEvent == eNetworkUp)
 	{
-		SBB_Network_status = pdTRUE;
+		the_network_status = true;
 		/* Create the tasks that use the IP stack if they have not already been
 		created. */
 		if (xTasksAlreadyCreated == pdFALSE)
@@ -236,7 +237,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 	}
 	else
 	{
-		SBB_Network_status = pdFALSE;
+        the_network_status = false;
 	}
 }
 /*-----------------------------------------------------------*/
