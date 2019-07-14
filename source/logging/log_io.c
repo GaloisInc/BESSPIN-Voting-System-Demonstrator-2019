@@ -186,6 +186,8 @@ size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
     size_t file_size;
     file_size = Log_FS_Size(stream);
 
+    debug_printf("file size of log = %d", file_size);
+    
     // The file size _should_ be an exact multiple of
     // the size of one log entry.
     if ((file_size % padded_log_entry_length) == 0)

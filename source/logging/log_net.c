@@ -85,6 +85,7 @@ static uint8_t This_SBB_MAC_Address[6] = {0x00, 0x12, 0x13, 0x10, 0x15, 0x11};
 // Exported function bodies //
 //////////////////////////////
 
+#ifdef NETWORK_LOGS
 void Log_Net_Initialize()
 {
 #ifdef TARGET_OS_FreeRTOS
@@ -312,3 +313,15 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
     }
     return;
 }
+#else // NETWORK_LOGS
+// ACSL Contracts TBD
+void Log_Net_Initialize(void) {}
+
+// ACSL Contracts TBD
+void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
+                  const size_t padded_log_entry_length,
+                  const size_t bytes_of_padding_required,
+                  const http_endpoint endpoint,
+                  const char *remote_file_name) {}
+#endif //NETWORK_LOGS
+

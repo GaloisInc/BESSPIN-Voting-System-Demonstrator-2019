@@ -111,6 +111,7 @@ void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
     configASSERT(its_length <= BARCODE_MAX_LENGTH);
     if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
         memcpy(barcode, the_barcode, its_length);
+        barcode_length = its_length;
         xSemaphoreGive(barcode_mutex);
     }
 }
@@ -120,6 +121,7 @@ bool has_a_barcode(void) {
 }
 
 barcode_length_t what_is_the_barcode(barcode_t the_barcode) {
+    configASSERT(barcode_length > 0);
     memcpy(the_barcode, barcode, barcode_length);
     return barcode_length;
 }

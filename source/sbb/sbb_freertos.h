@@ -29,7 +29,7 @@ extern EventGroupHandle_t xSBBEventGroup;
 /* How long we wait to receive a scanned barcode */
 #define SCANNER_BUFFER_RX_BLOCK_TIME_MS pdMS_TO_TICKS(15)
 /* How long to wait before we "see" a paper sensor "release" */
-#define PAPER_SENSOR_DEBOUNCE pdMS_TO_TICKS(500)
+#define PAPER_SENSOR_DEBOUNCE pdMS_TO_TICKS(1500)
 
 /* Event bit definitions. */
 #define ebPAPER_SENSOR_IN_PRESSED     ( 0x01 )

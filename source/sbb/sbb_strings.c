@@ -13,12 +13,16 @@ const char *cast_or_spoil_line_1_text = " Cast or Spoil?";
 const char *cast_or_spoil_line_2_text = "Spoil       Cast"; // spoil button on left
 const char *casting_ballot_text = "Casting ballot.";
 const char *spoiling_ballot_text = "Spoiling ballot.";
-const char *invalid_barcode_text = "Invalid barcode.";
-const char *no_barcode_text = "No barcode.";
+const char *invalid_barcode_text =  "Invalid ballot.";
+const char *duplicate_barcode_line_1_text = "Ballot already ";
+const char *duplicate_barcode_line_2_text = "cast or spoiled.";
+const char *no_barcode_text = "No ballot found.";
 const char *remove_ballot_text = "Remove ballot...";
+const char *error_line_1_text = " A fatal error";
+const char *error_line_2_text = "    occurred";
 
 // HW event messages
-#define HW_EVENT(msg) "HW event:" msg "."
+#define HW_EVENT(msg) "HW event: " msg "."
 log_entry sensor_in_pressed_msg            = HW_EVENT("Sensor in pressed");
 log_entry sensor_in_released_msg           = HW_EVENT("Sensor in released");
 log_entry sensor_out_pressed_msg           = HW_EVENT("Sensor out pressed");
