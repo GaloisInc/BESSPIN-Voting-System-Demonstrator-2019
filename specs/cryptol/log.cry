@@ -52,7 +52,7 @@ serializeBinaryLog log = log.message # log.msgHash # log.logMAC
 
 serializeASCIILog : {sizeBytes} (fin sizeBytes) =>
     Log sizeBytes -> [sizeBytes + Base64Length HashSizeBytes + 2][8]
-serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\n']
+serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
 
 /**
     A log file is a series of log messages. We must
