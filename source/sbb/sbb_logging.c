@@ -76,22 +76,25 @@ bool load_or_create_logs(void) {
     #endif
 }
 
-bool log_system_message(const log_entry new_entry) {
+bool log_system_message(const char *the_message) {
     #ifdef SIMULATION
-    debug_printf("LOG: %s\r\n", new_entry);
+    debug_printf("LOG: %s\r\n", the_message);
     return true;
     #else
-    Log_FS_Result res = write_entry(&system_log_handle, new_entry);
+    log_entry event_entry;
+    memset(&event_entry, 0x20, sizeof(log_entry));
+    memcpy(&event_entry, the_message, sizeof(the_message));
+    Log_FS_Result res = write_entry(&system_log_handle, event_entry);
     return (res == LOG_FS_OK);
     #endif
 }
 
-void log_or_abort(SBB_state *the_state, const log_entry the_entry) {
-    debug_printf((char *)the_entry);
+void log_or_abort(SBB_state *the_state, const char *the_message) {
     #ifdef SIMULATION
-    debug_printf("LOG: %s\r\n", the_entry);
+    debug_printf("LOG: %s\r\n", the_message);
     #else
-    if (!log_system_message(the_entry)) {
+    debug_printf(the_message);
+    if (!log_system_message(the_message)) {
         the_state->L = ABORT;
     }
     #endif
