@@ -76,28 +76,20 @@ bool load_or_create_logs(void) {
     #endif
 }
 
-bool log_system_message(const char *the_message) {
+bool log_system_message(const char *new_entry) {
     #ifdef SIMULATION
-    debug_printf("LOG: %s\r\n", the_message);
+    debug_printf("LOG: %s\r\n", new_entry);
     return true;
     #else
-    log_entry event_entry;
-    memset(&event_entry, 0x20, sizeof(log_entry));
-    memcpy(&event_entry, the_message, sizeof(the_message));
-    Log_FS_Result res = write_entry(&system_log_handle, event_entry);
+    Log_FS_Result res = write_entry(&system_log_handle, new_entry);
     return (res == LOG_FS_OK);
     #endif
 }
 
-void log_or_abort(SBB_state *the_state, const char *the_message) {
-    #ifdef SIMULATION
-    debug_printf("LOG: %s\r\n", the_message);
-    #else
-    debug_printf(the_message);
-    if (!log_system_message(the_message)) {
+void log_or_abort(SBB_state *the_state, const char *the_entry) {
+    if (!log_system_message(the_entry)) {
         the_state->L = ABORT;
     }
-    #endif
 }
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out
