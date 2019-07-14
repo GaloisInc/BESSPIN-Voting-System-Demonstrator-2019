@@ -113,8 +113,8 @@ bool log_app_event(app_event event,
         for (size_t i = 0; i < barcode_length; i++) {
             scanned_codes[num_scanned_codes][i] = (uint8_t)barcode[i];
         }
-        for (size_t i = barcode_length; i < 256; i++) {
-            scanned_codes[num_scanned_codes][i] = 0;
+        for (size_t i = barcode_length; i < BARCODE_MAX_LENGTH; i++) {
+            scanned_codes[num_scanned_codes][i] = 0x20;
         }
         num_scanned_codes = num_scanned_codes + 1;
 #endif
