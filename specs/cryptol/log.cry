@@ -42,16 +42,17 @@ parameter
 */
 type Log sizeBytes = {
     message : [sizeBytes][8],
-    msgHash : [HashSizeBytes][8]
+    msgHash : [HashSizeBytes][8],
+    logMAC  : [16][8]
 }
 
 serializeBinaryLog : {sizeBytes} (fin sizeBytes) =>
-    Log sizeBytes -> [sizeBytes + HashSizeBytes][8]
-serializeBinaryLog log = log.message # log.msgHash
+    Log sizeBytes -> [sizeBytes + HashSizeBytes + 16][8]
+serializeBinaryLog log = log.message # log.msgHash # log.logMAC
 
 serializeASCIILog : {sizeBytes} (fin sizeBytes) =>
     Log sizeBytes -> [sizeBytes + Base64Length HashSizeBytes + 2][8]
-serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # ['\n']
+serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\n']
 
 /**
     A log file is a series of log messages. We must
@@ -62,13 +63,13 @@ type LogFile maxSizeBytes msgs = [msgs](Log maxSizeBytes)
 
 serializeBinaryLogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
     LogFile maxSizeBytes msgs ->
-    [msgs * (maxSizeBytes + HashSizeBytes)][8]
+    [msgs * (maxSizeBytes + HashSizeBytes + 16)][8]
 serializeBinaryLogFile logFile = join serializedLogs where
     serializedLogs = [serializeBinaryLog entry | entry <- logFile]
 
 serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
     LogFile maxSizeBytes msgs ->
-    [msgs * (maxSizeBytes + Base64Length HashSizeBytes + 2)][8]
+    [msgs * (maxSizeBytes + Base64Length HashSizeBytes + Base64Length 16 + 2)][8]
 serializeASCIILogFile logFile = join serializedLogs where
     serializedLogs = [serializeASCIILog entry | entry <- logFile]
 
@@ -77,7 +78,7 @@ initialLogEntry : {msgSize, keySize, resultSize}
                 (fin msgSize, fin keySize, fin resultSize, msgSize <= resultSize) =>
     [keySize][8] -> [msgSize][8] -> Log resultSize
 initialLogEntry key msg =
-    { message = paddedMsg, msgHash = (cbcMAC key paddedMsg # zero)} where
+    { message = paddedMsg, msgHash = (cbcMAC key (paddedMsg # zero)), logMAC = (cbcMAC key (paddedMsg # msgHash))} where
         paddedMsg = ((msg # zero) : [resultSize][8])
 
 /**
@@ -99,7 +100,7 @@ updateLog : {msgSize, maxMsgSize, msgs}
 updateLog log msg = log # [newEntry] where
     paddedMsg = msg # zero
     previousHash = getLastHash log
-    newEntry = {message = paddedMsg, msgHash = hash (paddedMsg # previousHash)}
+    newEntry = {message = paddedMsg, msgHash = hash (paddedMsg # previousHash), logMAC = (cbcMAC key (paddedMsg # msgHash))}
 
 /**
     Given a log entry, check to see if it is a valid first entry
@@ -109,7 +110,8 @@ validFirstEntry : {msgSizeBytes, keySizeBytes}
     Log msgSizeBytes ->
     [keySizeBytes][8] ->
     Bit
-property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero)
+property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
+/* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
 /**
     Check to see if a log entry is valid given the previous hash
@@ -120,8 +122,8 @@ validLogEntry : {msgSizeBytes}
     [HashSizeBytes][8] ->
     Bit
 property validLogEntry log prevHash =
-    log.msgHash == hash (log.message # prevHash)
-
+    log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
+/* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
 /**
 Check the validity of an entire log file relative to a key
