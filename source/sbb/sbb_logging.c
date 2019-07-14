@@ -10,7 +10,7 @@ Log_Handle app_log_handle;
 Log_Handle system_log_handle;
 
 #ifndef FILESYSTEM_DUPLICATES
-uint8_t scanned_codes[1000][256];
+uint8_t scanned_codes[1000][BARCODE_MAX_LENGTH];
 uint16_t num_scanned_codes = 0;
 #endif // FILESYSTEM_DUPLICATES
 
@@ -139,28 +139,51 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
 #ifdef FILESYSTEM_DUPLICATES
     size_t n_entries = Log_IO_Num_Base64_Entries(&app_log_handle);
 
-    debug_printf("scanning for duplicates, there are %d entries", n_entries);
-    /** Scan the log backwards. The 0th entry is not a real entry to consider. */
-    // note uint32_t below because size_t is unsigned and subtraction 1 from it
-    // yields a large positive number - hat tip to Haneef
-    for (int32_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 1); i_entry_no--) {
-        debug_printf("scanning entry %d", i_entry_no);
-        secure_log_entry secure_entry = Log_IO_Read_Base64_Entry(&app_log_handle, i_entry_no);
-        b_found = true;
-        for (size_t i_barcode_idx = 0; b_found && (i_barcode_idx < length); i_barcode_idx++) {
-            b_found &= secure_entry.the_entry[2 + i_barcode_idx] == barcode[i_barcode_idx];
+    if (length >= BARCODE_MAX_LENGTH) {
+        debug_printf("barcode is too long, treated as duplicate");
+        b_found = true; // treat too-long barcode as duplicate
+    } else {
+        debug_printf("scanning for duplicates, there are %d entries", n_entries);
+        /** Scan the log backwards. The 0th entry is not a real entry to consider. */
+        // note int32_t below because size_t is unsigned and subtraction 1 from it
+        // yields a large positive number - hat tip to Haneef
+        for (int32_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 1); i_entry_no--) {
+            debug_printf("scanning entry %d", i_entry_no);
+            secure_log_entry secure_entry = Log_IO_Read_Base64_Entry(&app_log_handle, i_entry_no);
+            b_found = true;
+            // compare the barcodes up to the new barcode's length
+            for (size_t i_barcode_idx = 0;
+                 b_found && (i_barcode_idx < length) && (i_barcode_idx < BARCODE_MAX_LENGTH);
+                 i_barcode_idx++) {
+                b_found &= secure_entry.the_entry[2 + i_barcode_idx] == barcode[i_barcode_idx];
+            }
+            // ensure that the next character, if any, in the previously recorded barcode
+            // is a space
+            if (length + 1 < BARCODE_MAX_LENGTH) { // we haven't already checked the full width
+                b_found &= secure_entry.the_entry[2 + length] == 0x20;
+            }
         }
     }
 #else // FILESYSTEM_DUPLICATES
-    debug_printf("scanning for duplicates, there are %d entries", num_scanned_codes);
-    for (uint16_t i_entry_no = 0; !b_found && (i_entry_no < num_scanned_codes); i_entry_no++) {
-        debug_printf("scanning entry %d", i_entry_no);
-        b_found = true;
-        for (size_t i_barcode_idx = 0; b_found && (i_barcode_idx < length); i_barcode_idx++) {
-            b_found &= scanned_codes[i_entry_no][i_barcode_idx] == barcode[i_barcode_idx];
+    if (length >= BARCODE_MAX_LENGTH) {
+        debug_printf("barcode is too long, treated as duplicate");
+        b_found = true; // treat too-long barcode as duplicate
+    } else {
+        debug_printf("scanning for duplicates, there are %d entries", num_scanned_codes);
+        for (uint16_t i_entry_no = 0; !b_found && (i_entry_no < num_scanned_codes); i_entry_no++) {
+            debug_printf("scanning entry %d", i_entry_no);
+            b_found = true;
+            for (size_t i_barcode_idx = 0; b_found && (i_barcode_idx < length); i_barcode_idx++) {
+                b_found &= scanned_codes[i_entry_no][i_barcode_idx] == barcode[i_barcode_idx];
+            }
+            // ensure that the next character, if any, in the previously recorded barcode
+            // is a space
+            if (length + 1 < BARCODE_MAX_LENGTH) { // we haven't already checked the full width
+                b_found &= scanned_codes[i_entry_no][length] == 0x20;
+            }
         }
+        debug_printf("barcode is a duplicate: %d", b_found);
     }
-    debug_printf("barcode is a duplicate: %d", b_found);
     return b_found;
 #endif // FILESYSTEM_DUPLICATES
 }
