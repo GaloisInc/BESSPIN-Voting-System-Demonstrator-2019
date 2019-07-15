@@ -1,6 +1,4 @@
 module BallotFormat = AbstractBallotFormat where
 
 type timeBytes  = 4
-type seqBytes   = 4
 type timeDigits = 10
-type seqDigits  = 10

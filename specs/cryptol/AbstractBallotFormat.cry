@@ -9,28 +9,27 @@ import AESCBC
 
 parameter
   type timeBytes  : #
-  type seqBytes   : #
   type timeDigits : #
-  type seqDigits  : #
-  type constraint (fin timeBytes,  fin seqBytes,
-                   fin timeDigits, fin seqDigits,
-                   timeBytes  >= 1, seqBytes  >= 1,
-                   timeDigits >= 1, seqDigits >= 1,
+  type constraint (fin timeBytes, fin timeDigits,
+                   timeBytes  >= 1, timeDigits >= 1,
                    width (10 ^^ timeDigits) >= 8 * timeBytes,
-                   width (10 ^^ seqDigits)  >= 8 * seqBytes,
-                   10 ^^ timeDigits >= 2 ^^ (timeBytes * 8),
-                   10 ^^ seqDigits  >= 2 ^^ (seqBytes * 8))
+                   10 ^^ timeDigits >= 2 ^^ (timeBytes * 8))
 
 type Ballot contests positions
   = { time     : [timeBytes * 8],
-      number   : [seqBytes  * 8],
       contests : [contests][positions] }
+
+// TODO: drop sequence number
+// timestamp should be lifted out of base64 encoding, separated with ':'
+// take padding out of encrypt/decrypt
+// binary version of time digits go in MAC
+// base64 everything minus time digits
 
 encodeBallot :
   {contests, positions, encodedLength}
-  (fin contests, fin positions, fin timeDigits, fin seqDigits,
+  (fin contests, fin positions, fin timeDigits,
    encodedLength == 16 + timeDigits +
-     16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)) =>
+     16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
   [16][8] ->
@@ -39,10 +38,9 @@ encodeBallot :
 encodeBallot authKey ballotKey iv ballot =
   encodeBase64 (encryptedBallot # timeDigits # auth)
   where
-    seqDigits       = toBase`{digits=seqDigits}  decimal ballot.number
     timeDigits      = toBase`{digits=timeDigits} decimal ballot.time
     contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
-    ballotBytes     = seqDigits # timeDigits # contestsBytes
+    ballotBytes     = timeDigits # contestsBytes
     encryptedBallot = encrypt ballotKey iv ballotBytes
     auth            = cbcMAC authKey zero (encryptedBallot # timeDigits)
 
@@ -50,7 +48,7 @@ decodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions,
    encodedLength == 16 + timeDigits +
-     16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)) =>
+     16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
   [16][8] ->
@@ -63,37 +61,31 @@ decodeBallot authKey ballotKey iv encodedBallot =
   then error "Invalid CBC-MAC authentication: this ballot has been tampered with!"
   | outerTimePadding != zero
   then error "Invalid outer timestamp: out of range"
-  | numPadding != zero
-  then error "Invalid sequence number: out of range"
   | timePadding != zero
   then error "Invalid timestamp: out of range"
   | outerTime != time
   then error "Outer-inner timestamp mismatch: should be impossible with valid auth"
   else
-  { number = number, time = time, contests = split (contests) }
+  { time = time, contests = split contests }
   where
     encryptedBallot :
-      [16 * ((timeDigits + seqDigits + (contests * positions) /^ 8) /^ 16)][8]
+      [16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)][8]
     outerTimeDigits : [timeDigits][8]
     auth            : [16][8]
 
     encryptedBallot # outerTimeDigits # auth =
       decodeBase64`{encodedLength} encodedBallot
 
-    numberBits : [seqDigits  * 8]
     timeBits   : [timeDigits * 8]
     contests   : [contests * positions]
 
-    numberBits # timeBits # contests # padding =
-      join (decrypt`{timeDigits + seqDigits + (contests * positions) /^ 8}
+    timeBits # contests # padding =
+      join (decrypt`{timeDigits + (contests * positions) /^ 8}
                     ballotKey iv encryptedBallot)
 
-    number                        : [seqBytes  * 8]
     time, outerTime               : [timeBytes * 8]
-    numPadding                    : [width (10 ^^ seqDigits)  - seqBytes  * 8]
     timePadding, outerTimePadding : [width (10 ^^ timeDigits) - timeBytes * 8]
 
-    numPadding       # number     = fromBase decimal (groupBy`{8} numberBits)
     timePadding      # time       = fromBase decimal (groupBy`{8} timeBits)
     outerTimePadding # outerTime  = fromBase decimal outerTimeDigits
 
