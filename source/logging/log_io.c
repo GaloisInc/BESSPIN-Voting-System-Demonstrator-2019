@@ -15,7 +15,7 @@ const secure_log_entry null_secure_log_entry = {{0}, {0}};
 //
 // We therefore add just the right number of padding spaces between the data
 // block and the hash, as computed by the following 3 constants:
-const size_t unpadded_log_entry_length = LOG_ENTRY_LENGTH + SHA256_BASE_64_DIGEST_LENGTH_BYTES + 1;
+const size_t unpadded_log_entry_length = LOG_ENTRY_LENGTH + SHA256_BASE_64_DIGEST_LENGTH_BYTES;
 
 const size_t padded_log_entry_length =
   ((unpadded_log_entry_length / AES_BLOCK_LENGTH_BYTES) + 1) * AES_BLOCK_LENGTH_BYTES;
