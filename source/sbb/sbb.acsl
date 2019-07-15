@@ -190,17 +190,15 @@
   @     !spoil_button_lit(S);
   @
   @   predicate Abort_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF   &&
-  @     !cast_button_lit(S) &&
-  @     !spoil_button_lit(S);
+  @     true;
   @ }
   @*/
 
 /*@ predicate Ballot_Present(SBB_state S) =
-  @   S.L == BARCODE_DETECTED ||
+  @   S.L == BARCODE_DETECTED  ||
   @   S.L == WAIT_FOR_DECISION ||
-  @   S.L == CAST ||
-  @   S.L == EJECT ||
+  @   S.L == CAST              ||
+  @   S.L == EJECT             ||
   @   S.L == SPOIL;
 */
 

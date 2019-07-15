@@ -73,19 +73,27 @@ void update_button_state(bool cast_button_pressed,
     }
 }
 
+/*@ requires \valid((char *)pvRxData + (0 .. xBufferLengthBytes-1));
+  @ assigns *((char *)pvRxData + (0 .. \result - 1));
+  @ ensures 0 <= \result;
+  @ ensures \result <= xBufferLengthBytes;
+*/
+extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,
+                                   void *pvRxData,
+                                   size_t xBufferLengthBytes,
+                                   TickType_t xTicksToWait);
+
 void update_barcode_state( bool barcode_scanned ) {
     switch ( the_state.BS ) {
     case BARCODE_NOT_PRESENT:
         if ( barcode_scanned ) {
             char barcode[BARCODE_MAX_LENGTH] = {0};
-            //@ assert \valid_read(barcode + (0 .. BARCODE_MAX_LENGTH-1));
-            //@ assert \valid(barcode + (0 .. BARCODE_MAX_LENGTH-1));
             barcode_length_t xReceiveLength = 0;
+            //@assert \valid((char *)barcode + (0 .. BARCODE_MAX_LENGTH-1));
             xReceiveLength = xStreamBufferReceive(xScannerStreamBuffer,
-                                                  (void *)barcode, sizeof(barcode),
+                                                  barcode,
+                                                  BARCODE_MAX_LENGTH,
                                                   SCANNER_BUFFER_RX_BLOCK_TIME_MS);
-            //@ assert \valid_read(barcode + (0 .. BARCODE_MAX_LENGTH-1));
-            //@ assert \valid(barcode + (0 .. BARCODE_MAX_LENGTH-1));
             if ( xReceiveLength > 0 ) {
                 set_received_barcode(barcode, xReceiveLength);
                 CHANGE_STATE(the_state, BS, BARCODE_PRESENT_AND_RECORDED);
@@ -153,34 +161,13 @@ EventBits_t next_barcode_event_bits(void) {
 extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToSet );
 
-/*@ requires SBB_Machine_Invariant;
-  @ assigns the_state.L, the_state.M, the_state.button_illumination;
-  @ assigns fs, gpio_mem[..];
-  @ ensures the_state.L == ABORT;
-  @ ensures SBB_Machine_Invariant;
-*/
-void go_to_abort(void) {
-    cast_button_light_off();
-    spoil_button_light_off();
-    stop_motor();
-    the_state.L = ABORT;
-}
-
 void log_single_event( EventBits_t event_bits,
                        EventBits_t log_bit,
                        const log_entry event_entry ) {
     if ( event_bits & log_bit ) {
-        bool b_log_ok = log_system_message(event_entry);
-
-        if (!b_log_ok) {
+        if ( !log_system_message(event_entry) ) {
             debug_printf("Failed to write to system log.");
-            go_to_abort();
-            //@ assert SBB_Machine_Invariant;
-        } else {
-            //@ assert SBB_Machine_Invariant;
         }
-    } else {
-        //@ assert SBB_Machine_Invariant;
     }
 }
 
