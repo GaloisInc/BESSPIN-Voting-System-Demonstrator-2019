@@ -8,7 +8,7 @@
 
 /*@ requires SBB_Machine_Invariant;
   @ requires \valid_read(event_entry + (0 .. LOG_ENTRY_LENGTH - 1));
-  @ assigns fs, the_state.L;
+  @ assigns log_fs, the_state.L;
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures SBB_Machine_Invariant;
 */
@@ -17,7 +17,7 @@ void log_single_event( EventBits_t event_bits,
                        const log_entry event_entry );
 
 /*@ requires SBB_Machine_Invariant;
-  @ assigns fs, the_state.L;
+  @ assigns log_fs, the_state.L;
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures SBB_Machine_Invariant;
 */
@@ -32,7 +32,7 @@ extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
 /*@ requires SBB_Machine_Invariant;
   @ requires paper_in_pressed == true  || paper_in_pressed == false;
   @ requires paper_in_released == true || paper_in_released == false;
-  @ assigns the_state.P, the_state.L, fs;
+  @ assigns the_state.P, the_state.L, log_fs;
   @ ensures \old(the_state.L) == the_state.L || the_state.L == ABORT;
   @ ensures \old(the_state.P) == the_state.P
   @      || ASM_transition(\old(the_state), INTERNAL_PAPER_DETECT_E, the_state);
@@ -46,7 +46,7 @@ void update_paper_state( bool paper_in_pressed,
   @ requires cast_button_released == true  || cast_button_released == false;
   @ requires spoil_button_pressed == true  || spoil_button_pressed == false;
   @ requires spoil_button_released == true || spoil_button_released == false;
-  @ assigns the_state.B, the_state.L, fs;
+  @ assigns the_state.B, the_state.L, log_fs;
   @ ensures \old(the_state.B) == the_state.B
   @      || ASM_transition(\old(the_state), INTERNAL_CAST_SPOIL_E, the_state)
   @      || ASM_transition(\old(the_state), SPOIL_E, the_state)
@@ -61,8 +61,8 @@ void update_button_state( bool cast_button_pressed,
 
 /*@ requires SBB_Machine_Invariant;
   @ requires barcode_scanned == true || barcode_scanned == false;
-  @ assigns the_state.BS, the_state.L, fs,
-  @         barcode[0 .. BARCODE_MAX_LENGTH - 1];
+  @ assigns the_state.BS, the_state.L, log_fs,
+  @         barcode[0 .. BARCODE_MAX_LENGTH - 1], barcode_present, barcode_length;
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures \old(the_state.BS) == the_state.BS
   @      || ASM_transition(\old(the_state), INTERNAL_BARCODE_E, the_state);
@@ -82,8 +82,8 @@ EventBits_t next_button_event_bits(void);
 EventBits_t next_barcode_event_bits(void);
 
 /*@ requires SBB_Machine_Invariant;
-  @ assigns the_state.BS, the_state.L, the_state.P, the_state.B, fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
-  @ assigns fs, the_state.L;
+  @ assigns the_state.BS, the_state.L, the_state.P, the_state.B, log_fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
+  @ assigns log_fs, the_state.L;
   @ ensures
   @   (the_state.BS != \old(the_state).BS) ==>
   @     ASM_transition(\old(the_state), INTERNAL_BARCODE_E, the_state);

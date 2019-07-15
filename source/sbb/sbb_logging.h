@@ -40,6 +40,14 @@ extern const char *decision_timeout_event_msg;
 */
 bool import_and_verify(log_file the_file);
 
+/*@ requires Log_IO_Initialized;
+  @ requires \valid(the_file);
+  @ requires valid_string(the_name);
+  @ requires \separated(the_file, the_name);
+  @ assigns *the_file \from the_name, log_fs;
+  @ ensures Log_IO_Initialized;
+  @ ensures \result == true || \result == false;
+*/
 bool load_or_create(log_file the_file,
                     const log_name the_name,
                     const http_endpoint endpoint);

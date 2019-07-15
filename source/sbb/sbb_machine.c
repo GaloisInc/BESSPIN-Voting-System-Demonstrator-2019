@@ -109,7 +109,7 @@ void flush_barcodes() {
     /*@ loop invariant SBB_Machine_Invariant;
       @ loop invariant the_state.L == ABORT || the_state.L == STANDBY;
       @ loop assigns the_state.BS, the_state.L, the_state.P,
-      @ the_state.B, fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
+      @ the_state.B, log_fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
       @*/
     do {
         the_state.BS = BARCODE_NOT_PRESENT;

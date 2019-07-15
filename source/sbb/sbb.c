@@ -31,10 +31,12 @@
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;
 
-bool barcode_present = false;
+// We can't check these global invariant:
+// SBB_State.BS \in { BARCODE_DETECTED_AND_RECORDED } ==> barcode_present;
+// barcode_present ==> 0 < barcode_length <= BARCODE_MAX_LENGTH;
 char barcode[BARCODE_MAX_LENGTH] = {0};
 barcode_length_t barcode_length  = 0;
-SemaphoreHandle_t barcode_mutex;
+bool barcode_present = false;
 
 // Assigns declarations for FreeRTOS functions; these may not be
 // accurate but are currently required to avoid crashing wp.

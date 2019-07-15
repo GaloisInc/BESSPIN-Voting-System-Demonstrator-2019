@@ -15,6 +15,8 @@
 #include "sbb_logging.h"
 
 extern char barcode[BARCODE_MAX_LENGTH];
+extern bool barcode_present;
+extern barcode_length_t barcode_length;
 
 // Display strings
 extern const char *welcome_text;
@@ -64,6 +66,9 @@ extern SBB_state the_state;
     SBB_Strings_Invariant &&
     (the_state.D == INITIALIZED_DISPLAY || the_state.D == SHOWING_TEXT) &&
     (the_state.BS == BARCODE_NOT_PRESENT || the_state.BS == BARCODE_PRESENT_AND_RECORDED) &&
+    (barcode_present == true || barcode_present == false) &&
+    (the_state.BS == BARCODE_PRESENT_AND_RECORDED ==> barcode_present == true) &&
+    (barcode_present == true ==> (0 < barcode_length && barcode_length <= BARCODE_MAX_LENGTH)) &&
     motor_ASM_valid(the_state) &&
     sbb_L_ASM_valid(the_state);
   }
@@ -150,6 +155,10 @@ bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
   @ requires \valid_read(the_barcode + (1..its_length-1));
   @ requires its_length <= BARCODE_MAX_LENGTH;
   @ assigns barcode[0 .. its_length-1];
+  @ assigns barcode_present;
+  @ assigns barcode_length;
+  @ ensures barcode_length == its_length;
+  @ ensures barcode_present == true;
 */
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
