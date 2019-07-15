@@ -42,7 +42,7 @@ bool load_or_create(log_file the_file,
     bool b_success = true;
 
     if ( Log_IO_File_Exists(the_name) &&
-         LOG_FS_OK == Log_IO_Open(the_file, the_name) ) {
+         LOG_FS_OK == Log_IO_Open(the_file, the_name, endpoint) ) {
         b_success = import_and_verify(the_file);
     } else if ( LOG_FS_OK == create_log(the_file, the_name, endpoint) ) {
         b_success = true;

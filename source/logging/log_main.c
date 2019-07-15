@@ -60,7 +60,7 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
   }
 
   // open and read the log
-  Log_IO_Open(&r_log,log_file);
+  Log_IO_Open(&r_log,log_file, HTTP_Endpoint_None);
 
   secure_log_entry sle  = Log_IO_Read_Last_Base64_Entry(&r_log);
 

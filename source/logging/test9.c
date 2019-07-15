@@ -6,7 +6,7 @@ Log_FS_Result Test_Log_IO_Read_Base64_Entry(const char * test_file_name) {
 	size_t N;
 	secure_log_entry current_entry;
 
-	Log_IO_Open(&r_log, test_file_name);
+	Log_IO_Open(&r_log, test_file_name, HTTP_Endpoint_None);
 	if (!Log_IO_File_Exists(test_file_name)) {
     	printf("Failure - log file %s does not exist.\n", test_file_name);
     	 return LOG_FS_ERROR;
@@ -32,7 +32,7 @@ Log_FS_Result Test_Log_IO_Read_Last_Base64_Entry(const char * test_file_name) {
 	secure_log_entry current_entry;
 	size_t N = 0;
 
-	Log_IO_Open(&r_log, test_file_name);
+	Log_IO_Open(&r_log, test_file_name, HTTP_Endpoint_None);
 
 	if (!Log_IO_File_Exists(test_file_name))
 	{

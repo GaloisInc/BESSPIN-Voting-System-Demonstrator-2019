@@ -81,14 +81,14 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream,
 }
 
 Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
-                          const char *name)   // IN
+                          const char *name,   // IN
+                          const http_endpoint endpoint)  // IN
 {
     Log_FS_Result result = Log_FS_Open(stream, name);
 
-    // TBD set endpoint here?
-
     debug_printf ("Setting open remote file name to %s\n", name);
     stream->remote_file_name = (char *) name;
+    stream->endpoint = endpoint;
     return result;
 }
 
