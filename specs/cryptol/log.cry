@@ -50,8 +50,10 @@ serializeBinaryLog : {sizeBytes} (fin sizeBytes) =>
     Log sizeBytes -> [sizeBytes + HashSizeBytes + 16][8]
 serializeBinaryLog log = log.message # log.msgHash # log.logMAC
 
+/* In ASCII format, the hash is Base64 encoded, and we add FOUR characters for */
+/* readability - a space between each field and \r\n on the end                */
 serializeASCIILog : {sizeBytes} (fin sizeBytes) =>
-    Log sizeBytes -> [sizeBytes + Base64Length HashSizeBytes + 2][8]
+    Log sizeBytes -> [sizeBytes + Base64Length HashSizeBytes + 4][8]
 serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
 
 /**
@@ -69,7 +71,7 @@ serializeBinaryLogFile logFile = join serializedLogs where
 
 serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
     LogFile maxSizeBytes msgs ->
-    [msgs * (maxSizeBytes + Base64Length HashSizeBytes + Base64Length 16 + 2)][8]
+    [msgs * (maxSizeBytes + Base64Length HashSizeBytes + Base64Length 16 + 4)][8]
 serializeASCIILogFile logFile = join serializedLogs where
     serializedLogs = [serializeASCIILog entry | entry <- logFile]
 
