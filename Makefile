@@ -122,7 +122,7 @@ ifeq ($(TARGET),hosttests)
 # Apple's clang and use the HomeBrew one instead...
 export CC := clang
 
-HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -Wno-macro-redefined
+HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -DNETWORK_LOGS -Wno-macro-redefined
 
 include $(CRYPTO_DIR)/Makefile.hosttests
 include $(LOG_DIR)/Makefile.hosttests
