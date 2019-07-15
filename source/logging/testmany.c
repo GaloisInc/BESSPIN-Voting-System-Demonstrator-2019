@@ -11,14 +11,14 @@ int main(void)
         "draganxxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccdddddddddddd"
         "ddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhii"
         "iiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmm"
-        "mmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+        "mmmmmmmmnnnnnnnnnnnnnnnnoooooooooooooooo"; // 256 chars not including final \0
 
     log_entry next_entry =
         "hello rod   "
         "xxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccddddddddddddddddee"
         "eeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhiiiiiiii"
         "iiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmmmmmmmm"
-        "mmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+        "mmnnnnnnnnnnnnnnnnoooooooooooooooo"; // 256 chars not including final \0
 
     Log_IO_Initialize();
 
