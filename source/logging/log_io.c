@@ -102,7 +102,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     int r;
     size_t written;
     base64_secure_log_entry base_64_current_entry;
-   
+
     // Calculate the length of the fixed parts of the HTTP POST Header
     const size_t FIXED_MESSAGE_SIZE =
         strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
@@ -142,11 +142,13 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     written += Log_FS_Write(stream, &new_line, 1);
 
     Prepare_Transmit_Buffer(base_64_current_entry,
-                            padded_log_entry_length,
-                            bytes_of_padding_required,
                             stream->endpoint,
-                            stream->remote_file_name, 
-                            Transmit_Buffer, total, MESSAGE_SIZE);
+                            stream->remote_file_name,
+                            Transmit_Buffer,
+                            &total,
+                            MESSAGE_SIZE);
+
+    debug_printf ("total passed back is %zu", total);
 
     // Step 4 - Write same data over network to the Reporting System
     Log_Net_Send (Transmit_Buffer, total);
@@ -225,7 +227,7 @@ size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
     file_size = Log_FS_Size(stream);
 
     debug_printf("file size of log = %d", file_size);
-    
+
     // The file size _should_ be an exact multiple of
     // the size of one log entry.
     if ((file_size % padded_log_entry_length) == 0)
@@ -256,11 +258,12 @@ secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
     }
 }
 
-void Prepare_Transmit_Buffer(base64_secure_log_entry the_secure_log_entry,
-                  const size_t padded_log_entry_length,
-                  const size_t bytes_of_padding_required,
-                  const http_endpoint endpoint, const char *log_file_name, 
-                  uint8_t *Transmit_Buffer, size_t total, size_t MESSAGE_SIZE)
+void Prepare_Transmit_Buffer(base64_secure_log_entry the_secure_log_entry, // in
+                             const http_endpoint endpoint, // in
+                             const char *log_file_name, // in
+                             uint8_t *Transmit_Buffer, // out by ref
+                             size_t *total, // out by ref
+                             size_t MESSAGE_SIZE) // in
 {
     size_t current;
 
@@ -281,7 +284,7 @@ void Prepare_Transmit_Buffer(base64_secure_log_entry the_secure_log_entry,
     if (endpoint == HTTP_Endpoint_None)
     {
         return;
-    }   
+    }
 
     debug_printf("Transmit_Buffer is %zu", MESSAGE_SIZE);
 
@@ -355,13 +358,13 @@ void Prepare_Transmit_Buffer(base64_secure_log_entry the_secure_log_entry,
 
     portable_assert(BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
 
-    total = current + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+    *total = current + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
 
     // And append that MAC to the data to be sent
     memcpy(&Transmit_Buffer[current], &base64_mac[0],
            BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH);
 
-    debug_printf("total bytes to send is %zu", total);
+    debug_printf("total bytes to send is %zu", *total);
     // Socket creation, init and send
     return;
   }

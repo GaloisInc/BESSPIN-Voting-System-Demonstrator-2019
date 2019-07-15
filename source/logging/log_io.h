@@ -184,11 +184,11 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
  */
 secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream);
 
-void Prepare_Transmit_Buffer(base64_secure_log_entry the_secure_log_entry,
-                  const size_t padded_log_entry_length,
-                  const size_t bytes_of_padding_required,
-                  const http_endpoint endpoint,  
-                  const char *log_file_name, uint8_t *Transmit_Buffer, 
-                  size_t total, size_t MESSAGE_SIZE);
+void Prepare_Transmit_Buffer(base64_secure_log_entry the_secure_log_entry, // in
+                             const http_endpoint endpoint, // in
+                             const char *log_file_name, // in
+                             uint8_t *Transmit_Buffer, // out by ref
+                             size_t *total, // out by ref
+                             size_t MESSAGE_SIZE); // in
 
 #endif /* __LOG_IO_H__ */
