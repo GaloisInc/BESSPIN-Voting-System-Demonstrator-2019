@@ -117,14 +117,15 @@ void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
     const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
                                 strlen(remote_file_name) + content_length;
 
-    uint8_t Transmit_Buffer[MESSAGE_SIZE];
-
     // If user or test case has requested no HTTP echo of this log file,
     // then do nothing
     if (endpoint == HTTP_Endpoint_None)
     {
         return;
-    }
+    }   
+
+    uint8_t Transmit_Buffer[MESSAGE_SIZE];
+
 
     debug_printf("Transmit_Buffer is %zu", MESSAGE_SIZE);
 
