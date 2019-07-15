@@ -13,10 +13,6 @@
 void Log_Net_Initialize(void);
 
 // ACSL Contracts TBD
-void Log_Net_Send(base64_secure_log_entry the_secure_log_entry,
-                  const size_t padded_log_entry_length,
-                  const size_t bytes_of_padding_required,
-                  const http_endpoint endpoint,
-                  const char *remote_file_name);
+void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total);
 
 #endif /* __LOG_NET_H__ */
