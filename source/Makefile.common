@@ -93,7 +93,7 @@ export ASFLAGS  += -g $(ARCH) $(ABI)  \
     -DportasmHANDLE_INTERRUPT=external_interrupt_handler
 
 export CFLAGS = $(WARNINGS) $(INCLUDES)
-export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
+export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DNETWORK_LOGS -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
 
 export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \

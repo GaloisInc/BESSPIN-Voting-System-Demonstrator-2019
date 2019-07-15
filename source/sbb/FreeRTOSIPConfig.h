@@ -147,7 +147,7 @@ stack will revert to using the static IP address even when ipconfigUSE_DHCP is
 set to 1 if a valid configuration cannot be obtained from a DHCP server for any
 reason.  The static configuration used is that passed into the stack by the
 FreeRTOS_IPInit() function call. */
-#define ipconfigUSE_DHCP	1
+#define ipconfigUSE_DHCP	0
 
 /* When ipconfigUSE_DHCP is set to 1, DHCP requests will be sent out at
 increasing time intervals until either a reply is received from a DHCP server
@@ -307,16 +307,6 @@ disconnecting stage will timeout after a period of non-activity. */
 #define ipconfigZERO_COPY_RX_DRIVER			( 0 )
 #define ipconfigZERO_COPY_TX_DRIVER			( 0 )
 
-/* Demo config */
-/* The address of an echo server that will be used by the two demo echo client
-tasks.
-http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Clients.html
-http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
-#define configECHO_SERVER_ADDR0	10
-#define configECHO_SERVER_ADDR1 88
-#define configECHO_SERVER_ADDR2 88
-#define configECHO_SERVER_ADDR3 1
-
 /* Default MAC address configuration.  The demo creates a virtual network
 connection that uses this MAC address by accessing the raw Ethernet/WiFi data
 to and from a real network connection on the host PC.  See the
@@ -332,15 +322,21 @@ configure the real network connection to use. */
 /* Default IP address configuration.  Used in ipconfigUSE_DNS is set to 0, or
 ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
 #define configIP_ADDR0		10
-#define configIP_ADDR1		88
-#define configIP_ADDR2		88
+#define configIP_ADDR1		5
+#define configIP_ADDR2		5
 #define configIP_ADDR3		2
+
+// IP address of Reporter.  
+#define configRptrIP_ADDR0		10
+#define configRptrIP_ADDR1		5
+#define configRptrIP_ADDR2		5
+#define configRptrIP_ADDR3		1
 
 /* Default gateway IP address configuration.  Used in ipconfigUSE_DNS is set to
 0, or ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
 #define configGATEWAY_ADDR0	10
-#define configGATEWAY_ADDR1	88
-#define configGATEWAY_ADDR2	88
+#define configGATEWAY_ADDR1	5
+#define configGATEWAY_ADDR2	5
 #define configGATEWAY_ADDR3	1
 
 /* Default DNS server configuration.  OpenDNS addresses are 208.67.222.222 and
