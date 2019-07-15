@@ -69,7 +69,6 @@ export INCLUDES = \
 	-I$(VOTING_SYSTEM_SOURCE_DIR)/logging \
 	-T$(VOTING_SYSTEM_SOURCE_DIR)/crypto \
 	-I$(VOTING_SYSTEM_SOURCE_DIR)/sbb \
-	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
