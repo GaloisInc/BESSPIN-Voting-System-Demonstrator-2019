@@ -56,8 +56,12 @@ static const unsigned char base64_dec_map[128] =
 
 #define BASE64_SIZE_T_MAX   ( (size_t) -1 ) /* SIZE_T_MAX is not standard */
 
-int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
-                   const unsigned char *src, size_t slen )
+int mbedtls_base64_encode (unsigned char *dst,
+                           size_t dlen,
+                           size_t *olen,
+                           const unsigned char *src,
+                           size_t slen,
+                           bool add_null)
 {
     size_t i, n;
     int C1, C2, C3;
@@ -119,7 +123,11 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
     }
 
     *olen = p - dst;
-    *p = 0;
+
+    if (add_null == true)
+      {
+        *p = 0;
+      }
 
     /* Postcondition check */
     assert (*olen == (dlen - 2));

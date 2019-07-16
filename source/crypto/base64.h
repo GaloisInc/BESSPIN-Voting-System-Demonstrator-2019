@@ -34,7 +34,9 @@
  * 2. Calls to the assert() macro have also been added to check the
  *    pre- and post-condition at run-time, where possible.
  * 3. Changed to use RFC 4648 "Filename safe" encoding for values 62 and 63
- *
+ * 4. Addition of the "add_null" Boolean parameter on mbedtls_base64_encode()
+ *    so it can be used safety with binary (not zero-terminated C String)
+ *    output buffers.
  */
 
 #ifndef MBEDTLS_BASE64_H
@@ -43,6 +45,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #define MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL               -0x002A  /**< Output buffer too small. */
@@ -57,6 +60,7 @@
  * \param olen     number of bytes written
  * \param src      source buffer
  * \param slen     amount of data to be encoded
+ * \param add_null if true, append final \0 byte to the output
  *
  * \return         0 if successful, or MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL.
  *                 *olen is always updated to reflect the amount
@@ -72,7 +76,8 @@
 /**
  * Additional notes for Galois BSV Project and Frama-C users
  *
- * This function _does_ add a final 0x00 byte to the encoded string,
+ * If add_null == true, then this function adds a
+ * final 0x00 byte to the encoded string,
  * so it can be treated as a zero-terminated "C String". This means
  * that dlen is larger than expected, as defined in the requires clause
  * below.
@@ -89,8 +94,16 @@
   @ assigns *olen;
   @ ensures *olen == (dlen - 2);
 */
-int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
-                   const unsigned char *src, size_t slen );
+int mbedtls_base64_encode (unsigned char *dst,
+                           size_t dlen,
+                           size_t *olen,
+                           const unsigned char *src,
+                           size_t slen,
+                           bool add_null);
+
+
+
+
 
 /**
  * \brief          Decode a base64-formatted buffer
@@ -107,7 +120,8 @@ int mbedtls_base64_encode( unsigned char *dst, size_t dlen, size_t *olen,
  *                 of data that has (or would have) been written.
  *
  * \note           Call this function with *dst = NULL or dlen = 0 to obtain
- *                 the required buffer size in *olen
+ *                 the required buffer size in *olen, in which case the
+ *                 return value is MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL
  */
 
 /**
