@@ -3,6 +3,7 @@
 
 #include "secure_log_t.h"
 #include "log_fs.h"
+#include "log_net.h"
 #include <string.h>
 
 typedef Log_Handle *log_io_stream;
@@ -14,7 +15,8 @@ typedef Log_Handle *log_file;
 
 /*@
   predicate
-    Log_IO_Initialized{L} = \true; // abstract
+    Log_IO_Initialized{L} = Log_FS_Initialized{L} &&
+                            Log_Net_Initialized{L};
   predicate
     File_Is_Open{L}(Log_Handle *f) = \true; // abstract
   predicate
@@ -157,6 +159,7 @@ secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
+    requires valid_string(stream->remote_file_name);
     requires File_Is_Open (stream);
     assigns log_fs \from log_fs, stream, the_entry;
  */

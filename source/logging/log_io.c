@@ -183,6 +183,12 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
 
     ret_entry = Log_FS_Read(stream, &result.the_entry[0], LOG_ENTRY_LENGTH);
 
+
+    /*@
+      loop invariant 0 <= space_count <= bytes_of_padding_required;
+      loop assigns ret_space, space_count, dummy_char;
+      loop variant bytes_of_padding_required - space_count;
+    */
     for (size_t space_count = 0; space_count < bytes_of_padding_required;
          space_count++)
     {
@@ -326,6 +332,11 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
 
     // Initialize Transmit_Buffer to all 0x00 so we can dynamically calculate the
     // length of the header
+    /*@
+      loop invariant 0 <= i <= Transmit_Buffer_Length;
+      loop assigns i, Transmit_Buffer[0 .. Transmit_Buffer_Length - 1];
+      loop variant Transmit_Buffer_Length - i;
+    */
     for (size_t i = 0; i < Transmit_Buffer_Length; i++)
     {
         Transmit_Buffer[i] = 0x00;
@@ -351,6 +362,13 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     // spaces, hash and new_line an exact multiple of 16 bytes long.
     size_t space_index = *first_byte_of_data_index + LOG_ENTRY_LENGTH;
     debug_printf("space index is %zu", space_index);
+
+    /*@
+      loop invariant 0 <= space_count <= bytes_of_padding_required;
+      loop assigns space_index, space_count,
+           Transmit_Buffer[0 .. bytes_of_padding_required - 1];
+      loop variant bytes_of_padding_required - space_count;
+    */
     for (size_t space_count = 0; space_count < bytes_of_padding_required;
          space_count++)
     {
