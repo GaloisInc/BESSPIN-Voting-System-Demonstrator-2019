@@ -44,7 +44,8 @@ class LogRequestHandler(BaseHTTPRequestHandler):
             print('trying to open file ' + log_path)
             with open(log_path, 'ab') as log_file:
                 log_file.write(body)
-                log_file.write(b'\r\n')
+                if not body.endswith(b'\r\n'):
+                    log_file.write(b'\r\n')
         except:
             self.send_error(500, explain = 'invalid log file name')
             return

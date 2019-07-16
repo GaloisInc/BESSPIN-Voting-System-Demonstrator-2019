@@ -16,20 +16,20 @@ extern const log_name system_log_file_name;
 extern const log_name app_log_file_name;
 
 // HW event messages
-extern log_entry sensor_in_pressed_msg;
-extern log_entry sensor_in_released_msg;
-extern log_entry sensor_out_pressed_msg;
-extern log_entry sensor_out_released_msg;
-extern log_entry cast_button_pressed_msg;
-extern log_entry cast_button_released_msg;
-extern log_entry spoil_button_pressed_msg;
-extern log_entry spoil_button_released_msg;
-extern log_entry barcode_scanned_msg;
-extern log_entry barcode_received_event_msg;
-extern log_entry empty_barcode_received_event_msg;
+extern const char *sensor_in_pressed_msg;
+extern const char *sensor_in_released_msg;
+extern const char *sensor_out_pressed_msg;
+extern const char *sensor_out_released_msg;
+extern const char *cast_button_pressed_msg;
+extern const char *cast_button_released_msg;
+extern const char *spoil_button_pressed_msg;
+extern const char *spoil_button_released_msg;
+extern const char *barcode_scanned_msg;
+extern const char *barcode_received_event_msg;
+extern const char *empty_barcode_received_event_msg;
 
-extern log_entry invalid_barcode_received_event_msg;
-extern log_entry decision_timeout_event_msg;
+extern const char *invalid_barcode_received_event_msg;
+extern const char *decision_timeout_event_msg;
 
 // The file must be open
 bool import_and_verify(log_file the_file);
@@ -45,7 +45,7 @@ bool load_or_create(log_file the_file,
 bool load_or_create_logs(void);
 
 //@ requires true;
-bool log_system_message(const log_entry new_entry);
+bool log_system_message(const char *the_message);
 
 // @design abakst What information do we want to log here? The barcode?
 typedef enum { APP_EVENT_BALLOT_USER_CAST=0,
@@ -63,13 +63,13 @@ bool log_app_event(app_event event,
   @   ensures the_state->L == \old(the_state)->L;
   @ complete behaviors log_error, log_ok;
 */
-void log_or_abort(SBB_state *the_state, const log_entry the_entry);
+void log_or_abort(SBB_state *the_state, const char *the_message);
 
 bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length);
 
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \
-        const log_entry state_change_entry = "State change: " #_field " := " #_new_state; \
-        log_or_abort(&(_state), state_change_entry);                    \
+        const char *state_change_message = "State change: " #_field " := " #_new_state; \
+        log_or_abort(&(_state), state_change_message);                    \
     } while (0)
 #endif

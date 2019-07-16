@@ -21,7 +21,7 @@ Log_FS_Result create_log(Log_Handle *new_log_file,
         "worldxxxxxaaaaaaaaaaaaaaaabbbbbbbbbbbbbbbbccccccccccccccccdddddddddddd"
         "ddddeeeeeeeeeeeeeeeeffffffffffffffffgggggggggggggggghhhhhhhhhhhhhhhhii"
         "iiiiiiiiiiiiiijjjjjjjjjjjjjjjjkkkkkkkkkkkkkkkkllllllllllllllllmmmmmmmm"
-        "mmmmmmmmnnnnnnnnnnnnnnnnooooooooooooooo"; // 256 chars including final \0
+        "mmmmmmmmnnnnnnnnnnnnnnnnoooooooooooooooo"; // 256 chars not including final \0
 
     const secure_log_security_policy first_policy = {
         hashchain_sha2_256, no_provenance,     no_confidentiality,

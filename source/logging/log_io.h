@@ -77,7 +77,7 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     requires \valid(stream);
     requires valid_string(name);
     requires \separated(stream, name);
-    assigns *stream \from log_fs, name;
+    assigns *stream \from log_fs, name, endpoint;
     behavior success:
       ensures \result == LOG_FS_OK;
       ensures \valid (stream);
@@ -92,7 +92,8 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
     disjoint behaviors;
  */
 Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
-                          const char *name);  // IN
+                          const char *name,   // IN
+                          const http_endpoint endpoint);  // IN
 
 
 /*@ requires Log_IO_Initialized;
@@ -183,5 +184,6 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     assigns \result \from *stream, log_fs;
  */
 secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream);
+
 
 #endif /* __LOG_IO_H__ */

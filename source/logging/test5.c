@@ -19,7 +19,7 @@ int main(void)
     write_entry(&my_log, second_entry);
     Log_IO_Close(&my_log);
 
-    Log_IO_Open(&r_log, "test5log.txt");
+    Log_IO_Open(&r_log, "test5log.txt", HTTP_Endpoint_None);
 
     secure_log_entry _secure_log_entry = Log_IO_Read_Base64_Entry(&r_log, 0);
     uint8_t index = 0;

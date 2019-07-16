@@ -15,11 +15,11 @@ void test1()
 
     printf("%s\n", "Test1 - Test that 32 bytes become 44 bytes when Base64 encoded");
 
-    r = mbedtls_base64_encode (dst, 0, &olen, src, 32);
+    r = mbedtls_base64_encode (dst, 0, &olen, src, 32, false);
     printf("required encoder dlen=%zu\n", olen);
 
 
-    r = mbedtls_base64_encode (dst, 46, &olen, src, 32);
+    r = mbedtls_base64_encode (dst, 46, &olen, src, 32, false);
     printf("Encoded:%s\n", dst);
     printf("actual encoder olen=%zu\n", olen);
 
@@ -50,7 +50,7 @@ void test2()
 
   printf("Test2 - filename safe encoding of chars 62 and 63\n");
 
-  r = mbedtls_base64_encode (dst, 6, &olen, src, 3);
+  r = mbedtls_base64_encode (dst, 6, &olen, src, 3, false);
   printf("Result=%d\n", r);
   printf("Encoded len=%zu\n", olen);
   printf("Encoded:%s\n\n", dst);

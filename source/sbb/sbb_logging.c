@@ -42,7 +42,7 @@ bool load_or_create(log_file the_file,
     bool b_success = true;
 
     if ( Log_IO_File_Exists(the_name) &&
-         LOG_FS_OK == Log_IO_Open(the_file, the_name) ) {
+         LOG_FS_OK == Log_IO_Open(the_file, the_name, endpoint) ) {
         b_success = import_and_verify(the_file);
     } else if ( LOG_FS_OK == create_log(the_file, the_name, endpoint) ) {
         b_success = true;
@@ -76,7 +76,7 @@ bool load_or_create_logs(void) {
     #endif
 }
 
-bool log_system_message(const log_entry new_entry) {
+bool log_system_message(const char *new_entry) {
     #ifdef SIMULATION
     debug_printf("LOG: %s\r\n", new_entry);
     return true;
@@ -86,15 +86,10 @@ bool log_system_message(const log_entry new_entry) {
     #endif
 }
 
-void log_or_abort(SBB_state *the_state, const log_entry the_entry) {
-    debug_printf((char *)the_entry);
-    #ifdef SIMULATION
-    debug_printf("LOG: %s\r\n", the_entry);
-    #else
+void log_or_abort(SBB_state *the_state, const char *the_entry) {
     if (!log_system_message(the_entry)) {
         the_state->L = ABORT;
     }
-    #endif
 }
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out

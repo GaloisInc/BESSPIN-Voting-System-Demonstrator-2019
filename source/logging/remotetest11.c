@@ -25,7 +25,7 @@ Log_FS_Result Test_Log_IO_Read_Base64_Entry_Send_Remotely
   size_t olen;
   int r;
 
-  Log_IO_Open(&r_log, test_file_name);
+  Log_IO_Open(&r_log, test_file_name, HTTP_Endpoint_None);
   if (!Log_IO_File_Exists(test_file_name)) {
     printf("Failure - log file %s does not exist.\n", test_file_name);
     return LOG_FS_ERROR;
@@ -46,7 +46,8 @@ Log_FS_Result Test_Log_IO_Read_Base64_Entry_Send_Remotely
       r = mbedtls_base64_encode(&base_64_current_entry.the_digest[0],
                               	SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
                               	&current_entry.the_digest[0],
-                              	SHA256_DIGEST_LENGTH_BYTES);
+                              	SHA256_DIGEST_LENGTH_BYTES,
+                                false);
       (void)r;
 
       memcpy(&base_64_current_entry.the_entry[0], &current_entry.the_entry[0],

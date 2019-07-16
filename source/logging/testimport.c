@@ -22,7 +22,7 @@ void test_import(const char *test_file_name)
 {
     Log_Handle r_log;
 
-    Log_IO_Open(&r_log, test_file_name);
+    Log_IO_Open(&r_log, test_file_name, HTTP_Endpoint_None);
 
     if (import_log (&r_log))
       {
