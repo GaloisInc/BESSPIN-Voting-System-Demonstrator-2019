@@ -73,9 +73,11 @@ static uint8_t This_SBB_MAC_Address[6] = {0x00, 0x12, 0x13, 0x10, 0x15, 0x11};
 void Log_Net_Initialize()
 {
 #ifdef TARGET_OS_FreeRTOS
-    debug_printf("FreeRTOS_IPInit");
-    FreeRTOS_IPInit(This_SBB_IP_Address, SBB_NetMask, SBB_GatewayAddress,
-                    SBB_DNSServerAddress, This_SBB_MAC_Address);
+  // On FreeRTOS, this is currently null.
+  //
+  // We assume that FreeRTOS_IPInit() has been called already
+  // by the main program.
+
 #endif
     // On POSIX, implementation is null
     return;
@@ -83,7 +85,7 @@ void Log_Net_Initialize()
 
 
 void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
-{ 
+{
     {
 #ifdef TARGET_OS_FreeRTOS
       // FreeRTOS-specific implementation of socket handling code
@@ -196,4 +198,3 @@ void Log_Net_Initialize(void) {}
 // ACSL Contracts TBD
 void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total) {}
 #endif //NETWORK_LOGS
-
