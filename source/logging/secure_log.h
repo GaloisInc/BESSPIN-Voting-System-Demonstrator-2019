@@ -24,7 +24,7 @@ typedef log_io_stream secure_log_io_stream;
 // root block and authenticate it or, more likely, its first block
 // after the authenticated zeroed root block.
 
-/*@ requires \valid(new_secure_log);
+/*@ requires \valid(secure_log);
   @ requires \valid_read(a_log_entry_type + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires \separated (secure_log, the_secure_log_name);
   @ requires valid_string (the_secure_log_name);
@@ -48,7 +48,7 @@ Log_FS_Result create_secure_log(Log_Handle *secure_log,
   @ requires \valid(the_secure_log);
   @ requires \separated(the_secure_log, a_log_entry);
   @ requires File_Is_Open (the_secure_log);
-  @ assigns log_fs \from log_fs, the_secure_log, a_log_entry;=
+  @ assigns log_fs \from log_fs, the_secure_log, a_log_entry;
   @ ensures File_Is_Open (the_secure_log);
   @ ensures \valid(the_secure_log);
   @*/
