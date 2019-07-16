@@ -289,7 +289,12 @@ static void prvBarcodeScannerTask(void *pvParameters)
     for (;;)
     {
         /* explicitly ask for at most 16 characters, as that is the FIFO limit */
+#ifdef SIMULATION
+	len = strlen(valid_barcode);
+	strncpy(buffer, valid_barcode, 16);
+#else
         len = uart1_rxbuffer(buffer, 16);
+#endif
 
         if (len > 0)
         {
@@ -436,6 +441,7 @@ static void prvInputTask(void *pvParameters)
     \r\n";
 
     printf("Starting prvInputTask\r\n");
+    while(!the_network_status) {}
     printf("%s", intro);
 
 
@@ -584,7 +590,6 @@ static void run_scenario_3(void)
     printf("Scenario 3 - done\r\n");
 }
 
-#endif
 
 /*-----------------------------------------------------------*/
 
@@ -667,3 +672,4 @@ static void manual_input(void)
         }
     }
 }
+#endif

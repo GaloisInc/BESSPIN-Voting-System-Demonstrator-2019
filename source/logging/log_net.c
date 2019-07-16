@@ -109,6 +109,9 @@ void Log_Net_Initialize()
 
 void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 {
+#ifdef SIMULATION
+	return;
+#endif
     {
 #ifdef TARGET_OS_FreeRTOS
       // FreeRTOS-specific implementation of socket handling code
