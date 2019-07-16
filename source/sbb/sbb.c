@@ -16,7 +16,7 @@
 #include "sbb.h"
 #include "sbb_freertos.h"
 #include "sbb_logging.h"
-#include "crypto.h"
+#include "sbb_crypto.h"
 
 // BESSPIN Voting System devices
 #include "gpio.h"
@@ -35,16 +35,6 @@ bool barcode_present = false;
 char barcode[BARCODE_MAX_LENGTH] = {0};
 barcode_length_t barcode_length  = 0;
 SemaphoreHandle_t barcode_mutex;
-
-
-// Needed for checking barcode validity
-#define TIMESTAMP_LENGTH_BYTES 4
-#define ENCRYPTED_BLOCK_LENGTH_BYTES AES_BLOCK_LENGTH_BYTES
-#define DECODED_BARCODE_LENGTH_BYTES                                    \
-    ENCRYPTED_BLOCK_LENGTH_BYTES + TIMESTAMP_LENGTH_BYTES + AES_BLOCK_LENGTH_BYTES
-// Round up to the next multiple of AES_BLOCK_LENGTH_BYTES (which is a power of 2)
-#define CBC_MAC_MESSAGE_BYTES                                           \
-    (((TIMESTAMP_LENGTH_BYTES + AES_BLOCK_LENGTH_BYTES) + (AES_BLOCK_LENGTH_BYTES-1)) & ~(AES_BLOCK_LENGTH_BYTES-1))
 
 // Assigns declarations for FreeRTOS functions; these may not be
 // accurate but are currently required to avoid crashing wp.
@@ -97,36 +87,7 @@ void initialize(void) {
 void perform_tabulation(void) { printf("Performing tabulation!\r\n"); }
 
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
-    /**
-       the_barcode = base64( encrypted-block # timestamp # cbc-mac       )
-         where
-           cbc-mac         = last AES block of AES( encrypted-block # timestamp )
-    */
-    int r;
-    size_t olen;
-    // 1. Decode
-    uint8_t decoded_barcode[DECODED_BARCODE_LENGTH_BYTES] = {0};
-    r = mbedtls_base64_decode(&decoded_barcode[0], DECODED_BARCODE_LENGTH_BYTES, // destination
-                              &olen,                                       // output length
-                              &the_barcode[0],     its_length);            // source
-    configASSERT(DECODED_BARCODE_LENGTH_BYTES == olen);
-
-    // 2. Copy to a new buffer for AES_CBC_MAC, pad with 0.
-    uint8_t our_digest_input[CBC_MAC_MESSAGE_BYTES] = {0};
-    uint8_t our_digest_output[AES_BLOCK_LENGTH_BYTES] = {0};
-    memcpy(&our_digest_input[0],
-           &decoded_barcode[0],
-           ENCRYPTED_BLOCK_LENGTH_BYTES+TIMESTAMP_LENGTH_BYTES);
-    aes_cbc_mac(&our_digest_input[0], CBC_MAC_MESSAGE_BYTES, // Input
-                &our_digest_output[0]);                        // Output
-
-    // 3. Compare computed digest against cbc-mac in the barcode
-    bool b_match = true;
-    for (size_t i = 0; b_match && (i < AES_BLOCK_LENGTH_BYTES); ++i) {
-        b_match &= (our_digest_output[i] == decoded_barcode[i + ENCRYPTED_BLOCK_LENGTH_BYTES + TIMESTAMP_LENGTH_BYTES]);
-    }
-
-    return b_match;
+    return crypto_check_barcode_valid(the_barcode, its_length);
 }
 
 bool is_cast_button_pressed(void) {

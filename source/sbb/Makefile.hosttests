@@ -1,0 +1,12 @@
+sbb_hosttest_all: test_validity1
+
+CRYPTO_SOURCE = ../crypto/aes.c \
+                ../crypto/cbc.c \
+                ../crypto/mode_wrappers.c \
+                ../crypto/sha2-openbsd.c \
+                ../crypto/crypto.c \
+                ../crypto/base64.c
+
+test_validity1:
+	cd $(SBB_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o test_validity1 test_validity1.c sbb_crypto.c $(CRYPTO_SOURCE)

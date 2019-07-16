@@ -8,6 +8,7 @@ DEMO_SRC = \
     sbb.c \
     sbb_strings.c \
     sbb_logging.c \
+    sbb_crypto.c \
     sbb_machine.c \
     ../logging/log.c \
     ../logging/secure_log.c \
