@@ -25,7 +25,7 @@ unBase64 =
                  "did you ask for too many bytes?"))
   where
     allUndefined =
-      map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0.. 255]
+      map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0..255]
 
 type Base64Length n = 4 * ((8 * n) /^ 6 /^ 4)
 type Base64 n = [Base64Length n][8]
