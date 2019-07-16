@@ -1,6 +1,6 @@
 module AbstractBallotFormat where
 
-import Base64 (encodeBase64, decodeBase64, Base64)
+import Base64 (encodeBase64, decodeBase64, Base64, Base64Length)
 import Padding
 import BaseConvert
 import AESCBC
@@ -20,22 +20,20 @@ type Ballot contests positions
       contests : [contests][positions] }
 
 // TODO:
-// timestamp should be lifted out of base64 encoding, separated with ':'
 // binary version of time digits go in MAC
 // base64 everything minus time digits
 
 encodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions, fin timeDigits,
-   encodedLength == 16 + timeDigits +
-     16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)) =>
+   encodedLength == 16 + 16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
   [16][8] ->
   Ballot contests positions ->
-  Base64 encodedLength
+  [1 + timeDigits + Base64Length encodedLength][8]
 encodeBallot authKey ballotKey iv ballot =
-  encodeBase64 (encryptedBallot # timeDigits # auth)
+  timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
   where
     timeDigits      = toBase`{digits=timeDigits} decimal ballot.time
     contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
@@ -46,14 +44,13 @@ encodeBallot authKey ballotKey iv ballot =
 decodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions,
-   encodedLength == 16 + timeDigits +
-     16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)) =>
+   encodedLength == 16 + 16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
   [16][8] ->
-  Base64 encodedLength ->
+  [1 + timeDigits + Base64Length encodedLength][8] ->
   Ballot contests positions
-decodeBallot authKey ballotKey iv encodedBallot =
+decodeBallot authKey ballotKey iv encoded =
   if padding != zero
   then error "Invalid (non-zero) ballot padding"
   | auth != cbcMAC authKey zero (padWith`{mod=16} zero (encryptedBallot # outerTimeDigits))
@@ -67,16 +64,18 @@ decodeBallot authKey ballotKey iv encodedBallot =
   else
   { time = time, contests = split contests }
   where
+    outerTimeDigits : [timeDigits][8]
+    encodedBallot : Base64 encodedLength
+    outerTimeDigits # _ # encodedBallot = encoded
+
+    auth : [16][8]
     encryptedBallot :
       [16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)][8]
-    outerTimeDigits : [timeDigits][8]
-    auth            : [16][8]
-
-    encryptedBallot # outerTimeDigits # auth =
+    encryptedBallot # auth =
       decodeBase64`{encodedLength} encodedBallot
 
-    timeBits   : [timeDigits * 8]
-    contests   : [contests * positions]
+    timeBits : [timeDigits * 8]
+    contests : [contests * positions]
 
     timeBits # contests # padding =
       join (decrypt ballotKey iv encryptedBallot)

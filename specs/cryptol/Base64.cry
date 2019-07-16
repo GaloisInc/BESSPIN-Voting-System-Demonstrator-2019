@@ -27,7 +27,8 @@ unBase64 =
     allUndefined =
       map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0.. 255]
 
-type Base64 n = [4 * ((8 * n) /^ 6 /^ 4)][8]
+type Base64Length n = 4 * ((8 * n) /^ 6 /^ 4)
+type Base64 n = [Base64Length n][8]
 
 // Encode n bytes as Base64, padding to 4-byte chunks
 encodeBase64 : {n} (fin n) => [n][8] -> Base64 n
