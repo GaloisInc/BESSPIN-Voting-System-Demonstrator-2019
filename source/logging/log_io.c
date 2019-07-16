@@ -50,10 +50,11 @@ static const uint8_t new_line = '\n';
 
 void Prepare_Transmit_Buffer(secure_log_entry the_entry, // in
                              const char *log_file_name, // in
+                             const size_t http_content_length, // in
                              uint8_t *Transmit_Buffer, // out by ref
                              size_t *total, // out by ref
                              size_t *first_byte_of_data_index, // out by ref
-                             size_t MESSAGE_SIZE); // in
+                             size_t Transmit_Buffer_Length); // in
 
 //////////////////////////////////////////////
 // Common Implementation, built on log_fs.h //
@@ -107,38 +108,49 @@ bool Log_IO_File_Exists(const char *name) { return Log_FS_File_Exists(name); }
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
                                         secure_log_entry the_entry)
 {
-    // Calculate the length of the fixed parts of the HTTP POST Header
-    const size_t FIXED_MESSAGE_SIZE =
+    // Step 1 - Calculate the length of the fixed parts of the HTTP POST Header
+    const size_t HTTP_Header_Fixed_Part_Length =
         strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
         strlen(HEADER_2) + strlen(HEADER_3) + strlen(HEADER_4) +
         strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
 
-    const size_t content_length =
-        padded_log_entry_length + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+    // The length of the HTTP message body is the length of the already-padded
+    // log entry, plus the length of the Base64 encoding of an AES_CBC_MAC, plus
+    // one extra space between the log entry and the MAC, plus 2 bytes for the final
+    // \r\n sequence, so...
+    const size_t http_content_length =
+      padded_log_entry_length + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 3;
 
-    const size_t MESSAGE_SIZE = FIXED_MESSAGE_SIZE + worst_case_data_length +
-                                strlen(stream -> remote_file_name) + content_length;
+    const size_t Transmit_Buffer_Length = HTTP_Header_Fixed_Part_Length +
+                                          worst_case_data_length +
+                                          strlen(stream->remote_file_name) +
+                                          http_content_length;
 
-    uint8_t Transmit_Buffer[MESSAGE_SIZE];
+    uint8_t Transmit_Buffer[Transmit_Buffer_Length];
     size_t total = 0;
     size_t first_byte_of_data_index = 0;
 
 
+    // Step 2 - Prepare data to be sent, including the HTTP POST
+    // header for the network.
     Prepare_Transmit_Buffer(the_entry,
                             stream->remote_file_name,
+                            http_content_length,
                             Transmit_Buffer,
                             &total,
                             &first_byte_of_data_index,
-                            MESSAGE_SIZE);
+                            Transmit_Buffer_Length);
 
     debug_printf ("total passed back is %zu", total);
     debug_printf ("first byte of data index is %zu", first_byte_of_data_index);
 
-    // Step 3 - Write (data # spaces # base64_hash # space # mac # \r\n to file
-    size_t written = Log_FS_Write(stream, &Transmit_Buffer[first_byte_of_data_index],
+    // Step 3 - Write (data # spaces # base64_hash # space # mac # \r\n) to file
+    size_t written = Log_FS_Write(stream,
+                                  &Transmit_Buffer[first_byte_of_data_index],
                                   total - first_byte_of_data_index);
 
-    // Step 4 - Write HTTP header plus same data over network to the Reporting System if
+    // Step 4 - Write HTTP header plus same data over
+    // network to the Reporting System if
     // requested by the client when this log file was initialized.
     if (stream->endpoint != HTTP_Endpoint_None)
       {
@@ -291,10 +303,11 @@ secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
 
 void Prepare_Transmit_Buffer(secure_log_entry the_entry, // in
                              const char *log_file_name, // in
+                             const size_t http_content_length, // in
                              uint8_t *Transmit_Buffer, // out by ref
                              size_t *total, // out by ref
                              size_t *first_byte_of_data_index, // out by ref
-                             size_t MESSAGE_SIZE) // in
+                             size_t Transmit_Buffer_Length) // in
 {
     size_t olen;
     int r;
@@ -314,27 +327,22 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry, // in
     memcpy(&the_secure_log_entry.the_entry[0], &the_entry.the_entry[0],
            LOG_ENTRY_LENGTH);
 
-    // The length of the HTTP message body is the length of the already-padded
-    // log entry, plus the length of the Base64 encoding of an AES_CBC_MAC, plus
-    // one extra space between the log entry and the MAC, plus 2 bytes for the final
-    // \r\n sequence, so...
-    const size_t content_length =
-      padded_log_entry_length + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 3;
+    debug_printf("Transmit_Buffer is %zu bytes long", Transmit_Buffer_Length);
 
-    debug_printf("Transmit_Buffer is %zu bytes long", MESSAGE_SIZE);
-
-    debug_printf("HTTP Content-Length is %zu bytes", content_length);
+    debug_printf("HTTP Content-Length is %zu bytes", http_content_length);
 
     // Initialize Transmit_Buffer to all 0x00 so we can dynamically calculate the
     // length of the header
-    for (size_t i = 0; i < MESSAGE_SIZE; i++)
+    for (size_t i = 0; i < Transmit_Buffer_Length; i++)
     {
         Transmit_Buffer[i] = 0x00;
     }
 
-    snprintf((char *)Transmit_Buffer, MESSAGE_SIZE, "%s%s%s%s%s%s%s%s%zu%s",
+    snprintf((char *)Transmit_Buffer,
+             Transmit_Buffer_Length,
+             "%s%s%s%s%s%s%s%s%zu%s",
              REQUEST_LINE_1, log_file_name, REQUEST_LINE_3, HEADER_1,
-             HEADER_2, HEADER_3, HEADER_4, HEADER_5_1, content_length,
+             HEADER_2, HEADER_3, HEADER_4, HEADER_5_1, http_content_length,
              DOUBLE_CRLF);
 
     // After the header has been written, we have N bytes of header,
