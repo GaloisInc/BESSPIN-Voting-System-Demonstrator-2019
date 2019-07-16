@@ -19,9 +19,8 @@ type Ballot contests positions
   = { time     : [timeBytes * 8],
       contests : [contests][positions] }
 
-// TODO: drop sequence number
+// TODO:
 // timestamp should be lifted out of base64 encoding, separated with ':'
-// take padding out of encrypt/decrypt
 // binary version of time digits go in MAC
 // base64 everything minus time digits
 
@@ -41,8 +40,8 @@ encodeBallot authKey ballotKey iv ballot =
     timeDigits      = toBase`{digits=timeDigits} decimal ballot.time
     contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
     ballotBytes     = timeDigits # contestsBytes
-    encryptedBallot = encrypt ballotKey iv ballotBytes
-    auth            = cbcMAC authKey zero (encryptedBallot # timeDigits)
+    encryptedBallot = encrypt ballotKey iv (padWith`{mod=16} zero ballotBytes)
+    auth            = cbcMAC authKey zero (padWith`{mod=16} zero (encryptedBallot # timeDigits))
 
 decodeBallot :
   {contests, positions, encodedLength}
@@ -57,7 +56,7 @@ decodeBallot :
 decodeBallot authKey ballotKey iv encodedBallot =
   if padding != zero
   then error "Invalid (non-zero) ballot padding"
-  | cbcMAC authKey zero (encryptedBallot # outerTimeDigits) != auth
+  | auth != cbcMAC authKey zero (padWith`{mod=16} zero (encryptedBallot # outerTimeDigits))
   then error "Invalid CBC-MAC authentication: this ballot has been tampered with!"
   | outerTimePadding != zero
   then error "Invalid outer timestamp: out of range"
@@ -80,8 +79,7 @@ decodeBallot authKey ballotKey iv encodedBallot =
     contests   : [contests * positions]
 
     timeBits # contests # padding =
-      join (decrypt`{timeDigits + (contests * positions) /^ 8}
-                    ballotKey iv encryptedBallot)
+      join (decrypt ballotKey iv encryptedBallot)
 
     time, outerTime               : [timeBytes * 8]
     timePadding, outerTimePadding : [width (10 ^^ timeDigits) - timeBytes * 8]
