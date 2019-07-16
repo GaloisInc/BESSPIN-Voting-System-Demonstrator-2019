@@ -22,13 +22,13 @@ a (lazy) error value.
 */
 unBase64 : [256][6]
 unBase64 =
-  update (updates allUndefined base64 [0 .. 63])
+  update (updates allUndefined base64 [0..63])
          padChar
          (error ("Illegal read from Base64 padding: " #
                  "did you ask for too many bytes?"))
   where
     allUndefined =
-      map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0.. 255]
+      map (\c -> error ("Invalid Base64 character: '" # [c] # "'")) [0..255]
 
 type Base64Length n = 4 * ((8 * n) /^ 6 /^ 4)
 type Base64 n = [Base64Length n][8]
