@@ -12,7 +12,9 @@
 // ACSL Contracts TBD
 void Log_Net_Initialize(void);
 
-// ACSL Contracts TBD
+/*@ requires \valid_read(Transmit_Buffer + (0 .. total - 1));
+    assigns  reporting_system \from reporting_system, Transmit_Buffer, total;
+ */
 void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total);
 
 #endif /* __LOG_NET_H__ */
