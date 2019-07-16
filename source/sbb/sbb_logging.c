@@ -144,10 +144,9 @@ bool log_app_event(app_event event,
         }
         debug_printf("\r\n");
         return true;
-#else
+#endif
         Log_FS_Result res = write_entry(&app_log_handle, event_entry);
         return (res == LOG_FS_OK);
-#endif
     } else {
         return false;
     }
