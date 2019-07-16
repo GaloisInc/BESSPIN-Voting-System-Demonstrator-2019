@@ -192,25 +192,63 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     if (ret_entry == LOG_ENTRY_LENGTH &&
         ret_digest == SHA256_BASE_64_DIGEST_LENGTH_BYTES && ret_space == 1)
     {
-        // decode, create secure_log_entry and return
-        r = mbedtls_base64_decode(&secure_log_entry_result.the_digest[0],
-                                  SHA256_DIGEST_LENGTH_BYTES + 1, &olen,
+        // Check for validity of the Base64 encoded hash data and compute
+        // the length of the decoded binary hash data.
+        r = mbedtls_base64_decode(NULL,
+                                  0,
+                                  &olen,
                                   &result.the_digest[0],
                                   SHA256_BASE_64_DIGEST_LENGTH_BYTES);
-        (void)r; // suppress warning on r unused.
+        if (r == MBEDTLS_ERR_BASE64_BUFFER_TOO_SMALL)
+          {
+            // Looks like a valid Base64 encoded string, BUT (for example)
+            // a base64-encoded hash of 44 characters, _might_ decode to
+            // 31, 32, or 33 bytes. We're expecting exactly 32, so we have
+            // to check that first to avoid a buffer overflow
+            if (olen == SHA256_DIGEST_LENGTH_BYTES)
+              {
+                r = mbedtls_base64_decode(&secure_log_entry_result.the_digest[0],
+                                          SHA256_DIGEST_LENGTH_BYTES + 1,
+                                          &olen,
+                                          &result.the_digest[0],
+                                          SHA256_BASE_64_DIGEST_LENGTH_BYTES);
 
-        /*@
-          loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-          loop invariant \forall size_t j; 0 <= j < i ==> secure_log_entry_result.the_entry[i] == result.the_entry[i];
-          loop assigns i, secure_log_entry_result.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-          loop variant LOG_ENTRY_LENGTH - i;
-       */
-        for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-        {
-            secure_log_entry_result.the_entry[i] = result.the_entry[i];
-        }
-        return secure_log_entry_result;
+                if (r == 0)
+                  {
+
+                    /*@
+                      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
+                      loop invariant \forall size_t j; 0 <= j < i ==> secure_log_entry_result.the_entry[i] == result.the_entry[i];
+                      loop assigns i, secure_log_entry_result.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+                      loop variant LOG_ENTRY_LENGTH - i;
+                    */
+                    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+                      {
+                        secure_log_entry_result.the_entry[i] = result.the_entry[i];
+                      }
+                    return secure_log_entry_result;
+                  }
+                else // decode failed
+                  {
+
+                    debug_printf ("Log_IO_Read_Base64_Entry - decode failed");
+                    return null_secure_log_entry;
+                  }
+              }
+            else // Decoded hash not the right length
+              {
+                debug_printf ("Log_IO_Read_Base64_Entry - length wrong");
+                return null_secure_log_entry;
+              }
+          }
+        else // Base64 encoded string was just invalid
+          {
+            debug_printf ("Log_IO_Read_Base64_Entry - Base64 string invalid");
+            return null_secure_log_entry;
+          }
     }
+    // File Reads failed, so...
+    debug_printf ("Log_IO_Read_Base64_Entry - reading file failed");
     return null_secure_log_entry;
 }
 
@@ -263,9 +301,12 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry, // in
     base64_secure_log_entry the_secure_log_entry;
     // // Step 1 - Form the Base64 encoding of the hash
     r = mbedtls_base64_encode(&the_secure_log_entry.the_digest[0],
-                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
+                              SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2,
+                              &olen,
                               &the_entry.the_digest[0],
-                              SHA256_DIGEST_LENGTH_BYTES);
+                              SHA256_DIGEST_LENGTH_BYTES,
+                              false); // Don't add final \0
+
     (void)r; // suppress warning on r unused.
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
 
@@ -340,12 +381,14 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry, // in
     aes_cbc_mac(&Transmit_Buffer[*first_byte_of_data_index],
                 padded_log_entry_length, &binary_mac[0]);
 
-    // Turn that MAC into Base64 format
+    // Turn that MAC into Base64 format.
     uint8_t base64_mac[BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH];
 
     r = mbedtls_base64_encode(&base64_mac[0],
-                              BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 2, &olen,
-                              &binary_mac[0], AES_BLOCK_LENGTH_BYTES);
+                              BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 2,
+                              &olen,
+                              &binary_mac[0], AES_BLOCK_LENGTH_BYTES,
+                              false); // Don't add final \0
     (void)r; // suppress warning on r unused.
 
     portable_assert(BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
