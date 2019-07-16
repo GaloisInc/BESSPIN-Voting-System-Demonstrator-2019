@@ -25,43 +25,6 @@
  * 1 tab == 4 spaces!
  */
 
-/******************************************************************************
- * NOTE 1:  This project provides two demo applications.  A simple blinky
- * style project, and a more comprehensive test and demo application.  The
- * mainCREATE_SIMPLE_BLINKY_DEMO_ONLY setting in main.c is used to select
- * between the two.  See the notes on using mainCREATE_SIMPLE_BLINKY_DEMO_ONLY
- * in main.c.  This file implements the simply blinky style version.
- *
- * NOTE 2:  This file only contains the source code that is specific to the
- * basic demo.  Generic functions, such FreeRTOS hook functions, and functions
- * required to configure the hardware are defined in main.c.
- ******************************************************************************
- *
- * main_blinky() creates one queue, and two tasks.  It then starts the
- * scheduler.
- *
- * The Queue Send Task:
- * The queue send task is implemented by the prvQueueSendTask() function in
- * this file.  prvQueueSendTask() sits in a loop that causes it to repeatedly
- * block for 1000 milliseconds, before sending the value 100 to the queue that
- * was created within main_blinky().  Once the value is sent, the task loops
- * back around to block for another 1000 milliseconds...and so on.
- *
- * The Queue Receive Task:
- * The queue receive task is implemented by the prvQueueReceiveTask() function
- * in this file.  prvQueueReceiveTask() sits in a loop where it repeatedly
- * blocks on attempts to read data from the queue that was created within
- * main_blinky().  When data is received, the task checks the value of the
- * data, and if the value equals the expected 100, writes 'Blink' to the UART
- * (the UART is used in place of the LED to allow easy execution in QEMU).  The
- * 'block time' parameter passed to the queue receive function specifies that
- * the task should be held in the Blocked state indefinitely to wait for data to
- * be available on the queue.  The queue receive task will only leave the
- * Blocked state when the queue send task writes to the queue.  As the queue
- * send task writes to the queue every 1000 milliseconds, the queue receive
- * task leaves the Blocked state every 1000 milliseconds, and therefore toggles
- * the LED every 200 milliseconds.
- */
 
 /* Standard includes. */
 #include <stdio.h>
@@ -78,63 +41,6 @@
 /* IP stack includes. */
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
-
-/* Application includes */
-//#include "SimpleUDPClientAndServer.h"
-//#include "SimpleTCPEchoServer.h"
-//#include "TCPEchoClient_SingleTasks.h"
-
-/* Simple UDP client and server task parameters. */
-#define mainSIMPLE_UDP_CLIENT_SERVER_TASK_PRIORITY (tskIDLE_PRIORITY)
-#define mainSIMPLE_UDP_CLIENT_SERVER_PORT (5005UL)
-#define mainSIMPLE_UDP_CLIENT_SERVER_STACK_SIZE (configMINIMAL_STACK_SIZE * 10)
-
-/* Echo client task parameters - used for both TCP and UDP echo clients. */
-#define mainECHO_CLIENT_TASK_STACK_SIZE (configMINIMAL_STACK_SIZE * 10)
-#define mainECHO_CLIENT_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-
-/* Echo server task parameters. */
-#define mainECHO_SERVER_TASK_STACK_SIZE (configMINIMAL_STACK_SIZE * 10)
-#define mainECHO_SERVER_TASK_PRIORITY (tskIDLE_PRIORITY + 1)
-
-/* Define a name that will be used for LLMNR and NBNS searches. */
-#define mainHOST_NAME "RTOSDemo"
-#define mainDEVICE_NICK_NAME "fpga_demo"
-
-/* Set the following constants to 1 or 0 to define which tasks to include and
-exclude:
-
-mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS:  When set to 1 two UDP client tasks
-and two UDP server tasks are created.  The clients talk to the servers.  One set
-of tasks use the standard sockets interface, and the other the zero copy sockets
-interface.  These tasks are self checking and will trigger a configASSERT() if
-they detect a difference in the data that is received from that which was sent.
-As these tasks use UDP, and can therefore loose packets, they will cause
-configASSERT() to be called when they are run in a less than perfect networking
-environment.
-
-mainCREATE_TCP_ECHO_TASKS_SINGLE:  When set to 1 a set of tasks are created that
-send TCP echo requests to the standard echo port (port 7), then wait for and
-verify the echo reply, from within the same task (Tx and Rx are performed in the
-same RTOS task).  The IP address of the echo server must be configured using the
-configECHO_SERVER_ADDR0 to configECHO_SERVER_ADDR3 constants in
-FreeRTOSConfig.h.
-
-mainCREATE_TCP_ECHO_SERVER_TASK:  When set to 1 a task is created that accepts
-connections on the standard echo port (port 7), then echos back any data
-received on that connection.
-*/
-#ifndef mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS
-#define mainCREATE_SIMPLE_UDP_CLIENT_SERVER_TASKS 0
-#endif
-
-#ifndef mainCREATE_TCP_ECHO_TASKS_SINGLE
-#define mainCREATE_TCP_ECHO_TASKS_SINGLE 0
-#endif
-
-#ifndef mainCREATE_TCP_ECHO_SERVER_TASK
-#define mainCREATE_TCP_ECHO_SERVER_TASK 0
-#endif
 
 /*
  * Just seeds the simple pseudo random number generator.

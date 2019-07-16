@@ -80,7 +80,7 @@ bool load_or_create_logs(void) {
 
 bool log_system_message(const char *new_entry, int length) {
     #ifdef SIMULATION
-    debug_printf("LOG: %s\r\n", new_entry);
+    debug_printf("System LOG: %s\r\n", new_entry);
     return true;
     #else
     log_entry event_entry;
