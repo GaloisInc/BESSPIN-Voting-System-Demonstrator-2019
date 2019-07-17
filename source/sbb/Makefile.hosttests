@@ -10,3 +10,7 @@ CRYPTO_SOURCE = ../crypto/aes.c \
 test_validity1:
 	cd $(SBB_DIR); \
 	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o test_validity1 test_validity1.c sbb_crypto.c $(CRYPTO_SOURCE)
+
+test_validity2:
+	cd $(SBB_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o test_validity2 test_validity2.c sbb_crypto.c $(CRYPTO_SOURCE)

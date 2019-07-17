@@ -4,19 +4,12 @@
 #include <assert.h>
 #include <string.h>
 
-#ifdef TARGET_OS_FreeRTOS
-#include "FreeRTOS_Sockets.h"
-#define htonl FreeRTOS_htonl
-#else
-#include <arpa/inet.h>
-#endif
-
 // Needed for checking barcode validity
-#define TIMESTAMP_LENGTH_BYTES 4
+#define TIMESTAMP_LENGTH_BYTES 16
 #define ENCRYPTED_BALLOT_LENGTH_BYTES (AES_BLOCK_LENGTH_BYTES)
-#define BASE64_DECODED_BYTES 33 // From formula in cryptol spec
+#define BASE64_DECODED_BYTES 32 // From formula in cryptol spec
 
-#define TIMESTAMP_DIGITS 10
+#define TIMESTAMP_DIGITS 16
 #define BASE64_ENCODING_START (TIMESTAMP_DIGITS + 1)
 
 #define CBC_MAC_INPUT_DATA_BYTES \
@@ -45,31 +38,17 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
 
     // 2.
     // Now set up the message for aes_cbc_mac. The formula is:
-    // timeBytes # encryptedBallot.
+    // timestamp # encryptedBallot.
     // `encryptedBallot` is bytes 0-15 of the base64 decoding.
     uint8_t our_digest_input[CBC_MAC_MESSAGE_BYTES] = {0};
     uint8_t our_digest_output[AES_BLOCK_LENGTH_BYTES] = {0};
-    // (a) Calculate the time bytes
-    unsigned timeBytes = 0;
-    assert(sizeof(timeBytes) >= TIMESTAMP_LENGTH_BYTES);
-    {
-        unsigned pow = 1;
-        for (int b = TIMESTAMP_DIGITS - 1; b >= 0; b--) {
-            timeBytes += pow*(barcode[b] - 48); /*Time is in ascii decimal */
-            pow *= 10;
-        }
-    }
+    memcpy(&our_digest_input[0], &barcode[0], TIMESTAMP_LENGTH_BYTES);
 
-    // (b) copy time bytes to first TIMESTAMP_LENGTH_BYTES of message to cbc-mac
-    timeBytes = htonl(timeBytes);
-    memcpy(&our_digest_input[0], &timeBytes, TIMESTAMP_LENGTH_BYTES);
-
-    // (c) copy encrypted ballot to our input
     memcpy(&our_digest_input[TIMESTAMP_LENGTH_BYTES], &decoded_barcode[0], ENCRYPTED_BALLOT_LENGTH_BYTES);
 
     // 3. Compute the cbc-mac
     aes_cbc_mac(&our_digest_input[0], CBC_MAC_MESSAGE_BYTES, // Input
-                &our_digest_output[0]);                        // Output
+                &our_digest_output[0]);                      // Output
 
     // 4.
     // Compare computed digest against cbc-mac in the barcode
