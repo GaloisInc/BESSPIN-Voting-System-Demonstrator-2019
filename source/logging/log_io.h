@@ -117,45 +117,6 @@ Log_FS_Result Log_IO_Close(Log_Handle *stream); // IN
  */
 Log_FS_Result Log_IO_Sync(Log_Handle *stream); // IN
 
-/*@ requires Log_IO_Initialized;
-    requires \valid(stream);
-    requires valid_secure_log_entry(the_entry);
-    requires File_Is_Open (stream);
-    assigns log_fs \from log_fs, stream, the_entry;
- */
-Log_FS_Result Log_IO_Write_Entry(Log_Handle *stream,          // IN
-                                 secure_log_entry the_entry); // IN
-
-/* returns the number of secure_log_entry records in the given file */
-/*@ requires Log_IO_Initialized;
-    requires \valid(stream);
-    requires File_Is_Open (stream);
-    assigns \result \from *stream, log_fs;
-    ensures \result == File_Num_Entries (stream);
- */
-size_t Log_IO_Num_Entries(Log_Handle *stream);
-
-/* reads the n'th entry. n = 0 means the "initial" or "root" entry */
-// @design kiniry We need a logic query for the model of
-// Log_IO_Num_Entries so that we can express the precondition for this
-// function.
-/*@ requires Log_IO_Initialized;
-    requires \valid(stream);
-    requires File_Is_Open (stream);
-    requires n >= 0;
-    requires n <  File_Num_Entries (stream);
-    assigns \result \from *stream, n, log_fs;
- */
-secure_log_entry Log_IO_Read_Entry(Log_Handle *stream, // IN
-                                   size_t n);          // IN
-
-/* reads the last entry (i.e. most recently written to the end of the file) */
-/*@ requires Log_IO_Initialized;
-    requires \valid(stream);
-    requires File_Is_Open (stream);
-    assigns \result \from *stream, log_fs;
- */
-secure_log_entry Log_IO_Read_Last_Entry(Log_Handle *stream);
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
