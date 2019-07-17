@@ -9,4 +9,6 @@ unsigned char *a_barcode =
 
 int main(void) {
     assert(!crypto_check_barcode_valid(a_barcode, strlen(a_barcode)));
+
+    return 0;
 }
