@@ -1,0 +1,24 @@
+sbb_hosttest_all: sbb_hosttest1 sbb_hosttest2 sbb_hosttest3
+
+CRYPTO_SOURCE = ../crypto/aes.c \
+                ../crypto/cbc.c \
+                ../crypto/mode_wrappers.c \
+                ../crypto/sha2-openbsd.c \
+                ../crypto/crypto.c \
+                ../crypto/base64.c
+
+sbb_hosttest1:
+	cd $(SBB_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o hosttest1 hosttest1.c sbb_crypto.c $(CRYPTO_SOURCE)
+
+sbb_hosttest2:
+	cd $(SBB_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o hosttest2 hosttest2.c sbb_crypto.c $(CRYPTO_SOURCE)
+
+sbb_hosttest3:
+	cd $(SBB_DIR); \
+	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o hosttest3 hosttest3.c sbb_crypto.c $(CRYPTO_SOURCE)
+
+sbb_hosttest_clean:
+	cd $(CRYPTO_DIR); \
+	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 base64test *.o

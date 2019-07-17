@@ -12,7 +12,7 @@
 
 #define BARCODE_MAX_LENGTH 254
 
-typedef char* barcode_t;
+typedef uint8_t* barcode_t;
 // @todo kiniry Add a pure helper function for relating
 // BARCODE_MAX_LENGTH to all uses of the pair (barcode,
 // barcode_length).

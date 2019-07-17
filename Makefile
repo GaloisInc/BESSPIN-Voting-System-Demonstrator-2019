@@ -126,9 +126,10 @@ HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -DNETWORK_LOGS -Wno-macro-redef
 
 include $(CRYPTO_DIR)/Makefile.hosttests
 include $(LOG_DIR)/Makefile.hosttests
+include $(SBB_DIR)/Makefile.hosttests
 
-hosts_all: crypto_hosttest_all log_hosttest_all
-clean: crypto_hosttest_clean log_hosttest_clean
+hosts_all: crypto_hosttest_all log_hosttest_all sbb_hosttest_all
+clean: crypto_hosttest_clean log_hosttest_clean sbb_hosttest_clean
 
 else
 #####################################

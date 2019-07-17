@@ -16,6 +16,7 @@
 #include "sbb.h"
 #include "sbb_freertos.h"
 #include "sbb_logging.h"
+#include "sbb_crypto.h"
 
 // BESSPIN Voting System devices
 #include "gpio.h"
@@ -34,7 +35,6 @@ bool barcode_present = false;
 char barcode[BARCODE_MAX_LENGTH] = {0};
 barcode_length_t barcode_length  = 0;
 SemaphoreHandle_t barcode_mutex;
-
 
 // Assigns declarations for FreeRTOS functions; these may not be
 // accurate but are currently required to avoid crashing wp.
@@ -84,12 +84,8 @@ void initialize(void) {
    \forall motor m; \at(!motor_running(m), DevicesInitialized);
 */
 
-void perform_tabulation(void) { printf("Performing tabulation!\r\n"); }
-
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
-    (void)the_barcode;
-    (void)its_length;
-    return true;
+    return crypto_check_barcode_valid(the_barcode, its_length);
 }
 
 bool is_cast_button_pressed(void) {

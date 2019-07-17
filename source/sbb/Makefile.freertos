@@ -1,5 +1,6 @@
 PROG = main_ballot_box
 LOGGING_DIR = ../logging
+CRYPTO_DIR = ../crypto
 
 DEMO_SRC = \
     main_freertos.c \
@@ -8,6 +9,7 @@ DEMO_SRC = \
     sbb.c \
     sbb_strings.c \
     sbb_logging.c \
+    sbb_crypto.c \
     sbb_machine.c \
     ../logging/log.c \
     ../logging/secure_log.c \
@@ -23,7 +25,6 @@ DEMO_SRC = \
     ../crypto/aes.c \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
-
 
 APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
@@ -78,7 +79,7 @@ APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
 	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
 
-CFLAGS += -I$(LOGGING_DIR)
+CFLAGS += -I$(LOGGING_DIR) -I$(CRYPTO_DIR)
 
 #
 # Define all object files.
