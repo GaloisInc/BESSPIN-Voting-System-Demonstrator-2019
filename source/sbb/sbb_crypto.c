@@ -9,10 +9,10 @@
 
 #define BASE64_ENCODING_START (TIMESTAMP_LENGTH_BYTES + 1)
 
-#define CBC_MAC_INPUT_DATA_BYTES \
+#define CBC_MAC_INPUT_DATA_LENGTH_BYTES \
     (TIMESTAMP_LENGTH_BYTES + ENCRYPTED_BALLOT_LENGTH_BYTES)
-#define CBC_MAC_MESSAGE_BYTES \
-  (((CBC_MAC_INPUT_DATA_BYTES) + (AES_BLOCK_LENGTH_BYTES-1)) & (~(AES_BLOCK_LENGTH_BYTES - 1)))
+#define CBC_MAC_MESSAGE_LENGTH_BYTES \
+  (((CBC_MAC_INPUT_DATA_LENGTH_BYTES) + (AES_BLOCK_LENGTH_BYTES-1)) & (~(AES_BLOCK_LENGTH_BYTES - 1)))
 
 bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
     /**
@@ -39,7 +39,7 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
             // Now set up the message for aes_cbc_mac. The formula is:
             // timestamp # encryptedBallot.
             // `encryptedBallot` is bytes 0-15 of the base64 decoding.
-            uint8_t our_digest_input[CBC_MAC_MESSAGE_BYTES] = {0};
+            uint8_t our_digest_input[CBC_MAC_MESSAGE_LENGTH_BYTES] = {0};
             uint8_t our_digest_output[AES_BLOCK_LENGTH_BYTES] = {0};
             // { input |-> ... }
             memcpy(&our_digest_input[0],
@@ -54,15 +54,14 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
             // 3.
             // Compute the cbc-mac
             aes_cbc_mac(&our_digest_input[0],
-                        CBC_MAC_MESSAGE_BYTES,
+                        CBC_MAC_MESSAGE_LENGTH_BYTES,
                         &our_digest_output[0]);
 
             // 4.
             // Compare computed digest against cbc-mac in the barcode
-            b_match = true;
-            for (size_t i = 0; b_match && (i < AES_BLOCK_LENGTH_BYTES); ++i) {
-                b_match &= (our_digest_output[i] == decoded_barcode[i + ENCRYPTED_BALLOT_LENGTH_BYTES]);
-            }
+            b_match = (0 == memcmp(&our_digest_output[0],
+                                   &decoded_barcode[ENCRYPTED_BALLOT_LENGTH_BYTES],
+                                   AES_BLOCK_LENGTH_BYTES));
         }
 
     }

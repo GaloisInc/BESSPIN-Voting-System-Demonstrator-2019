@@ -84,8 +84,6 @@ void initialize(void) {
    \forall motor m; \at(!motor_running(m), DevicesInitialized);
 */
 
-void perform_tabulation(void) { printf("Performing tabulation!\r\n"); }
-
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
     return crypto_check_barcode_valid(the_barcode, its_length);
 }
