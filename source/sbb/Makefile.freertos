@@ -79,7 +79,7 @@ APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
 	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
 
-CFLAGS += -I$(LOGGING_DIR) -I$(CRYPTO_DIR) \
+CFLAGS += -I$(LOGGING_DIR) -I$(CRYPTO_DIR) -DconfigUSE_DHCP \
           -DHARDCODE_CURRENT_TIME \
           -DCURRENT_YEAR=2019 \
           -DCURRENT_MONTH=7 \
