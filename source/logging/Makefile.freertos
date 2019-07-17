@@ -1,8 +1,8 @@
 
 PROG = test_freertos
 
+#    ../sbb/sbb_tcp.c 
 DEMO_SRC = \
-    ../sbb/sbb_tcp.c \
     test_freertos.c \
     log.c \
     secure_log.c \
@@ -21,12 +21,13 @@ DEMO_SRC = \
 # Define all object files.
 #
 RTOS_OBJ = $(FREERTOS_SRC:.c=.o)
+RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
 APP_OBJ  = $(APP_SRC:.c=.o)
 PORT_OBJ = $(PORT_SRC:.c=.o)
 DEMO_OBJ = $(DEMO_SRC:.c=.o)
 PORT_ASM_OBJ = $(PORT_ASM:.S=.o)
 CRT0_OBJ = $(CRT0:.S=.o)
-OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(DEMO_OBJ) $(APP_OBJ)
+OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(RTOS_TCP_OBJ) $(DEMO_OBJ) $(APP_OBJ)
 
 $(info ASFLAGS=$(ASFLAGS))
 $(info LDLIBS=$(LDLIBS))
@@ -46,10 +47,10 @@ all: $(PROG).elf
 
 $(PROG).elf  : $(OBJS)
 	@echo Linking....
-	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
-	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
 	@echo Completed $@
 
+	#@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+	#@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
 clean :
 	@rm -f $(OBJS)
 	@rm -f $(PROG).elf

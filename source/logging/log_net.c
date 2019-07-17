@@ -34,6 +34,12 @@ static const uint16_t PORT_NUMBER = 8066;
 
 #ifdef TARGET_OS_FreeRTOS
 
+uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
+											uint16_t usSourcePort,
+											uint32_t ulDestinationAddress,
+											uint16_t usDestinationPort);
+
+
 //////////////////////////////////////////////
 // FreeRTOS-specific includes and constants //
 //////////////////////////////////////////////

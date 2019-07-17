@@ -46,7 +46,9 @@ export FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/timers.c \
 	$(FREERTOS_SOURCE_DIR)/event_groups.c \
 	$(FREERTOS_SOURCE_DIR)/stream_buffer.c \
-	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c \
+	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c 
+
+export FREERTOS_TCP_SRC = \
 	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP.c \
 	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_ARP.c \
 	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DNS.c \

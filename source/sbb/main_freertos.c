@@ -79,9 +79,9 @@ static void prvStatsTask(void *pvParameters);
 #define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+2
 #define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+3
 
-static void prvBallotBoxMainTask(void *pvParameters);
-static void prvBarcodeScannerTask(void *pvParameters);
-static void prvInputTask(void *pvParameters);
+void prvBallotBoxMainTask(void *pvParameters);
+void prvBarcodeScannerTask(void *pvParameters);
+void prvInputTask(void *pvParameters);
 
 void sbb_tcp(void);
 void reportIPStatus(void);
@@ -159,9 +159,6 @@ int main(void)
     configASSERT( xSBBEventGroup );
 
 
-    xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
-    xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-    xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 
 #if configGENERATE_RUN_TIME_STATS
     xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 2, NULL, tskIDLE_PRIORITY, NULL);
@@ -180,7 +177,7 @@ int main(void)
 /*-----------------------------------------------------------*/
 
 #if configGENERATE_RUN_TIME_STATS
-static void prvStatsTask(void *pvParameters)
+void prvStatsTask(void *pvParameters)
 {
     (void)pvParameters;
     printf(("prvStatsTask: starting\r\n"));
@@ -262,7 +259,7 @@ void vApplicationTickHook(void)
 /**
  * Runs the main ballot box code
  */
-static void prvBallotBoxMainTask(void *pvParameters)
+void prvBallotBoxMainTask(void *pvParameters)
 {
     (void)pvParameters;
     printf("Starting prvBallotBoxMainTask\r\n");
@@ -274,7 +271,7 @@ static void prvBallotBoxMainTask(void *pvParameters)
 /**
  * Aux task polling data from the barcode scanner
  */
-static void prvBarcodeScannerTask(void *pvParameters)
+void prvBarcodeScannerTask(void *pvParameters)
 {
     (void)pvParameters;
 
@@ -344,7 +341,7 @@ static void prvBarcodeScannerTask(void *pvParameters)
 
 /* Task handling the GPIO inputs */
 #ifndef SIMULATION
-static void prvInputTask(void *pvParameters) {
+void prvInputTask(void *pvParameters) {
     (void)pvParameters;
     EventBits_t uxReturned;
     TickType_t paper_in_timestamp = 0;
@@ -429,7 +426,7 @@ static void prvInputTask(void *pvParameters) {
 }
 #else
 /* Manually handle user inputs */
-static void prvInputTask(void *pvParameters)
+void prvInputTask(void *pvParameters)
 {
     (void)pvParameters;
 
@@ -625,31 +622,37 @@ static void manual_input(void)
             printf("SIM: ebCAST_BUTTON_PRESSED\r\n");
             xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
             xEventGroupClearBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
+	    msleep(500);
             break;
         case 'b':
             printf("SIM: ebCAST_BUTTON_RELEASED\r\n");
             xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
             xEventGroupClearBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
+	    msleep(500);
             break;
         case 'c':
             printf("SIM: ebSPOIL_BUTTON_PRESSED\r\n");
             xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
             xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
+	    msleep(500);
             break;
         case 'd':
             printf("SIM: ebSPOIL_BUTTON_RELEASED\r\n");
             xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
             xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
+	    msleep(500);
             break;
         case 'e':
             printf("SIM: ebPAPER_SENSOR_IN_PRESSED\r\n");
             xEventGroupSetBits(xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
             xEventGroupClearBits(xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
+	    msleep(500);
             break;
         case 'f':
             printf("SIM: ebPAPER_SENSOR_IN_RELEASED\r\n");
             xEventGroupSetBits(xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
             xEventGroupClearBits(xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
+	    msleep(500);
             break;
         case 'g':
             printf("SIM: ebBARCODE_SCANNED\r\n");
@@ -658,6 +661,7 @@ static void manual_input(void)
                               sizeof(valid_barcode),
                               SCANNER_BUFFER_TX_BLOCK_TIME_MS);
             xEventGroupClearBits(xSBBEventGroup, ebBARCODE_SCANNED);
+	    msleep(500);
             break;
         case 'x':
             printf("Returning to main menu\r\n");

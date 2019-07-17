@@ -1,7 +1,6 @@
 PROG = test_freertos
 
 DEMO_SRC = \
-    ../sbb/sbb_tcp.c \
     test_freertos.c \
     crypto.c \
     cbc.c \
@@ -13,6 +12,7 @@ DEMO_SRC = \
 # Define all object files.
 #
 RTOS_OBJ = $(FREERTOS_SRC:.c=.o)
+RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
 APP_OBJ  = $(APP_SRC:.c=.o)
 PORT_OBJ = $(PORT_SRC:.c=.o)
 DEMO_OBJ = $(DEMO_SRC:.c=.o)
