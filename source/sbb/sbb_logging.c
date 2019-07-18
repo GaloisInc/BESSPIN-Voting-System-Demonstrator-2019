@@ -81,7 +81,10 @@ bool log_system_message(const char *new_entry) {
     debug_printf("LOG: %s\r\n", new_entry);
     return true;
     #else
-    Log_FS_Result res = write_entry(&system_log_handle, new_entry);
+    log_entry event_entry;
+    memset(&event_entry, 0x20, sizeof(log_entry));
+    memcpy(&event_entry, new_entry, strlen(new_entry));
+    Log_FS_Result res = write_entry(&system_log_handle, event_entry);
     return (res == LOG_FS_OK);
     #endif
 }
