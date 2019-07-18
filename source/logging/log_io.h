@@ -14,21 +14,25 @@ typedef Log_Handle *log_file;
 //
 
 /*@
+  axiomatic log_io_axioms {
   predicate
-    Log_IO_Initialized{L} = Log_FS_Initialized{L} &&
-                            Log_Net_Initialized{L};
+    File_Is_Open{L}(Log_Handle *f) reads *f; // abstract
   predicate
-    File_Is_Open{L}(Log_Handle *f) = \true; // abstract
-  predicate
-    File_Exists{L}(char *name) = \true; // abstract
+    File_Exists{L}(char *name) reads *name; // abstract
   logic
-    size_t File_Num_Entries{L}(Log_Handle *f) = (size_t) 0; // abstract
+    size_t File_Num_Entries{L}(Log_Handle *f) reads *f; // abstract
+  }
+*/
 
+/*@
   predicate
     valid_secure_log_entry(secure_log_entry sle)=
       \valid_read((uint8_t*)sle.the_entry[0 .. LOG_ENTRY_LENGTH - 1]) &&
       \valid_read((uint8_t*)sle.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1]);
 
+  predicate
+    Log_IO_Initialized{L} = Log_FS_Initialized{L} &&
+                            Log_Net_Initialized{L};
   global invariant log_file_is_not_empty:
    \forall log_file f; File_Num_Entries(f) > 0 ;
 
@@ -131,6 +135,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,          // IN
     requires \valid(stream);
     requires File_Is_Open (stream);
     assigns \result \from *stream, log_fs;
+    ensures \result == File_Num_Entries (stream);
  */
 size_t Log_IO_Num_Base64_Entries(Log_Handle *stream);
 
