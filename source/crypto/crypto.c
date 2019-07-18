@@ -23,21 +23,47 @@ typedef uint8_t key256[AES256_KEY_LENGTH_BYTES];
 // This is for initial integration and testing only
 static const key256 mock_key = "From Russia with Love";
 
-void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext)
+// Local functions
+
+
+// Returns a pointer to the key data for the given Key Name
+const uint8_t *fetch_key (AES_Key_Name key)
+{
+  // The body of this function is implemented differently on FreeRTOS and POSIX
+
+#ifdef TARGET_OS_FreeRTOS
+  // TBD for target system.
+  // Are the key(s) in well-defined memory-mapped locations?
+  // Pick up a reference to the right key and return it.
+>>>>>>> Modify crypto API to allow for up to 3 named keys. Initial implementation on POSIX uses the mock_key previously defined for testing. Implementation for FreeRTOS is TBD.
+
+  return NULL; // TBD
+
+#else // POSIX systems
+
+  // For host testing, we return the same key for all cases
+  return mock_key;
+
+#endif // TARGET_OS_FreeRTOS
+}
+
+// Export function bodies
+
+void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext, AES_Key_Name key)
 {
     AES_KEY key_schedule;
 
-    // Only fails if mock_key == NULL || &key_schedule == NULL
-    AES_set_encrypt_key(mock_key, AES256_KEY_LENGTH_BITS, &key_schedule);
+    // Only fails if fetch_key (key) == NULL || &key_schedule == NULL
+    AES_set_encrypt_key(fetch_key (key), AES256_KEY_LENGTH_BITS, &key_schedule);
     AES_encrypt(the_plaintext, the_ciphertext, &key_schedule);
 }
 
-void aes_decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext)
+void aes_decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext, AES_Key_Name key)
 {
     AES_KEY key_schedule;
 
-    // Only fails if mock_key == NULL || &key_schedule == NULL
-    AES_set_decrypt_key(mock_key, AES256_KEY_LENGTH_BITS, &key_schedule);
+    // Only fails if fetch_key (key) == NULL || &key_schedule == NULL
+    AES_set_decrypt_key(fetch_key (key), AES256_KEY_LENGTH_BITS, &key_schedule);
     AES_decrypt(the_ciphertext, the_plaintext, &key_schedule);
 }
 
@@ -49,7 +75,7 @@ void hash(message the_message, size_t the_message_size, digest the_digest)
     SHA256Final(the_digest, &context);
 }
 
-void hmac(message the_message, size_t the_message_size, digest the_digest)
+void hmac(message the_message, size_t the_message_size, digest the_digest, AES_Key_Name key)
 {
 
     ///////////////////////////////////////////////////
@@ -69,8 +95,8 @@ void hmac(message the_message, size_t the_message_size, digest the_digest)
     SHA2_CTX context;
     SHA256Init(&context);
 
-    // Mix in the mock_key
-    SHA256Update(&context, mock_key, AES256_KEY_LENGTH_BYTES);
+    // Mix in the key
+    SHA256Update(&context, fetch_key (key), AES256_KEY_LENGTH_BYTES);
 
     // Plus the_message itself
     SHA256Update(&context, the_message, the_message_size);
@@ -78,7 +104,8 @@ void hmac(message the_message, size_t the_message_size, digest the_digest)
     SHA256Final(the_digest, &context);
 }
 
-void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest)
+void aes_cbc_mac(message the_message, size_t the_message_size,
+                 block the_digest, AES_Key_Name key)
 {
     AES_KEY key_schedule;
     size_t block_count;
@@ -92,7 +119,7 @@ void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest)
 #endif
 
     // Only fails if mock_key == NULL || &key_schedule == NULL
-    AES_set_encrypt_key(mock_key, AES256_KEY_LENGTH_BITS, &key_schedule);
+    AES_set_encrypt_key(fetch_key (key), AES256_KEY_LENGTH_BITS, &key_schedule);
 
     block_count = the_message_size / AES_BLOCK_LENGTH_BYTES;
 

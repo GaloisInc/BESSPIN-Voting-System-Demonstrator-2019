@@ -378,7 +378,9 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     // Compute the AES_CBC_MAC of the whole block
     uint8_t binary_mac[AES_BLOCK_LENGTH_BYTES];
     aes_cbc_mac(&Transmit_Buffer[*first_byte_of_data_index],
-                padded_log_entry_length, &binary_mac[0]);
+                padded_log_entry_length,
+                &binary_mac[0],
+                Log_Entry_MAC_Key);
 
     // Turn that MAC into Base64 format.
     uint8_t base64_mac[BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH];

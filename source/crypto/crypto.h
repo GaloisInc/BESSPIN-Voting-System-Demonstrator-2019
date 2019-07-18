@@ -20,7 +20,7 @@
   @ ensures \initialized(the_ciphertext);
   @ ensures \valid(the_ciphertext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @*/
-void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext);
+void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext, AES_Key_Name key);
 
 /*@ requires \valid_read(the_ciphertext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @ requires \separated(the_plaintext, the_ciphertext);
@@ -28,7 +28,7 @@ void aes_encrypt(plaintext_block the_plaintext, ciphertext_block the_ciphertext)
   @ ensures \initialized(the_plaintext);
   @ ensures \valid(the_plaintext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @*/
-void aes_decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext);
+void aes_decrypt(ciphertext_block the_ciphertext, plaintext_block the_plaintext, AES_Key_Name key);
 
 /*@ requires \valid_read(the_message + (0 .. the_message_size - 1));
   @ requires \separated(the_message, the_digest);
@@ -44,7 +44,7 @@ void hash(message the_message, size_t the_message_size, digest the_digest);
   @ ensures \initialized(the_digest);
   @ ensures \valid(the_digest + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @*/
-void hmac(message the_message, size_t the_message_size, digest the_digest);
+void hmac(message the_message, size_t the_message_size, digest the_digest, AES_Key_Name key);
 
 /*@ requires \valid_read(the_message + (0 .. the_message_size - 1));
   @ requires \separated(the_message, the_digest);
@@ -54,6 +54,6 @@ void hmac(message the_message, size_t the_message_size, digest the_digest);
   @ ensures \valid(the_digest + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @*/
 void aes_cbc_mac(message the_message, size_t the_message_size,
-                 block the_digest);
+                 block the_digest, AES_Key_Name key);
 
 #endif
