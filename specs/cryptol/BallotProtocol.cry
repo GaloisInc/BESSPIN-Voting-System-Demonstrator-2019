@@ -1,0 +1,38 @@
+module BallotProtocol where
+
+parameter
+
+    type BlockSizeBytes : #
+    type SelectionsSizeBytes : #
+    type TimeSizeBytes : #
+    type KeySizeBytes : #
+
+    type constraint (fin BlockSizeBytes, fin SelectionsSizeBytes, fin TimeSizeBytes)
+
+    type constraint BlockSizeBytes >= 1
+
+    aes : {n} (fin n) => [KeySizeBytes][8]
+                      -> [n][8]
+                      -> [BlockSizeBytes * (n/^BlockSizeBytes)][8]
+
+    cbcMAC : {n} (fin n) => [KeySizeBytes][8] -> [n][8] -> [BlockSizeBytes][8]
+
+type EncryptedSize = BlockSizeBytes * (SelectionsSizeBytes /^ BlockSizeBytes)
+
+type BallotMessage
+    = { encrypted : [EncryptedSize][8]
+      , timeStamp : [TimeSizeBytes][8]
+      , mac       : [BlockSizeBytes][8]
+    }
+
+makeBallotMessage :  [KeySizeBytes][8]
+                  -> [KeySizeBytes][8]
+                  -> [SelectionsSizeBytes][8]
+                  -> [TimeSizeBytes][8]
+                  -> BallotMessage
+makeBallotMessage encKey authKey selections time =
+    { encrypted = enc
+    , timeStamp = time
+    , mac       = cbcMAC authKey (enc # time)
+    } where
+    enc = aes encKey selections
