@@ -44,7 +44,6 @@ const uint8_t *fetch_key (AES_Key_Name key)
 
   // Are the key(s) in well-defined memory-mapped locations?
   // Pick up a reference to the right key and return it.
->>>>>>> Modify crypto API to allow for up to 3 named keys. Initial implementation on POSIX uses the mock_key previously defined for testing. Implementation for FreeRTOS is TBD.
 
   // For now, return mock_key to enable existing test cases to run
   // with expected results.
@@ -87,34 +86,6 @@ void hash(message the_message, size_t the_message_size, digest the_digest)
     SHA256Final(the_digest, &context);
 }
 
-void hmac(message the_message, size_t the_message_size, digest the_digest, AES_Key_Name key)
-{
-
-    ///////////////////////////////////////////////////
-    // NOTE - This is a "mock" implementation        //
-    // It does not implement the true HMAC algorithm //
-    // but rather implements something simpler that  //
-    // exhibits the properties of a MAC function     //
-    // without the cryptographic provenance of HMAC  //
-    //                                               //
-    // This implementation is only intended as a     //
-    // placeholder to allow the integration and test //
-    // of other subsystem on which it depends to     //
-    // progress                                      //
-    ///////////////////////////////////////////////////
-
-    // This is NOT the proper HMAC Algorithm
-    SHA2_CTX context;
-    SHA256Init(&context);
-
-    // Mix in the key
-    SHA256Update(&context, fetch_key (key), AES256_KEY_LENGTH_BYTES);
-
-    // Plus the_message itself
-    SHA256Update(&context, the_message, the_message_size);
-
-    SHA256Final(the_digest, &context);
-}
 
 void aes_cbc_mac(message the_message, size_t the_message_size,
                  block the_digest, AES_Key_Name key)
