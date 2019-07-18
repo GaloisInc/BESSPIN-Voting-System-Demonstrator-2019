@@ -6,11 +6,11 @@ DEMO_SRC = \
     cbc.c \
     aes.c \
     sha2-openbsd.c \
-    mode_wrappers.c \
-    ../protocols/Common/FreeRTOS_TCP_server.c \
-    ../protocols/HTTP/FreeRTOS_HTTP_server.c \
-    ../protocols/HTTP/FreeRTOS_HTTP_commands.c \
-    ../protocols/HTTP/peekpoke.c
+    mode_wrappers.c 
+#    ../protocols/Common/FreeRTOS_TCP_server.c \
+#    ../protocols/HTTP/FreeRTOS_HTTP_server.c \
+#    ../protocols/HTTP/FreeRTOS_HTTP_commands.c \
+#    ../protocols/HTTP/peekpoke.c
 
 #
 # Define all object files.
