@@ -20,11 +20,19 @@
 
 typedef uint8_t key256[AES256_KEY_LENGTH_BYTES];
 
-// This is for initial integration and testing only
+// Restore this #ifndef when the implementation of fetch_key()
+// for FreeRTOS is complete. This will ensure that mock_key is
+// NOT compiled into the target binary
+
+// #ifndef TARGET_OS_FreeRTOS
+
+// This is for initial integration and testing only, so only
+// declared on POSIX systems
 static const key256 mock_key = "From Russia with Love";
 
-// Local functions
+// #endif
 
+// Local functions
 
 // Returns a pointer to the key data for the given Key Name
 const uint8_t *fetch_key (AES_Key_Name key)
@@ -33,11 +41,15 @@ const uint8_t *fetch_key (AES_Key_Name key)
 
 #ifdef TARGET_OS_FreeRTOS
   // TBD for target system.
+
   // Are the key(s) in well-defined memory-mapped locations?
   // Pick up a reference to the right key and return it.
 >>>>>>> Modify crypto API to allow for up to 3 named keys. Initial implementation on POSIX uses the mock_key previously defined for testing. Implementation for FreeRTOS is TBD.
 
-  return NULL; // TBD
+  // For now, return mock_key to enable existing test cases to run
+  // with expected results.
+  return mock_key; // TBD
+
 
 #else // POSIX systems
 
