@@ -12,7 +12,7 @@
 
 #define BARCODE_MAX_LENGTH 254
 
-typedef uint8_t* barcode_t;
+typedef char* barcode_t;
 // @todo kiniry Add a pure helper function for relating
 // BARCODE_MAX_LENGTH to all uses of the pair (barcode,
 // barcode_length).
@@ -58,6 +58,7 @@ typedef enum { INITIALIZE = BARCODE_PRESENT_AND_RECORDED+1,
                ABORT,
 } logic_state;
 // @design kiniry START and STOP are the top-level (superposed) start
+// and stop state for all ASMs.
 typedef enum { START = ABORT+1,
                INNER,
                STOP } start_stop_state;

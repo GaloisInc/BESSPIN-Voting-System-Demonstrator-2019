@@ -31,12 +31,8 @@
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;
 
-// We can't check these global invariant:
-// SBB_State.BS \in { BARCODE_DETECTED_AND_RECORDED } ==> barcode_present;
-// barcode_present ==> 0 < barcode_length <= BARCODE_MAX_LENGTH;
 char barcode[BARCODE_MAX_LENGTH] = {0};
 barcode_length_t barcode_length  = 0;
-bool barcode_present = false;
 
 // Assigns declarations for FreeRTOS functions; these may not be
 // accurate but are currently required to avoid crashing wp.
@@ -74,6 +70,8 @@ void initialize(void) {
     the_state.M = MOTORS_OFF;
     the_state.D = INITIALIZED_DISPLAY;
     the_state.BS = BARCODE_NOT_PRESENT;
+    __assume_strings_OK();
+    barcode_length = 0;
  DevicesInitialized:
     return;
 }
@@ -90,8 +88,6 @@ void initialize(void) {
 /* global invariant Motor_initial_state:
    \forall motor m; \at(!motor_running(m), DevicesInitialized);
 */
-#define TIMESTAMP_LENGTH_BYTES 4
-#define DECODED_BARCODE_LENGTH AES_BLOCK_LENGTH_BYTES + TIMESTAMP_LENGTH_BYTES + AES_BLOCK_LENGTH_BYTES
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
     return crypto_check_barcode_valid(the_barcode, its_length);
 }
@@ -110,7 +106,7 @@ void just_received_barcode(void) {
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
     configASSERT(its_length <= BARCODE_MAX_LENGTH);
     memcpy(barcode, the_barcode, its_length);
-    barcode_length = its_length;
+    barcode_length  = its_length;
 }
 
 bool has_a_barcode(void) {
@@ -118,8 +114,8 @@ bool has_a_barcode(void) {
 }
 
 barcode_length_t what_is_the_barcode(barcode_t the_barcode) {
-    configASSERT(barcode_length > 0);
     memcpy(the_barcode, barcode, barcode_length);
+    __assume_strings_OK();
     return barcode_length;
 }
 

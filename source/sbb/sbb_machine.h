@@ -7,14 +7,16 @@
 #include "log_t.h"
 
 /*@ requires SBB_Machine_Invariant;
-  @ requires \valid_read(event_entry + (0 .. LOG_ENTRY_LENGTH - 1));
+  @ requires 0 < length && length <= LOG_ENTRY_LENGTH;
+  @ requires \valid_read(event_entry + (0 .. length - 1));
   @ assigns log_fs, the_state.L;
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures SBB_Machine_Invariant;
 */
 void log_single_event( EventBits_t event_bits,
                        EventBits_t log_bit,
-                       const log_entry event_entry );
+                       const char* event_entry,
+                       int length );
 
 /*@ requires SBB_Machine_Invariant;
   @ assigns log_fs, the_state.L;
@@ -62,7 +64,7 @@ void update_button_state( bool cast_button_pressed,
 /*@ requires SBB_Machine_Invariant;
   @ requires barcode_scanned == true || barcode_scanned == false;
   @ assigns the_state.BS, the_state.L, log_fs,
-  @         barcode[0 .. BARCODE_MAX_LENGTH - 1], barcode_present, barcode_length;
+  @         barcode[0 .. BARCODE_MAX_LENGTH - 1], barcode_length;
   @ ensures the_state.L != ABORT ==> the_state.L == \old(the_state.L);
   @ ensures \old(the_state.BS) == the_state.BS
   @      || ASM_transition(\old(the_state), INTERNAL_BARCODE_E, the_state);
@@ -82,24 +84,20 @@ EventBits_t next_button_event_bits(void);
 EventBits_t next_barcode_event_bits(void);
 
 /*@ requires SBB_Machine_Invariant;
-  @ assigns the_state.BS, the_state.L, the_state.P, the_state.B, log_fs, barcode[0 .. BARCODE_MAX_LENGTH-1];
-  @ assigns log_fs, the_state.L;
+  @ assigns the_state.BS, the_state.L, the_state.P, the_state.B, log_fs;
+  @ assigns barcode[0 .. BARCODE_MAX_LENGTH - 1], barcode_length;
   @ ensures
   @   (the_state.BS != \old(the_state).BS) ==>
   @     ASM_transition(\old(the_state), INTERNAL_BARCODE_E, the_state);
-  @
   @ ensures
   @   (the_state.B != \old(the_state).B) ==>
   @     (ASM_transition(\old(the_state), INTERNAL_CAST_SPOIL_E, the_state) ||
   @      ASM_transition(\old(the_state), SPOIL_E, the_state) ||
   @      ASM_transition(\old(the_state), CAST_E, the_state));
-  @
   @ ensures
   @   (the_state.P != \old(the_state).P) ==>
   @      ASM_transition(\old(the_state), INTERNAL_PAPER_DETECT_E, the_state);
-  @
   @ ensures the_state.L == ABORT || the_state.L == \old(the_state.L);
-  @
   @ ensures SBB_Machine_Invariant;
 */
 void update_sensor_state(void);
@@ -146,7 +144,7 @@ void run_wait_for_decision(void);
 /*@ requires SBB_Machine_Invariant;
   @ requires the_state.L == BARCODE_DETECTED;
   @ ensures SBB_Machine_Invariant;
- */
+*/
 void run_barcode_detected(void);
 
 /*@ requires SBB_Machine_Invariant;
@@ -162,7 +160,6 @@ void run_feed_ballot(void);
 void run_wait_for_ballot(void);
 
 /*@ requires the_state.L == INITIALIZE;
-  @ requires SBB_Strings_Invariant;
   @ ensures SBB_Machine_Invariant;
  */
 void run_initialize(void);
@@ -172,5 +169,11 @@ void run_initialize(void);
   @ ensures SBB_Machine_Invariant;
  */
 void run_standby(void);
+
+/*@ requires SBB_Machine_Invariant;
+  @ requires the_state.L == ABORT;
+  @ ensures SBB_Machine_Invariant;
+  @ */
+void run_abort(void);
 
 #endif

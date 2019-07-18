@@ -138,6 +138,31 @@
   @
   @ }
   @ axiomatic SBB_States_Invariants {
+  @
+  @   predicate valid_range(integer lo, integer x, integer hi) =
+  @     lo <= x && x <= hi;
+  @
+  @   predicate M_ASM_valid(SBB_state S) =
+  @     valid_range(MOTORS_OFF, S.M, MOTORS_TURNING_BACKWARD);
+  @
+  @   predicate L_ASM_valid(SBB_state S) =
+  @     valid_range(INITIALIZE, S.L, ABORT);
+  @
+  @   predicate D_ASM_valid(SBB_state S) =
+  @     valid_range(INITIALIZED_DISPLAY, S.D, SHOWING_TEXT);
+  @
+  @   predicate BS_ASM_valid(SBB_state S) =
+  @     valid_range(BARCODE_NOT_PRESENT, S.BS, BARCODE_PRESENT_AND_RECORDED);
+  @
+  @   predicate Barcode_Present(SBB_state S) =
+  @    S.BS == BARCODE_PRESENT_AND_RECORDED;
+  @
+  @   predicate Valid_ASM_States(SBB_state S) =
+  @     M_ASM_valid(S) &&
+  @     L_ASM_valid(S) &&
+  @     D_ASM_valid(S) &&
+  @     BS_ASM_valid(S);
+  @
   @   predicate Initialize_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
   @     !cast_button_lit(S) &&
@@ -159,23 +184,26 @@
   @     !spoil_button_lit(S);
   @
   @   predicate Barcode_Detected_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF                    &&
-  @     S.BS == BARCODE_PRESENT_AND_RECORDED &&
-  @     !cast_button_lit(S)                  &&
+  @     S.M == MOTORS_OFF     &&
+  @     Barcode_Present(S)    &&
+  @     !cast_button_lit(S)   &&
   @     !spoil_button_lit(S);
   @
   @   predicate Wait_For_Decision_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF  &&
+  @     Barcode_Present(S) &&
   @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
   @
   @   predicate Cast_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
+  @     Barcode_Present(S) &&
   @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
   @
   @   predicate Spoil_Inv(SBB_state S) =
   @     S.M == MOTORS_OFF   &&
+  @     Barcode_Present(S) &&
   @     cast_button_lit(S) &&
   @     spoil_button_lit(S);
   @
@@ -201,7 +229,6 @@
   @   S.L == EJECT             ||
   @   S.L == SPOIL;
 */
-
 // Since we only have one sensor, we consider paper to be present
 // in some cases beyond the sensor being active
 // (like if we have fed it far enough that the sensor is no longer active)

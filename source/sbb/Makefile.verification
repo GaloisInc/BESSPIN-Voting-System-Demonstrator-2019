@@ -62,7 +62,8 @@ SOFTWARE_SPECS := sbb.h sbb_logging.h sbb_lemmas.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := sbb_machine.c sbb.c sbb_logging.c sbb_strings.c sbb_lemmas.c
+FRAMA_C_SOURCES := sbb.c sbb_machine.c sbb_logging.c sbb_strings.c sbb_lemmas.c
+FRAMA_C_SMOKETEST_SOURCES := sbb_lemma_smoketests.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
 SOFTWARE_SOURCES := $(FRAMA_C_SOURCES)
@@ -88,13 +89,16 @@ typecheck: $(FRAMA_C_SOURCES)
 # WP reasoning.
 
 wp:
-	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES)
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte -wp-model typed+Cast $(FRAMA_C_SOURCES) -wp-skip-fct __assume_strings_OK
 
 wp.%:
-	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES) -wp-fct $*
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES) -wp-model typed+Cast -wp-fct $*
 
 wp-verbose-report:
 	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp-verbose 0 $(FRAMA_C_SOURCES) -then -report
+
+smoketest:
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SMOKETEST_SOURCES) -wp-model typed+Cast
 
 # Metrics anlaysis
 # @todo Automatically analyze SLOC and CC to identify violations.
