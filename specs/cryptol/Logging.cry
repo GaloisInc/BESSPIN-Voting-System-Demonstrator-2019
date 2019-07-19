@@ -37,11 +37,13 @@ parameter
     /**
         We also need the CBC-MAC function.
     */
+    
     cbcMAC : {msgSizeBytes, keySizeBytes} (fin msgSizeBytes, fin keySizeBytes, msgSizeBytes % CbcMACBlockSizeBytes == 0) =>
         [keySizeBytes][8] ->
         [msgSizeBytes][8] ->
-        [16][8] //cbcMAC with AES always has 128 bit output, regardless of keysize
+        [MACOutputBytes][8] //cbcMAC with AES always has 128 bit output, regardless of keysize
 
+type MACOutputBytes = 16
 type CbcMACBlockSizeBytes = 16
 
 /**
@@ -75,7 +77,7 @@ serializeBinaryLog log = log.message # log.msgHash # log.logMAC
     encoding of the MAC, and finally \r\n
 */
 serializeASCIILog : {maxMsgSizeBytes} (fin maxMsgSizeBytes) =>
-    Log maxMsgSizeBytes -> [27 + msgAndHashASCIILen maxMsgSizeBytes (Base64Length HashSizeBytes)][8]
+    Log maxMsgSizeBytes -> [Base64Length MACOutputBytes + 3 + msgAndHashASCIILen maxMsgSizeBytes (Base64Length HashSizeBytes)][8]
 serializeASCIILog log = (msgAndHashASCII log.message log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
 
 /**
@@ -93,7 +95,7 @@ serializeBinaryLogFile logFile = join serializedLogs where
 
 serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
     LogFile maxSizeBytes msgs ->
-    [msgs * (27 + msgAndHashASCIILen maxSizeBytes (Base64Length HashSizeBytes))][8]
+    [msgs * (Base64Length MACOutputBytes + 3 + msgAndHashASCIILen maxSizeBytes (Base64Length HashSizeBytes))][8]
 serializeASCIILogFile logFile = join serializedLogs where
     serializedLogs = [serializeASCIILog entry | entry <- logFile]
 
