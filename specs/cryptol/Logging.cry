@@ -4,9 +4,9 @@ import Base64
 
 parameter
 
-    /** This defines the output size of the hash (TODO: the hash _function_?) in bytes.
-        For our use it is expected we will use SHA256 and
-        this will be instantiated as 32
+    /** 
+        This defines the output size of the hash function in bytes. For our use
+        it is expected we will use SHA256 and this will be instantiated as 32
     */
 
     type HashSizeBytes : #
@@ -45,8 +45,9 @@ parameter
 type CbcMACBlockSizeBytes = 16
 
 /**
-    A log entry. The msgHash should always be the hash of the message,
-    unless it's the first entry in which case it should be the MAC (TODO: of the padded message?)
+    A log entry. The msgHash should always be the hash of the message, unless
+    it's the first entry in which case it should be the MAC of the padded
+    message
 */
 type Log sizeBytes = {
     message : [sizeBytes][8],
@@ -102,8 +103,8 @@ initialLogEntry : {msgSize, keySize, maxMsgSize}
     [keySize][8] -> [msgSize][8] -> Log maxMsgSize
 initialLogEntry key msg = 
     { message = paddedMsg, msgHash = msgHash, logMAC = cbcMAC key (msgAndHashASCII paddedMsg msgHash)} where
-        paddedMsg = ((msg # (repeat spaceChar)) : [maxMsgSize][8]) // TODO: is the padding with spaces okay or shoudl it be zeros?
-        msgHash = (cbcMAC key paddedMsg) # zero // TODO: this implies that maxMsgSize is a multiple of 16. I added this as a type constraint but should we pad instead? Moreover, is the zero padding okay?
+        paddedMsg = ((msg # (repeat spaceChar)) : [maxMsgSize][8]) // TODO: is the padding with spaces okay or should it be zeros?
+        msgHash = (cbcMAC key paddedMsg) # zero // TODO: the use of cbcMAC implies that maxMsgSize is a multiple of 16; I added this as a type constraint, but should we pad `paddedMsg` again instead, and if so with what? Moreover, is the final zero padding okay or should it be spaces?
 
 /**
     Utility function to get the previous hash
