@@ -5,41 +5,59 @@ import Padding
 import BaseConvert
 import AESCBC
 
+// Time encoding
+type Time = {
+  year   : [16],
+  month  : [8],
+  day    : [8],
+  hour   : [8],
+  minute : [8]
+}
+
+timeToDigits : Time -> [16][8]
+timeToDigits time =
+  yearDigits # sep # monthDigits # sep # dayDigits # sep # hourDigits # sep # minuteDigits
+    where
+  sep          = "+"
+  yearDigits   = drop`{back=4} (toBase`{digits=5} decimal time.year)
+  monthDigits  = drop`{back=2} (toBase`{digits=3} decimal time.month)
+  dayDigits    = drop`{back=2} (toBase`{digits=3} decimal time.day)
+  hourDigits   = drop`{back=2} (toBase`{digits=3} decimal time.hour)
+  minuteDigits = drop`{back=2} (toBase`{digits=3} decimal time.minute)
+
+testTime = {
+  year   = 2019,
+  month  = 1,
+  day    = 1,
+  hour   = 1,
+  minute = 1
+}
+
 // Ballot encoding
-
-parameter
-  type timeBytes  : #   // how many bytes to represent the timestamp? (e.g. int32 => 4)
-  type timeDigits : #   // how many decimal digits to represent the timestamp?
-  type constraint (fin timeBytes, fin timeDigits,
-                   timeBytes  >= 1, timeDigits >= 1,
-                   // These constraints guarantee that the values above can
-                   // represent each other properly
-                   width (10 ^^ timeDigits) >= 8 * timeBytes,
-                   10 ^^ timeDigits >= 2 ^^ (timeBytes * 8))
-
 type Ballot contests positions
-  = { time     : [timeBytes * 8],
+  = { time     : Time,
+      unixTime : [6][8],
       contests : [contests][positions] }
 
 encodeBallot :
   {contests, positions, encodedLength}
-  (fin contests, fin positions, fin timeDigits,
-   encodedLength == 16 + 16 * ((timeDigits + (contests * positions) /^ 8) /^ 16)) =>
+  (fin contests, fin positions,
+   encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
   [16][8] ->
   Ballot contests positions ->
-  [1 + timeDigits + Base64Length encodedLength][8]
+  [1 + 16 + Base64Length encodedLength][8]
 encodeBallot authKey ballotKey iv ballot =
   timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
   where
-    timeDigits      = toBase`{digits=timeDigits} decimal ballot.time
-    timeBytes       = groupBy`{8} ballot.time
+    timeDigits      = timeToDigits ballot.time
+    timeBytes       = ballot.unixTime
     contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
-    ballotBytes     = timeDigits # contestsBytes
+    ballotBytes     = timeBytes # contestsBytes
     encryptedBallot = encrypt ballotKey iv (padWith`{mod=16} zero ballotBytes)
-    auth            = cbcMAC authKey zero (padWith`{mod=16} zero (timeBytes # encryptedBallot))
-
+    auth            = cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
+/*
 decodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions,
@@ -92,3 +110,4 @@ ballot_roundtrip :
   [32][8] -> [32][8] -> [16][8] -> Ballot contests positions -> Bool
 property ballot_roundtrip authKey ballotKey iv ballot =
   decodeBallot authKey ballotKey iv (encodeBallot authKey ballotKey iv ballot) == ballot
+  */
