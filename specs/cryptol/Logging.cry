@@ -128,43 +128,43 @@ updateLog log key msg = log # [newEntry] where
     newEntry = {message = paddedMsg, msgHash = msgHash, logMAC = (cbcMAC key (msgAndHashASCII paddedMsg msgHash))}
     msgHash = hash (paddedMsg # previousHash)
 
-///**
-    //Given a log entry, check to see if it is a valid first entry
-//*/
-//validFirstEntry : {msgSizeBytes, keySizeBytes}
-    //(fin msgSizeBytes, fin keySizeBytes) =>
-    //Log msgSizeBytes ->
-    //[keySizeBytes][8] ->
-    //Bit
-//property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
-///* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
+/**
+    Given a log entry, check to see if it is a valid first entry
+*/
+validFirstEntry : {maxMsgSizeBytes, keySizeBytes}
+    (fin maxMsgSizeBytes, fin keySizeBytes, maxMsgSizeBytes % CbcMACBlockSizeBytes == 0) =>
+    Log maxMsgSizeBytes ->
+    [keySizeBytes][8] ->
+    Bit
+property validFirstEntry log key = log.msgHash == (cbcMAC key log.message) # zero /\ log.logMAC == cbcMAC key (msgAndHashASCII log.message log.msgHash)
+/* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
-///**
-    //Check to see if a log entry is valid given the previous hash
-//*/
-//validLogEntry : {msgSizeBytes, keySize}
-    //(fin msgSizeBytes, fin keySize) =>
-    //Log msgSizeBytes ->
-    //[keySize][8] ->
-    //[HashSizeBytes][8] ->
-    //Bit
-//property validLogEntry log key prevHash =
-    //log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
-///* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
+/**
+    Check to see if a log entry is valid given the previous hash
+*/
+validLogEntry : {msgSizeBytes, keySize}
+    (fin msgSizeBytes, fin keySize) =>
+    Log msgSizeBytes ->
+    [keySize][8] ->
+    [HashSizeBytes][8] ->
+    Bit
+property validLogEntry log key prevHash =
+    log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (msgAndHashASCII log.message log.msgHash)
+/* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
-///**
-//Check the validity of an entire log file relative to a key
-//*/
-//validLogFile : {maxMsgSize, keySize, msgs}
-    //(fin maxMsgSize, fin keySize, fin msgs) =>
-    //LogFile maxMsgSize msgs ->
-    //[keySize][8] ->
-    //Bit
-//property validLogFile logFile key =
-    //`msgs == (0 : [width msgs]) \/
-    //(foldResult ! 0 where
-        //foldResult = [validFirstEntry (logFile @ 0) key] #
-                        //[prevValid /\ validLogEntry log key (prevLog.msgHash)
-                            //| log <- logFile
-                            //| prevLog <- [zero] # logFile
-                            //| prevValid <- foldResult])
+/**
+Check the validity of an entire log file relative to a key
+*/
+validLogFile : {maxMsgSize, keySize, msgs}
+    (fin maxMsgSize, fin keySize, fin msgs, maxMsgSize % CbcMACBlockSizeBytes == 0) =>
+    LogFile maxMsgSize msgs ->
+    [keySize][8] ->
+    Bit
+property validLogFile logFile key =
+    `msgs == (0 : [width msgs]) \/
+    (foldResult ! 0 where
+        foldResult = [validFirstEntry (logFile @ 0) key] #
+                        [prevValid /\ validLogEntry log key (prevLog.msgHash)
+                            | log <- logFile
+                            | prevLog <- [zero] # logFile
+                            | prevValid <- foldResult])
