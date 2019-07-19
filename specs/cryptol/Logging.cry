@@ -20,7 +20,7 @@ parameter
         The hash size must be bigger than the output of the CBC-MAC used on
         the initial message
     */
-    type constraint HashSizeBytes >= 16
+    type constraint HashSizeBytes >= MACOutputBytes
 
     /**
         Our hash function must take in an arbitrary number
