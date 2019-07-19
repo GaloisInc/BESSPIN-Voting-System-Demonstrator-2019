@@ -148,13 +148,19 @@ int mbedtls_base64_encode (unsigned char *dst,
  */
 
 /*@ requires \valid_read (src + (0 .. slen - 1));
-  @ requires \valid (dst + (0 .. dlen - 1));
-  @ requires \separated (dst, src, olen);
   @ requires (slen % 4) == 0;
-  @ requires dlen == (3 * (slen / 4));
-  @ assigns dst[0 .. dlen - 1];
+  @ requires \separated (dst, src, olen);
   @ assigns *olen;
-  @ ensures *olen <= dlen;
+  @ behavior length_query:
+  @   assumes ((dst == NULL) || (dlen == 0));
+  @ behavior decode:
+  @   assumes (dst != NULL) && (dlen != 0);
+  @   requires dlen == (3 * (slen / 4));
+  @   requires \valid (dst + (0 .. dlen - 1));
+  @   assigns dst[0 .. dlen - 1];
+  @   ensures *olen <= dlen;
+  @ complete behaviors;
+  @ disjoint behaviors;
 */
 int mbedtls_base64_decode( unsigned char *dst, size_t dlen, size_t *olen,
                    const unsigned char *src, size_t slen );
