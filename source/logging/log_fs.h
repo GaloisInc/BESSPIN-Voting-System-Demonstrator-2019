@@ -53,19 +53,24 @@ typedef struct Log_Handles
 //@ ghost int log_fs;
 
 //
-// ACSL Predicates supporting contracts for Log_IO
+// ACSL Predicates supporting contracts for Log_FS
 //
 
-/*@
-  predicate
-    Log_FS_Initialized{L} = \true; // abstract
-  predicate
-    Log_FS_File_Is_Open{L}(Log_Handle *f) = \true; // abstract
-  predicate
-    Log_FS_Exists{L}(char *name) = \true; // abstract
-  logic
-    size_t Log_FS_File_Num_Entries{L}(Log_Handle *f) = (size_t) 0; // abstract
+/*@ 
+  axiomatic log_fs_axioms {
 
+  predicate
+    Log_FS_Initialized{L}; // abstract
+
+  predicate
+    Log_FS_File_Is_Open{L}(Log_Handle *f) reads *f, log_fs; // abstract
+
+  predicate
+    Log_FS_Exists{L}(char *name) reads *name, log_fs; // abstract
+
+//  logic
+//    size_t Log_FS_File_Num_Entries{L}(Log_Handle *f) reads *f, log_fs; // abstract
+  }
 */
 
 typedef enum
@@ -160,6 +165,7 @@ Log_FS_Result Log_FS_Close(Log_Handle *stream); // IN
     requires Log_FS_File_Is_Open (stream);
     assigns log_fs \from log_fs, stream;
     ensures Log_FS_File_Is_Open (stream);
+    ensures log_fs == \old(log_fs);
  */
 Log_FS_Result Log_FS_Sync(Log_Handle *stream); // IN
 
@@ -170,6 +176,7 @@ Log_FS_Result Log_FS_Sync(Log_Handle *stream); // IN
     requires \valid_read(data + (0 .. length - 1));
     requires Log_FS_File_Is_Open (stream);
     assigns log_fs \from log_fs, stream, data, length;
+    ensures Log_FS_File_Is_Open (stream);
  */
 size_t Log_FS_Write (Log_Handle *stream,
                      const uint8_t *data,
@@ -183,6 +190,7 @@ size_t Log_FS_Write (Log_Handle *stream,
     requires Log_FS_File_Is_Open (stream);
     assigns \result \from *stream, bytes_to_read, log_fs;
     assigns *data \from *stream, bytes_to_read, log_fs;
+    ensures Log_FS_File_Is_Open (stream);
  */
 size_t Log_FS_Read (Log_Handle *stream,
                     uint8_t *data,
@@ -191,23 +199,29 @@ size_t Log_FS_Read (Log_Handle *stream,
 
 /* returns size in Bytes */
 /*@ requires Log_FS_Initialized;
+    requires Log_FS_File_Is_Open (stream);
     requires \valid(stream);
     assigns \result \from *stream, log_fs;
+    ensures Log_FS_File_Is_Open (stream);
 */
 size_t Log_FS_Size(Log_Handle *stream);
 
 /* returns value of current file pointer */
 /*@ requires Log_FS_Initialized;
+    requires Log_FS_File_Is_Open (stream);
     requires \valid(stream);
     assigns \result \from *stream, log_fs;
+    ensures Log_FS_File_Is_Open (stream);
 */
 file_offset Log_FS_Tell (Log_Handle *stream);
 
 /* Sets current file pointer, relative to position 0
    which is the first byte of the file */
 /*@ requires Log_FS_Initialized;
+    requires Log_FS_File_Is_Open (stream);
     requires \valid(stream);
     assigns  *stream \from *stream, new_offset, log_fs;
+    ensures Log_FS_File_Is_Open (stream);
  */
 void Log_FS_Seek (Log_Handle *stream,
                   file_offset new_offset);
