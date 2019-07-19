@@ -15,16 +15,18 @@ typedef Log_Handle *log_file;
 
 /*@
   axiomatic log_io_axioms {
-  predicate
-    File_Is_Open{L}(Log_Handle *f) reads *f; // abstract
-  predicate
-    File_Exists{L}(char *name) reads *name; // abstract
   logic
-    size_t File_Num_Entries{L}(Log_Handle *f) reads *f; // abstract
+    size_t File_Num_Entries{L}(Log_Handle *f) reads *f, log_fs; // abstract
   }
 */
 
 /*@
+  predicate
+    File_Exists{L}(char *name) = Log_FS_Exists (name);
+
+  predicate
+    File_Is_Open{L}(Log_Handle *f) = Log_FS_File_Is_Open (f);
+
   predicate
     valid_secure_log_entry(secure_log_entry sle)=
       \valid_read((uint8_t*)sle.the_entry[0 .. LOG_ENTRY_LENGTH - 1]) &&
