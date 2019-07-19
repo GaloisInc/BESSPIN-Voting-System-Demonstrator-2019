@@ -81,8 +81,10 @@ serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >
 serializeASCIILogFile logFile = join serializedLogs where
     serializedLogs = [serializeASCIILog entry | entry <- logFile]
 
-
-type LogMACArgLength paddedMsgSize msgHashSize = (CbcMACBlockSizeBytes * ((paddedMsgSize + msgHashSize) /^ CbcMACBlockSizeBytes))
+/**
+  The smallest multiple of CbcMACBlockSizeBytes that is strictly bigger than `a+b`
+*/
+type LogMACArgLength a b = (CbcMACBlockSizeBytes * ((a + b + 1) /^ CbcMACBlockSizeBytes))
 
 //Message will be something from secure boot, not identified yet
 initialLogEntry : {msgSize, keySize, maxMsgSize}
@@ -95,7 +97,7 @@ initialLogEntry key msg =
         paddedMsg = ((msg # (repeat padChar)) : [maxMsgSize][8])
         msgHash = cbcMAC key paddedMsg // TODO: this implies that maxMsgSize is a multiple of 16. I added this as a type constraint but should we pad instead?
     where
-      TODO1 = zero
+      TODO1 = repeat padChar
 
 /**
     Utility function to get the previous hash
