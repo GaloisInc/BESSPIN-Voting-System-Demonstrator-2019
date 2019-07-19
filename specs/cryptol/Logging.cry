@@ -90,9 +90,10 @@ initialLogEntry : {msgSize, keySize, maxMsgSize}
     [keySize][8] -> [msgSize][8] -> Log maxMsgSize
 initialLogEntry key msg = 
 // TODO: how should we pad msgHash below?
-    { message = paddedMsg, msgHash = msgHash # TODO1, logMAC = cbcMAC key ((paddedMsg # (repeat padChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8]) } where
+    { message = paddedMsg, msgHash = msgHash # TODO1, logMAC = cbcMAC key logMACArg} where
+        logMACArg = ((paddedMsg # (repeat padChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8])
         paddedMsg = ((msg # (repeat padChar)) : [maxMsgSize][8])
-        msgHash = cbcMAC key paddedMsg // TODO: this implies that maxMsgSize is a multiple of 16
+        msgHash = cbcMAC key paddedMsg // TODO: this implies that maxMsgSize is a multiple of 16. I added this as a type constraint but should we pad instead?
     where
       TODO1 = zero
 
@@ -116,7 +117,8 @@ updateLog : {msgSize, keySize, maxMsgSize, msgs}
 updateLog log key msg = log # [newEntry] where
     paddedMsg = msg # (repeat padChar)
     previousHash = getLastHash log
-    newEntry = {message = paddedMsg, msgHash = msgHash, logMAC = (cbcMAC key ((paddedMsg # (repeat padChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8]))}
+    newEntry = {message = paddedMsg, msgHash = msgHash, logMAC = (cbcMAC key logMACArg)}
+    logMACArg = ((paddedMsg # (repeat padChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8])
     msgHash = hash (paddedMsg # previousHash)
 
 /**
