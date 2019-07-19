@@ -4,7 +4,7 @@ import Base64
 
 parameter
 
-    /** This defines the output size of the hash in bytes.
+    /** This defines the output size of the hash (TODO: the hash _function_?) in bytes.
         For our use it is expected we will use SHA256 and
         this will be instantiated as 32
     */
@@ -39,6 +39,7 @@ parameter
 /**
     A log entry. The msgHash should always be the hash of the message,
     unless it's the first entry in which case it should be the MAC
+    TODO: what is this MAC?
 */
 type Log sizeBytes = {
     message : [sizeBytes][8],
@@ -53,7 +54,7 @@ serializeBinaryLog log = log.message # log.msgHash # log.logMAC
 /* In ASCII format, the hash is Base64 encoded, and we add FOUR characters for */
 /* readability - a space between each field and \r\n on the end                */
 serializeASCIILog : {sizeBytes} (fin sizeBytes) =>
-    Log sizeBytes -> [sizeBytes + Base64Length HashSizeBytes + 4][8]
+    Log sizeBytes -> [_][8]
 serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
 
 /**
@@ -80,8 +81,9 @@ initialLogEntry : {msgSize, keySize, resultSize}
                 (fin msgSize, fin keySize, fin resultSize, msgSize <= resultSize) =>
     [keySize][8] -> [msgSize][8] -> Log resultSize
 initialLogEntry key msg =
-    { message = paddedMsg, msgHash = (cbcMAC key (paddedMsg # zero)), logMAC = (cbcMAC key (paddedMsg # msgHash))} where
+    { message = paddedMsg, msgHash = msgHash, logMAC = (cbcMAC key (paddedMsg # msgHash))} where
         paddedMsg = ((msg # zero) : [resultSize][8])
+        msgHash = (cbcMAC key paddedMsg) # zero
 
 /**
     Utility function to get the previous hash
@@ -94,15 +96,17 @@ getLastHash logs = (logs ! 0).msgHash
     We require the number of messages to be >= 1 because
     this operation should not be used for the first message
 */
-updateLog : {msgSize, maxMsgSize, msgs}
-    (fin msgSize, msgSize <= maxMsgSize, fin msgs, fin maxMsgSize, msgs >=1) =>
+updateLog : {msgSize, keySize, maxMsgSize, msgs}
+    (fin msgSize, fin keySize, msgSize <= maxMsgSize, fin msgs, fin maxMsgSize, msgs >=1) =>
     (LogFile maxMsgSize msgs) ->
+    [keySize][8] ->
     [msgSize][8] ->
     LogFile maxMsgSize (msgs + 1)
-updateLog log msg = log # [newEntry] where
+updateLog log key msg = log # [newEntry] where
     paddedMsg = msg # zero
     previousHash = getLastHash log
-    newEntry = {message = paddedMsg, msgHash = hash (paddedMsg # previousHash), logMAC = (cbcMAC key (paddedMsg # msgHash))}
+    newEntry = {message = paddedMsg, msgHash = msgHash, logMAC = (cbcMAC key (paddedMsg # msgHash))}
+    msgHash = hash (paddedMsg # previousHash)
 
 /**
     Given a log entry, check to see if it is a valid first entry
@@ -118,12 +122,13 @@ property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero
 /**
     Check to see if a log entry is valid given the previous hash
 */
-validLogEntry : {msgSizeBytes}
-    (fin msgSizeBytes) =>
+validLogEntry : {msgSizeBytes, keySize}
+    (fin msgSizeBytes, fin keySize) =>
     Log msgSizeBytes ->
+    [keySize][8] ->
     [HashSizeBytes][8] ->
     Bit
-property validLogEntry log prevHash =
+property validLogEntry log key prevHash =
     log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
 /* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
@@ -139,7 +144,7 @@ property validLogFile logFile key =
     `msgs == (0 : [width msgs]) \/
     (foldResult ! 0 where
         foldResult = [validFirstEntry (logFile @ 0) key] #
-                        [prevValid /\ validLogEntry log (prevLog.msgHash)
+                        [prevValid /\ validLogEntry log key (prevLog.msgHash)
                             | log <- logFile
                             | prevLog <- [zero] # logFile
                             | prevValid <- foldResult])
