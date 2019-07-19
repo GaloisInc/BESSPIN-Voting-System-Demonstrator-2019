@@ -42,6 +42,14 @@ parameter
         [16][8] //cbcMAC with AES always has 128 bit output, regardless of keysize
 
 type CbcMACBlockSizeBytes = 16
+
+spaceChar = ' '
+
+/**
+  The smallest multiple of CbcMACBlockSizeBytes that is strictly bigger than `a+b`
+*/
+type LogMACArgLength a b = (CbcMACBlockSizeBytes * ((a + b + 1) /^ CbcMACBlockSizeBytes))
+
 /**
     A log entry. The msgHash should always be the hash of the message,
     unless it's the first entry in which case it should be the MAC (TODO: of the padded message?)
@@ -56,11 +64,14 @@ serializeBinaryLog : {sizeBytes} (fin sizeBytes) =>
     Log sizeBytes -> [sizeBytes + HashSizeBytes + 16][8]
 serializeBinaryLog log = log.message # log.msgHash # log.logMAC
 
-/* In ASCII format, the hash is Base64 encoded, and we add FOUR characters for */
-/* readability - a space between each field and \r\n on the end                */
-serializeASCIILog : {sizeBytes} (fin sizeBytes) =>
-    Log sizeBytes -> [_][8]
-serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
+/** 
+    In ASCII format, first come the message and message hash in the same format
+    as used to produce the MAC, then a space character, then the base64
+    encoding of the MAC, and finally \r\n
+*/
+serializeASCIILog : {maxMsgSizeBytes} (fin maxMsgSizeBytes) =>
+    Log maxMsgSizeBytes -> [27 + LogMACArgLength maxMsgSizeBytes (Base64Length HashSizeBytes)][8]
+serializeASCIILog log = ((log.message # (repeat spaceChar) # (encodeBase64 log.msgHash)):[LogMACArgLength maxMsgSizeBytes (Base64Length HashSizeBytes)][8]) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
 
 /**
     A log file is a series of log messages. We must
@@ -77,14 +88,9 @@ serializeBinaryLogFile logFile = join serializedLogs where
 
 serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
     LogFile maxSizeBytes msgs ->
-    [msgs * (maxSizeBytes + Base64Length HashSizeBytes + Base64Length 16 + 4)][8]
+    [msgs * (27 + LogMACArgLength maxSizeBytes (Base64Length HashSizeBytes))][8]
 serializeASCIILogFile logFile = join serializedLogs where
     serializedLogs = [serializeASCIILog entry | entry <- logFile]
-
-/**
-  The smallest multiple of CbcMACBlockSizeBytes that is strictly bigger than `a+b`
-*/
-type LogMACArgLength a b = (CbcMACBlockSizeBytes * ((a + b + 1) /^ CbcMACBlockSizeBytes))
 
 //Message will be something from secure boot, not identified yet
 initialLogEntry : {msgSize, keySize, maxMsgSize}
@@ -93,11 +99,11 @@ initialLogEntry : {msgSize, keySize, maxMsgSize}
 initialLogEntry key msg = 
 // TODO: how should we pad msgHash below?
     { message = paddedMsg, msgHash = msgHash # TODO1, logMAC = cbcMAC key logMACArg} where
-        logMACArg = ((paddedMsg # (repeat padChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8])
-        paddedMsg = ((msg # (repeat padChar)) : [maxMsgSize][8])
+        logMACArg = ((paddedMsg # (repeat spaceChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8])
+        paddedMsg = ((msg # (repeat spaceChar)) : [maxMsgSize][8])
         msgHash = cbcMAC key paddedMsg // TODO: this implies that maxMsgSize is a multiple of 16. I added this as a type constraint but should we pad instead?
     where
-      TODO1 = repeat padChar
+      TODO1 = repeat spaceChar
 
 /**
     Utility function to get the previous hash
@@ -117,49 +123,49 @@ updateLog : {msgSize, keySize, maxMsgSize, msgs}
     [msgSize][8] ->
     LogFile maxMsgSize (msgs + 1)
 updateLog log key msg = log # [newEntry] where
-    paddedMsg = msg # (repeat padChar)
+    paddedMsg = msg # (repeat spaceChar)
     previousHash = getLastHash log
     newEntry = {message = paddedMsg, msgHash = msgHash, logMAC = (cbcMAC key logMACArg)}
-    logMACArg = ((paddedMsg # (repeat padChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8])
+    logMACArg = ((paddedMsg # (repeat spaceChar) # (encodeBase64 msgHash)):[LogMACArgLength maxMsgSize (Base64Length HashSizeBytes)][8])
     msgHash = hash (paddedMsg # previousHash)
 
-/**
-    Given a log entry, check to see if it is a valid first entry
-*/
-validFirstEntry : {msgSizeBytes, keySizeBytes}
-    (fin msgSizeBytes, fin keySizeBytes) =>
-    Log msgSizeBytes ->
-    [keySizeBytes][8] ->
-    Bit
-property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
-/* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
+///**
+    //Given a log entry, check to see if it is a valid first entry
+//*/
+//validFirstEntry : {msgSizeBytes, keySizeBytes}
+    //(fin msgSizeBytes, fin keySizeBytes) =>
+    //Log msgSizeBytes ->
+    //[keySizeBytes][8] ->
+    //Bit
+//property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
+///* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
-/**
-    Check to see if a log entry is valid given the previous hash
-*/
-validLogEntry : {msgSizeBytes, keySize}
-    (fin msgSizeBytes, fin keySize) =>
-    Log msgSizeBytes ->
-    [keySize][8] ->
-    [HashSizeBytes][8] ->
-    Bit
-property validLogEntry log key prevHash =
-    log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
-/* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
+///**
+    //Check to see if a log entry is valid given the previous hash
+//*/
+//validLogEntry : {msgSizeBytes, keySize}
+    //(fin msgSizeBytes, fin keySize) =>
+    //Log msgSizeBytes ->
+    //[keySize][8] ->
+    //[HashSizeBytes][8] ->
+    //Bit
+//property validLogEntry log key prevHash =
+    //log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
+///* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
-/**
-Check the validity of an entire log file relative to a key
-*/
-validLogFile : {maxMsgSize, keySize, msgs}
-    (fin maxMsgSize, fin keySize, fin msgs) =>
-    LogFile maxMsgSize msgs ->
-    [keySize][8] ->
-    Bit
-property validLogFile logFile key =
-    `msgs == (0 : [width msgs]) \/
-    (foldResult ! 0 where
-        foldResult = [validFirstEntry (logFile @ 0) key] #
-                        [prevValid /\ validLogEntry log key (prevLog.msgHash)
-                            | log <- logFile
-                            | prevLog <- [zero] # logFile
-                            | prevValid <- foldResult])
+///**
+//Check the validity of an entire log file relative to a key
+//*/
+//validLogFile : {maxMsgSize, keySize, msgs}
+    //(fin maxMsgSize, fin keySize, fin msgs) =>
+    //LogFile maxMsgSize msgs ->
+    //[keySize][8] ->
+    //Bit
+//property validLogFile logFile key =
+    //`msgs == (0 : [width msgs]) \/
+    //(foldResult ! 0 where
+        //foldResult = [validFirstEntry (logFile @ 0) key] #
+                        //[prevValid /\ validLogEntry log key (prevLog.msgHash)
+                            //| log <- logFile
+                            //| prevLog <- [zero] # logFile
+                            //| prevValid <- foldResult])
