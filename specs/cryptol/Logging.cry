@@ -28,12 +28,6 @@ parameter
     */
     hash : {n} (fin n) => [n][8] -> [HashSizeBytes][8]
 
-    //cbcMac block size in bytes 
-    //TODO: the cryptol type-checker chockes on this given the type constraints later in the file
-    //type CbcMACBlockSizeBytes : #
-    //type constraint CbcMACBlockSizeBytes >= 1
-    //type constraint fin CbcMACBlockSizeBytes
-
     /**
         We also need the CBC-MAC function.
     */
@@ -57,10 +51,14 @@ type Log sizeBytes = {
     logMAC  : [16][8]
 }
 
+/**
+    The space charater is used for padding ASCII data
+*/
 spaceChar = ' '
 
 /**
-  The smallest multiple of CbcMACBlockSizeBytes that is strictly bigger than `a+b`
+  The smallest multiple of CbcMACBlockSizeBytes that is strictly bigger than
+  `a+b`
 */
 type msgAndHashASCIILen a b = (CbcMACBlockSizeBytes * ((a + b + 1) /^ CbcMACBlockSizeBytes))
 
@@ -99,14 +97,20 @@ serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >
 serializeASCIILogFile logFile = join serializedLogs where
     serializedLogs = [serializeASCIILog entry | entry <- logFile]
 
+/** 
+    Creates the first log entry. The message hash of the first entry is
+    computed using `cbcMac`, while for later entries we use the `hash`
+    function. Note that the type signature requires that `maxMsgSize` be a
+    multiple of CbcMACBlockSizeBytes.
+*/
 //Message will be something from secure boot, not identified yet
 initialLogEntry : {msgSize, keySize, maxMsgSize}
                 (fin msgSize, fin keySize, fin maxMsgSize, maxMsgSize % CbcMACBlockSizeBytes == 0, msgSize <= maxMsgSize) => 
     [keySize][8] -> [msgSize][8] -> Log maxMsgSize
 initialLogEntry key msg = 
     { message = paddedMsg, msgHash = msgHash, logMAC = cbcMAC key (msgAndHashASCII paddedMsg msgHash)} where
-        paddedMsg = ((msg # (repeat spaceChar)) : [maxMsgSize][8]) // TODO: is the padding with spaces okay or should it be zeros?
-        msgHash = (cbcMAC key paddedMsg) # zero // TODO: the use of cbcMAC implies that maxMsgSize is a multiple of 16; I added this as a type constraint, but should we pad `paddedMsg` again instead, and if so with what? Moreover, is the final zero padding okay or should it be spaces?
+        paddedMsg = ((msg # (repeat spaceChar)) : [maxMsgSize][8])
+        msgHash = (cbcMAC key paddedMsg) # zero
 
 /**
     Utility function to get the previous hash
