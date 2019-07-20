@@ -4,9 +4,9 @@ import Base64
 
 parameter
 
-    /** This defines the output size of the hash in bytes.
-        For our use it is expected we will use SHA256 and
-        this will be instantiated as 32
+    /** 
+        This defines the output size of the hash function in bytes. For our use
+        it is expected we will use SHA256 and this will be instantiated as 32
     */
 
     type HashSizeBytes : #
@@ -20,7 +20,7 @@ parameter
         The hash size must be bigger than the output of the CBC-MAC used on
         the initial message
     */
-    type constraint HashSizeBytes >= 16
+    type constraint HashSizeBytes >= MACOutputBytes
 
     /**
         Our hash function must take in an arbitrary number
@@ -31,14 +31,19 @@ parameter
     /**
         We also need the CBC-MAC function.
     */
-    cbcMAC : {msgSizeBytes, keySizeBytes} (fin msgSizeBytes, fin keySizeBytes) =>
+    
+    cbcMAC : {msgSizeBytes, keySizeBytes} (fin msgSizeBytes, fin keySizeBytes, msgSizeBytes % CbcMACBlockSizeBytes == 0) =>
         [keySizeBytes][8] ->
         [msgSizeBytes][8] ->
-        [16][8] //cbcMAC with AES always has 128 bit output, regardless of keysize
+        [MACOutputBytes][8] //cbcMAC with AES always has 128 bit output, regardless of keysize
+
+type MACOutputBytes = 16
+type CbcMACBlockSizeBytes = 16
 
 /**
-    A log entry. The msgHash should always be the hash of the message,
-    unless it's the first entry in which case it should be the MAC
+    A log entry. The msgHash should always be the hash of the message, unless
+    it's the first entry in which case it should be the MAC of the padded
+    message
 */
 type Log sizeBytes = {
     message : [sizeBytes][8],
@@ -46,15 +51,32 @@ type Log sizeBytes = {
     logMAC  : [16][8]
 }
 
+/**
+    The space charater is used for padding ASCII data
+*/
+spaceChar = ' '
+
+/**
+  The smallest multiple of CbcMACBlockSizeBytes that is strictly bigger than
+  `a+b`
+*/
+type msgAndHashASCIILen a b = (CbcMACBlockSizeBytes * ((a + b + 1) /^ CbcMACBlockSizeBytes))
+
+msgAndHashASCII : {sizeBytes} (fin sizeBytes) => [sizeBytes][8] -> [HashSizeBytes][8] -> [msgAndHashASCIILen sizeBytes (Base64Length HashSizeBytes)][8]
+msgAndHashASCII msg msgHash = msg # (repeat spaceChar) # (encodeBase64 msgHash)
+
 serializeBinaryLog : {sizeBytes} (fin sizeBytes) =>
     Log sizeBytes -> [sizeBytes + HashSizeBytes + 16][8]
 serializeBinaryLog log = log.message # log.msgHash # log.logMAC
 
-/* In ASCII format, the hash is Base64 encoded, and we add FOUR characters for */
-/* readability - a space between each field and \r\n on the end                */
-serializeASCIILog : {sizeBytes} (fin sizeBytes) =>
-    Log sizeBytes -> [sizeBytes + Base64Length HashSizeBytes + 4][8]
-serializeASCIILog log = log.message # [' '] # (encodeBase64 log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
+/** 
+    In ASCII format, first come the message and message hash in the same format
+    as used to produce the MAC, then a space character, then the base64
+    encoding of the MAC, and finally \r\n
+*/
+serializeASCIILog : {maxMsgSizeBytes} (fin maxMsgSizeBytes) =>
+    Log maxMsgSizeBytes -> [Base64Length MACOutputBytes + 3 + msgAndHashASCIILen maxMsgSizeBytes (Base64Length HashSizeBytes)][8]
+serializeASCIILog log = (msgAndHashASCII log.message log.msgHash) # [' '] # (encodeBase64 log.logMAC) # ['\r'] # ['\n']
 
 /**
     A log file is a series of log messages. We must
@@ -71,17 +93,24 @@ serializeBinaryLogFile logFile = join serializedLogs where
 
 serializeASCIILogFile : {maxSizeBytes, msgs} (fin maxSizeBytes, fin msgs, msgs >= 1) =>
     LogFile maxSizeBytes msgs ->
-    [msgs * (maxSizeBytes + Base64Length HashSizeBytes + Base64Length 16 + 4)][8]
+    [msgs * (Base64Length MACOutputBytes + 3 + msgAndHashASCIILen maxSizeBytes (Base64Length HashSizeBytes))][8]
 serializeASCIILogFile logFile = join serializedLogs where
     serializedLogs = [serializeASCIILog entry | entry <- logFile]
 
+/** 
+    Creates the first log entry. The message hash of the first entry is
+    computed using `cbcMac`, while for later entries we use the `hash`
+    function. Note that the type signature requires that `maxMsgSize` be a
+    multiple of CbcMACBlockSizeBytes.
+*/
 //Message will be something from secure boot, not identified yet
-initialLogEntry : {msgSize, keySize, resultSize}
-                (fin msgSize, fin keySize, fin resultSize, msgSize <= resultSize) =>
-    [keySize][8] -> [msgSize][8] -> Log resultSize
-initialLogEntry key msg =
-    { message = paddedMsg, msgHash = (cbcMAC key (paddedMsg # zero)), logMAC = (cbcMAC key (paddedMsg # msgHash))} where
-        paddedMsg = ((msg # zero) : [resultSize][8])
+initialLogEntry : {msgSize, keySize, maxMsgSize}
+                (fin msgSize, fin keySize, fin maxMsgSize, maxMsgSize % CbcMACBlockSizeBytes == 0, msgSize <= maxMsgSize) => 
+    [keySize][8] -> [msgSize][8] -> Log maxMsgSize
+initialLogEntry key msg = 
+    { message = paddedMsg, msgHash = msgHash, logMAC = cbcMAC key (msgAndHashASCII paddedMsg msgHash)} where
+        paddedMsg = ((msg # (repeat spaceChar)) : [maxMsgSize][8])
+        msgHash = (cbcMAC key paddedMsg) # zero
 
 /**
     Utility function to get the previous hash
@@ -94,52 +123,55 @@ getLastHash logs = (logs ! 0).msgHash
     We require the number of messages to be >= 1 because
     this operation should not be used for the first message
 */
-updateLog : {msgSize, maxMsgSize, msgs}
-    (fin msgSize, msgSize <= maxMsgSize, fin msgs, fin maxMsgSize, msgs >=1) =>
+updateLog : {msgSize, keySize, maxMsgSize, msgs}
+    (fin msgSize, fin keySize, msgSize <= maxMsgSize, fin msgs, fin maxMsgSize, msgs >=1) =>
     (LogFile maxMsgSize msgs) ->
+    [keySize][8] ->
     [msgSize][8] ->
     LogFile maxMsgSize (msgs + 1)
-updateLog log msg = log # [newEntry] where
-    paddedMsg = msg # zero
+updateLog log key msg = log # [newEntry] where
+    paddedMsg = msg # (repeat spaceChar)
     previousHash = getLastHash log
-    newEntry = {message = paddedMsg, msgHash = hash (paddedMsg # previousHash), logMAC = (cbcMAC key (paddedMsg # msgHash))}
+    newEntry = {message = paddedMsg, msgHash = msgHash, logMAC = (cbcMAC key (msgAndHashASCII paddedMsg msgHash))}
+    msgHash = hash (paddedMsg # previousHash)
 
 /**
     Given a log entry, check to see if it is a valid first entry
 */
-validFirstEntry : {msgSizeBytes, keySizeBytes}
-    (fin msgSizeBytes, fin keySizeBytes) =>
-    Log msgSizeBytes ->
+validFirstEntry : {maxMsgSizeBytes, keySizeBytes}
+    (fin maxMsgSizeBytes, fin keySizeBytes, maxMsgSizeBytes % CbcMACBlockSizeBytes == 0) =>
+    Log maxMsgSizeBytes ->
     [keySizeBytes][8] ->
     Bit
-property validFirstEntry log key = log.msgHash == (cbcMAC key log.message # zero) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
+validFirstEntry log key = log.msgHash == (cbcMAC key log.message) # zero /\ log.logMAC == cbcMAC key (msgAndHashASCII log.message log.msgHash)
 /* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
 /**
     Check to see if a log entry is valid given the previous hash
 */
-validLogEntry : {msgSizeBytes}
-    (fin msgSizeBytes) =>
+validLogEntry : {msgSizeBytes, keySize}
+    (fin msgSizeBytes, fin keySize) =>
     Log msgSizeBytes ->
+    [keySize][8] ->
     [HashSizeBytes][8] ->
     Bit
-property validLogEntry log prevHash =
-    log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (log.message # log.msgHash)
+validLogEntry log key prevHash =
+    log.msgHash == hash (log.message # prevHash) /\ log.logMAC == cbcMAC key (msgAndHashASCII log.message log.msgHash)
 /* NOTE: the CBC MAC part of this check need not be performed on the smart ballot box */
 
 /**
 Check the validity of an entire log file relative to a key
 */
 validLogFile : {maxMsgSize, keySize, msgs}
-    (fin maxMsgSize, fin keySize, fin msgs) =>
+    (fin maxMsgSize, fin keySize, fin msgs, maxMsgSize % CbcMACBlockSizeBytes == 0) =>
     LogFile maxMsgSize msgs ->
     [keySize][8] ->
     Bit
-property validLogFile logFile key =
+validLogFile logFile key =
     `msgs == (0 : [width msgs]) \/
     (foldResult ! 0 where
         foldResult = [validFirstEntry (logFile @ 0) key] #
-                        [prevValid /\ validLogEntry log (prevLog.msgHash)
+                        [prevValid /\ validLogEntry log key (prevLog.msgHash)
                             | log <- logFile
                             | prevLog <- [zero] # logFile
                             | prevValid <- foldResult])
