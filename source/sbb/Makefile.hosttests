@@ -1,4 +1,4 @@
-sbb_hosttest_all: sbb_hosttest1 sbb_hosttest2 sbb_hosttest3
+sbb_hosttest_all: sbb_hosttest1 sbb_hosttest2 sbb_hosttest3 sbb_hosttest4
 
 CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/cbc.c \
@@ -7,17 +7,29 @@ CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/crypto.c \
                 ../crypto/base64.c
 
+CFLAGS = -DHARDCODE_CURRENT_TIME \
+         -DCURRENT_YEAR=2019 \
+         -DCURRENT_MONTH=7 \
+         -DCURRENT_DAY=22 \
+         -DCURRENT_HOUR=13 \
+         -DCURRENT_MINUTE=18 \
+         $(HOSTTEST_CFLAGS)
+
 sbb_hosttest1:
 	cd $(SBB_DIR); \
-	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o hosttest1 hosttest1.c sbb_crypto.c $(CRYPTO_SOURCE)
+	$(CC) $(CFLAGS) -I../crypto -o hosttest1 hosttest1.c sbb_crypto.c $(CRYPTO_SOURCE)
 
 sbb_hosttest2:
 	cd $(SBB_DIR); \
-	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o hosttest2 hosttest2.c sbb_crypto.c $(CRYPTO_SOURCE)
+	$(CC) $(CFLAGS) -I../crypto -o hosttest2 hosttest2.c sbb_crypto.c $(CRYPTO_SOURCE)
 
 sbb_hosttest3:
 	cd $(SBB_DIR); \
-	$(CC) $(HOSTTEST_CFLAGS) -I../crypto -o hosttest3 hosttest3.c sbb_crypto.c $(CRYPTO_SOURCE)
+	$(CC) $(CFLAGS) -I../crypto -o hosttest3 hosttest3.c sbb_crypto.c $(CRYPTO_SOURCE)
+
+sbb_hosttest4:
+	cd $(SBB_DIR); \
+	$(CC) $(CFLAGS) -I../crypto -o hosttest4 hosttest4.c sbb_crypto.c $(CRYPTO_SOURCE)
 
 sbb_hosttest_clean:
 	cd $(CRYPTO_DIR); \
