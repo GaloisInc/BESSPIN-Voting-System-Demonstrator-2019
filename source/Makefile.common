@@ -30,6 +30,7 @@ export RANLIB	= $(RISCV_TARGET)-ranlib
 export FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
 export FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
 export FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
+export VOTING_SYSTEM_SOURCE_DIR = ..
 export FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 
 export WARNINGS= -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
@@ -45,7 +46,9 @@ export FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/timers.c \
 	$(FREERTOS_SOURCE_DIR)/event_groups.c \
 	$(FREERTOS_SOURCE_DIR)/stream_buffer.c \
-	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c \
+	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c 
+
+export FREERTOS_TCP_SRC = \
 	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP.c \
 	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_ARP.c \
 	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DNS.c \
@@ -65,8 +68,10 @@ export PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
 export PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
 
 export INCLUDES = \
-    -I. \
-	-I$(FREERTOS_DEMO_DIR) \
+	-I$(VOTING_SYSTEM_SOURCE_DIR)/protocols/include \
+	-I$(VOTING_SYSTEM_SOURCE_DIR)/logging \
+	-T$(VOTING_SYSTEM_SOURCE_DIR)/crypto \
+	-I$(VOTING_SYSTEM_SOURCE_DIR)/sbb \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
@@ -91,7 +96,7 @@ export ASFLAGS  += -g $(ARCH) $(ABI)  \
     -DportasmHANDLE_INTERRUPT=external_interrupt_handler
 
 export CFLAGS = $(WARNINGS) $(INCLUDES)
-export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
+export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DNETWORK_LOGS -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
 
 export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \

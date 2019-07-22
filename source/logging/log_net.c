@@ -9,6 +9,23 @@
 
 #include <stdio.h>
 
+///////////////////////////////////////////////////
+// Common constants needed by all implemenations //
+///////////////////////////////////////////////////
+
+static const char space = ' ';
+static const char new_line = '\n';
+
+static const char *REQUEST_LINE_1 = "POST /";
+static const char *REQUEST_LINE_3 = " HTTP/1.1\r\n";
+static const char *HEADER_1 = "Host: 10.5.5.1\r\n";
+static const char *HEADER_2 = "User-Agent: sbb/2019\r\n";
+static const char *HEADER_3 = "Accept: */*\r\n";
+static const char *HEADER_4 = "Content-Type: application/octet-stream\r\n";
+static const char *HEADER_5_1 = "Content-Length: ";
+static const char *DOUBLE_CRLF = "\r\n\r\n";
+
+//static const size_t data_block_length = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
 static const uint16_t PORT_NUMBER = 8066;
 
 // We assume that a log entry data block can't be more than 9_999_999 bytes long, so
@@ -16,6 +33,12 @@ static const uint16_t PORT_NUMBER = 8066;
 // static const size_t worst_case_data_length = 7;
 
 #ifdef TARGET_OS_FreeRTOS
+
+uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
+											uint16_t usSourcePort,
+											uint32_t ulDestinationAddress,
+											uint16_t usDestinationPort);
+
 
 //////////////////////////////////////////////
 // FreeRTOS-specific includes and constants //
@@ -30,20 +53,20 @@ static const uint16_t PORT_NUMBER = 8066;
 #define portable_assert(x) configASSERT(x)
 
 // Network configuration and addresses that are the same for all SBBs
-static const uint8_t SBB_NetMask[4] = {255, 255, 255, 0};
-static const uint8_t SBB_GatewayAddress[4] = {10, 10, 10, 1};
-static const uint8_t SBB_DNSServerAddress[4] = {4, 2, 2, 2};
-static const uint8_t Reporting_Server_IP_Address[4] = {10, 6, 6, 253};
+//static const uint8_t SBB_NetMask[4] = {255, 255, 255, 0};
+//static const uint8_t SBB_GatewayAddress[4] = {10, 10, 10, 1};
+//static const uint8_t SBB_DNSServerAddress[4] = {4, 2, 2, 2};
+//static const uint8_t Reporting_Server_IP_Address[4] = {10, 6, 6, 253};
 
 // Network configuration and addresses that will be different for each SBB
 
 // RCC made this up - to be confirmed
 // Should be different for each SBB
-static uint8_t This_SBB_IP_Address[4] = {10, 6, 6, 1};
+//static uint8_t This_SBB_IP_Address[4] = {10, 6, 6, 1};
 
 // RCC No idea where these numbers came from - to be confirmed
 // Should be different for each SBB
-static uint8_t This_SBB_MAC_Address[6] = {0x00, 0x12, 0x13, 0x10, 0x15, 0x11};
+//static uint8_t This_SBB_MAC_Address[6] = {0x00, 0x12, 0x13, 0x10, 0x15, 0x11};
 
 #else
 
@@ -77,7 +100,6 @@ void Log_Net_Initialize()
   //
   // We assume that FreeRTOS_IPInit() has been called already
   // by the main program.
-
 #endif
     // On POSIX, implementation is null
     return;
@@ -86,6 +108,9 @@ void Log_Net_Initialize()
 
 void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 {
+#ifdef SIMULATION
+	return;
+#endif
     {
 #ifdef TARGET_OS_FreeRTOS
       // FreeRTOS-specific implementation of socket handling code
@@ -99,8 +124,9 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
       // otherwise address can be taken from log_net.h uIPAddress
       // for now it is hardcoded before test.
       xRemoteAddress.sin_addr = FreeRTOS_inet_addr_quick
-        (Reporting_Server_IP_Address[0], Reporting_Server_IP_Address[1],
-         Reporting_Server_IP_Address[2], Reporting_Server_IP_Address[3]);
+	      (configRptrIP_ADDR0, configRptrIP_ADDR1, configRptrIP_ADDR2, configRptrIP_ADDR3);
+        //(Reporting_Server_IP_Address[0], Reporting_Server_IP_Address[1],
+        // Reporting_Server_IP_Address[2], Reporting_Server_IP_Address[3]);
 
       // Create a socket.
       xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,

@@ -1,18 +1,22 @@
 PROG = test_freertos
 
 DEMO_SRC = \
-    ../sbb/sbb_tcp.c \
     test_freertos.c \
     crypto.c \
     cbc.c \
     aes.c \
     sha2-openbsd.c \
-    mode_wrappers.c
+    mode_wrappers.c 
+#    ../protocols/Common/FreeRTOS_TCP_server.c \
+#    ../protocols/HTTP/FreeRTOS_HTTP_server.c \
+#    ../protocols/HTTP/FreeRTOS_HTTP_commands.c \
+#    ../protocols/HTTP/peekpoke.c
 
 #
 # Define all object files.
 #
 RTOS_OBJ = $(FREERTOS_SRC:.c=.o)
+RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
 APP_OBJ  = $(APP_SRC:.c=.o)
 PORT_OBJ = $(PORT_SRC:.c=.o)
 DEMO_OBJ = $(DEMO_SRC:.c=.o)

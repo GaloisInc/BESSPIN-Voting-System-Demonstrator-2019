@@ -33,7 +33,6 @@ FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
 
 INCLUDES = \
 	-I. \
-	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_SOURCE_DIR)/include \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \

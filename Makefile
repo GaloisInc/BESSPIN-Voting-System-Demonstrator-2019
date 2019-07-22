@@ -139,15 +139,34 @@ else
 #####################################
 ifeq ($(TARGET),sim)
 
-sim_all: sim_sbb
+sim_all: freertos_crypto freertos_log freertos_sbb
 
-sim_sbb:
+clean: clean_crypto clean_log clean_sbb
+
+freertos_crypto:
+	cd $(CRYPTO_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim all
+
+clean_crypto:
+	cd $(CRYPTO_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim clean
+
+freertos_log:
+	cd $(LOG_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim all
+
+clean_log:
+	cd $(LOG_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim clean
+
+freertos_sbb:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim all
 
-clean:
+clean_sbb:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
+
 
 else
 $(info unknown target type: $(TARGET) Available types are "bottom", "verification", "freertos", "hosttests")

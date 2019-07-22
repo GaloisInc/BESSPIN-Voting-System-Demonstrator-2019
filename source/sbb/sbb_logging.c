@@ -80,7 +80,7 @@ bool load_or_create_logs(void) {
 
 bool log_system_message(const char *new_entry, int length) {
     #ifdef SIMULATION
-    debug_printf("LOG: %s\r\n", new_entry);
+    debug_printf("System LOG: %s\r\n", new_entry);
     return true;
     #else
     log_entry event_entry;
@@ -144,10 +144,9 @@ bool log_app_event(app_event event,
         }
         debug_printf("\r\n");
         return true;
-#else
+#endif
         Log_FS_Result res = write_entry(&app_log_handle, event_entry);
         return (res == LOG_FS_OK);
-#endif
     } else {
         return false;
     }

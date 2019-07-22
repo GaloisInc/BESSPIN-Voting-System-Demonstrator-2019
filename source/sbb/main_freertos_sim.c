@@ -55,6 +55,9 @@
 #include "sbb.h"
 #include "sbb_freertos.h"
 
+/* "Peek/poke" embedded web server */
+#include "peekpoke.h"
+
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented
    within this file.  See https://www.freertos.org/a00016.html */
 void vApplicationMallocFailedHook(void);
@@ -108,6 +111,9 @@ int main(void)
                 NULL);
     xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U,
                 NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+
+    /* Set priority now, starts later once TCP is up. */
+    peekPokeServerTaskPriority( SBB_MAIN_TASK_PRIORITY );
 
     /* If all is well, the scheduler will now be running, and the following
        line will never be reached.  If the following line does execute, then

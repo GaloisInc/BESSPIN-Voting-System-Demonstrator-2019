@@ -36,10 +36,10 @@ LOGGING_DIR = ../logging
 CRYPTO_DIR = ../crypto
 
 FREERTOS_INCLUDES = \
-  -I. \
-  -I $(LOGGING_DIR) \
-  -I $(CRYPTO_DIR) \
-	-I$(FREERTOS_DEMO_DIR) \
+    -I. \
+    -I $(LOGGING_DIR) \
+    -I $(CRYPTO_DIR) \
+    -I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
