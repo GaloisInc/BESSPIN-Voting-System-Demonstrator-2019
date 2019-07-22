@@ -12,7 +12,7 @@
 
 #define BARCODE_MAX_LENGTH 254
 
-typedef uint8_t* barcode_t;
+typedef char* barcode_t;
 // @todo kiniry Add a pure helper function for relating
 // BARCODE_MAX_LENGTH to all uses of the pair (barcode,
 // barcode_length).
@@ -114,8 +114,11 @@ typedef struct SBB_states {
     uint8_t button_illumination: 2;
 } SBB_state;
 
-#define cast_button_lit(s) (s.button_illumination & 0x0)
-#define spoil_button_lit(s) (s.button_illumination & 0x1)
+#define cast_button_mask  (0x1 << 0)
+#define spoil_button_mask (0x1 << 1)
+
+#define cast_button_lit(s) (s.button_illumination & cast_button_mask)
+#define spoil_button_lit(s) (s.button_illumination & spoil_button_mask)
 #define no_buttons_lit(s) !(cast_button_lit(s) || spoil_button_lit(s))
 
 #endif

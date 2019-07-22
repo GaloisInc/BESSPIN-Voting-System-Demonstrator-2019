@@ -70,12 +70,17 @@
   @    ((preS.D == INITIALIZED_DISPLAY || preS.D == SHOWING_TEXT) && postS.D == SHOWING_TEXT));
   @ }
   @ axiomatic SBB_motor_ASM {
+  @   predicate motor_ASM_valid(SBB_state S) =
+  @     S.M == MOTORS_OFF ||
+  @     S.M == MOTORS_TURNING_FORWARD ||
+  @     S.M == MOTORS_TURNING_BACKWARD;
+  @
   @   predicate motor_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
   @                                  SBB_state postS) =
   @     ((E == MOTOR_OFF_E) ==>
   @       (preS.M == MOTORS_OFF && postS.M == MOTORS_OFF) ||
-  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) &&
+  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) ||
   @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_OFF)) &&
   @     ((E == MOTOR_FORWARD_E) ==>
   @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_FORWARD) ||
@@ -130,8 +135,122 @@
   @     timer_ASM_transition(preS, E, postS)        &&
   @     sd_card_ASM_transition(preS, E, postS)
   @     ;
+  @
+  @ }
+  @ axiomatic SBB_States_Invariants {
+  @
+  @   predicate valid_range(integer lo, integer x, integer hi) =
+  @     lo <= x && x <= hi;
+  @
+  @   predicate M_ASM_valid(SBB_state S) =
+  @     valid_range(MOTORS_OFF, S.M, MOTORS_TURNING_BACKWARD);
+  @
+  @   predicate L_ASM_valid(SBB_state S) =
+  @     valid_range(INITIALIZE, S.L, ABORT);
+  @
+  @   predicate D_ASM_valid(SBB_state S) =
+  @     valid_range(INITIALIZED_DISPLAY, S.D, SHOWING_TEXT);
+  @
+  @   predicate BS_ASM_valid(SBB_state S) =
+  @     valid_range(BARCODE_NOT_PRESENT, S.BS, BARCODE_PRESENT_AND_RECORDED);
+  @
+  @   predicate Barcode_Present(SBB_state S) =
+  @    S.BS == BARCODE_PRESENT_AND_RECORDED;
+  @
+  @   predicate Valid_ASM_States(SBB_state S) =
+  @     M_ASM_valid(S) &&
+  @     L_ASM_valid(S) &&
+  @     D_ASM_valid(S) &&
+  @     BS_ASM_valid(S);
+  @
+  @   predicate Initialize_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Standby_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Wait_For_Ballot_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Feed_Ballot_Inv(SBB_state S) =
+  @     S.M == MOTORS_TURNING_FORWARD &&
+  @     !cast_button_lit(S)           &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Barcode_Detected_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF     &&
+  @     Barcode_Present(S)    &&
+  @     !cast_button_lit(S)   &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Wait_For_Decision_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF  &&
+  @     Barcode_Present(S) &&
+  @     cast_button_lit(S) &&
+  @     spoil_button_lit(S);
+  @
+  @   predicate Cast_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
+  @     Barcode_Present(S) &&
+  @     cast_button_lit(S) &&
+  @     spoil_button_lit(S);
+  @
+  @   predicate Spoil_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
+  @     Barcode_Present(S) &&
+  @     cast_button_lit(S) &&
+  @     spoil_button_lit(S);
+  @
+  @   predicate Eject_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF    &&
+  @     !cast_button_lit(S)  &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Await_Removal_Inv(SBB_state S) =
+  @     S.M == MOTORS_OFF   &&
+  @     !cast_button_lit(S) &&
+  @     !spoil_button_lit(S);
+  @
+  @   predicate Abort_Inv(SBB_state S) =
+  @     true;
   @ }
   @*/
+
+/*@ predicate Ballot_Present(SBB_state S) =
+  @   S.L == BARCODE_DETECTED  ||
+  @   S.L == WAIT_FOR_DECISION ||
+  @   S.L == CAST              ||
+  @   S.L == EJECT             ||
+  @   S.L == SPOIL;
+*/
+// Since we only have one sensor, we consider paper to be present
+// in some cases beyond the sensor being active
+// (like if we have fed it far enough that the sensor is no longer active)
+// Moreover, since we are polling, this definition is when we _think_ there
+// is paper present (we don't allow the sensor to pre-empt the executing SBB task)
+/*@ predicate Paper_Present(SBB_state S) =
+  @   Ballot_Present(S) || S.L == FEED_BALLOT || S.L == AWAIT_REMOVAL;
+*/
+
+/*@ predicate SBB_States_Invariant(SBB_state S) =
+      (S.L == WAIT_FOR_BALLOT   && Wait_For_Ballot_Inv(S))   ||
+      (S.L == FEED_BALLOT       && Feed_Ballot_Inv(S))       ||
+      (S.L == BARCODE_DETECTED  && Barcode_Detected_Inv(S))  ||
+      (S.L == WAIT_FOR_DECISION && Wait_For_Decision_Inv(S)) ||
+      (S.L == CAST              && Cast_Inv(S))              ||
+      (S.L == SPOIL             && Spoil_Inv(S))             ||
+      (S.L == EJECT             && Eject_Inv(S))             ||
+      (S.L == AWAIT_REMOVAL     && Await_Removal_Inv(S))     ||
+      (S.L == ABORT             && Abort_Inv(S))             ||
+      (S.L == STANDBY           && Standby_Inv(S))           ||
+      (S.L == INITIALIZE        && Initialize_Inv(S));
+*/
 
 // @spec abakst should NO_PAPER_DETECTED be reachable from the other states?
 // @spec abakst the diagram seems to indicate there is a skip transition from stopped to initialized

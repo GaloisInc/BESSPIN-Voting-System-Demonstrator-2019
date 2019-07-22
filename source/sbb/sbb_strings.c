@@ -36,3 +36,5 @@ const char *empty_barcode_received_event_msg = "Received empty barcode";
 
 const char *invalid_barcode_received_event_msg = "Barcode is invalid";
 const char *decision_timeout_event_msg         = "User cast/spoil decision timeout";
+
+void __assume_strings_OK() { }

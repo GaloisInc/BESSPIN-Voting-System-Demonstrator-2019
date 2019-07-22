@@ -7,10 +7,8 @@
 
 #include "log_io.h"
 
-/*@ requires \valid(the_format);
-  @ // requires \strlen(the_format) >= 0; // it's really a string
-  @ assigns \nothing; // TBD
-  @*/
+/*@ assigns \nothing; // TBD
+*/
 int debug_printf(const char *the_format, ...);
 
 /*@ requires \valid(the_io_stream);

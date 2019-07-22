@@ -25,8 +25,6 @@ SBB_state the_state = { .S = START };
 // can talk about the state of memory-mapped firmware.
 firmware_state the_firmware_state;
 
-// @todo abakst refactor or expose this
-extern void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length);
 
 void update_paper_state(bool paper_in_pressed,
                         bool paper_in_released)
@@ -51,6 +49,8 @@ void update_button_state(bool cast_button_pressed,
                          bool spoil_button_pressed,
                          bool spoil_button_released) {
     switch ( the_state.B ) {
+    default:
+        break;
     case ALL_BUTTONS_UP:
         if ( cast_button_pressed ) {
             CHANGE_STATE(the_state, B, CAST_BUTTON_DOWN);
@@ -73,14 +73,25 @@ void update_button_state(bool cast_button_pressed,
     }
 }
 
+/*@ requires \valid((char *)pvRxData + (0 .. xBufferLengthBytes-1));
+  @ assigns *((char *)pvRxData + (0 .. \result - 1));
+  @ ensures 0 <= \result;
+  @ ensures \result <= xBufferLengthBytes;
+*/
+extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,
+                                   void *pvRxData,
+                                   size_t xBufferLengthBytes,
+                                   TickType_t xTicksToWait);
+
 void update_barcode_state( bool barcode_scanned ) {
     switch ( the_state.BS ) {
     case BARCODE_NOT_PRESENT:
         if ( barcode_scanned ) {
-            uint8_t barcode[BARCODE_MAX_LENGTH] = {0};
+            char barcode[BARCODE_MAX_LENGTH] = {0};
             barcode_length_t xReceiveLength = 0;
             xReceiveLength = xStreamBufferReceive(xScannerStreamBuffer,
-                                                  (void *)barcode, sizeof(barcode),
+                                                  barcode,
+                                                  BARCODE_MAX_LENGTH,
                                                   SCANNER_BUFFER_RX_BLOCK_TIME_MS);
             if ( xReceiveLength > 0 ) {
                 set_received_barcode(barcode, xReceiveLength);
@@ -93,8 +104,12 @@ void update_barcode_state( bool barcode_scanned ) {
     }
 }
 
-// this is a workaround for multiple barcodes being "queued"
 void flush_barcodes() {
+    /*@ loop invariant SBB_Machine_Invariant;
+      @ loop invariant the_state.L == ABORT || the_state.L == STANDBY;
+      @ loop assigns the_state.BS, the_state.L, the_state.P,
+      @ the_state.B, log_fs, barcode[0 .. BARCODE_MAX_LENGTH-1], barcode_length;
+      @*/
     do {
         the_state.BS = BARCODE_NOT_PRESENT;
         update_sensor_state();
@@ -145,30 +160,27 @@ EventBits_t next_barcode_event_bits(void) {
 extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToSet );
 
-
 void log_single_event( EventBits_t event_bits,
                        EventBits_t log_bit,
-                       const log_entry event_entry ) {
+                       const char *event_entry,
+                       int length ) {
     if ( event_bits & log_bit ) {
-        bool b_log_ok = log_system_message(event_entry);
-
-        if (!b_log_ok) {
+        if ( !log_system_message(event_entry, length) ) {
             debug_printf("Failed to write to system log.");
-            the_state.L = ABORT;
         }
     }
 }
 
 void log_event_group_result ( EventBits_t bits ) {
-    log_single_event(bits, ebPAPER_SENSOR_IN_PRESSED, sensor_in_pressed_msg);
-    log_single_event(bits, ebPAPER_SENSOR_IN_RELEASED, sensor_in_released_msg);
+    log_single_event(bits, ebPAPER_SENSOR_IN_PRESSED, sensor_in_pressed_msg, strlen(sensor_in_pressed_msg));
+    log_single_event(bits, ebPAPER_SENSOR_IN_RELEASED, sensor_in_released_msg, strlen(sensor_in_released_msg));
 
-    log_single_event(bits, ebCAST_BUTTON_PRESSED, cast_button_pressed_msg);
-    log_single_event(bits, ebCAST_BUTTON_RELEASED, cast_button_released_msg);
-    log_single_event(bits, ebSPOIL_BUTTON_PRESSED, spoil_button_pressed_msg);
-    log_single_event(bits, ebSPOIL_BUTTON_RELEASED, spoil_button_released_msg);
+    log_single_event(bits, ebCAST_BUTTON_PRESSED, cast_button_pressed_msg, strlen(cast_button_pressed_msg));
+    log_single_event(bits, ebCAST_BUTTON_RELEASED, cast_button_released_msg, strlen(cast_button_released_msg));
+    log_single_event(bits, ebSPOIL_BUTTON_PRESSED, spoil_button_pressed_msg, strlen(spoil_button_pressed_msg));
+    log_single_event(bits, ebSPOIL_BUTTON_RELEASED, spoil_button_released_msg, strlen(spoil_button_released_msg));
 
-    log_single_event(bits, ebBARCODE_SCANNED, barcode_scanned_msg);
+    log_single_event(bits, ebBARCODE_SCANNED, barcode_scanned_msg, strlen(barcode_scanned_msg));
 }
 
 void update_sensor_state(void) {
@@ -229,13 +241,13 @@ void run_cast(void) {
 }
 
 void run_wait_for_decision(void) {
-    uint8_t this_barcode[BARCODE_MAX_LENGTH] = {0};
+    char this_barcode[BARCODE_MAX_LENGTH] = {0};
     barcode_length_t its_length;
     its_length = what_is_the_barcode(this_barcode);
     if ( cast_or_spoil_timeout_expired() ) {
         spoil_button_light_off();
         cast_button_light_off();
-        log_system_message(decision_timeout_event_msg);
+        log_system_message(decision_timeout_event_msg, strlen(decision_timeout_event_msg));
         CHANGE_STATE(the_state, L, EJECT);
     } else if ( is_cast_button_pressed() ) {
         if ( !log_app_event(APP_EVENT_BALLOT_USER_CAST,
@@ -257,11 +269,10 @@ void run_wait_for_decision(void) {
         // pass
     }
 }
-
 void run_barcode_detected(void) {
-    uint8_t this_barcode[BARCODE_MAX_LENGTH] = {0};
+    char this_barcode[BARCODE_MAX_LENGTH] = {0};
     display_this_text(barcode_detected_text,
-                      strlen(barcode_detected_text));
+                     strlen(barcode_detected_text));
     barcode_length_t length = what_is_the_barcode(this_barcode);
     if ( barcode_cast_or_spoiled(this_barcode, length) ) {
         // Eject Ballot
@@ -287,7 +298,8 @@ void run_barcode_detected(void) {
         debug_printf("invalid barcode detected");
         display_this_text(invalid_barcode_text,
                           strlen(invalid_barcode_text));
-        log_system_message(invalid_barcode_received_event_msg);
+        log_system_message(invalid_barcode_received_event_msg,
+                           strlen(invalid_barcode_received_event_msg));
         CHANGE_STATE(the_state, L, EJECT);
     }
 }
@@ -319,7 +331,12 @@ void run_initialize(void) {
     initialize();
     if ( LOG_FS_OK == Log_IO_Initialize() ) {
         if ( load_or_create_logs() ) {
-            CHANGE_STATE(the_state, L, STANDBY);
+            update_sensor_state();
+            if ( ballot_detected() ) {
+                CHANGE_STATE(the_state, L, EJECT);
+            } else {
+                CHANGE_STATE(the_state, L, STANDBY);
+            }
         } else {
             debug_printf("Failed to import logs.");
             CHANGE_STATE(the_state, L, ABORT);
@@ -331,8 +348,8 @@ void run_initialize(void) {
 }
 
 void run_standby(void) {
-    go_to_standby();
     flush_barcodes();
+    go_to_standby();
     CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
 }
 
@@ -343,69 +360,82 @@ void run_abort(void) {
                              strlen(error_line_2_text));
 }
 
+/*@ requires SBB_Machine_Invariant;
+  @ ensures SBB_Machine_Invariant;
+*/
+void take_step(void) {
+    switch ( the_state.L ) {
+    default:
+        break;
+
+    case STANDBY:
+        run_standby();
+        break;
+
+    case WAIT_FOR_BALLOT:
+        run_wait_for_ballot();
+        break;
+
+    case FEED_BALLOT:
+        run_feed_ballot();
+        break;
+
+    case BARCODE_DETECTED:
+        run_barcode_detected();
+        break;
+
+    case WAIT_FOR_DECISION:
+        run_wait_for_decision();
+        break;
+
+    case CAST:
+        run_cast();
+        break;
+
+    case SPOIL:
+        run_spoil();
+        break;
+
+    case EJECT:
+        run_eject();
+        break;
+
+    case AWAIT_REMOVAL:
+        run_await_removal();
+        break;
+
+    case ABORT:
+        run_abort();
+        configASSERT(false);
+        break;
+        //default:
+        //assert(false);
+    }
+}
+
+// This exists to isolate the effect of the var_arg call (which we can't specify)
+/*@ assigns \nothing; */
+logic_state debug_state_change(logic_state then, logic_state now) {
+    if (then != now) {
+        debug_printf("logic state changed to %d", now);
+    }
+    return now;
+}
 // This main loop for the SBB never terminates until the system is
 // turned off.
 void ballot_box_main_loop(void) {
     the_state.L = INITIALIZE;
     logic_state old = 0;
+    run_initialize();
 
+    /*@ loop invariant SBB_Machine_Invariant;
+     */
     for(;;) {
-        if (the_state.L != old) {
-            debug_printf("logic state changed to %d", the_state.L);
-            old = the_state.L;
-        }
+        debug_state_change(old, the_state.L);
 
-        switch ( the_state.L ) {
+        take_step();
 
-        case INITIALIZE:
-            run_initialize();
-            break;
-
-        case STANDBY:
-            run_standby();
-            break;
-
-        case WAIT_FOR_BALLOT:
-            run_wait_for_ballot();
-            break;
-
-        case FEED_BALLOT:
-            run_feed_ballot();
-            break;
-
-            // Requires: has_a_barcode
-        case BARCODE_DETECTED:
-            run_barcode_detected();
-            break;
-
-        case WAIT_FOR_DECISION:
-            run_wait_for_decision();
-            break;
-
-        case CAST:
-            run_cast();
-            break;
-
-        case SPOIL:
-            run_spoil();
-            break;
-
-        case EJECT:
-            run_eject();
-            break;
-
-        case AWAIT_REMOVAL:
-            run_await_removal();
-            break;
-
-        case ABORT:
-            run_abort();
-            configASSERT(false);
-            break;
-            //default:
-            //assert(false);
-        }
-
-        update_sensor_state();
+        if (the_state.L != ABORT)
+          update_sensor_state();
     }
 }

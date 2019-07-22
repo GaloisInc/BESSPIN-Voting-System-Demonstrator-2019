@@ -31,10 +31,8 @@
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;
 
-bool barcode_present = false;
 char barcode[BARCODE_MAX_LENGTH] = {0};
 barcode_length_t barcode_length  = 0;
-SemaphoreHandle_t barcode_mutex;
 
 // Assigns declarations for FreeRTOS functions; these may not be
 // accurate but are currently required to avoid crashing wp.
@@ -43,11 +41,7 @@ SemaphoreHandle_t barcode_mutex;
 extern void serLcdPrintf(char *str, uint8_t len);
 //@ assigns \nothing;
 extern void serLcdPrintTwoLines(char* line_1, uint8_t len_1, char* line_2, uint8_t len_2);
-//@ assigns \nothing;
-extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,
-                                   void *pvRxData,
-                                   size_t xBufferLengthBytes,
-                                   TickType_t xTicksToWait);
+
 //@ assigns \nothing;
 extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToWaitFor,
@@ -56,6 +50,11 @@ extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
                                        TickType_t xTicksToWait);
 
 // main code
+/*@ assigns the_firmware_state; */
+extern void gpio_set_as_input(uint8_t);
+
+/*@ assigns the_firmware_state; */
+extern void gpio_set_as_output(uint8_t);
 
 void initialize(void) {
     gpio_set_as_input(BUTTON_CAST_IN);
@@ -66,9 +65,15 @@ void initialize(void) {
     gpio_set_as_output(MOTOR_1);
     gpio_set_as_output(BUTTON_CAST_LED);
     gpio_set_as_output(BUTTON_SPOIL_LED);
-
-    barcode_mutex = xSemaphoreCreateMutex();
- DevicesInitialized: return;
+    the_state.button_illumination = 0;
+    // Logging is not set up yet...we could do that here I suppose
+    the_state.M = MOTORS_OFF;
+    the_state.D = INITIALIZED_DISPLAY;
+    the_state.BS = BARCODE_NOT_PRESENT;
+    __assume_strings_OK();
+    barcode_length = 0;
+ DevicesInitialized:
+    return;
 }
 
 /* global invariant Button_lighting_conditions_power_on:
@@ -83,7 +88,6 @@ void initialize(void) {
 /* global invariant Motor_initial_state:
    \forall motor m; \at(!motor_running(m), DevicesInitialized);
 */
-
 bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
     return crypto_check_barcode_valid(the_barcode, its_length);
 }
@@ -97,19 +101,12 @@ bool is_spoil_button_pressed(void) {
 }
 
 void just_received_barcode(void) {
-    if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
-        barcode_present = true;
-        xSemaphoreGive(barcode_mutex);
-    }
 }
 
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
     configASSERT(its_length <= BARCODE_MAX_LENGTH);
-    if (xSemaphoreTake(barcode_mutex, portMAX_DELAY) == pdTRUE) {
-        memcpy(barcode, the_barcode, its_length);
-        barcode_length = its_length;
-        xSemaphoreGive(barcode_mutex);
-    }
+    memcpy(barcode, the_barcode, its_length);
+    barcode_length  = its_length;
 }
 
 bool has_a_barcode(void) {
@@ -117,18 +114,30 @@ bool has_a_barcode(void) {
 }
 
 barcode_length_t what_is_the_barcode(barcode_t the_barcode) {
-    configASSERT(barcode_length > 0);
     memcpy(the_barcode, barcode, barcode_length);
+    __assume_strings_OK();
     return barcode_length;
 }
 
-void spoil_button_light_on(void) { gpio_write(BUTTON_SPOIL_LED); }
+void spoil_button_light_on(void) {
+    gpio_write(BUTTON_SPOIL_LED);
+    the_state.button_illumination |= spoil_button_mask;
+}
 
-void spoil_button_light_off(void) { gpio_clear(BUTTON_SPOIL_LED); }
+void spoil_button_light_off(void) {
+    gpio_clear(BUTTON_SPOIL_LED);
+    the_state.button_illumination &= ~spoil_button_mask;
+}
 
-void cast_button_light_on(void) { gpio_write(BUTTON_CAST_LED); }
+void cast_button_light_on(void) {
+    gpio_write(BUTTON_CAST_LED);
+    the_state.button_illumination |= cast_button_mask;
+}
 
-void cast_button_light_off(void) { gpio_clear(BUTTON_CAST_LED); }
+void cast_button_light_off(void) {
+    gpio_clear(BUTTON_CAST_LED);
+    the_state.button_illumination &= ~cast_button_mask;
+}
 
 void move_motor_forward(void) {
     gpio_clear(MOTOR_0);
@@ -155,6 +164,7 @@ void display_this_text(const char *the_text, uint8_t its_length) {
     #else
     serLcdPrintf(the_text, its_length);
     #endif
+    CHANGE_STATE(the_state,D,SHOWING_TEXT);
 }
 
 void display_this_2_line_text(const char *line_1, uint8_t length_1,
@@ -162,6 +172,7 @@ void display_this_2_line_text(const char *line_1, uint8_t length_1,
     #ifdef SIMULATION
     debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", line_1, line_2);
     #else
+    CHANGE_STATE(the_state,D,SHOWING_TEXT);
     serLcdPrintTwoLines(line_1, length_1, line_2, length_2);
     #endif
 }
@@ -175,6 +186,7 @@ void eject_ballot(void) {
     // run the motor for a bit to get the paper back over the switch
     TickType_t spoil_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(SPOIL_EJECT_TIMEOUT_MS);
+    /*@ loop assigns \nothing; */
     while (xTaskGetTickCount() < spoil_timeout) {
         // wait for the motor to run a while
     }
@@ -191,11 +203,14 @@ void spoil_ballot(void) {
 }
 
 void cast_ballot(void) {
+    spoil_button_light_off();
+    cast_button_light_off();
     move_motor_forward();
 
     // run the motor for a bit to get the paper into the box
     TickType_t cast_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(CAST_INGEST_TIMEOUT_MS);
+    /*@ loop assigns \nothing; */
     while (xTaskGetTickCount() < cast_timeout) {
         // wait for the motor to run a while
     }
@@ -204,7 +219,9 @@ void cast_ballot(void) {
 }
 
 void go_to_standby(void) {
-    stop_motor();
+    if ( the_state.M != MOTORS_OFF ) {
+        stop_motor();
+    }
     cast_button_light_off();
     spoil_button_light_off();
     display_this_2_line_text(welcome_text, strlen(welcome_text),
@@ -215,8 +232,10 @@ void go_to_standby(void) {
     CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
     CHANGE_STATE(the_state, S, INNER);
     CHANGE_STATE(the_state, B, ALL_BUTTONS_UP);
+    CHANGE_STATE(the_state, L, STANDBY);
 }
 
+//@ assigns ballot_detect_timeout;
 void ballot_detect_timeout_reset(void) {
     ballot_detect_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(BALLOT_DETECT_TIMEOUT_MS);
@@ -226,6 +245,7 @@ bool ballot_detect_timeout_expired(void) {
     return (xTaskGetTickCount() > ballot_detect_timeout);
 }
 
+//@ assigns cast_or_spoil_timeout;
 void cast_or_spoil_timeout_reset(void) {
     cast_or_spoil_timeout =
         xTaskGetTickCount() + pdMS_TO_TICKS(CAST_OR_SPOIL_TIMEOUT_MS);
