@@ -57,7 +57,7 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
                                   &barcode[BASE64_ENCODING_START],
                                   length - BASE64_ENCODING_START);
 
-        if (BASE64_DECODED_BYTES == olen) {
+        if (r == 0 && BASE64_DECODED_BYTES == olen) {
             // 2. a
             // Check the timestamp to make sure it's not from the future
 

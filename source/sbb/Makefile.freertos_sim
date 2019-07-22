@@ -25,7 +25,13 @@ DEMO_SRC = \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c
 
-CFLAGS += -I$(LOGGING_DIR) -I$(CRYPTO_DIR) -DSIMULATION -DconfigUSE_DHCP
+CFLAGS += -I$(LOGGING_DIR) -I$(CRYPTO_DIR) -DSIMULATION -DconfigUSE_DHCP \
+          -DHARDCODE_CURRENT_TIME \
+          -DCURRENT_YEAR=2019 \
+          -DCURRENT_MONTH=7 \
+          -DCURRENT_DAY=22 \
+          -DCURRENT_HOUR=13 \
+          -DCURRENT_MINUTE=18
 
 #
 # Define all object files.
