@@ -162,9 +162,9 @@ void display_this_text(const char *the_text, uint8_t its_length) {
     #ifdef SIMULATION
     debug_printf("DISPLAY: %s\r\n", the_text);
     #else
-    CHANGE_STATE(the_state,D,SHOWING_TEXT);
     serLcdPrintf(the_text, its_length);
     #endif
+    CHANGE_STATE(the_state,D,SHOWING_TEXT);
 }
 
 void display_this_2_line_text(const char *line_1, uint8_t length_1,

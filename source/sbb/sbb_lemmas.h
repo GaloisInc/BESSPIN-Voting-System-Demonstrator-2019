@@ -5,7 +5,7 @@
   @ requires the_state.L != ABORT;
   @ ensures cast_button_lit(the_state) <==> spoil_button_lit(the_state);
 */
-void lemma_button_lights_disjoint(void);
+void lemma_button_lights_jointness(void);
 
 /*@ requires SBB_Machine_Invariant;
   @ requires the_state.L != ABORT;

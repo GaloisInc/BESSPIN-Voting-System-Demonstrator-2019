@@ -1,6 +1,6 @@
 #include "sbb_lemmas.h"
 
-void lemma_button_lights_disjoint(void) {}
+void lemma_button_lights_jointness(void) {}
 
 void lemma_button_lights_ballot(void) {}
 

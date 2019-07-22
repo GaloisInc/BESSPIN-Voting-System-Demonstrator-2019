@@ -200,7 +200,7 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
     if (length >= BARCODE_MAX_LENGTH) {
         debug_printf("barcode is too long, treated as duplicate");
         b_found = true; // treat too-long barcode as duplicate
-    } else if (num_scanned_codes >= 1000) {
+    } else if (num_scanned_codes >= MAX_SCANNED_CODES) {
         debug_printf("somehow scanned too many barcodes, treated as duplicate");
         b_found = true;
     } else {

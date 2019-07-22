@@ -2,7 +2,7 @@
 
 ## Strings
 
-Facts about strings are current assumed by a function `__assume_strings_OK`, in
+Facts about strings are currently assumed by a function `__assume_strings_OK`, in
 order to temporarily work around issues with Frama-C and string literals.
 
 ## Logging
