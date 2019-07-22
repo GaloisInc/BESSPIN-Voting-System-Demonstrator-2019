@@ -449,7 +449,6 @@ void prvInputTask(void *pvParameters)
     \r\n";
 
     printf("Starting prvInputTask\r\n");
-    while(!the_network_status) {}
     printf("%s", intro);
 
 
