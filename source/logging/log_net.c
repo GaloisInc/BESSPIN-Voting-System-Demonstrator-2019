@@ -96,17 +96,10 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 void Log_Net_Initialize()
 {
 #ifdef TARGET_OS_FreeRTOS
-<<<<<<< HEAD
   // On FreeRTOS, this is currently null.
   //
   // We assume that FreeRTOS_IPInit() has been called already
   // by the main program.
-
-=======
-    debug_printf("FreeRTOS_IPInit");
-//    FreeRTOS_IPInit(This_SBB_IP_Address, SBB_NetMask, SBB_GatewayAddress,
-//                    SBB_DNSServerAddress, This_SBB_MAC_Address);
->>>>>>> Turned on network logging and forced IP addresses for testing.
 #endif
     // On POSIX, implementation is null
     return;
