@@ -28,7 +28,7 @@ Log_FS_Result Log_FS_Initialize(void)
     FRESULT res;
     res = f_mount(&FatFs,
                   "", // Mount the default volume
-                  0); // Mount on first access
+                  1); // Mount on first access
 
     if (res == FR_OK)
     {

@@ -16,6 +16,7 @@
 #include "sbb_logging.h"
 
 // Display strings
+extern const char *empty;
 extern const char *welcome_text;
 extern const char *insert_ballot_text;
 extern const char *barcode_detected_text;

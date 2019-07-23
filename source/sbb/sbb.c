@@ -72,7 +72,6 @@ void initialize(void) {
     the_state.BS = BARCODE_NOT_PRESENT;
     __assume_strings_OK();
     barcode_length = 0;
- //DevicesInitialized:
     return;
 }
 
@@ -118,46 +117,61 @@ barcode_length_t what_is_the_barcode(barcode_t the_barcode) {
 }
 
 void spoil_button_light_on(void) {
+#ifndef SIMULATION
     gpio_write(BUTTON_SPOIL_LED);
+#endif
     the_state.button_illumination |= spoil_button_mask;
 }
 
 void spoil_button_light_off(void) {
+#ifndef SIMULATION
     gpio_clear(BUTTON_SPOIL_LED);
+#endif
     the_state.button_illumination &= ~spoil_button_mask;
 }
 
 void cast_button_light_on(void) {
+#ifndef SIMULATION
     gpio_write(BUTTON_CAST_LED);
+#endif
     the_state.button_illumination |= cast_button_mask;
 }
 
 void cast_button_light_off(void) {
+#ifndef SIMULATION
     gpio_clear(BUTTON_CAST_LED);
+#endif
     the_state.button_illumination &= ~cast_button_mask;
 }
 
 void move_motor_forward(void) {
+#ifndef SIMULATION
     gpio_clear(MOTOR_0);
     gpio_write(MOTOR_1);
+#endif
     CHANGE_STATE(the_state, M, MOTORS_TURNING_FORWARD);
 }
 
 void move_motor_back(void) {
+#ifndef SIMULATION
     gpio_write(MOTOR_0);
     gpio_clear(MOTOR_1);
+#endif
     CHANGE_STATE(the_state, M, MOTORS_TURNING_BACKWARD);
 }
 
 void stop_motor(void) {
+#ifndef SIMULATION
     gpio_clear(MOTOR_0);
     gpio_clear(MOTOR_1);
+#endif
     CHANGE_STATE(the_state, M, MOTORS_OFF);
 }
 
 
 void display_this_text(const char *the_text, uint8_t its_length) {
     #ifdef SIMULATION
+    (void) its_length;
     debug_printf("DISPLAY: %s\r\n", the_text);
     #else
     serLcdPrintf((char*)the_text, its_length);
@@ -168,6 +182,8 @@ void display_this_text(const char *the_text, uint8_t its_length) {
 void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2) {
     #ifdef SIMULATION
+    (void) length_1;
+    (void) length_2;
     debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", line_1, line_2);
     #else
     CHANGE_STATE(the_state,D,SHOWING_TEXT);

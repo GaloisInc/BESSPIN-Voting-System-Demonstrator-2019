@@ -107,13 +107,9 @@ void Log_Net_Initialize()
     return;
 }
 
-
+// Send network logs in simulation as well
 void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 {
-#ifdef SIMULATION
-	return;
-#endif
-    {
 #ifdef TARGET_OS_FreeRTOS
       // Send the data to the network logging taks
       debug_printf("Log_Net_Send: %lu bytes\r\n", total);
@@ -172,14 +168,14 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
       close(sockfd);
 
 #endif // TARGET_OS_FreeRTOS
-
-    }
-    return;
 }
 #else // NETWORK_LOGS
 // ACSL Contracts TBD
 void Log_Net_Initialize(void) {}
 
 // ACSL Contracts TBD
-void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total) {}
+void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total) {
+  (void) Transmit_Buffer;
+  (void) total;
+}
 #endif //NETWORK_LOGS

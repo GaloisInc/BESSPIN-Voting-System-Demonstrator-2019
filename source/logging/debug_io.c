@@ -48,6 +48,7 @@ int debug_printf(const char *the_format, ...)
         // we can print it in a platform-appropriate way
         
         #ifdef TARGET_OS_FreeRTOS
+        printf("%lu.%lu[s]:", uptimeMs()/1000, uptimeMs());
         printf("%s", buffer);
         #else
         fprintf(stderr, "%s",buffer);

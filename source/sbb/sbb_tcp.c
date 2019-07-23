@@ -36,7 +36,7 @@
 /* FreeRTOS  includes. */
 #include "FreeRTOS.h"
 #include "task.h"
-//#include "sbb.h"
+#include "sbb.h"
 
 /* IP stack includes. */
 #include "FreeRTOS_IP.h"
@@ -104,6 +104,8 @@ void prvInputTask(void *pvParameters);
 
 void sbb_tcp(void)
 {
+	printf("Smart Ballot Box starting...\r\n");
+	// serLcdPrintf(empty,strlen(empty)); TODO: clean the display
 	/* Miscellaneous initialisation including preparing the logging and seeding
 	   the random number generator. */
 	prvMiscInitialisation();
@@ -135,11 +137,14 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 		/* Create the tasks that use the IP stack if they have not already been
 		   created. */
 		if (xTasksAlreadyCreated == pdFALSE)
-		{
+		{	
+			printf("Smart Ballot Box: starting tasks...\r\n");
 			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
 			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
 			xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+			#ifdef NETWORK_LOGS
 			xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
+			#endif
 			xTasksAlreadyCreated = pdTRUE;
 		}
 

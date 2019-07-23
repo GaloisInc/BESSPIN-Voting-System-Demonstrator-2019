@@ -156,4 +156,8 @@ header file. */
             ;                     \
     }
 
+// Get number of ms since startup
+#define uptimeMs() xTaskGetTickCount()/pdMS_TO_TICKS(1)
+
+
 #endif /* FREERTOS_CONFIG_H */
