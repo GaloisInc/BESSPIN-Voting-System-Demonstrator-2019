@@ -17,7 +17,7 @@
 bool time_is_valid(const uint8_t *barcode_time) {
     uint32_t year;
     uint16_t month, day, hour, minute;
-    int num_scanned = sscanf((const char*)barcode_time, "%lu:%hu:%hu:%hu:%hu", &year, &month, &day, &hour, &minute);
+    int num_scanned = sscanf(barcode_time, "%u+%hu+%hu+%hu+%hu", &year, &month, &day, &hour, &minute);
     bool b_valid = false;
     if (num_scanned == 5) {
 #ifdef HARDCODE_CURRENT_TIME
