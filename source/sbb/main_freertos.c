@@ -50,13 +50,11 @@
 #include "bsp.h"
 #include "uart.h"
 #include "gpio.h"
-#include "ff.h" /* Declarations of FatFs API */
-#include "diskio.h"
 
 /* Smart Ballot Box includes */
-#include "sbb.h"
+//#include "sbb.h"
 #include "sbb_freertos.h"
-#include "../logging/debug_io.h"
+//#include "../logging/debug_io.h"
 
 /* "Peek/poke" embedded web server */
 #include "peekpoke.h"
@@ -145,7 +143,7 @@ uint32_t port_get_current_mtime(void)
     return (uint32_t)(get_cycle_count() / (configCPU_CLOCK_HZ / 1000000));
 }
 
-extern void sbb_tcp( void ); // should have been declared elsewhere...
+//extern void sbb_tcp( void ); // should have been declared elsewhere...
 
 /**
  * Main application entry
@@ -155,7 +153,7 @@ int main(void)
     prvSetupHardware();
 
     // Setup TCP IP
-    sbb_tcp();
+    //sbb_tcp();
 
     /* Initialize stream buffers */
     xScannerStreamBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
@@ -173,7 +171,7 @@ int main(void)
 	 * Tells the peekPokeServer what its priority will be. The task won't
 	 * launch until peekPokeServerTaskCreate() is called.
 	 */
-    peekPokeServerTaskPriority( SBB_MAIN_TASK_PRIORITY );
+    //peekPokeServerTaskPriority( SBB_MAIN_TASK_PRIORITY );
 
     /* If all is well, the scheduler will now be running, and the following
        line will never be reached.  If the following line does execute, then
@@ -275,7 +273,7 @@ void prvBallotBoxMainTask(void *pvParameters)
     (void)pvParameters;
     printf("Starting prvBallotBoxMainTask\r\n");
 
-    ballot_box_main_loop();
+    //ballot_box_main_loop();
 }
 /*-----------------------------------------------------------*/
 
@@ -313,7 +311,7 @@ void prvBarcodeScannerTask(void *pvParameters)
                     /* Send the barcode */
                     /* Debug print below */
                     barcode[idx] = '\0';
-                    debug_printf("Barcode, idx=%u: %s\r\n", idx, barcode);
+                    printf("Barcode, idx=%u: %s\r\n", idx, barcode);
                     /* We have a barcode, send it over stream buffer and fire the event */
                     size_t bytes_available =
                         xStreamBufferSpacesAvailable(xScannerStreamBuffer);
@@ -380,24 +378,24 @@ void prvInputTask(void *pvParameters) {
             paper_in_timestamp + PAPER_SENSOR_DEBOUNCE < xTaskGetTickCount()) {
             if (paper_sensor_in_input == 0) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
-                debug_printf("#paper_sensor_in_input: paper_detected");
+                printf("#paper_sensor_in_input: paper_detected");
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
             } else if (paper_sensor_in_input == 1) {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
-                debug_printf("#paper_sensor_in_input: no paper detected");
+                printf("#paper_sensor_in_input: no paper detected");
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
             }
             paper_in_timestamp = xTaskGetTickCount();
             paper_sensor_in_input_last = paper_sensor_in_input;
-            // printf("uxReturned = 0x%lx\r\n",uxReturned);
+            printf("uxReturned = 0x%lx\r\n",uxReturned);
         }
 
         /* Cast button */
         cast_button_input = gpio_read(BUTTON_CAST_IN);
         if (cast_button_input != cast_button_input_last) {
-            debug_printf("#cast_button_input changed: %u -> %u\r\n", cast_button_input_last, cast_button_input);
+            printf("#cast_button_input changed: %u -> %u\r\n", cast_button_input_last, cast_button_input);
 
             /* Broadcast the event */
             if (cast_button_input == 1) {
@@ -409,14 +407,14 @@ void prvInputTask(void *pvParameters) {
                 uxReturned = xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_RELEASED );
                 uxReturned = xEventGroupClearBits( xSBBEventGroup, ebCAST_BUTTON_PRESSED );
             }
-            // printf("uxReturned = 0x%lx\r\n",uxReturned);
+            printf("uxReturned = 0x%lx\r\n",uxReturned);
             cast_button_input_last = cast_button_input;
         }
 
         /* Spoil button */
         spoil_button_input = gpio_read(BUTTON_SPOIL_IN);
         if (spoil_button_input != spoil_button_input_last) {
-            debug_printf("#spoil_button_input changed: %u -> %u\r\n", spoil_button_input_last, spoil_button_input);
+            printf("#spoil_button_input changed: %u -> %u\r\n", spoil_button_input_last, spoil_button_input);
 
             /* Broadcast the event */
             if (spoil_button_input == 1) {
