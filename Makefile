@@ -16,11 +16,11 @@ RANLIB	= $(TARGET)-ranlib
 FREERTOS_DEMO_DIR = FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
 
 # Use main_blinky as demo source and target file name if not specified
-PROG 	?= main_blinky
+PROG 	= main_ballot_box
 CRT0	= $(FREERTOS_DEMO_DIR)/bsp/boot.S
 
 # For debugging
-#$(info $$PROG is [${PROG}])
+$(info $$PROG is [${PROG}])
 
 SBB_SOURCE_DIR = source/sbb
 FREERTOS_SOURCE_DIR	= FreeRTOS-mirror/FreeRTOS/Source
