@@ -105,6 +105,9 @@ void update_barcode_state( bool barcode_scanned ) {
 }
 
 void flush_barcodes() {
+#ifndef SIMULATION
+    // this is not necessary in simulation, because simulation doesn't
+    // scan barcodes multiple times based on paper location
     /*@ loop invariant SBB_Machine_Invariant;
       @ loop invariant the_state.L == ABORT || the_state.L == STANDBY;
       @ loop assigns the_state.BS, the_state.L, the_state.P,
@@ -114,6 +117,7 @@ void flush_barcodes() {
         the_state.BS = BARCODE_NOT_PRESENT;
         update_sensor_state();
     } while (the_state.BS == BARCODE_PRESENT_AND_RECORDED);
+#endif
 }
 
 // This refines the internal paper ASM event
