@@ -87,8 +87,8 @@ void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest)
     size_t block_count;
     uint8_t *current_data_ptr = the_message;
     aes128_block iv = {0};
-    aes128_block plaintext_block = {0};
-    aes128_block ciphertext_block = {0};
+    aes128_block local_plaintext_block = {0};
+    aes128_block local_ciphertext_block = {0};
 
 #ifndef TARGET_OS_FreeRTOS
     assert(the_message_size % AES_BLOCK_LENGTH_BYTES == 0);
@@ -105,15 +105,15 @@ void aes_cbc_mac(message the_message, size_t the_message_size, block the_digest)
         // Input data to encrypt is IV xor Mi
         for (size_t i = 0; i < AES_BLOCK_LENGTH_BYTES; i++)
         {
-            plaintext_block[i] = iv[i] ^ (*current_data_ptr);
+            local_plaintext_block[i] = iv[i] ^ (*current_data_ptr);
             current_data_ptr++;
         }
-        AES_encrypt(plaintext_block, ciphertext_block, &key_schedule);
+        AES_encrypt(local_plaintext_block, local_ciphertext_block, &key_schedule);
 
         // Copy the newly encrypted block back into IV for the next time.
         for (size_t j = 0; j < AES_BLOCK_LENGTH_BYTES; j++)
         {
-            iv[j] = ciphertext_block[j];
+            iv[j] = local_ciphertext_block[j];
         }
     }
 

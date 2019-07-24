@@ -75,6 +75,7 @@ typedef struct _SHA2_CTX {
 
 __BEGIN_DECLS
 void SHA256Init(SHA2_CTX *);
+#pragma GCC diagnostic ignored "-Wattributes"
 void SHA256Update(SHA2_CTX *, const uint8_t *, size_t)
 	__attribute__((__bounded__(__string__,2,3)));
 void SHA256Final(uint8_t[SHA256_DIGEST_LENGTH], SHA2_CTX *)

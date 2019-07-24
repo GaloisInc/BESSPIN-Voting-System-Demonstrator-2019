@@ -25,9 +25,7 @@
 // static const char *HEADER_5_1 = "Content-Length: ";
 // static const char *DOUBLE_CRLF = "\r\n\r\n";
 
-
 //static const size_t data_block_length = BASE64_SECURE_BLOCK_LOG_ENTRY_LENGTH;
-static const uint16_t PORT_NUMBER = 8066;
 
 // We assume that a log entry data block can't be more than 9_999_999 bytes long, so
 // we allocate up to 7 characters for this to be printed in decimal in the HTTP header.
@@ -50,6 +48,8 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 #include "list.h"
+
+#include "sbb_freertos.h"
 
 #define portable_assert(x) configASSERT(x)
 
@@ -85,6 +85,7 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 #include <unistd.h>     /* read, write, close */
 
 // #define portable_assert(x) assert(x)
+static const uint16_t PORT_NUMBER = LOG_PORT_NUMBER;
 
 #endif
 
@@ -114,55 +115,12 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 #endif
     {
 #ifdef TARGET_OS_FreeRTOS
-      // FreeRTOS-specific implementation of socket handling code
-      Socket_t xSocket;
-      struct freertos_sockaddr xRemoteAddress;
-      BaseType_t xBytesSent = 0;
-      size_t xLenToSend;
-
-      xRemoteAddress.sin_port = FreeRTOS_htons(PORT_NUMBER);
-      // IP address needs to be modified for the test purpose
-      // otherwise address can be taken from log_net.h uIPAddress
-      // for now it is hardcoded before test.
-      xRemoteAddress.sin_addr = FreeRTOS_inet_addr_quick
-	      (configRptrIP_ADDR0, configRptrIP_ADDR1, configRptrIP_ADDR2, configRptrIP_ADDR3);
-        //(Reporting_Server_IP_Address[0], Reporting_Server_IP_Address[1],
-        // Reporting_Server_IP_Address[2], Reporting_Server_IP_Address[3]);
-
-      // Create a socket.
-      xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-                                FREERTOS_IPPROTO_TCP);
-      configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
-      if (FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress)) == 0)
-        {
-          xLenToSend = 0;
-          do
-            {
-              xBytesSent =
-                FreeRTOS_send(/* The socket being sent to. */
-                              xSocket,
-                              /* The data being sent. */
-                              Transmit_Buffer + xLenToSend,
-                              /* The remaining length of data to send. */
-                              total - xLenToSend,
-                              /* ulFlags. */
-                              0);
-              if (xBytesSent < 0)
-                {
-                  debug_printf("ERROR writing Transmit_Buffer to socket");
-                }
-
-              if (xBytesSent == 0)
-                {
-                  break;
-                }
-              xLenToSend += xBytesSent;
-            } while (xLenToSend < total);
-        }
-      /* Initiate graceful shutdown. */
-      FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
-      /* The socket has shut down and is safe to close. */
-      FreeRTOS_closesocket(xSocket);
+      // Send the data to the network logging taks
+      debug_printf("Log_Net_Send: %lu bytes\r\n", total);
+      xStreamBufferSend(xNetLogStreamBuffer,
+                        (void *)Transmit_Buffer,
+                        total,
+                        0);
 
 #else
       // POSIX-specific implementation of socket handling code

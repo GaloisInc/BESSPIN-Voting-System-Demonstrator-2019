@@ -182,13 +182,7 @@ bool ballot_detected(void) {
 void eject_ballot(void) {
     move_motor_back();
     // run the motor for a bit to get the paper back over the switch
-    TickType_t spoil_timeout =
-        xTaskGetTickCount() + pdMS_TO_TICKS(SPOIL_EJECT_TIMEOUT_MS);
-    /*@ loop assigns \nothing; */
-    while (xTaskGetTickCount() < spoil_timeout) {
-        // wait for the motor to run a while
-    }
-
+    msleep(SPOIL_EJECT_TIMEOUT_MS);
     stop_motor();
 }
 
@@ -204,15 +198,7 @@ void cast_ballot(void) {
     spoil_button_light_off();
     cast_button_light_off();
     move_motor_forward();
-
-    // run the motor for a bit to get the paper into the box
-    TickType_t cast_timeout =
-        xTaskGetTickCount() + pdMS_TO_TICKS(CAST_INGEST_TIMEOUT_MS);
-    /*@ loop assigns \nothing; */
-    while (xTaskGetTickCount() < cast_timeout) {
-        // wait for the motor to run a while
-    }
-
+    msleep(CAST_INGEST_TIMEOUT_MS);
     stop_motor();
 }
 

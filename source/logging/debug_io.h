@@ -7,6 +7,14 @@
 
 #include "log_io.h"
 
+#ifdef LOG_SYSTEM_DEBUG
+#define log_system_debug_printf debug_printf
+#else
+#define log_system_debug_printf(...)
+#endif // LOG_SYSTEM_DEBUG
+
+#define LOG_PORT_NUMBER 8066
+
 /*@ assigns \nothing; // TBD
 */
 int debug_printf(const char *the_format, ...);

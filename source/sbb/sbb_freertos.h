@@ -16,8 +16,32 @@
 #include "stream_buffer.h"
 #include "event_groups.h"
 
+void prvBallotBoxMainTask(void *pvParameters);
+void prvBarcodeScannerTask(void *pvParameters);
+void prvInputTask(void *pvParameters);
+void prvNetworkLogTask(void *pvParameters);
+
+void sbb_tcp(void);
+void reportIPStatus(void);
+
+
+extern StreamBufferHandle_t xNetLogStreamBuffer;
 extern StreamBufferHandle_t xScannerStreamBuffer;
 extern EventGroupHandle_t xSBBEventGroup;
+
+/* Smart Ballot Box Tasks and priorities*/
+#define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY+1
+#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+2
+#define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+3
+#define SBB_NET_LOG_TASK_PRIORITY tskIDLE_PRIORITY+2
+
+#define SBB_MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*4U
+#define SBB_SCANNER_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*2U
+#define SBB_INPUT_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*2U
+#define SBB_NET_LOG_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*4U
+
+#define sbLOG_BUFFER_SIZE 1024
+#define sbLOG_BUFFER_TRIGGER_LEVEL 331
 
 /* The number of bytes of storage in the stream buffers */
 #define sbSTREAM_BUFFER_LENGTH_BYTES	( ( size_t ) BARCODE_MAX_LENGTH )

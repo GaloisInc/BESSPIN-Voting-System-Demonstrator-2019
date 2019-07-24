@@ -42,6 +42,8 @@
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 
+#include "sbb_freertos.h"
+
 #include "peekpoke.h"
 
 
@@ -95,11 +97,6 @@ bool the_network_status = false;
 void sbb_tcp(void);
 void reportIPStatus(void);
 
-/* Smart Ballot Box Tasks and priorities*/
-#define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY+3
-#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+2
-#define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+1
-
 void prvBallotBoxMainTask(void *pvParameters);
 void prvBarcodeScannerTask(void *pvParameters);
 void prvInputTask(void *pvParameters);
@@ -139,9 +136,10 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 		   created. */
 		if (xTasksAlreadyCreated == pdFALSE)
 		{
-			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
-			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-			xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
+			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
+			xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+			xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
 			xTasksAlreadyCreated = pdTRUE;
 		}
 

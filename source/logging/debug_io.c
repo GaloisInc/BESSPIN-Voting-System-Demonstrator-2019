@@ -10,14 +10,14 @@
 #include "debug_io.h"
 #include "log_io.h"
 
-#ifdef DEBUG
+#ifdef VOTING_SYSTEM_DEBUG
 // only declare this constant in debug mode, to avoid unused constant warnings
 static const int BUFFER_SIZE = 4096; // should be large enough for any log entry
-#endif // DEBUG
+#endif // VOTING_SYSTEM_DEBUG
 
 int debug_printf(const char *the_format, ...)
 {
-    #ifdef DEBUG // only do anything in debug mode
+    #ifdef VOTING_SYSTEM_DEBUG // only do anything in debug mode
     char buffer[BUFFER_SIZE];
     
     // format the string
@@ -55,14 +55,14 @@ int debug_printf(const char *the_format, ...)
     }
     #else // not in debug mode
     int result = 0;
-    #endif // DEBUG
+    #endif // VOTING_SYSTEM_DEBUG
     
     return result;
 }
 
 int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
 {
-    #ifdef DEBUG // only do anything in debug mode
+    #ifdef VOTING_SYSTEM_DEBUG // only do anything in debug mode
     char buffer[BUFFER_SIZE];
     
     // format the string
@@ -102,7 +102,7 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
     }
     #else // not in debug mode
     int result = 0;
-    #endif // DEBUG
+    #endif // VOTING_SYSTEM_DEBUG
     
     return result;
 }
