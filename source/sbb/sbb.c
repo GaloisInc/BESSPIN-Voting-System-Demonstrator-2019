@@ -72,7 +72,7 @@ void initialize(void) {
     the_state.BS = BARCODE_NOT_PRESENT;
     __assume_strings_OK();
     barcode_length = 0;
- DevicesInitialized:
+ //DevicesInitialized:
     return;
 }
 
@@ -100,8 +100,6 @@ bool is_spoil_button_pressed(void) {
     return the_state.B == SPOIL_BUTTON_DOWN;
 }
 
-void just_received_barcode(void) {
-}
 
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length) {
     configASSERT(its_length <= BARCODE_MAX_LENGTH);
@@ -162,7 +160,7 @@ void display_this_text(const char *the_text, uint8_t its_length) {
     #ifdef SIMULATION
     debug_printf("DISPLAY: %s\r\n", the_text);
     #else
-    serLcdPrintf(the_text, its_length);
+    serLcdPrintf((char*)the_text, its_length);
     #endif
     CHANGE_STATE(the_state,D,SHOWING_TEXT);
 }
@@ -173,7 +171,7 @@ void display_this_2_line_text(const char *line_1, uint8_t length_1,
     debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", line_1, line_2);
     #else
     CHANGE_STATE(the_state,D,SHOWING_TEXT);
-    serLcdPrintTwoLines(line_1, length_1, line_2, length_2);
+    serLcdPrintTwoLines((char*)line_1, length_1, (char*)line_2, length_2);
     #endif
 }
 

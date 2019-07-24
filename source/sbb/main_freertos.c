@@ -52,7 +52,7 @@
 #include "gpio.h"
 
 /* Smart Ballot Box includes */
-//#include "sbb.h"
+#include "sbb.h"
 #include "sbb_freertos.h"
 //#include "../logging/debug_io.h"
 
@@ -273,7 +273,7 @@ void prvBallotBoxMainTask(void *pvParameters)
     (void)pvParameters;
     printf("Starting prvBallotBoxMainTask\r\n");
 
-    //ballot_box_main_loop();
+    ballot_box_main_loop();
 }
 /*-----------------------------------------------------------*/
 

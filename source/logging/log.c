@@ -43,10 +43,15 @@ Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry)
 
 bool verify_log_entry_well_formedness(const log_entry a_log_entry)
 {
+    (void)a_log_entry;
     return false;
 }
 
-void export_log(const log_file the_log, log_io_stream a_target) { return; }
+void export_log(const log_file the_log, log_io_stream a_target) { 
+    (void)the_log;
+    (void)a_target;
+    return;
+}
 
 
 bool verify_log_well_formedness(log_file the_log)

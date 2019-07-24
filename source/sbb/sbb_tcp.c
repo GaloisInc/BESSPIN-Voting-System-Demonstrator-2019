@@ -139,7 +139,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 		   created. */
 		if (xTasksAlreadyCreated == pdFALSE)
 		{
-			//xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
+			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
 			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
 			xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 			xTasksAlreadyCreated = pdTRUE;

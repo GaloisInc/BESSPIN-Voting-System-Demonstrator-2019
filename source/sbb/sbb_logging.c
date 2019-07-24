@@ -91,13 +91,13 @@ bool log_system_message(const char *new_entry, int length) {
     #endif
 }
 
-void log_or_abort(SBB_state *the_state, const char *the_entry, int length) {
+void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length) {
     debug_printf((char *)the_entry);
     #ifdef SIMULATION
     debug_printf("LOG: %s\r\n", the_entry);
     #else
     if (!log_system_message(the_entry, length)) {
-        the_state->L = ABORT;
+        the_local_state->L = ABORT;
     }
     #endif
 }

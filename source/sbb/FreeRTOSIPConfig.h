@@ -336,6 +336,13 @@ ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
 #define configIP_ADDR2		88
 #define configIP_ADDR3		2
 
+// IP address of Reporter.  
+#define configRptrIP_ADDR0		10
+#define configRptrIP_ADDR1		5
+#define configRptrIP_ADDR2		5
+#define configRptrIP_ADDR3		2
+
+
 /* Default gateway IP address configuration.  Used in ipconfigUSE_DNS is set to
 0, or ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
 #define configGATEWAY_ADDR0	10

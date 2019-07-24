@@ -15,9 +15,6 @@
 #include "sbb.acsl"
 #include "sbb_logging.h"
 
-extern char barcode[BARCODE_MAX_LENGTH];
-extern barcode_length_t barcode_length;
-
 // Display strings
 extern const char *welcome_text;
 extern const char *insert_ballot_text;

@@ -17,7 +17,7 @@
 bool time_is_valid(const uint8_t *barcode_time) {
     uint32_t year;
     uint16_t month, day, hour, minute;
-    int num_scanned = sscanf(barcode_time, "%u:%hu:%hu:%hu:%hu", &year, &month, &day, &hour, &minute);
+    int num_scanned = sscanf((const char*)barcode_time, "%lu:%hu:%hu:%hu:%hu", &year, &month, &day, &hour, &minute);
     bool b_valid = false;
     if (num_scanned == 5) {
 #ifdef HARDCODE_CURRENT_TIME
@@ -54,7 +54,7 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
         r = mbedtls_base64_decode(&decoded_barcode[0],
                                   BASE64_DECODED_BUFFER_BYTES,
                                   &olen,
-                                  &barcode[BASE64_ENCODING_START],
+                                  (const uint8_t*)&barcode[BASE64_ENCODING_START],
                                   length - BASE64_ENCODING_START);
 
         if (r == 0 && BASE64_DECODED_BYTES == olen) {
@@ -62,7 +62,7 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
             // Check the timestamp to make sure it's not from the future
 
             // The barcode must not be from the future
-            if (time_is_valid(&barcode[0])) {
+            if (time_is_valid((const uint8_t*)&barcode[0])) {
                 // 2. b
                 // Now set up the message for aes_cbc_mac. The formula is:
                 // timestamp # encryptedBallot.

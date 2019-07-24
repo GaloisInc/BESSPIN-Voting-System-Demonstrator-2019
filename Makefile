@@ -23,6 +23,8 @@ CRT0	= $(FREERTOS_DEMO_DIR)/bsp/boot.S
 $(info $$PROG is [${PROG}])
 
 SBB_SOURCE_DIR = source/sbb
+LOG_SOURCE_DIR = source/logging
+CRYPTO_SOURCE_DIR = source/crypto
 FREERTOS_SOURCE_DIR	= FreeRTOS-mirror/FreeRTOS/Source
 FREERTOS_PLUS_SOURCE_DIR = FreeRTOS-mirror/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
@@ -67,7 +69,9 @@ INCLUDES = \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \
 	-I$(FREERTOS_DEMO_DIR)/devices \
-	-I$(SBB_SOURCE_DIR)
+	-I$(SBB_SOURCE_DIR) \
+	-I$(LOG_SOURCE_DIR) \
+	-I$(CRYPTO_SOURCE_DIR)
 
 ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
@@ -75,11 +79,37 @@ ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
 
 CFLAGS = $(WARNINGS) $(INCLUDES)
 CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany
+CFLAGS += \
+ 	-DHARDCODE_CURRENT_TIME \
+    -DCURRENT_YEAR=2019 \
+    -DCURRENT_MONTH=7 \
+    -DCURRENT_DAY=22 \
+    -DCURRENT_HOUR=13 \
+    -DCURRENT_MINUTE=18 \
+	-DNETWORK_LOGS -DTARGET_OS_FreeRTOS -DNO_MEMSET_S
 
 DEMO_SRC = \
 	$(SBB_SOURCE_DIR)/main_freertos.c \
-	$(SBB_SOURCE_DIR)/sbb_tcp.c
-	#$(FREERTOS_DEMO_DIR)/demo/$(PROG).c
+	$(SBB_SOURCE_DIR)/sbb_tcp.c \
+	$(SBB_SOURCE_DIR)/sbb.c \
+	$(SBB_SOURCE_DIR)/sbb_machine.c \
+	$(SBB_SOURCE_DIR)/sbb_strings.c \
+    $(SBB_SOURCE_DIR)/sbb_logging.c \
+    $(SBB_SOURCE_DIR)/sbb_crypto.c \
+	$(LOG_SOURCE_DIR)/log.c \
+    $(LOG_SOURCE_DIR)/secure_log.c \
+    $(LOG_SOURCE_DIR)/system_log.c \
+    $(LOG_SOURCE_DIR)/application_log.c \
+    $(LOG_SOURCE_DIR)/log_io.c \
+    $(LOG_SOURCE_DIR)/log_fs.c \
+    $(LOG_SOURCE_DIR)/log_net.c \
+    $(LOG_SOURCE_DIR)/debug_io.c \
+    $(CRYPTO_SOURCE_DIR)/base64.c \
+    $(CRYPTO_SOURCE_DIR)/crypto.c \
+    $(CRYPTO_SOURCE_DIR)/sha2-openbsd.c \
+    $(CRYPTO_SOURCE_DIR)/aes.c \
+    $(CRYPTO_SOURCE_DIR)/cbc.c \
+    $(CRYPTO_SOURCE_DIR)/mode_wrappers.c
 
 APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
@@ -127,7 +157,12 @@ APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_sinit.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xbasic_types.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_io.c \
-	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c \
+	$(FREERTOS_DEMO_DIR)/devices/serLcd.c \
+	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
+	$(FREERTOS_DEMO_DIR)/devices/ff.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
 
 ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
