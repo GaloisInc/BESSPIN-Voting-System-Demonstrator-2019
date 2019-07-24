@@ -19,5 +19,5 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length);
 /*@ assigns \nothing;
   @ ensures \result == true || \result == false;
 */
-bool time_is_valid(const uint8_t *barcode_time);
+bool timestamp_lte_now(const uint8_t *barcode_time);
 #endif //__SBB_CRYPTO__

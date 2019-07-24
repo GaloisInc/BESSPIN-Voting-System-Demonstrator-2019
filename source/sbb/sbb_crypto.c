@@ -14,7 +14,7 @@
 #define CBC_MAC_MESSAGE_LENGTH_BYTES \
   (((CBC_MAC_INPUT_DATA_LENGTH_BYTES) + (AES_BLOCK_LENGTH_BYTES-1)) & (~(AES_BLOCK_LENGTH_BYTES - 1)))
 
-bool time_is_valid(const uint8_t *barcode_time) {
+bool timestamp_lte_now(const uint8_t *barcode_time) {
     uint32_t year;
     uint16_t month, day, hour, minute;
     int num_scanned = sscanf(barcode_time, "%u+%hu+%hu+%hu+%hu", &year, &month, &day, &hour, &minute);
@@ -61,8 +61,8 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
             // 2. a
             // Check the timestamp to make sure it's not from the future
 
-            // The barcode must not be from the future
-            if (time_is_valid((const uint8_t*)&barcode[0])) {
+            // The barcode must not have expired (i.e. the expiry date should be > now)
+            if (!timestamp_lte_now(&barcode[0])) {
                 // 2. b
                 // Now set up the message for aes_cbc_mac. The formula is:
                 // timestamp # encryptedBallot.
