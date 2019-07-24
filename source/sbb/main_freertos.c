@@ -153,7 +153,7 @@ int main(void)
     prvSetupHardware();
 
     // Setup TCP IP
-    //sbb_tcp();
+    sbb_tcp();
 
     /* Initialize stream buffers */
     xScannerStreamBuffer = xStreamBufferCreate( sbSTREAM_BUFFER_LENGTH_BYTES, sbTRIGGER_LEVEL_1 );
@@ -171,7 +171,7 @@ int main(void)
 	 * Tells the peekPokeServer what its priority will be. The task won't
 	 * launch until peekPokeServerTaskCreate() is called.
 	 */
-    //peekPokeServerTaskPriority( SBB_MAIN_TASK_PRIORITY );
+    peekPokeServerTaskPriority( SBB_MAIN_TASK_PRIORITY );
 
     /* If all is well, the scheduler will now be running, and the following
        line will never be reached.  If the following line does execute, then
