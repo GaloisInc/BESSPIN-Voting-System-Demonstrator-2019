@@ -337,7 +337,6 @@ void prvBarcodeScannerTask(void *pvParameters)
 
 /*-----------------------------------------------------------*/
 
-
 void prvNetworkLogTask(void *pvParameters)
 {
     (void)pvParameters;
@@ -358,31 +357,29 @@ void prvNetworkLogTask(void *pvParameters)
     //(Reporting_Server_IP_Address[0], Reporting_Server_IP_Address[1],
     // Reporting_Server_IP_Address[2], Reporting_Server_IP_Address[3]);
 
-    // Create a socket.
-    //xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-    //                          FREERTOS_IPPROTO_TCP);
-    //configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
-    //if (FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress)) == 0)
     {
         for (;;)
         {
             xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-                              FREERTOS_IPPROTO_TCP);
-    configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+                                      FREERTOS_IPPROTO_TCP);
+            configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+            configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
+                                          sizeof(xRemoteAddress)) == 0);
 
-    configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress)) == 0)
-    
-            printf("wainting for data\r\n");
+            debug_printf("prvNetworkLogTask: wainting for data\r\n");
             // Wait indefinitely for new data to send
             xReceiveLength = xStreamBufferReceive(xNetLogStreamBuffer, buf,
                                                   sizeof(buf), portMAX_DELAY);
-            printf("Got %u bytes to send\r\n", xReceiveLength);
+            debug_printf("prvNetworkLogTask: Got %u bytes to send\r\n",
+                         xReceiveLength);
             xLenToSend = 0;
             uint8_t iter = 0;
             do
             {
                 iter++;
-                printf("#%u: xLenToSend: %u, xReceiveLength: %u,\r\n", iter, xLenToSend, xReceiveLength);
+                debug_printf("prvNetworkLogTask: #%u: xLenToSend: %u, "
+                             "xReceiveLength: %u,\r\n",
+                             iter, xLenToSend, xReceiveLength);
                 xBytesSent =
                     FreeRTOS_send(/* The socket being sent to. */
                                   xSocket,
@@ -392,10 +389,13 @@ void prvNetworkLogTask(void *pvParameters)
                                   xReceiveLength - xLenToSend,
                                   /* ulFlags. */
                                   0);
-                printf("returned: %lu\r\n", xBytesSent);
+                debug_printf("prvNetworkLogTask: returned: %lu\r\n",
+                             xBytesSent);
                 if (xBytesSent < 0)
                 {
-                    debug_printf("ERROR writing Transmit_Buffer to socket: %lu\r\n",xBytesSent);
+                    debug_printf("prvNetworkLogTask: ERROR writing "
+                                 "Transmit_Buffer to socket: %lu\r\n",
+                                 xBytesSent);
                 }
 
                 if (xBytesSent == 0)
@@ -405,14 +405,12 @@ void prvNetworkLogTask(void *pvParameters)
                 xLenToSend += xBytesSent;
             } while (xLenToSend < xReceiveLength);
         }
-        printf("I am done\r\n");
         /* Initiate graceful shutdown. */
-    printf("Closing the socket\r\n");
-    FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
-    /* The socket has shut down and is safe to close. */
-    FreeRTOS_closesocket(xSocket);
+        printf("prvNetworkLogTask: Closing the socket\r\n");
+        FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
+        /* The socket has shut down and is safe to close. */
+        FreeRTOS_closesocket(xSocket);
     }
-    
 }
 
 /* Task handling the GPIO inputs */
