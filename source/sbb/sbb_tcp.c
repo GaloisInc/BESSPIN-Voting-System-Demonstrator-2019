@@ -105,7 +105,7 @@ void prvInputTask(void *pvParameters);
 void sbb_tcp(void)
 {
 	printf("Smart Ballot Box starting...\r\n");
-	// serLcdPrintf(empty,strlen(empty)); TODO: clean the display
+	clear_display();
 	/* Miscellaneous initialisation including preparing the logging and seeding
 	   the random number generator. */
 	prvMiscInitialisation();

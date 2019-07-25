@@ -168,6 +168,11 @@ void stop_motor(void) {
     CHANGE_STATE(the_state, M, MOTORS_OFF);
 }
 
+void clear_display(void) {
+    #ifndef SIMULATION
+    serLcdPrintf((char*)empty, strlen(empty));
+    #endif
+}
 
 void display_this_text(const char *the_text, uint8_t its_length) {
     #ifdef SIMULATION
