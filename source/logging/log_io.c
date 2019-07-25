@@ -175,6 +175,8 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     base64_secure_log_entry result;
     size_t ret_entry, ret_space, ret_digest;
 
+    //@ assert 1 <= bytes_of_padding_required <= 16;
+
     byte_offset_of_entry_n = n * total_log_entry_length;
 
     original_offset = Log_FS_Tell(stream);
@@ -183,6 +185,13 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
 
     ret_entry = Log_FS_Read(stream, &result.the_entry[0], LOG_ENTRY_LENGTH);
 
+
+    /*@
+      loop invariant 0 <= space_count <= bytes_of_padding_required;
+      loop invariant 1 <= bytes_of_padding_required <= 16;
+      loop assigns ret_space, space_count, dummy_char;
+      loop variant bytes_of_padding_required - space_count;
+    */
     for (size_t space_count = 0; space_count < bytes_of_padding_required;
          space_count++)
     {
@@ -213,24 +222,41 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
             // to check that first to avoid a buffer overflow
             if (olen == SHA256_DIGEST_LENGTH_BYTES)
             {
+	        // We still need to decode into a buffer which is larger than
+	        // strictly necessary to satisfy the precondition on base64_decode
+                uint8_t tmpbuf[SHA256_DIGEST_LENGTH_BYTES + 1];
+
                 r = mbedtls_base64_decode(
-                    &secure_log_entry_result.the_digest[0],
+                    &tmpbuf[0],
                     SHA256_DIGEST_LENGTH_BYTES + 1, &olen,
                     &result.the_digest[0], SHA256_BASE_64_DIGEST_LENGTH_BYTES);
 
                 if (r == 0)
                 {
+  		    // All is well... so copy the decoded digest
+		    // into secure_log_entry_result.the_digest
 
                     /*@
-                      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-                      loop invariant \forall size_t j; 0 <= j < i ==> secure_log_entry_result.the_entry[i] == result.the_entry[i];
-                      loop assigns i, secure_log_entry_result.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-                      loop variant LOG_ENTRY_LENGTH - i;
+                      loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
+                      loop assigns i, secure_log_entry_result.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+                      loop variant SHA256_DIGEST_LENGTH_BYTES - i;
                     */
-                    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
+                    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
                     {
-                        secure_log_entry_result.the_entry[i] =
-                            result.the_entry[i];
+                        secure_log_entry_result.the_digest[i] = tmpbuf[i];
+                    }
+
+		    // Now copy the data
+
+                    /*@
+                      loop invariant 0 <= k <= LOG_ENTRY_LENGTH;
+                      loop assigns k, secure_log_entry_result.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
+                      loop variant LOG_ENTRY_LENGTH - k;
+                    */
+                    for (size_t k = 0; k < LOG_ENTRY_LENGTH; k++)
+                    {
+                        secure_log_entry_result.the_entry[k] =
+                            result.the_entry[k];
                     }
                     return secure_log_entry_result;
                 }
@@ -326,6 +352,11 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
 
     // Initialize Transmit_Buffer to all 0x00 so we can dynamically calculate the
     // length of the header
+    /*@
+      loop invariant 0 <= i <= Transmit_Buffer_Length;
+      loop assigns i, Transmit_Buffer[0 .. Transmit_Buffer_Length - 1];
+      loop variant Transmit_Buffer_Length - i;
+    */
     for (size_t i = 0; i < Transmit_Buffer_Length; i++)
     {
         Transmit_Buffer[i] = 0x00;
@@ -351,6 +382,13 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     // spaces, hash and new_line an exact multiple of 16 bytes long.
     size_t space_index = *first_byte_of_data_index + LOG_ENTRY_LENGTH;
     debug_printf("space index is %zu", space_index);
+
+    /*@
+      loop invariant 0 <= space_count <= bytes_of_padding_required;
+      loop assigns space_index, space_count,
+           Transmit_Buffer[0 .. bytes_of_padding_required - 1];
+      loop variant bytes_of_padding_required - space_count;
+    */
     for (size_t space_count = 0; space_count < bytes_of_padding_required;
          space_count++)
     {

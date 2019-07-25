@@ -120,7 +120,8 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
 
     /*@
       loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant \forall size_t j, index; (0 <= j < i) && (index ==j)  ==> msg[index] == a_log_entry[j];
+      loop invariant 0 <= index <= LOG_ENTRY_LENGTH;
+      loop invariant i == index;
       loop assigns i, index, msg[0 .. LOG_ENTRY_LENGTH - 1];
       loop variant LOG_ENTRY_LENGTH - i;
   */
@@ -130,11 +131,15 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
         index++;
     }
 
+    //@ assert (index == LOG_ENTRY_LENGTH);
+
     // adding previous_hash
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant \forall size_t j, index; (0 <= j < i) && (index ==j)  ==> msg[index] == a_log_entry[j];
-      loop assigns i, index, msg[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+      loop invariant LOG_ENTRY_LENGTH <= index <= SECURE_LOG_ENTRY_LENGTH;
+      loop invariant index == i + LOG_ENTRY_LENGTH;
+      loop invariant \valid_read(the_secure_log->previous_hash + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+      loop assigns msg[LOG_ENTRY_LENGTH .. SECURE_LOG_ENTRY_LENGTH - 1], i, index;
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
   */
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
@@ -199,7 +204,7 @@ bool valid_first_entry(secure_log_entry root_entry)
     //    significant
     /*@
       loop invariant 0 <= i <= AES_BLOCK_LENGTH_BYTES;
-      loop assigns \nothing;
+      loop assigns i;
       loop variant AES_BLOCK_LENGTH_BYTES - i;
   */
     for (int i = 0; i < AES_BLOCK_LENGTH_BYTES; i++)
@@ -215,6 +220,9 @@ bool valid_first_entry(secure_log_entry root_entry)
 }
 
 // Refinces Cryptol validLogEntry
+/*@
+  requires \valid_read(prev_hash + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+*/
 bool valid_log_entry(const secure_log_entry this_entry,
                      const sha256_digest prev_hash)
 {
@@ -225,8 +233,9 @@ bool valid_log_entry(const secure_log_entry this_entry,
     // Concatenate this_entry and prev_hash into msg
     /*@
       loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant 0 <= index <= SECURE_LOG_ENTRY_LENGTH;
-      loop assigns *msg, index;
+      loop invariant 0 <= index <= LOG_ENTRY_LENGTH;
+      loop invariant i == index;
+      loop assigns i, index, msg[0 .. LOG_ENTRY_LENGTH - 1];
       loop variant LOG_ENTRY_LENGTH - i;
     */
     for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
@@ -235,10 +244,14 @@ bool valid_log_entry(const secure_log_entry this_entry,
         index++;
     }
 
+    //@ assert (index == LOG_ENTRY_LENGTH);
+
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant 0 <= index <= SECURE_LOG_ENTRY_LENGTH;
-      loop assigns *msg, index;
+      loop invariant LOG_ENTRY_LENGTH <= index <= SECURE_LOG_ENTRY_LENGTH;
+      loop invariant index == i + LOG_ENTRY_LENGTH;
+      loop invariant \valid_read(prev_hash + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+      loop assigns msg[LOG_ENTRY_LENGTH .. SECURE_LOG_ENTRY_LENGTH - 1], i, index;
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
     */
     for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
@@ -252,7 +265,7 @@ bool valid_log_entry(const secure_log_entry this_entry,
     // 3. new_hash and this_entry.the_digest should match
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop assigns \nothing;
+      loop assigns i;
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
   */
     for (int i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
