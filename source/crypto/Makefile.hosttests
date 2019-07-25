@@ -2,7 +2,7 @@
 
 crypto_hosttest_all: crypto_hosttest1 crypto_hosttest2 crypto_hosttest3 crypto_hosttest4 crypto_hosttest5 crypto_base64test
 
-CRYPTO_SOURCE = aes.c cbc.c mode_wrappers.c sha2-openbsd.c crypto.c base64.c
+CRYPTO_SOURCE = aes.c cbc.c mode_wrappers.c sha2-openbsd.c crypto.c base64.c crypto_config_default.c
 
 crypto_hosttest1:
 	cd $(CRYPTO_DIR); \

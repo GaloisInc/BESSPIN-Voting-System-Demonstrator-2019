@@ -118,7 +118,9 @@ void sbb_tcp(void)
 	 are used if ipconfigUSE_DHCP is set to 0, or if ipconfigUSE_DHCP is set to 1
 	 but a DHCP server cannot be	contacted. */
 	FreeRTOS_debug_printf(("FreeRTOS_IPInit\r\n"));
-	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, ucMACAddress);
+	FreeRTOS_IPInit(sbb_default_ip_address, sbb_default_netmask,
+                    sbb_default_gateway_address, sbb_default_dns_server_address,
+                    sbb_mac_address);
 }
 /*-----------------------------------------------------------*/
 

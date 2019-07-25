@@ -18,6 +18,14 @@
 extern char barcode[BARCODE_MAX_LENGTH];
 extern barcode_length_t barcode_length;
 
+// Per-ballot-box data
+extern const char *sbb_name; // to be prepended to log names
+extern const uint8_t sbb_mac_address[6]; // for DHCP
+extern const uint8_t sbb_default_ip_address[4]; // in case DHCP doesn't work
+extern const uint8_t sbb_default_netmask[4]; // in case DHCP doesn't work
+extern const uint8_t sbb_default_gateway_address[4]; // in case DHCP doesn't work
+extern const uint8_t sbb_default_dns_server_address[4]; // in case DHCP doesn't work
+
 // Display strings
 extern const char *welcome_text;
 extern const char *insert_ballot_text;

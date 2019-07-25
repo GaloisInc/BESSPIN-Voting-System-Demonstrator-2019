@@ -14,6 +14,11 @@
 #include "crypto.acsl"
 #include "crypto_t.h"
 
+// Per-ballot-box data
+extern const aes256_key barcode_mac_key;
+extern const aes256_key log_root_block_mac_key;
+extern const aes256_key log_entry_mac_key;
+
 /*@ requires \valid_read(the_plaintext + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
   @ requires \separated(the_plaintext, the_ciphertext);
   @ assigns the_ciphertext[0 .. AES_BLOCK_LENGTH_BYTES - 1];
