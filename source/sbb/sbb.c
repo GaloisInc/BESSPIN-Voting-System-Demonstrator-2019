@@ -23,6 +23,12 @@
 #include "gpio.h"
 #include "serLcd.h"
 
+// Timeouts
+#define BALLOT_DETECT_TIMEOUT_MS 10000
+#define CAST_OR_SPOIL_TIMEOUT_MS 30000
+#define SPOIL_EJECT_TIMEOUT_MS 6000
+#define CAST_INGEST_TIMEOUT_MS 6000
+
 TickType_t ballot_detect_timeout = 0;
 TickType_t cast_or_spoil_timeout = 0;
 
@@ -282,15 +288,6 @@ bool cast_or_spoil_timeout_expired(void)
     return (xTaskGetTickCount() > cast_or_spoil_timeout);
 }
 
-TickType_t ballot_detect_timeout_remaining(void) {
-    return (ballot_detect_timeout - xTaskGetTickCount());
-}
-
-TickType_t cast_or_spoil_timeout_remaining(void) {
-    return (cast_or_spoil_timeout - xTaskGetTickCount());
-}
-
-
 /**
  * Attempt to read current RTC time 
  */
@@ -310,7 +307,8 @@ bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
         // A character array to hold the string representation of the time
         static char time_str[20];
         format_time_str(&time, time_str);
-        printf("Get current time:  %s\r\n",time_str);
+        printf("Get current time: \r\n");
+        printf("%s\r\n",time_str);
 #endif
         return true;
     }

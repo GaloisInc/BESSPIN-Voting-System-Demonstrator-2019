@@ -115,7 +115,7 @@ void flush_barcodes() {
       @*/
     do {
         the_state.BS = BARCODE_NOT_PRESENT;
-        update_sensor_state(pdMS_TO_TICKS(100));
+        update_sensor_state();
     } while (the_state.BS == BARCODE_PRESENT_AND_RECORDED);
 #endif
 }
@@ -187,7 +187,7 @@ void log_event_group_result ( EventBits_t bits ) {
     log_single_event(bits, ebBARCODE_SCANNED, barcode_scanned_msg, strlen(barcode_scanned_msg));
 }
 
-void update_sensor_state(TickType_t maxDelay) {
+void update_sensor_state(void) {
     EventBits_t waitEvents = 0;
     waitEvents |= next_paper_event_bits();
     waitEvents |= next_button_event_bits();
@@ -202,7 +202,7 @@ void update_sensor_state(TickType_t maxDelay) {
                                                     waitEvents,
                                                     pdTRUE,  /* Clear events on return        */
                                                     pdFALSE, /* Wait for *any* event, not all */
-                                                    maxDelay );
+                                                    pdMS_TO_TICKS(100) );
     log_event_group_result(ux_Returned);
 
     /* "Run" the internal paper ASM transition */
@@ -335,7 +335,7 @@ void run_initialize(void) {
     initialize();
     if ( LOG_FS_OK == Log_IO_Initialize() ) {
         if ( load_or_create_logs() ) {
-            update_sensor_state(pdMS_TO_TICKS(100));
+            update_sensor_state();
             if ( ballot_detected() ) {
                 CHANGE_STATE(the_state, L, EJECT);
             } else {
@@ -435,28 +435,11 @@ void ballot_box_main_loop(void) {
     /*@ loop invariant SBB_Machine_Invariant;
      */
     for(;;) {
+        debug_state_change(old, the_state.L);
         old = the_state.L;
         take_step();
-        debug_state_change(old, the_state.L);
-
-        if (the_state.L != ABORT &&
-            // List states here if we should transition to them immediately
-            // (without waiting for sensor changes)
-            (the_state.L != AWAIT_REMOVAL || ballot_detected()) && // This is an optimization
-            the_state.L != STANDBY &&
-            the_state.L != CAST    &&
-            the_state.L != SPOIL   &&
-            the_state.L != EJECT) {
-            TickType_t delay = portMAX_DELAY;
-
-            // We want to let these states time out sooner
-            if (the_state.L == WAIT_FOR_DECISION) {
-                delay = cast_or_spoil_timeout_remaining();
-            } else if (the_state.L == WAIT_FOR_BALLOT) {
-                delay = ballot_detect_timeout_remaining();
-            }
-
-            update_sensor_state(delay);
-        }
+        
+        if (the_state.L != ABORT)
+          update_sensor_state();
     }
 }
