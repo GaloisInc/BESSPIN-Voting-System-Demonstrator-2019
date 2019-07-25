@@ -25,6 +25,26 @@ timeToDigits time =
   hourDigits   = drop`{back=2} (toBase`{digits=3} decimal time.hour)
   minuteDigits = drop`{back=2} (toBase`{digits=3} decimal time.minute)
 
+digitsToTime : [16][8] -> Time
+digitsToTime digits =
+  if allSeparatorsValid
+  then {year = year, month = month, day = day, hour = hour, minute = minute}
+  else error "Invalid separator character in timestamp"
+  where
+    s1, s2, s3, s4 : [1][8]
+    yearDigits : [4][8]
+    monthDigits, dayDigits, hourDigits, minuteDigits : [2][8]
+
+    yearDigits # s1 # monthDigits # s2 # dayDigits # s3 # hourDigits # s4 # minuteDigits = digits
+
+    allSeparatorsValid = all (\s -> s == "+") [s1, s2, s3, s4]
+
+    year   = fromBase decimal yearDigits
+    month  = fromBase decimal monthDigits
+    day    = fromBase decimal dayDigits
+    hour   = fromBase decimal hourDigits
+    minute = fromBase decimal minuteDigits
+
 testTime = {
   year   = 2019,
   month  = 1,
@@ -52,11 +72,47 @@ encodeBallot authKey ballotKey iv ballot =
   timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
   where
     timeDigits      = timeToDigits ballot.time
-    timeBytes       = ballot.unixTime
     contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
-    ballotBytes     = timeBytes # contestsBytes
+    ballotBytes     = ballot.unixTime # contestsBytes
     encryptedBallot = encrypt ballotKey iv (padWith`{mod=16} zero ballotBytes)
     auth            = cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
+
+decodeBallot :
+  {contests, positions, encodedLength}
+  (fin contests, fin positions,
+   encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
+  [32][8] ->
+  [32][8] ->
+  [16][8] ->
+  [1 + 16 + Base64Length encodedLength][8] ->
+  Ballot contests positions
+decodeBallot authKey ballotKey iv encoded =
+  if auth != recomputedAuth
+  then error "Invalid authentication: ballot has been tampered with"
+  | timeSep != ":"
+  then error "Invalid time separator character"
+  | contestPadding != zero
+  then error "Non-zero padding in contest: did you ask for the right size ballot?"
+  else { time = time, unixTime = unixTime, contests = contests }
+  where
+    timeSep : [1][8]
+    timeDigits # timeSep # encryptedAndAuth = encoded
+
+    time = digitsToTime timeDigits
+
+    auth : [16][8]
+    encryptedBallot # auth =
+      decodeBase64`{encodedLength} encryptedAndAuth
+
+    recomputedAuth =
+      cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
+
+    unixTime # contestsBytes = decrypt ballotKey iv encryptedBallot
+
+    contests : [contests][positions]
+    contestBits # contestPadding = join contestsBytes
+    contests = groupBy`{each=positions} contestBits
+
 /*
 decodeBallot :
   {contests, positions, encodedLength}
