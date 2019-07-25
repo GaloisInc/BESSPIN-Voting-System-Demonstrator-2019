@@ -60,11 +60,11 @@ int main()
                            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
         printf("Encrypt with crypto.h\n");
-        aes_encrypt(bufp, bufc);
+        aes_encrypt(bufp, bufc, Barcode_MAC_Key);
         dump(bufc);
 
         printf("Decrypt with crypto.h\n");
-        aes_decrypt(bufc, bufp2);
+        aes_decrypt(bufc, bufp2, Barcode_MAC_Key);
         dump(bufp2);
     }
     return 0;

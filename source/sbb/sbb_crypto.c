@@ -83,7 +83,8 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
                 // Compute the cbc-mac
                 aes_cbc_mac(&our_digest_input[0],
                             CBC_MAC_MESSAGE_LENGTH_BYTES,
-                            &our_digest_output[0]);
+                            &our_digest_output[0],
+                            Barcode_MAC_Key);
 
                 // 4.
                 // Compare computed digest against cbc-mac in the barcode

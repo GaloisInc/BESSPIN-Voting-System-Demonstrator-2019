@@ -49,7 +49,7 @@ int main()
 
         // MAC with input data 1 block
         printf("Test case 1\n");
-        aes_cbc_mac(bufp, 16, mac);
+        aes_cbc_mac(bufp, 16, mac, Barcode_MAC_Key);
         dump(mac);
     }
 
@@ -63,7 +63,7 @@ int main()
 
         // MAC with input data 2 blocks
         printf("Test case 2\n");
-        aes_cbc_mac(bufp, 32, mac);
+        aes_cbc_mac(bufp, 32, mac, Barcode_MAC_Key);
         dump(mac);
     }
     {
@@ -78,7 +78,7 @@ int main()
 
         // MAC with input data 3 blocks
         printf("Test case 3\n");
-        aes_cbc_mac(bufp, 48, mac);
+        aes_cbc_mac(bufp, 48, mac, Barcode_MAC_Key);
         dump(mac);
     }
 
@@ -88,7 +88,7 @@ int main()
 
         // MAC with input data 1 block, but wrong size
         printf("Test case 4 - wrong size - expect assertion failure\n");
-        aes_cbc_mac(bufp, 17, mac);
+        aes_cbc_mac(bufp, 17, mac, Barcode_MAC_Key);
         dump(mac);
     }
 

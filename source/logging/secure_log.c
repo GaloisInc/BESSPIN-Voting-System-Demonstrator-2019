@@ -32,7 +32,7 @@ static secure_log_entry initial_log_entry(const log_entry msg) // IN
     // 2. Form "aes_cbc_mac msg"
     // The MAC occupies the first 16 bytes of initial_entry.the_digest, while
     // the remaining bytes are all 0x00 as initialized above.
-    aes_cbc_mac((message)msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0]);
+    aes_cbc_mac((message)msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0], Log_Root_Block_MAC_Key);
 
     // 3. Copy the msg data
     /*@
@@ -192,7 +192,7 @@ bool valid_first_entry(secure_log_entry root_entry)
     sha256_digest new_mac = {0};
 
     // 2. Form the AES CBC MAC of the message part of root_entry
-    aes_cbc_mac(root_entry.the_entry, LOG_ENTRY_LENGTH, &new_mac[0]);
+    aes_cbc_mac(root_entry.the_entry, LOG_ENTRY_LENGTH, &new_mac[0], Log_Root_Block_MAC_Key);
 
     // 3. new_mac and root_entry.the_digest should match, but only
     //    comparing the first AES_BLOCK_LENGTH_BYTES which are
