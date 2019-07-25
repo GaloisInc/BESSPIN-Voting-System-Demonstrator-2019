@@ -94,6 +94,7 @@ static void run_scenario_3(void);
 StreamBufferHandle_t xNetLogStreamBuffer;
 StreamBufferHandle_t xScannerStreamBuffer;
 EventGroupHandle_t xSBBEventGroup;
+TaskHandle_t prvStartupTaskHandle = NULL;
 
 /*-----------------------------------------------------------*/
 
@@ -132,8 +133,6 @@ uint32_t port_get_current_mtime(void)
     return (uint32_t)(get_cycle_count() / (configCPU_CLOCK_HZ / 1000000));
 }
 
-//extern void sbb_tcp( void ); // should have been declared elsewhere...
-
 /**
  * Main application entry
  */
@@ -149,6 +148,11 @@ int main(void)
     /* Initialize event groups */
     xSBBEventGroup = xEventGroupCreate();
     configASSERT(xSBBEventGroup);
+    
+    // Initialize some of the IO tasks
+    xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
+	xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+    xTaskCreate(prvStartupTask, "prvStartupTask", SBB_STARTUP_TASK_STACK_SIZE, NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
 
     // Setup TCP IP *after* all buffers and event groups are initialized
     sbb_tcp();
@@ -344,6 +348,7 @@ void prvNetworkLogTask(void *pvParameters)
     (void)pvParameters;
     // FreeRTOS-specific implementation of socket handling code
     Socket_t xSocket;
+    BaseType_t res;
     struct freertos_sockaddr xRemoteAddress;
     BaseType_t xBytesSent = 0;
     size_t xLenToSend, xReceiveLength;
@@ -362,6 +367,8 @@ void prvNetworkLogTask(void *pvParameters)
     xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
                               FREERTOS_IPPROTO_TCP);
     configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+    res = FreeRTOS_connect(xSocket, &xRemoteAddress,sizeof(xRemoteAddress));
+    printf("res = %li\r\n",res);
     configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
                                   sizeof(xRemoteAddress)) == 0);
     debug_printf("prvNetworkLogTask: socket connected\r\n");
@@ -428,6 +435,28 @@ void prvNetworkLogTask(void *pvParameters)
     FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
     /* The socket has shut down and is safe to close. */
     FreeRTOS_closesocket(xSocket);
+}
+
+void prvStartupTask(void *pvParameters)
+{
+    (void)pvParameters;
+    char buf[17] = {' '};
+    uint8_t cnt = 0;
+    clear_display();
+
+    for(;;) {
+        memset(buf,' ',16);
+        buf[16] = 0;
+        buf[cnt] = '.';
+#ifndef SIMULATION
+        display_this_text_no_log(buf,strlen(buf));
+#endif
+        printf("%s\r",buf);
+        cnt++;
+        cnt %= 16;
+        msleep(1000);
+    }
+    printf("Terminating\r\n");
 }
 
 /* Task handling the GPIO inputs */

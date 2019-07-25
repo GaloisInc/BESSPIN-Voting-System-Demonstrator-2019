@@ -180,8 +180,18 @@ void stop_motor(void)
 void clear_display(void)
 {
 #ifndef SIMULATION
-    serLcdPrintf((char *)empty, strlen(empty));
+    serLcdClear();
 #endif
+}
+
+void display_this_text_no_log(const char *the_text, uint8_t its_length)
+{
+#ifdef SIMULATION
+    (void)its_length;
+    debug_printf("DISPLAY: %s\r\n", the_text);
+#else
+    serLcdPrintf((char *)the_text, its_length);
+#endif    
 }
 
 void display_this_text(const char *the_text, uint8_t its_length)

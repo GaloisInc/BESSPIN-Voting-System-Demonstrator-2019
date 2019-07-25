@@ -279,6 +279,8 @@ void stop_motor(void);
 */
 void display_this_text(const char* the_text, uint8_t its_length);
 
+void display_this_text_no_log(const char* the_text, uint8_t its_length);
+
 void clear_display(void);
 
 /*@ requires valid_read_string(line_1);

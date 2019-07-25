@@ -105,10 +105,6 @@ void prvInputTask(void *pvParameters);
 void sbb_tcp(void)
 {
 	printf("Smart Ballot Box starting...\r\n");
-	clear_display();
-	/* Miscellaneous initialisation including preparing the logging and seeding
-	   the random number generator. */
-	prvMiscInitialisation();
 
 	/* Initialise the network interface.
 	 ***NOTE*** Tasks that use the network are created in the network event hook
@@ -134,14 +130,19 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 	{
 		vTaskDelay(pdMS_TO_TICKS(2000));
 		the_network_status = true;
+		if (prvStartupTaskHandle != NULL) {
+			vTaskDelete( prvStartupTaskHandle );
+		}
 		/* Create the tasks that use the IP stack if they have not already been
 		   created. */
 		if (xTasksAlreadyCreated == pdFALSE)
 		{	
+			/* Miscellaneous initialisation including preparing the logging and seeding
+	   		the random number generator. */
+			prvMiscInitialisation();
+
 			printf("Smart Ballot Box: starting tasks...\r\n");
 			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
-			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-			xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 			#ifdef NETWORK_LOGS
 			xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
 			#endif
@@ -182,6 +183,9 @@ static void prvSRand(UBaseType_t ulSeed)
 }
 /*-----------------------------------------------------------*/
 
+/**
+ * This has to be called after the scheduler is started
+ */
 static void prvMiscInitialisation(void)
 {
 	uint32_t year_now;

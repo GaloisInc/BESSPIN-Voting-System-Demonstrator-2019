@@ -92,8 +92,13 @@ bool log_system_message(const char *new_entry, int length) {
     memset(&event_entry[0], 0x20, sizeof(log_entry));
     memcpy(&event_entry[0], new_entry, length);
     Log_FS_Result res = write_entry(&system_log_handle, event_entry);
+    #ifdef SD_CARD_LOGGING
     return (res == LOG_FS_OK);
-    #endif
+    #else
+    (void)res;
+    return true;
+    #endif /* SD_CARD_LOGGING */
+    #endif /* SIMULATION */
 }
 
 void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length) {
