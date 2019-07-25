@@ -184,7 +184,14 @@ static void prvSRand(UBaseType_t ulSeed)
 
 static void prvMiscInitialisation(void)
 {
-	uint32_t seed = 42;
+	uint32_t year_now;
+	uint16_t month_now, day_now, hour_now, minute_now;
+	configASSERT(get_current_time(&year_now, &month_now, &day_now, &hour_now, &minute_now));
+	uint8_t month = (uint8_t) month_now;
+	uint8_t day = (uint8_t) day_now;
+	uint8_t hour = (uint8_t) hour_now;
+	uint8_t minute = (uint8_t) minute_now;
+	uint32_t seed = (uint32_t) ( day | hour << 8 | minute << 16 | month << 24);
 	FreeRTOS_debug_printf(("Seed for randomiser: %lu\r\n", seed));
 	prvSRand((uint32_t)seed);
 	FreeRTOS_debug_printf(("Random numbers: %08lX %08lX %08lX %08lX\r\n", ipconfigRAND32(), ipconfigRAND32(), ipconfigRAND32(), ipconfigRAND32()));
