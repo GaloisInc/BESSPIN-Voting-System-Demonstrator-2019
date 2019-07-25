@@ -80,14 +80,14 @@ ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
 CFLAGS = $(WARNINGS) $(INCLUDES)
 CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany
 CFLAGS += \
- 	-DHARDCODE_CURRENT_TIME \
-    -DCURRENT_YEAR=2019 \
-    -DCURRENT_MONTH=6 \
-    -DCURRENT_DAY=24 \
-    -DCURRENT_HOUR=21 \
-    -DCURRENT_MINUTE=12 \
 	-DTARGET_OS_FreeRTOS -DNO_MEMSET_S \
 	-DVOTING_SYSTEM_DEBUG #-DNETWORK_LOGS #-DSIMULATION
+ 	#-DHARDCODE_CURRENT_TIME \
+    #-DCURRENT_YEAR=2019 \
+    #-DCURRENT_MONTH=6 \
+    #-DCURRENT_DAY=24 \
+    #-DCURRENT_HOUR=21 \
+    #-DCURRENT_MINUTE=12
 
 DEMO_SRC = \
 	$(SBB_SOURCE_DIR)/main_freertos.c \
@@ -163,7 +163,8 @@ APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
 	$(FREERTOS_DEMO_DIR)/devices/ff.c \
 	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
-	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
+	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c \
+	$(FREERTOS_DEMO_DIR)/devices/ds1338rtc.c
 
 ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \

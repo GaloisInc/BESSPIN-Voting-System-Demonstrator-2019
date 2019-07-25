@@ -377,4 +377,12 @@ bool cast_or_spoil_timeout_expired(void);
 */
 void ballot_box_main_loop(void);
 
+/**
+ * Get current system time
+ * @return true if the time was retrieved correctly
+ * @return false otherwise
+ */
+bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
+                      uint16_t *hour, uint16_t *minute);
+
 #endif /* __SBB_H__ */
