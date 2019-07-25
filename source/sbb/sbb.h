@@ -15,6 +15,13 @@
 #include "sbb.acsl"
 #include "sbb_logging.h"
 
+// Timeouts
+#define BALLOT_DETECT_TIMEOUT_MS 10000
+#define CAST_OR_SPOIL_TIMEOUT_MS 30000
+#define SPOIL_EJECT_TIMEOUT_MS 6000
+#define CAST_INGEST_TIMEOUT_MS 6000
+
+
 // Display strings
 extern const char *empty;
 extern const char *welcome_text;
@@ -386,5 +393,11 @@ void ballot_box_main_loop(void);
  */
 bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
                       uint16_t *hour, uint16_t *minute);
+
+/*@ assigns \nothing; */
+TickType_t ballot_detect_timeout_remaining(void);
+
+/*@ assigns \nothing; */
+TickType_t cast_or_spoil_timeout_remaining(void);
 
 #endif /* __SBB_H__ */

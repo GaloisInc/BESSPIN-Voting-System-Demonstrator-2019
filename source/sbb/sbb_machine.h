@@ -107,7 +107,7 @@ EventBits_t next_barcode_event_bits(void);
   @ ensures the_state.L == ABORT || the_state.L == \old(the_state.L);
   @ ensures SBB_Machine_Invariant;
 */
-void update_sensor_state(void);
+void update_sensor_state(TickType_t maxDelay);
 
 // this is a workaround for multiple barcodes being "queued"
 /*@ requires SBB_Machine_Invariant;
