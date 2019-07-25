@@ -349,6 +349,8 @@ void prvNetworkLogTask(void *pvParameters)
     size_t xLenToSend, xReceiveLength;
     uint8_t buf[sbLOG_BUFFER_SIZE] = {0};
 
+    printf("Starting prvNetworkLogTask\r\n");
+
     xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
     // IP address needs to be modified for the test purpose
     // otherwise address can be taken from log_net.h uIPAddress
@@ -356,6 +358,13 @@ void prvNetworkLogTask(void *pvParameters)
     xRemoteAddress.sin_addr =
         FreeRTOS_inet_addr_quick(configRptrIP_ADDR0, configRptrIP_ADDR1,
                                  configRptrIP_ADDR2, configRptrIP_ADDR3);
+
+    xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+                              FREERTOS_IPPROTO_TCP);
+    configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+    configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
+                                  sizeof(xRemoteAddress)) == 0);
+    debug_printf("prvNetworkLogTask: socket connected\r\n");
 
     for (;;)
     {
@@ -366,11 +375,21 @@ void prvNetworkLogTask(void *pvParameters)
         debug_printf("prvNetworkLogTask: Got %u bytes to send\r\n",
                      xReceiveLength);
 
-        xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-                                  FREERTOS_IPPROTO_TCP);
-        configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
-        configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
-                                      sizeof(xRemoteAddress)) == 0);
+        if (FreeRTOS_issocketconnected(xSocket) == pdTRUE)
+        {
+            // Socket is connected, we can send data
+            debug_printf("prvNetworkLogTask: socket is connected\r\n");
+        }
+        else
+        {
+            // reconnect
+            debug_printf("prvNetworkLogTask: Connecting new socket\r\n");
+            xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+                                      FREERTOS_IPPROTO_TCP);
+            configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+            configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
+                                          sizeof(xRemoteAddress)) == 0);
+        }
 
         xLenToSend = 0;
         uint8_t iter = 0;
@@ -403,13 +422,12 @@ void prvNetworkLogTask(void *pvParameters)
             }
             xLenToSend += xBytesSent;
         } while (xLenToSend < xReceiveLength);
-
-        /* Initiate graceful shutdown. */
-        printf("prvNetworkLogTask: Closing the socket\r\n");
-        FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
-        /* The socket has shut down and is safe to close. */
-        FreeRTOS_closesocket(xSocket);
     }
+    /* Initiate graceful shutdown. */
+    printf("prvNetworkLogTask: Closing the socket\r\n");
+    FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
+    /* The socket has shut down and is safe to close. */
+    FreeRTOS_closesocket(xSocket);
 }
 
 /* Task handling the GPIO inputs */
