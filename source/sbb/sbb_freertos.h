@@ -98,4 +98,10 @@ extern TaskHandle_t prvStartupTaskHandle;
 /* Input defines */
 #define GPIO_READ_DELAY_MS pdMS_TO_TICKS(15)
 
+/*
+ * Just seeds the simple pseudo random number generator.
+ */
+void prvSRand(UBaseType_t ulSeed);
+
+
 #endif /* __SBB_FREERTOS_H__ */

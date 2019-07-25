@@ -149,9 +149,7 @@ int main(void)
     xSBBEventGroup = xEventGroupCreate();
     configASSERT(xSBBEventGroup);
     
-    // Initialize some of the IO tasks
-    xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-	xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+    // Initialize startup task
     xTaskCreate(prvStartupTask, "prvStartupTask", SBB_STARTUP_TASK_STACK_SIZE, NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
 
     // Setup TCP IP *after* all buffers and event groups are initialized
@@ -356,6 +354,17 @@ void prvNetworkLogTask(void *pvParameters)
 
     printf("Starting prvNetworkLogTask\r\n");
 
+    uint32_t year_now;
+	uint16_t month_now, day_now, hour_now, minute_now;
+	configASSERT(get_current_time(&year_now, &month_now, &day_now, &hour_now, &minute_now));
+	uint8_t month = (uint8_t) month_now;
+	uint8_t day = (uint8_t) day_now;
+	uint8_t hour = (uint8_t) hour_now;
+	uint8_t minute = (uint8_t) minute_now;
+	uint32_t seed = (uint32_t) ( day | hour << 8 | minute << 16 | month << 24);
+	FreeRTOS_debug_printf(("Seed for randomiser: %lu\r\n", seed));
+	prvSRand((uint32_t)seed);
+
     xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
     // IP address needs to be modified for the test purpose
     // otherwise address can be taken from log_net.h uIPAddress
@@ -369,8 +378,7 @@ void prvNetworkLogTask(void *pvParameters)
     configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
     res = FreeRTOS_connect(xSocket, &xRemoteAddress,sizeof(xRemoteAddress));
     printf("res = %li\r\n",res);
-    configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
-                                  sizeof(xRemoteAddress)) == 0);
+    configASSERT(res == 0);
     debug_printf("prvNetworkLogTask: socket connected\r\n");
 
     for (;;)

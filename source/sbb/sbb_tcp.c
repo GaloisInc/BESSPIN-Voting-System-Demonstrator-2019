@@ -52,11 +52,6 @@
 #define mainDEVICE_NICK_NAME "fpga_demo"
 
 /*
- * Just seeds the simple pseudo random number generator.
- */
-static void prvSRand(UBaseType_t ulSeed);
-
-/*
  * Miscellaneous initialisation including preparing the logging and seeding the
  * random number generator.
  */
@@ -106,6 +101,10 @@ void sbb_tcp(void)
 {
 	printf("Smart Ballot Box starting...\r\n");
 
+	/* Miscellaneous initialisation including preparing the logging and seeding
+	the random number generator. */
+	prvMiscInitialisation();
+
 	/* Initialise the network interface.
 	 ***NOTE*** Tasks that use the network are created in the network event hook
 	 when the network is connected and ready for use (see the definition of
@@ -136,13 +135,11 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 		/* Create the tasks that use the IP stack if they have not already been
 		   created. */
 		if (xTasksAlreadyCreated == pdFALSE)
-		{	
-			/* Miscellaneous initialisation including preparing the logging and seeding
-	   		the random number generator. */
-			prvMiscInitialisation();
-
+		{
 			printf("Smart Ballot Box: starting tasks...\r\n");
 			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
+			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
+			xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 			#ifdef NETWORK_LOGS
 			xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
 			#endif
@@ -176,7 +173,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 }
 /*-----------------------------------------------------------*/
 
-static void prvSRand(UBaseType_t ulSeed)
+void prvSRand(UBaseType_t ulSeed)
 {
 	/* Utility function to seed the pseudo random number generator. */
 	ulNextRand = ulSeed;
@@ -188,14 +185,7 @@ static void prvSRand(UBaseType_t ulSeed)
  */
 static void prvMiscInitialisation(void)
 {
-	uint32_t year_now;
-	uint16_t month_now, day_now, hour_now, minute_now;
-	configASSERT(get_current_time(&year_now, &month_now, &day_now, &hour_now, &minute_now));
-	uint8_t month = (uint8_t) month_now;
-	uint8_t day = (uint8_t) day_now;
-	uint8_t hour = (uint8_t) hour_now;
-	uint8_t minute = (uint8_t) minute_now;
-	uint32_t seed = (uint32_t) ( day | hour << 8 | minute << 16 | month << 24);
+	uint32_t seed = 42;
 	FreeRTOS_debug_printf(("Seed for randomiser: %lu\r\n", seed));
 	prvSRand((uint32_t)seed);
 	FreeRTOS_debug_printf(("Random numbers: %08lX %08lX %08lX %08lX\r\n", ipconfigRAND32(), ipconfigRAND32(), ipconfigRAND32(), ipconfigRAND32()));
