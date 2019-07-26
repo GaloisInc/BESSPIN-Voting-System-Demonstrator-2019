@@ -63,7 +63,7 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length)
     bool b_match = false;
     // 0.
     // Precondition: length > BASE64_ENCODING_START
-    debug_printf("crypto_check_barcode_valid: Checkig lentghr\r\n");
+    debug_printf("crypto_check_barcode_valid: Checking length\r\n");
     if (BASE64_ENCODING_START < length)
     {
         // 1.
