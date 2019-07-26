@@ -35,9 +35,9 @@ static const uint16_t PORT_NUMBER = 8066;
 #ifdef TARGET_OS_FreeRTOS
 
 uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
-											uint16_t usSourcePort,
-											uint32_t ulDestinationAddress,
-											uint16_t usDestinationPort);
+                                            uint16_t usSourcePort,
+                                            uint32_t ulDestinationAddress,
+                                            uint16_t usDestinationPort);
 
 
 //////////////////////////////////////////////
@@ -51,22 +51,6 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 #include "list.h"
 
 #define portable_assert(x) configASSERT(x)
-
-// Network configuration and addresses that are the same for all SBBs
-//static const uint8_t SBB_NetMask[4] = {255, 255, 255, 0};
-//static const uint8_t SBB_GatewayAddress[4] = {10, 10, 10, 1};
-//static const uint8_t SBB_DNSServerAddress[4] = {4, 2, 2, 2};
-//static const uint8_t Reporting_Server_IP_Address[4] = {10, 6, 6, 253};
-
-// Network configuration and addresses that will be different for each SBB
-
-// RCC made this up - to be confirmed
-// Should be different for each SBB
-//static uint8_t This_SBB_IP_Address[4] = {10, 6, 6, 1};
-
-// RCC No idea where these numbers came from - to be confirmed
-// Should be different for each SBB
-//static uint8_t This_SBB_MAC_Address[6] = {0x00, 0x12, 0x13, 0x10, 0x15, 0x11};
 
 #else
 
@@ -96,10 +80,10 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 void Log_Net_Initialize()
 {
 #ifdef TARGET_OS_FreeRTOS
-  // On FreeRTOS, this is currently null.
-  //
-  // We assume that FreeRTOS_IPInit() has been called already
-  // by the main program.
+    // On FreeRTOS, this is currently null.
+    //
+    // We assume that FreeRTOS_IPInit() has been called already
+    // by the main program.
 #endif
     // On POSIX, implementation is null
     return;
@@ -218,9 +202,9 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
     return;
 }
 #else // NETWORK_LOGS
-// ACSL Contracts TBD
-void Log_Net_Initialize(void) {}
 
-// ACSL Contracts TBD
-void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total) {}
+void Log_Net_Initialize(void) { return; }
+
+void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total) { return; }
+
 #endif //NETWORK_LOGS

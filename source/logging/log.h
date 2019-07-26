@@ -38,27 +38,22 @@ Log_FS_Result create_log(log_file new_log_file,
   @*/
 Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry);
 
+
 /*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ assigns  \result \from a_log_entry;
   @ ensures \result == false || \result == true;
   @*/
 bool verify_log_entry_well_formedness(const log_entry a_log_entry);
+// Not required and not implemented for DEFCON'19
 
-// @design kiniry I do not understand how these two functions are
-// duals of each other, given that once you export a log to a device
-// (which may be a socket, for all we know), there is no binding
-// between that export and its `log_file`.  I *think* that
-// `import_log` has to return a `Log_Handle`?
 
-// @review kiniry I'm experiencing some type confusion as well between
-// `log_name` and `log_file`.
-
-// @todo re-evaluate frame axiom for this function.
 /*@ requires \valid(the_log);
   @ requires \separated(the_log, a_target);
-  @ assigns \nothing; // TBD
+  @ assigns \nothing; // TBD - see below
   @*/
 void export_log(const log_file the_log, const log_io_stream a_target);
+// Not required and not implemented for DEFCON'19
+
 
 
 /*@ requires \valid(the_log);

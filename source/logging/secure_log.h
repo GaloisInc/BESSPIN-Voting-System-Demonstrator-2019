@@ -39,10 +39,6 @@ Log_FS_Result create_secure_log(Log_Handle *secure_log,
                                 const secure_log_security_policy the_policy,
                                 const http_endpoint endpoint);
 
-// TBD and Unimplemented at present
-// /*@ requires \valid_read(((char*)a_secure_log_name) + (0 .. LOG_ENTRY_LENGTH -1));
-//   @*/
-// secure_log_entry secure_log_entry_kind(const secure_log_name a_secure_log_name);
 
 /*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires \valid(the_secure_log);
@@ -55,13 +51,6 @@ Log_FS_Result create_secure_log(Log_Handle *secure_log,
 Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
                                         const log_entry a_log_entry);
 
-
-
-// TBD and Unimplemented at present
-// /*@ requires \valid_read(the_secure_log_entry.the_entry  + (0 .. LOG_ENTRY_LENGTH - 1));
-//   @ requires \valid_read(the_secure_log_entry.the_digest + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
-//   @*/
-// bool verify_secure_log_entry_security(const secure_log_entry the_secure_log_entry);
 
 
 

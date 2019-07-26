@@ -9,7 +9,9 @@
 #define portable_assert(x) assert(x)
 
 // Local constants
+
 const secure_log_entry null_secure_log_entry = {{0}, {0}};
+
 ///////////////////////////////////////////////////
 // Common constants needed by all implemenations //
 ///////////////////////////////////////////////////

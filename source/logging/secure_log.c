@@ -68,7 +68,7 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
     // 2. call initial_log_entry above to create the first block
     initial_entry = initial_log_entry(a_log_entry_type);
 
-    // 2.1 @dragan keep the first hash
+    // keep the first hash
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
       loop invariant \forall size_t k; 0 <= k < i ==> new_secure_log -> previous_hash[k] == initial_entry.the_digest[k];
@@ -82,9 +82,6 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
 
     // 3. Write that new block to the file.
     write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
-
-    // TBD - what to do with the_policy parameter?
-    //       awaiting requirements on this.
 
     // 4. sync the file.
     sync_result = Log_IO_Sync(new_secure_log);
@@ -206,7 +203,7 @@ bool valid_first_entry(secure_log_entry root_entry)
       loop invariant 0 <= i <= AES_BLOCK_LENGTH_BYTES;
       loop assigns i;
       loop variant AES_BLOCK_LENGTH_BYTES - i;
-  */
+     */
     for (int i = 0; i < AES_BLOCK_LENGTH_BYTES; i++)
     {
         if (root_entry.the_digest[i] != new_mac[i])
@@ -267,7 +264,7 @@ bool valid_log_entry(const secure_log_entry this_entry,
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
       loop assigns i;
       loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-  */
+    */
     for (int i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
     {
         if (this_entry.the_digest[i] != new_hash[i])
