@@ -113,10 +113,13 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 #ifdef TARGET_OS_FreeRTOS
       // Send the data to the network logging taks
       debug_printf("Log_Net_Send: %lu bytes\r\n", total);
-      xStreamBufferSend(xNetLogStreamBuffer,
+      size_t res = xStreamBufferSend(xNetLogStreamBuffer,
                         (void *)Transmit_Buffer,
                         total,
                         0);
+      if (res != total) {
+        printf("Log_Net_Send Warning: attempted to send %u bytes, but sent only %u\r\n", total, res);
+      }
 
 #else
       // POSIX-specific implementation of socket handling code
