@@ -45,17 +45,18 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length) {
     size_t olen;
     bool b_match = false;
     // 0.
-    // Precondition: length > BASE64_ENCODING_START
-    if ( BASE64_ENCODING_START < length  ) {
+    // Precondition: BASE64_ENCODING_START < length &&
+    //               (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH
+    if ( BASE64_ENCODING_START < length &&
+         (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH ) {
         // 1.
         // Decode. mbedtls_base64_decode requires (srcLength/4)*3 bytes in the destination.
-        // If `length` is not what we are expecting, then this we will return false.
         uint8_t decoded_barcode[BASE64_DECODED_BUFFER_BYTES] = {0};
         r = mbedtls_base64_decode(&decoded_barcode[0],
                                   BASE64_DECODED_BUFFER_BYTES,
                                   &olen,
                                   &barcode[BASE64_ENCODING_START],
-                                  length - BASE64_ENCODING_START);
+                                  BASE64_ENCODED_LENGTH);
 
         if (r == 0 && BASE64_DECODED_BYTES == olen) {
             // 2. a
