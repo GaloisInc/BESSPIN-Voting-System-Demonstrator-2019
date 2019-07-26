@@ -65,15 +65,6 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 		uint32_t ulDestinationAddress,
 		uint16_t usDestinationPort);
 
-/* The default IP and MAC address used by the demo.  The address configuration
-   defined here will be used if ipconfigUSE_DHCP is 0, or if ipconfigUSE_DHCP is
-   1 but a DHCP server could not be contacted.  See the online documentation for
-   more information. */
-static const uint8_t ucIPAddress[4] = {configIP_ADDR0, configIP_ADDR1, configIP_ADDR2, configIP_ADDR3};
-static const uint8_t ucNetMask[4] = {configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3};
-static const uint8_t ucGatewayAddress[4] = {configGATEWAY_ADDR0, configGATEWAY_ADDR1, configGATEWAY_ADDR2, configGATEWAY_ADDR3};
-static const uint8_t ucDNSServerAddress[4] = {configDNS_SERVER_ADDR0, configDNS_SERVER_ADDR1, configDNS_SERVER_ADDR2, configDNS_SERVER_ADDR3};
-
 /* Set the following constant to pdTRUE to log using the method indicated by the
    name of the constant, or pdFALSE to not log using the method indicated by the
    name of the constant.  Options include to standard out (xLogToStdout), to a disk
@@ -83,12 +74,6 @@ static const uint8_t ucDNSServerAddress[4] = {configDNS_SERVER_ADDR0, configDNS_
    the port number set by configPRINT_PORT in FreeRTOSConfig.h. */
 const BaseType_t xLogToStdout = pdTRUE, xLogToFile = pdFALSE, xLogToUDP = pdFALSE;
 
-/* Default MAC address configuration.  The demo creates a virtual network
-   connection that uses this MAC address by accessing the raw Ethernet data
-   to and from a real network connection on the host PC.  See the
-   configNETWORK_INTERFACE_TO_USE definition for information on how to configure
-   the real network connection to use. */
-const uint8_t ucMACAddress[6] = {configMAC_ADDR0, configMAC_ADDR1, configMAC_ADDR2, configMAC_ADDR3, configMAC_ADDR4, configMAC_ADDR5};
 /*-----------------------------------------------------------*/
 
 bool the_network_status = false;
@@ -118,7 +103,9 @@ void sbb_tcp(void)
 	 are used if ipconfigUSE_DHCP is set to 0, or if ipconfigUSE_DHCP is set to 1
 	 but a DHCP server cannot be	contacted. */
 	FreeRTOS_debug_printf(("FreeRTOS_IPInit\r\n"));
-	FreeRTOS_IPInit(ucIPAddress, ucNetMask, ucGatewayAddress, ucDNSServerAddress, ucMACAddress);
+	FreeRTOS_IPInit(sbb_default_ip_address, sbb_default_netmask,
+                    sbb_default_gateway_address, sbb_default_dns_server_address,
+                    sbb_mac_address);
 }
 /*-----------------------------------------------------------*/
 

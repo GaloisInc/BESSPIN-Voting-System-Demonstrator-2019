@@ -62,7 +62,7 @@ SOFTWARE_SPECS := crypto.h
 FRAMA_C_SOURCES := crypto.c 
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) crypto_main.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) crypto_main.c crypto_config_default.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 MAIN_ENTRY_POINT := main

@@ -18,19 +18,9 @@
 // All software implementation of SHA2. To be replaced when hardware HSM is available
 #include "sha2-openbsd.h"
 
-typedef uint8_t key256[AES256_KEY_LENGTH_BYTES];
-
-// Restore this #ifndef when the implementation of fetch_key()
-// for FreeRTOS is complete. This will ensure that mock_key is
-// NOT compiled into the target binary
-
-// #ifndef TARGET_OS_FreeRTOS
-
-// This is for initial integration and testing only, so only
-// declared on POSIX systems
-static const key256 mock_key = "From Russia with Love";
-
-// #endif
+// the mock/default key, used for testing and returned when an unknown
+// key is asked for
+static const aes256_key mock_key = "From Russia with Love";
 
 // Local functions
 
@@ -40,19 +30,33 @@ const uint8_t *fetch_key (AES_Key_Name key)
   // The body of this function is implemented differently on FreeRTOS and POSIX
 
 #ifdef TARGET_OS_FreeRTOS
-  // TBD for target system.
+    const uint8_t *result;
+    
+    // we simply return addresses of the hard-coded keys that were linked
+    // in at compile time, with the mock key returned in any situation
+    // where one of the 3 "real" keys is not asked for
+    switch (key) {
+    case Barcode_MAC_Key:
+        result = &barcode_mac_key[0];
+        break;
+    
+    case Log_Root_Block_MAC_Key:
+        result = &log_root_block_mac_key[0];
+        break;
+        
+    case Log_Entry_MAC_Key:
+        result = &log_entry_mac_key[0];
+        break;
+        
+    default:
+        result = &mock_key[0];
+        break;
+    }
 
-  // Are the key(s) in well-defined memory-mapped locations?
-  // Pick up a reference to the right key and return it.
-
-  // For now, return mock_key to enable existing test cases to run
-  // with expected results.
-  return mock_key; // TBD
-
-
+    return result;
 #else // POSIX systems
 
-  // For host testing, we return the same key for all cases
+  // For host testing, we return the same mock key for all cases
   return mock_key;
 
 #endif // TARGET_OS_FreeRTOS
