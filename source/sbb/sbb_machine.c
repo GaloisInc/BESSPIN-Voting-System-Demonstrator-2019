@@ -311,6 +311,7 @@ void run_barcode_detected(void) {
                                      strlen(expired_ballot_line_2_text));
             log_system_message(expired_ballot_received_event_msg,
                                strlen(expired_ballot_received_event_msg));
+            CHANGE_STATE(the_state, L, EJECT);
             break;
                 
         default: // no specific messages for other failures
