@@ -297,7 +297,7 @@ bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
     static struct rtctime_t time;
     if (ds1338_read_time(&time) == 0)
     {
-        *year = (uint32_t)time.year;
+        *year = (uint32_t)time.year + 2000;
         *month = (uint16_t)time.month;
         *day = (uint16_t)time.day;
         *hour = (uint16_t)time.hour;

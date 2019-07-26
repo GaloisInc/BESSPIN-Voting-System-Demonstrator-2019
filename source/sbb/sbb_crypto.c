@@ -37,15 +37,15 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
                                       &hour_now, &minute_now));
 #endif
     
-        bool b_valid_by_minutes = minute <= minute_now;
+        bool b_valid_by_minutes = minute >= minute_now;
         bool b_valid_by_hours =
-            hour < hour_now || (hour == hour_now && b_valid_by_minutes);
+            hour > hour_now || (hour == hour_now && b_valid_by_minutes);
         bool b_valid_by_days =
-            day < day_now || (day == day_now && b_valid_by_hours);
+            day > day_now || (day == day_now && b_valid_by_hours);
         bool b_valid_by_months =
-            month < month_now || (month == month_now && b_valid_by_days);
+            month > month_now || (month == month_now && b_valid_by_days);
         bool b_valid_by_years =
-            year < year_now || (year == year_now && b_valid_by_months);
+            year > year_now || (year == year_now && b_valid_by_months);
 
         b_valid = b_valid_by_years;
     }
@@ -63,6 +63,7 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length)
     bool b_match = false;
     // 0.
     // Precondition: length > BASE64_ENCODING_START
+    debug_printf("crypto_check_barcode_valid: Checkig lentghr\r\n");
     if (BASE64_ENCODING_START < length)
     {
         // 1.
@@ -76,11 +77,12 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length)
 
         if (r == 0 && BASE64_DECODED_BYTES == olen)
         {
+            debug_printf("crypto_check_barcode_valid: Checkig Timestamp\r\n");
             // 2. a
             // Check the timestamp to make sure it's not from the future
 
             // The barcode must not have expired (i.e. the expiry date should be > now)
-            if (!timestamp_lte_now((const uint8_t *)&barcode[0]))
+            if (timestamp_lte_now((const uint8_t *)&barcode[0]))
             {
                 // 2. b
                 // Now set up the message for aes_cbc_mac. The formula is:
@@ -111,5 +113,6 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length)
             }
         }
     }
+    debug_printf("crypto_check_barcode_valid: barcodes match? %u\r\n",b_match);
     return b_match;
 }
