@@ -30,26 +30,26 @@ const uint8_t *fetch_key (AES_Key_Name key)
   // The body of this function is implemented differently on FreeRTOS and POSIX
 
 #ifdef TARGET_OS_FreeRTOS
-    uint8_t *result;
+    const uint8_t *result;
     
     // we simply return addresses of the hard-coded keys that were linked
     // in at compile time, with the mock key returned in any situation
     // where one of the 3 "real" keys is not asked for
     switch (key) {
     case Barcode_MAC_Key:
-        result = &barcode_mac_key;
+        result = &barcode_mac_key[0];
         break;
     
     case Log_Root_Block_MAC_Key:
-        result = &log_root_block_mac_key;
+        result = &log_root_block_mac_key[0];
         break;
         
     case Log_Entry_MAC_Key:
-        result = &log_entry_mac_key;
+        result = &log_entry_mac_key[0];
         break;
         
     default:
-        result = &mock_key;
+        result = &mock_key[0];
         break;
     }
 

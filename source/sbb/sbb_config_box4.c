@@ -16,5 +16,5 @@ const uint8_t sbb_default_dns_server_address[4] = { 10, 5, 5, 104 };
 // cryptographic keys for SBB 1
 
 const aes256_key barcode_mac_key = "From Russia with Love";
-const aes256_key log_root_block_mac_key = "From Russia with Love";
-const aes256_key log_entry_mac_key = "From Russia with Love";
+const aes256_key log_root_block_mac_key = "Tomorrow Never Dies";
+const aes256_key log_entry_mac_key = "Quantum of Solace";
