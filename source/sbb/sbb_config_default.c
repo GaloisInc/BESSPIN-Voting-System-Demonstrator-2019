@@ -6,7 +6,9 @@
 #include "sbb.h"
 
 // Default configuration strings for a SBB
-const char *sbb_name = "SBB";
+const char *sbb_name = "DEFAULT";
+const log_name system_log_file_name = "default_system.log";
+const log_name app_log_file_name = "default_application.log";
 const uint8_t sbb_mac_address[6] = { 0x00, 0x0a, 0x35, 0x66, 0x66, 0x00 };
 const uint8_t sbb_default_ip_address[4] = { 10, 5, 5, 1 };
 const uint8_t sbb_default_netmask[4] = { 255, 255, 255, 0 };
