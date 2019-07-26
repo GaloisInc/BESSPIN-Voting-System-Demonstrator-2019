@@ -109,7 +109,7 @@ task.  This setting is less important when the FreeRTOS Win32 simulator is used
 as the Win32 simulator only stores a fixed amount of information on the task
 stack.  FreeRTOS includes optional stack overflow detection, see:
 http://www.freertos.org/Stacks-and-stack-overflow-checking.html */
-#define ipconfigIP_TASK_STACK_SIZE_WORDS	( configMINIMAL_STACK_SIZE * 20 )
+#define ipconfigIP_TASK_STACK_SIZE_WORDS	( configMINIMAL_STACK_SIZE * 100 )
 
 /* ipconfigRAND32() is called by the IP stack to generate random numbers for
 things such as a DHCP transaction number or initial sequence number.  Random
@@ -285,9 +285,11 @@ simultaneously, one could define TCP_WIN_SEG_COUNT as 120. */
 
 /* Each TCP socket has a circular buffers for Rx and Tx, which have a fixed
 maximum size.  Define the size of Rx buffer for TCP sockets. */
-#define ipconfigTCP_RX_BUFFER_LENGTH			( 1000 )
+// @mpodhradsky: Use default value of 5840 bytes
+#define ipconfigTCP_RX_BUFFER_LENGTH			( 1000 ) 
 
 /* Define the size of Tx buffer for TCP sockets. */
+// @mpodhradsky: Use default value of 5840 bytes
 #define ipconfigTCP_TX_BUFFER_LENGTH			( 1000 )
 
 /* When using call-back handlers, the driver may check if the handler points to

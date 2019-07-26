@@ -148,9 +148,10 @@ int main(void)
     /* Initialize event groups */
     xSBBEventGroup = xEventGroupCreate();
     configASSERT(xSBBEventGroup);
-    
+
     // Initialize startup task
-    xTaskCreate(prvStartupTask, "prvStartupTask", SBB_STARTUP_TASK_STACK_SIZE, NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
+    xTaskCreate(prvStartupTask, "prvStartupTask", SBB_STARTUP_TASK_STACK_SIZE,
+                NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
 
     // Setup TCP IP *after* all buffers and event groups are initialized
     sbb_tcp();
@@ -355,15 +356,16 @@ void prvNetworkLogTask(void *pvParameters)
     printf("Starting prvNetworkLogTask\r\n");
 
     uint32_t year_now;
-	uint16_t month_now, day_now, hour_now, minute_now;
-	configASSERT(get_current_time(&year_now, &month_now, &day_now, &hour_now, &minute_now));
-	uint8_t month = (uint8_t) month_now;
-	uint8_t day = (uint8_t) day_now;
-	uint8_t hour = (uint8_t) hour_now;
-	uint8_t minute = (uint8_t) minute_now;
-	uint32_t seed = (uint32_t) ( day | hour << 8 | minute << 16 | month << 24);
-	FreeRTOS_debug_printf(("Seed for randomiser: %lu\r\n", seed));
-	prvSRand((uint32_t)seed);
+    uint16_t month_now, day_now, hour_now, minute_now;
+    configASSERT(get_current_time(&year_now, &month_now, &day_now, &hour_now,
+                                  &minute_now));
+    uint8_t month = (uint8_t)month_now;
+    uint8_t day = (uint8_t)day_now;
+    uint8_t hour = (uint8_t)hour_now;
+    uint8_t minute = (uint8_t)minute_now;
+    uint32_t seed = (uint32_t)(day | hour << 8 | minute << 16 | month << 24);
+    FreeRTOS_debug_printf(("Seed for randomiser: %lu\r\n", seed));
+    prvSRand((uint32_t)seed);
 
     xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
     // IP address needs to be modified for the test purpose
@@ -373,13 +375,13 @@ void prvNetworkLogTask(void *pvParameters)
         FreeRTOS_inet_addr_quick(configRptrIP_ADDR0, configRptrIP_ADDR1,
                                  configRptrIP_ADDR2, configRptrIP_ADDR3);
 
-    xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-                              FREERTOS_IPPROTO_TCP);
-    configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
-    res = FreeRTOS_connect(xSocket, &xRemoteAddress,sizeof(xRemoteAddress));
-    printf("res = %li\r\n",res);
-    configASSERT(res == 0);
-    debug_printf("prvNetworkLogTask: socket connected\r\n");
+    // xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+    //                           FREERTOS_IPPROTO_TCP);
+    // configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+    // res = FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress));
+    // printf("res = %li\r\n", res);
+    // configASSERT(res == 0);
+    // debug_printf("prvNetworkLogTask: socket connected\r\n");
 
     for (;;)
     {
@@ -390,21 +392,30 @@ void prvNetworkLogTask(void *pvParameters)
         debug_printf("prvNetworkLogTask: Got %u bytes to send\r\n",
                      xReceiveLength);
 
-        if (FreeRTOS_issocketconnected(xSocket) == pdTRUE)
-        {
-            // Socket is connected, we can send data
-            debug_printf("prvNetworkLogTask: socket is connected\r\n");
-        }
-        else
-        {
-            // reconnect
-            debug_printf("prvNetworkLogTask: Connecting new socket\r\n");
-            xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-                                      FREERTOS_IPPROTO_TCP);
-            configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
-            configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
-                                          sizeof(xRemoteAddress)) == 0);
-        }
+        xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+                                  FREERTOS_IPPROTO_TCP);
+        configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+        res =
+            FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress));
+        printf("res = %li\r\n", res);
+        configASSERT(res == 0);
+        debug_printf("prvNetworkLogTask: socket connected\r\n");
+
+        // if (FreeRTOS_issocketconnected(xSocket) == pdTRUE)
+        // {
+        //     // Socket is connected, we can send data
+        //     debug_printf("prvNetworkLogTask: socket is connected\r\n");
+        // }
+        // else
+        // {
+        //     // reconnect
+        //     debug_printf("prvNetworkLogTask: Connecting new socket\r\n");
+        //     xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+        //                               FREERTOS_IPPROTO_TCP);
+        //     configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+        //     configASSERT(FreeRTOS_connect(xSocket, &xRemoteAddress,
+        //                                   sizeof(xRemoteAddress)) == 0);
+        // }
 
         xLenToSend = 0;
         uint8_t iter = 0;
@@ -437,12 +448,13 @@ void prvNetworkLogTask(void *pvParameters)
             }
             xLenToSend += xBytesSent;
         } while (xLenToSend < xReceiveLength);
+
+        /* Initiate graceful shutdown. */
+        printf("prvNetworkLogTask: Closing the socket\r\n");
+        FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
+        /* The socket has shut down and is safe to close. */
+        FreeRTOS_closesocket(xSocket);
     }
-    /* Initiate graceful shutdown. */
-    printf("prvNetworkLogTask: Closing the socket\r\n");
-    FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
-    /* The socket has shut down and is safe to close. */
-    FreeRTOS_closesocket(xSocket);
 }
 
 void prvStartupTask(void *pvParameters)
@@ -452,14 +464,15 @@ void prvStartupTask(void *pvParameters)
     uint8_t cnt = 0;
     clear_display();
 
-    for(;;) {
-        memset(buf,' ',16);
+    for (;;)
+    {
+        memset(buf, ' ', 16);
         buf[16] = 0;
         buf[cnt] = '.';
 #ifndef SIMULATION
-        display_this_text_no_log(buf,strlen(buf));
+        display_this_text_no_log(buf, strlen(buf));
 #endif
-        printf("%s\r",buf);
+        printf("%s\r", buf);
         cnt++;
         cnt %= 16;
         msleep(1000);
