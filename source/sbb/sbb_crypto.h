@@ -14,7 +14,8 @@
 /*@ assigns \nothing;
   @ ensures \result == true || \result == false;
  */
-bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length);
+barcode_validity crypto_check_barcode_valid(barcode_t barcode,
+                                            barcode_length_t length);
 
 /*@ assigns \nothing;
   @ ensures \result == true || \result == false;

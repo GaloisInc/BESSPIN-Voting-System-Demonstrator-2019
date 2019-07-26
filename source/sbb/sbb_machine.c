@@ -286,25 +286,42 @@ void run_barcode_detected(void) {
                                  strlen(duplicate_barcode_line_2_text));
         debug_printf("previously seen barcode detected");
         CHANGE_STATE(the_state, L, EJECT);
-    } else if ( is_barcode_valid(this_barcode, length) ) {
-        // Prompt the user for a decision
-        debug_printf("valid barcode detected");
-        cast_button_light_on();
-        spoil_button_light_on();
-        cast_or_spoil_timeout_reset();
-        display_this_2_line_text(cast_or_spoil_line_1_text,
-                                 strlen(cast_or_spoil_line_1_text),
-                                 cast_or_spoil_line_2_text,
-                                 strlen(cast_or_spoil_line_2_text));
-        // Go to the waiting state
-        CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
     } else {
-        debug_printf("invalid barcode detected");
-        display_this_text(invalid_barcode_text,
-                          strlen(invalid_barcode_text));
-        log_system_message(invalid_barcode_received_event_msg,
-                           strlen(invalid_barcode_received_event_msg));
-        CHANGE_STATE(the_state, L, EJECT);
+        barcode_validity validity = is_barcode_valid(this_barcode, length);
+        switch (validity) {
+        case BARCODE_VALID:
+            // Prompt the user for a decision
+            debug_printf("valid barcode detected");
+            cast_button_light_on();
+            spoil_button_light_on();
+            cast_or_spoil_timeout_reset();
+            display_this_2_line_text(cast_or_spoil_line_1_text,
+                                     strlen(cast_or_spoil_line_1_text),
+                                     cast_or_spoil_line_2_text,
+                                     strlen(cast_or_spoil_line_2_text));
+            // Go to the waiting state
+            CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
+            break;
+        
+        case BARCODE_INVALID_TIMESTAMP:
+            debug_printf("expired ballot detected");
+            display_this_2_line_text(expired_ballot_line_1_text,
+                                     strlen(expired_ballot_line_1_text),
+                                     expired_ballot_line_2_text,
+                                     strlen(expired_ballot_line_2_text));
+            log_system_message(expired_ballot_received_event_msg,
+                               strlen(expired_ballot_received_event_msg));
+            CHANGE_STATE(the_state, L, EJECT);
+            break;
+                
+        default: // no specific messages for other failures
+            debug_printf("invalid barcode detected, type %d", validity);
+            display_this_text(invalid_barcode_text,
+                              strlen(invalid_barcode_text));
+            log_system_message(invalid_barcode_received_event_msg,
+                               strlen(invalid_barcode_received_event_msg));
+            CHANGE_STATE(the_state, L, EJECT);
+        }
     }
 }
 

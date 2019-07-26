@@ -88,7 +88,7 @@ void initialize(void) {
 /* global invariant Motor_initial_state:
    \forall motor m; \at(!motor_running(m), DevicesInitialized);
 */
-bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
+barcode_validity is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
     return crypto_check_barcode_valid(the_barcode, its_length);
 }
 
