@@ -76,11 +76,11 @@ barcode_validity crypto_check_barcode_valid(barcode_t barcode,
                 memcpy(&our_digest_input[0],
                        &barcode[0],
                        TIMESTAMP_LENGTH_BYTES);
-                // { input[0..15] |-> timeestamp[0..5] }
+                // { input[0..15] |-> timestamp[0..5] }
                 memcpy(&our_digest_input[TIMESTAMP_LENGTH_BYTES],
                        &decoded_barcode[0],
                        ENCRYPTED_BALLOT_LENGTH_BYTES);
-                // { input[0..32] |-> timeestamp[0..5] # decode_barcode[0..15] }
+                // { input[0..32] |-> timestamp[0..5] # decode_barcode[0..15] }
 
                 // 3.
                 // Compute the cbc-mac
