@@ -36,6 +36,8 @@ extern const char *cast_or_spoil_line_1_text;
 extern const char *cast_or_spoil_line_2_text;
 extern const char *casting_ballot_text;
 extern const char *spoiling_ballot_text;
+const char *expired_ballot_line_1_text;
+const char *expired_ballot_line_2_text;
 extern const char *invalid_barcode_text;
 extern const char *duplicate_barcode_line_1_text;
 extern const char *duplicate_barcode_line_2_text;
@@ -179,9 +181,8 @@ void initialize(void);
 // spec is ready for use.
 /*@ requires \valid(the_barcode + (0 .. its_length - 1));
   @ assigns \nothing;
-  @ ensures \result == true || \result == false;
 */
-bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
+barcode_validity is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
 
 /*@ requires \valid_read(the_barcode);
   @ requires \valid_read(the_barcode + (1..its_length-1));
