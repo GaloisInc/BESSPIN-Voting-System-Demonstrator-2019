@@ -17,8 +17,6 @@ DEMO_SRC = \
     sbb_machine.c \
     ../logging/log.c \
     ../logging/secure_log.c \
-    ../logging/system_log.c \
-    ../logging/application_log.c \
     ../logging/log_io.c \
     ../logging/log_fs.c \
     ../logging/log_net.c \
@@ -46,7 +44,7 @@ DEFAULT_SRC = \
 # the crypto directory exists solely to allow crypto tests to be
 # run on their own
 
-BOX1_SRC = sbb_config_box1.c 
+BOX1_SRC = sbb_config_box1.c
 BOX2_SRC = sbb_config_box2.c
 BOX3_SRC = sbb_config_box3.c
 BOX4_SRC = sbb_config_box4.c
@@ -103,25 +101,25 @@ $(BOX1_PROG).elf  : $(OBJS_BOX1)
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX1) $(LIBS)
 	@$(OBJDUMP) -S $(BOX1_PROG).elf > $(BOX1_PROG).asm
 	@echo Completed $@
-	
+
 $(BOX2_PROG).elf  : $(OBJS_BOX2)
 	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX2) $(LIBS)
 	@$(OBJDUMP) -S $(BOX2_PROG).elf > $(BOX2_PROG).asm
 	@echo Completed $@
-	
+
 $(BOX3_PROG).elf  : $(OBJS_BOX3)
 	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX3) $(LIBS)
 	@$(OBJDUMP) -S $(BOX3_PROG).elf > $(BOX3_PROG).asm
 	@echo Completed $@
-	
+
 $(BOX4_PROG).elf  : $(OBJS_BOX4)
 	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX4) $(LIBS)
 	@$(OBJDUMP) -S $(BOX4_PROG).elf > $(BOX4_PROG).asm
 	@echo Completed $@
-	
+
 clean :
 	@rm -f $(OBJS_DEFAULT) $(OBJS_BOX1) $(OBJS_BOX2) $(OBJS_BOX3) $(OBJS_BOX4)
 	@rm -f $(DEFAULT_PROG).elf $(BOX1_PROG).elf $(BOX2_PROG).elf $(BOX3_PROG).elf $(BOX4_PROG).elf
