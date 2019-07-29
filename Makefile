@@ -12,29 +12,23 @@ CRYPTO_DIR = $(SOURCE_DIR)/crypto
 # 		SBB Target
 #
 #####################################
-sbb_all: fpga sim
-
-clean_all: fpga_clean sim_clean
-
 fpga:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos all;
 	cp $(SBB_DIR)/main_ballot_box.* .
-
-fpga_clean:
-	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos clean
-	rm main_ballot_box.*
 
 sim:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim all
 	cp $(SBB_DIR)/main_ballot_box_sim.* .
 
-sim_clean:
+clean_all:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos clean
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
-	rm main_ballot_box_sim.*
+	rm -f main_ballot_box.*
+	rm -f main_ballot_box_sim.*
 
 #####################################
 #
@@ -194,9 +188,6 @@ clean_sbb:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
 
-
-else
-$(info unknown target type: $(TARGET) Available types are "bottom", "verification", "freertos", "hosttests")
 endif # ($(TARGET),sim)
 endif # ($(TARGET),hosttests)
 endif # ($(TARGET),verification)
