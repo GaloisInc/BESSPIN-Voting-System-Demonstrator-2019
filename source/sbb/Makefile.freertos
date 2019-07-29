@@ -1,8 +1,6 @@
 # Common includes
 include ../Makefile.freertos_common
 
-PROG ?= main_ballot_box
-
 DEMO_SRC = \
 	$(SBB_SOURCE_DIR)/main_freertos.c \
 	$(SBB_SOURCE_DIR)/sbb_tcp.c \
@@ -13,8 +11,6 @@ DEMO_SRC = \
     $(SBB_SOURCE_DIR)/sbb_crypto.c \
 	$(LOG_SOURCE_DIR)/log.c \
     $(LOG_SOURCE_DIR)/secure_log.c \
-    $(LOG_SOURCE_DIR)/system_log.c \
-    $(LOG_SOURCE_DIR)/application_log.c \
     $(LOG_SOURCE_DIR)/log_io.c \
     $(LOG_SOURCE_DIR)/log_fs.c \
     $(LOG_SOURCE_DIR)/log_net.c \

@@ -14,21 +14,21 @@ CRYPTO_DIR = $(SOURCE_DIR)/crypto
 #####################################
 fpga:
 	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos all;
-	cp $(SBB_DIR)/main_ballot_box.* .
+	$(MAKE) -f Makefile.freertos default
+	cp $(SBB_DIR)/default_ballot_box.* .
 
 sim:
 	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim all
-	cp $(SBB_DIR)/main_ballot_box_sim.* .
+	$(MAKE) -f Makefile.freertos_sim default
+	cp $(SBB_DIR)/default_ballot_box_sim.* .
 
 clean_all:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
-	rm -f main_ballot_box.*
-	rm -f main_ballot_box_sim.*
+	rm -f default_ballot_box.*
+	rm -f default_ballot_box_sim.*
 
 #####################################
 #
@@ -58,7 +58,7 @@ clean: clean_crypto clean_log clean_sbb
 
 freertos_crypto:
 	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos all
+	$(MAKE) -f Makefile.freertos default
 
 clean_crypto:
 	cd $(CRYPTO_DIR) ; \
@@ -66,7 +66,7 @@ clean_crypto:
 
 freertos_log:
 	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos all
+	$(MAKE) -f Makefile.freertos default
 
 clean_log:
 	cd $(LOG_DIR) ; \
@@ -166,7 +166,7 @@ clean: clean_crypto clean_log clean_sbb
 
 sim_crypto:
 	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim all
+	$(MAKE) -f Makefile.freertos_sim default
 
 clean_crypto:
 	cd $(CRYPTO_DIR) ; \
@@ -174,7 +174,7 @@ clean_crypto:
 
 sim_log:
 	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim all
+	$(MAKE) -f Makefile.freertos_sim default
 
 clean_log:
 	cd $(LOG_DIR) ; \
@@ -182,7 +182,7 @@ clean_log:
 
 sim_sbb:
 	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim all
+	$(MAKE) -f Makefile.freertos_sim default
 
 clean_sbb:
 	cd $(SBB_DIR) ; \
