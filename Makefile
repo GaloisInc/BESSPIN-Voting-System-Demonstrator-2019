@@ -74,7 +74,7 @@ clean_log:
 
 freertos_sbb:
 	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos all
+	$(MAKE) -f Makefile.freertos default
 
 clean_sbb:
 	cd $(SBB_DIR) ; \

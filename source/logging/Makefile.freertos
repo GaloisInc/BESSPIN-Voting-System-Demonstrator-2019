@@ -1,7 +1,7 @@
 # Common includes
 include ../Makefile.freertos_common
 
-PROG = test_freertos
+DEFAULT_PROG = test_freertos
 
 DEMO_SRC = \
     test_freertos.c \
@@ -17,11 +17,6 @@ DEMO_SRC = \
     ../crypto/mode_wrappers.c \
     ../crypto/sha2-openbsd.c \
     ../crypto/crypto.c 
-
-#
-# Target specific flags
-#
-#FREERTOS_SRC += $(FREERTOS_IP_SRC)
 
 CFLAGS += \
     $(FREERTOS_IP_INCLUDE) \
