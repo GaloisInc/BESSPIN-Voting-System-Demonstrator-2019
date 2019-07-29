@@ -1,2 +1,2 @@
-CFLAGS += -I$(LOGGING_DIR) -DSIMULATION
-include ./Makefile.freertos
+CFLAGS += -DSIMULATION
+include Makefile.freertos

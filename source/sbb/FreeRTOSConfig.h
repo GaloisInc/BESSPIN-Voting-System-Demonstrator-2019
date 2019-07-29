@@ -91,7 +91,7 @@
 #define configTICK_RATE_HZ ((TickType_t)1000)
 #define configMAX_PRIORITIES (5)
 #define configMINIMAL_STACK_SIZE ((uint32_t)2048) /* Can be as low as 60 but some of the demo tasks that use this constant require it to be higher. */
-#define configTOTAL_HEAP_SIZE ((size_t)(7000 * 1024))
+#define configTOTAL_HEAP_SIZE ((size_t)(7000 * 1024)) // TODO: the HEAP size is ridiculous, the minimal stack size as well, adjust!
 #define configMAX_TASK_NAME_LEN (16)
 #define configUSE_TRACE_FACILITY 1
 #define configUSE_16_BIT_TICKS 0

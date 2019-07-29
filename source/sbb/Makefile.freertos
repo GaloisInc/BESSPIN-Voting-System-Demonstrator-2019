@@ -1,82 +1,36 @@
 PROG = main_ballot_box
-LOGGING_DIR = ../logging
-CRYPTO_DIR = ../crypto
-PROTOCOLS_DIR = ../protocols
 
 DEMO_SRC = \
-    main_freertos.c \
-    sbb_tcp.c \
-    sbb.c \
-    sbb_strings.c \
-    sbb_logging.c \
-    sbb_crypto.c \
-    sbb_machine.c \
-    ../logging/log.c \
-    ../logging/secure_log.c \
-    ../logging/system_log.c \
-    ../logging/application_log.c \
-    ../logging/log_io.c \
-    ../logging/log_fs.c \
-    ../logging/log_net.c \
-    ../logging/debug_io.c \
-    ../crypto/base64.c \
-    ../crypto/crypto.c \
-    ../crypto/sha2-openbsd.c \
-    ../crypto/aes.c \
-    ../crypto/cbc.c \
-    ../crypto/mode_wrappers.c \
-    ../protocols/Common/FreeRTOS_TCP_server.c \
-    ../protocols/HTTP/FreeRTOS_HTTP_server.c \
-    ../protocols/HTTP/FreeRTOS_HTTP_commands.c \
-    ../protocols/HTTP/peekpoke.c
-
-CFLAGS += -I$(LOGGING_DIR) -I$(CRYPTO_DIR) -DconfigUSE_DHCP \
-          -DHARDCODE_CURRENT_TIME \
-          -DCURRENT_YEAR=2019 \
-          -DCURRENT_MONTH=7 \
-          -DCURRENT_DAY=22 \
-          -DCURRENT_HOUR=13 \
-          -DCURRENT_MINUTE=18
+	$(SBB_SOURCE_DIR)/main_freertos.c \
+	$(SBB_SOURCE_DIR)/sbb_tcp.c \
+	$(SBB_SOURCE_DIR)/sbb.c \
+	$(SBB_SOURCE_DIR)/sbb_machine.c \
+	$(SBB_SOURCE_DIR)/sbb_strings.c \
+    $(SBB_SOURCE_DIR)/sbb_logging.c \
+    $(SBB_SOURCE_DIR)/sbb_crypto.c \
+	$(LOG_SOURCE_DIR)/log.c \
+    $(LOG_SOURCE_DIR)/secure_log.c \
+    $(LOG_SOURCE_DIR)/system_log.c \
+    $(LOG_SOURCE_DIR)/application_log.c \
+    $(LOG_SOURCE_DIR)/log_io.c \
+    $(LOG_SOURCE_DIR)/log_fs.c \
+    $(LOG_SOURCE_DIR)/log_net.c \
+    $(LOG_SOURCE_DIR)/debug_io.c \
+    $(CRYPTO_SOURCE_DIR)/base64.c \
+    $(CRYPTO_SOURCE_DIR)/crypto.c \
+    $(CRYPTO_SOURCE_DIR)/sha2-openbsd.c \
+    $(CRYPTO_SOURCE_DIR)/aes.c \
+    $(CRYPTO_SOURCE_DIR)/cbc.c \
+    $(CRYPTO_SOURCE_DIR)/mode_wrappers.c
 
 #
-# Define all object files.
+# Target specific flags
 #
-RTOS_OBJ = $(FREERTOS_SRC:.c=.o)
-RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
-APP_OBJ  = $(APP_SRC:.c=.o)
-PORT_OBJ = $(PORT_SRC:.c=.o)
-DEMO_OBJ = $(DEMO_SRC:.c=.o)
-PORT_ASM_OBJ = $(PORT_ASM:.S=.o)
-CRT0_OBJ = $(CRT0:.S=.o)
-OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(RTOS_TCP_OBJ) $(DEMO_OBJ) $(APP_OBJ)
+FREERTOS_SRC += $(FREERTOS_PEEKPOKE_SRC)
 
-$(info ASFLAGS=$(ASFLAGS))
-$(info LDLIBS=$(LDLIBS))
-$(info CFLAGS=$(CFLAGS))
-$(info LDFLAGS=$(LDFLAGS))
-$(info ARFLAGS=$(ARFLAGS))
+CFLAGS += \
+    $(FREERTOS_IP_INCLUDE) \
+	-I$(FREERTOS_PROTOCOLS_DIR)/include \
+	-DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DSIMULATION
 
-%.o: %.c
-	@echo "    CC $<"
-	@$(GCC) -c $(CFLAGS) -o $@ $<
-
-%.o: %.S
-	@echo "    CC $<"
-	@$(GCC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
-
-all: $(PROG).elf
-
-$(PROG).elf  : $(OBJS)
-	@echo Linking....
-	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
-	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
-	@echo Completed $@
-
-clean :
-	@rm -f $(OBJS)
-	@rm -f $(PROG).elf
-	@rm -f $(PROG).map
-	@rm -f $(PROG).asm
-
-docs :
-	@doxygen
+include ../Makefile.freertos_targets

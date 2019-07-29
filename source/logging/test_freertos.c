@@ -32,6 +32,7 @@
 /* FreeRTOS kernel includes. */
 #include <FreeRTOS.h>
 #include <task.h>
+#include "stream_buffer.h"
 
 /* Standard includes */
 #include <stdbool.h>
@@ -64,6 +65,10 @@ static void prvStatsTask(void *pvParameters);
 
 /* Smart Ballot Box Tasks and priorities*/
 #define SBB_LOGGING_TASK_PRIORITY tskIDLE_PRIORITY + 2
+
+StreamBufferHandle_t xNetLogStreamBuffer;
+#define sbLOG_BUFFER_SIZE 1024
+#define sbLOG_BUFFER_TRIGGER_LEVEL 331
 
 static void prvLoggingTask(void *pvParameters);
 /*-----------------------------------------------------------*/
@@ -109,6 +114,10 @@ uint32_t port_get_current_mtime(void)
 int main(void)
 {
     prvSetupHardware();
+
+    xNetLogStreamBuffer =
+        xStreamBufferCreate(sbLOG_BUFFER_SIZE, sbLOG_BUFFER_TRIGGER_LEVEL);
+
     xTaskCreate(prvLoggingTask, "prvLoggingTask", configMINIMAL_STACK_SIZE * 2U,
                 NULL, SBB_LOGGING_TASK_PRIORITY, NULL);
 

@@ -1,19 +1,9 @@
-# Makefile for Building the "bottom" variant of the BVS application
-
-.PHONY: bottom bottom_clean
-
-# Assume clang is on PATH, but needs some special setup on Darwin to override
-# Apple's clang and use the HomeBrew one instead...
-export CC := clang
-
-INCLUDES = -I ../logging
-
-CFLAGS = $(INCLUDES)
-
 # Build the bottom target
-all:
-	$(CC) $(CFLAGS) sbb_strings.c sbb_bottom.c -o sbb_bottom.elf
+sbb_bottom:
+	cd $(SBB_DIR); \
+	$(CC) $(CFLAGS) sbb_strings.c sbb_bottom.c -o sbb_bottom.elf; \
 	rm -f *.o
 
-clean:
+sbb_bottom_clean:
+	cd $(SBB_DIR); \
 	rm -f sbb_bottom.elf

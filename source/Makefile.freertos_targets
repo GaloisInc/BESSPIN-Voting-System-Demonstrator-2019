@@ -1,0 +1,42 @@
+#
+# Define all object files.
+#
+RTOS_OBJ = $(FREERTOS_SRC:.c=.o)
+RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
+APP_OBJ  = $(APP_SRC:.c=.o)
+PORT_OBJ = $(PORT_SRC:.c=.o)
+DEMO_OBJ = $(DEMO_SRC:.c=.o)
+PORT_ASM_OBJ = $(PORT_ASM:.S=.o)
+CRT0_OBJ = $(CRT0:.S=.o)
+OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(RTOS_TCP_OBJ) $(DEMO_OBJ) $(APP_OBJ)
+
+$(info ASFLAGS=$(ASFLAGS))
+$(info LDLIBS=$(LDLIBS))
+$(info CFLAGS=$(CFLAGS))
+$(info LDFLAGS=$(LDFLAGS))
+$(info ARFLAGS=$(ARFLAGS))
+
+%.o: %.c
+	@echo "    CC $<"
+	@$(GCC) -c $(CFLAGS) -o $@ $<
+
+%.o: %.S
+	@echo "    CC $<"
+	@$(GCC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
+
+all: $(PROG).elf
+
+$(PROG).elf  : $(OBJS)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
+	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
+	@echo Completed $@
+
+clean :
+	@rm -f $(OBJS)
+	@rm -f $(PROG).elf
+	@rm -f $(PROG).map
+	@rm -f $(PROG).asm
+
+docs :
+	@doxygen
