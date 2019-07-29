@@ -272,6 +272,27 @@ void prvBallotBoxMainTask(void *pvParameters)
 }
 /*-----------------------------------------------------------*/
 
+
+/**
+ * The infamous malware task
+ */
+void prvMalwareTask(void *pvParameters)
+{
+    (void)pvParameters;
+    printf("Starting prvMalwareTask\r\n");
+    void (*function_handle)(void) = NULL;
+
+    for (;;) {
+        if (function_handle != NULL) {
+            printf("Jumping to malware task function handle...\r\n");
+            (*function_handle)();
+        }
+        msleep(100);
+    }
+}
+/*-----------------------------------------------------------*/
+
+
 /**
  * Aux task polling data from the barcode scanner
  */

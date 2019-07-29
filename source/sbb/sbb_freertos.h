@@ -21,6 +21,7 @@ void prvBarcodeScannerTask(void *pvParameters);
 void prvInputTask(void *pvParameters);
 void prvNetworkLogTask(void *pvParameters);
 void prvStartupTask(void *pvParameters);
+void prvMalwareTask(void *pvParameters);
 
 void sbb_tcp(void);
 void reportIPStatus(void);
@@ -38,12 +39,15 @@ extern TaskHandle_t prvStartupTaskHandle;
 #define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+3
 #define SBB_NET_LOG_TASK_PRIORITY tskIDLE_PRIORITY+2
 #define SBB_STARTUP_TASK_PRIORITY tskIDLE_PRIORITY
+#define SBB_MALWARE_TASK_PRIORITY tskIDLE_PRIORITY
+
 
 #define SBB_MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*8U
 #define SBB_SCANNER_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*2U
 #define SBB_INPUT_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*2U
 #define SBB_NET_LOG_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*10U
 #define SBB_STARTUP_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
+#define SBB_MALWARE_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
 
 #define sbLOG_BUFFER_SIZE 1024
 #define sbLOG_BUFFER_TRIGGER_LEVEL 331
