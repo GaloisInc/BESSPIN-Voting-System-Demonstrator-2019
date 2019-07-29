@@ -1,3 +1,6 @@
+# Common includes
+include ../Makefile.freertos_common
+
 PROG = test_freertos
 
 DEMO_SRC = \

@@ -12,7 +12,29 @@ CRYPTO_DIR = $(SOURCE_DIR)/crypto
 # 		SBB Target
 #
 #####################################
+sbb_all: fpga sim
 
+clean_all: fpga_clean sim_clean
+
+fpga:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos all;
+	cp $(SBB_DIR)/main_ballot_box.* .
+
+fpga_clean:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos clean
+	rm main_ballot_box.*
+
+sim:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim all
+	cp $(SBB_DIR)/main_ballot_box_sim.* .
+
+sim_clean:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim clean
+	rm main_ballot_box_sim.*
 
 #####################################
 #
@@ -35,8 +57,6 @@ else
 #
 #####################################
 ifeq ($(TARGET),freertos)
-# Common includes
-include source/Makefile.freertos_common
 
 freertos_all: freertos_crypto freertos_log freertos_sbb
 
@@ -145,8 +165,6 @@ else
 #
 #####################################
 ifeq ($(TARGET),sim)
-# Common includes
-include source/Makefile.freertos_common
 
 sim_all: sim_crypto sim_log sim_sbb
 

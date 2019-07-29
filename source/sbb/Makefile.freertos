@@ -1,4 +1,7 @@
-PROG = main_ballot_box
+# Common includes
+include ../Makefile.freertos_common
+
+PROG ?= main_ballot_box
 
 DEMO_SRC = \
 	$(SBB_SOURCE_DIR)/main_freertos.c \
