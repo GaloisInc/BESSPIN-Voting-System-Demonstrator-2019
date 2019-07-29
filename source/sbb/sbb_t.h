@@ -90,6 +90,15 @@ typedef enum { //motor_ASM
               RESET_TIMER_E,
 } SBB_event;
 
+typedef enum { // invalid barcode classifications
+              BARCODE_VALID,
+              BARCODE_INVALID_LENGTH,
+              BARCODE_INVALID_ENCODING,
+              BARCODE_INVALID_SIGNATURE,
+              BARCODE_INVALID_TIMESTAMP,
+              BARCODE_INVALID_OTHER,
+} barcode_validity;
+
 // @design kiniry This is the record type that encodes the full
 // top-level set of states for the SBB.  Note that a C record type for
 // fields F, G encodes the tuple type (F, G) which is equivalent to

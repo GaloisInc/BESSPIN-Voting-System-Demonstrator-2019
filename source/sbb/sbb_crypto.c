@@ -53,27 +53,28 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
     return b_valid;
 }
 
-bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length)
-{
+barcode_validity crypto_check_barcode_valid(barcode_t barcode,
+                                            barcode_length_t length) {
     /**
        timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
     */
     int r;
     size_t olen;
-    bool b_match = false;
+    barcode_validity result = BARCODE_INVALID_OTHER;
+
     // 0.
-    // Precondition: length > BASE64_ENCODING_START
-    debug_printf("crypto_check_barcode_valid: Checking length\r\n");
-    if (BASE64_ENCODING_START < length)
-    {
+    // Precondition: BASE64_ENCODING_START < length &&
+    //               (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH
+    if ( BASE64_ENCODING_START < length &&
+         (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH ) {
         // 1.
         // Decode. mbedtls_base64_decode requires (srcLength/4)*3 bytes in the destination.
-        // If `length` is not what we are expecting, then this we will return false.
         uint8_t decoded_barcode[BASE64_DECODED_BUFFER_BYTES] = {0};
-        r = mbedtls_base64_decode(
-            &decoded_barcode[0], BASE64_DECODED_BUFFER_BYTES, &olen,
-            (const uint8_t *)&barcode[BASE64_ENCODING_START],
-            length - BASE64_ENCODING_START);
+        r = mbedtls_base64_decode(&decoded_barcode[0],
+                                  BASE64_DECODED_BUFFER_BYTES,
+                                  &olen,
+                                  &barcode[BASE64_ENCODING_START],
+                                  BASE64_ENCODED_LENGTH);
 
         if (r == 0 && BASE64_DECODED_BYTES == olen)
         {
@@ -93,26 +94,36 @@ bool crypto_check_barcode_valid(barcode_t barcode, barcode_length_t length)
                 // { input |-> ... }
                 memcpy(&our_digest_input[0], &barcode[0],
                        TIMESTAMP_LENGTH_BYTES);
-                // { input[0..15] |-> timeestamp[0..5] }
+                // { input[0..15] |-> timestamp[0..5] }
                 memcpy(&our_digest_input[TIMESTAMP_LENGTH_BYTES],
-                       &decoded_barcode[0], ENCRYPTED_BALLOT_LENGTH_BYTES);
-                // { input[0..32] |-> timeestamp[0..5] # decode_barcode[0..15] }
+                       &decoded_barcode[0],
+                       ENCRYPTED_BALLOT_LENGTH_BYTES);
+                // { input[0..32] |-> timestamp[0..5] # decode_barcode[0..15] }
 
                 // 3.
                 // Compute the cbc-mac
-                aes_cbc_mac(&our_digest_input[0], CBC_MAC_MESSAGE_LENGTH_BYTES,
-                            &our_digest_output[0]);
+                aes_cbc_mac(&our_digest_input[0],
+                            CBC_MAC_MESSAGE_LENGTH_BYTES,
+                            &our_digest_output[0],
+                            Barcode_MAC_Key);
 
                 // 4.
                 // Compare computed digest against cbc-mac in the barcode
-                b_match =
-                    (0 ==
-                     memcmp(&our_digest_output[0],
-                            &decoded_barcode[ENCRYPTED_BALLOT_LENGTH_BYTES],
-                            AES_BLOCK_LENGTH_BYTES));
+                if (0 == memcmp(&our_digest_output[0],
+                                &decoded_barcode[ENCRYPTED_BALLOT_LENGTH_BYTES],
+                                AES_BLOCK_LENGTH_BYTES)) {
+                    result = BARCODE_VALID;
+                } else {
+                    result = BARCODE_INVALID_SIGNATURE;
+                }
+            } else {
+                result = BARCODE_INVALID_TIMESTAMP;
             }
+        } else {
+            result = BARCODE_INVALID_ENCODING;
         }
+    } else {
+        result = BARCODE_INVALID_LENGTH;
     }
-    debug_printf("crypto_check_barcode_valid: barcodes match? %u\r\n",b_match);
-    return b_match;
+    return result;
 }

@@ -29,7 +29,7 @@ extern const char *spoil_button_released_msg;
 extern const char *barcode_scanned_msg;
 extern const char *barcode_received_event_msg;
 extern const char *empty_barcode_received_event_msg;
-
+extern const char *expired_ballot_received_event_msg;
 extern const char *invalid_barcode_received_event_msg;
 extern const char *decision_timeout_event_msg;
 

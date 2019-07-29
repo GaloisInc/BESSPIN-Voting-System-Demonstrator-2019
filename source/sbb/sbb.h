@@ -15,6 +15,19 @@
 #include "sbb.acsl"
 #include "sbb_logging.h"
 
+extern char barcode[BARCODE_MAX_LENGTH];
+extern barcode_length_t barcode_length;
+
+// Per-ballot-box data
+extern const char *sbb_name; // the SBB name, for display
+extern const log_name system_log_file_name; // the system log
+extern const log_name app_log_file_name; // the application log
+extern const uint8_t sbb_mac_address[6]; // for DHCP
+extern const uint8_t sbb_default_ip_address[4]; // in case DHCP doesn't work
+extern const uint8_t sbb_default_netmask[4]; // in case DHCP doesn't work
+extern const uint8_t sbb_default_gateway_address[4]; // in case DHCP doesn't work
+extern const uint8_t sbb_default_dns_server_address[4]; // in case DHCP doesn't work
+
 // Display strings
 extern const char *empty;
 extern const char *welcome_text;
@@ -24,6 +37,8 @@ extern const char *cast_or_spoil_line_1_text;
 extern const char *cast_or_spoil_line_2_text;
 extern const char *casting_ballot_text;
 extern const char *spoiling_ballot_text;
+const char *expired_ballot_line_1_text;
+const char *expired_ballot_line_2_text;
 extern const char *invalid_barcode_text;
 extern const char *duplicate_barcode_line_1_text;
 extern const char *duplicate_barcode_line_2_text;
@@ -153,9 +168,8 @@ void initialize(void);
 // spec is ready for use.
 /*@ requires \valid(the_barcode + (0 .. its_length - 1));
   @ assigns \nothing;
-  @ ensures \result == true || \result == false;
 */
-bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
+barcode_validity is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length);
 
 /*@ requires \valid_read(the_barcode);
   @ requires \valid_read(the_barcode + (1..its_length-1));

@@ -220,8 +220,8 @@ static void prvCryptoTask(void *pvParameters)
     aes_block bufp2 = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
                        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
-    aes_encrypt(bufp, bufc);
-    aes_decrypt(bufc, bufp2);
+    aes_encrypt(bufp, bufc, Barcode_MAC_Key);
+    aes_decrypt(bufc, bufp2, Barcode_MAC_Key);
 
     printf("prvCryptoTask done\r\n");
 }

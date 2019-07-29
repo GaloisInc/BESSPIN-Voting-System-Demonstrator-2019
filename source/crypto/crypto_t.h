@@ -34,4 +34,10 @@ typedef uint8_t *message;
 
 typedef uint8_t sha_digest[SHA256_DIGEST_LENGTH_BYTES];
 
-#endif
+// Names for a set of keys that can be used with AES encrypt, decrypt, or MAC
+typedef enum { Barcode_MAC_Key = 0,
+               Log_Root_Block_MAC_Key,
+               Log_Entry_MAC_Key,
+               Mock_Key } AES_Key_Name;
+
+#endif // __CRYPTO_T__

@@ -15,6 +15,8 @@ const char *cast_or_spoil_line_2_text = "Spoil       Cast"; // spoil button on l
 const char *casting_ballot_text = "Casting ballot.";
 const char *spoiling_ballot_text = "Spoiling ballot.";
 const char *invalid_barcode_text =  "Invalid ballot.";
+const char *expired_ballot_line_1_text = " Ballot casting";
+const char *expired_ballot_line_2_text = " time expired.";
 const char *duplicate_barcode_line_1_text = "Ballot already ";
 const char *duplicate_barcode_line_2_text = "cast or spoiled.";
 const char *no_barcode_text = "No ballot found.";
@@ -34,7 +36,7 @@ const char *spoil_button_released_msg        = "Spoil button released";
 const char *barcode_scanned_msg              = "Barcode scanned";
 const char *barcode_received_event_msg       = "Received barcode";
 const char *empty_barcode_received_event_msg = "Received empty barcode";
-
+const char *expired_ballot_received_event_msg = "Ballot is expired";
 const char *invalid_barcode_received_event_msg = "Barcode is invalid";
 const char *decision_timeout_event_msg         = "User cast/spoil decision timeout";
 

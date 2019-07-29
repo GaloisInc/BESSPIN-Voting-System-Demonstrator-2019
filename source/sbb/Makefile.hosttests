@@ -5,7 +5,8 @@ CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/mode_wrappers.c \
                 ../crypto/sha2-openbsd.c \
                 ../crypto/crypto.c \
-                ../crypto/base64.c
+                ../crypto/base64.c \
+                ../crypto/crypto_config_default.c
 
 CFLAGS = -DHARDCODE_CURRENT_TIME \
          -DCURRENT_YEAR=2019 \

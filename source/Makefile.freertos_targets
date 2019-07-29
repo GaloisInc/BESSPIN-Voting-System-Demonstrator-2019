@@ -1,3 +1,9 @@
+DEFAULT_PROG = default_ballot_box
+BOX1_PROG = ballot_box_1
+BOX2_PROG = ballot_box_2
+BOX3_PROG = ballot_box_3
+BOX4_PROG = ballot_box_4
+
 #
 # Define all object files.
 #
@@ -24,19 +30,41 @@ $(info ARFLAGS=$(ARFLAGS))
 	@echo "    CC $<"
 	@$(GCC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
 
-all: $(PROG).elf
 
-$(PROG).elf  : $(OBJS)
+all: $(DEFAULT_PROG).elf $(BOX1_PROG).elf $(BOX2_PROG).elf $(BOX3_PROG).elf $(BOX4_PROG).elf
+
+$(DEFAULT_PROG).elf  : $(OBJS_DEFAULT)
 	@echo Linking....
-	@$(GCC) -o $@ $(LDFLAGS) $(OBJS) $(LIBS)
-	@$(OBJDUMP) -S $(PROG).elf > $(PROG).asm
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_DEFAULT) $(LIBS)
+	@$(OBJDUMP) -S $(DEFAULT_PROG).elf > $(DEFAULT_PROG).asm
+	@echo Completed $@
+
+$(BOX1_PROG).elf  : $(OBJS_BOX1)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX1) $(LIBS)
+	@$(OBJDUMP) -S $(BOX1_PROG).elf > $(BOX1_PROG).asm
+	@echo Completed $@
+
+$(BOX2_PROG).elf  : $(OBJS_BOX2)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX2) $(LIBS)
+	@$(OBJDUMP) -S $(BOX2_PROG).elf > $(BOX2_PROG).asm
+	@echo Completed $@
+
+$(BOX3_PROG).elf  : $(OBJS_BOX3)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX3) $(LIBS)
+	@$(OBJDUMP) -S $(BOX3_PROG).elf > $(BOX3_PROG).asm
+	@echo Completed $@
+
+$(BOX4_PROG).elf  : $(OBJS_BOX4)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX4) $(LIBS)
+	@$(OBJDUMP) -S $(BOX4_PROG).elf > $(BOX4_PROG).asm
 	@echo Completed $@
 
 clean :
-	@rm -f $(OBJS)
-	@rm -f $(PROG).elf
-	@rm -f $(PROG).map
-	@rm -f $(PROG).asm
-
-docs :
-	@doxygen
+	@rm -f $(OBJS_DEFAULT) $(OBJS_BOX1) $(OBJS_BOX2) $(OBJS_BOX3) $(OBJS_BOX4)
+	@rm -f $(DEFAULT_PROG).elf $(BOX1_PROG).elf $(BOX2_PROG).elf $(BOX3_PROG).elf $(BOX4_PROG).elf
+	@rm -f $(DEFAULT_PROG).map $(BOX1_PROG).map $(BOX2_PROG).map $(BOX3_PROG).map $(BOX4_PROG).map
+	@rm -f $(DEFAULT_PROG).asm $(BOX1_PROG).asm $(BOX2_PROG).asm $(BOX3_PROG).asm $(BOX4_PROG).asm

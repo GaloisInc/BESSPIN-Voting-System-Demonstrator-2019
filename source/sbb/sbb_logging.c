@@ -4,8 +4,8 @@
 #include "sbb_t.h"
 #include "sbb_logging.h"
 
-const log_name system_log_file_name = "system_log.txt";
-const log_name app_log_file_name    = "application_log.txt";
+extern const log_name system_log_file_name;
+extern const log_name app_log_file_name;
 
 Log_Handle app_log_handle;
 Log_Handle system_log_handle;

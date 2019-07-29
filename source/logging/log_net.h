@@ -9,7 +9,15 @@
 
 //@ ghost int reporting_system;
 
-// ACSL Contracts TBD
+/*@
+  predicate
+    Log_Net_Initialized{L} = \true; // abstract
+*/
+
+
+/*@ assigns reporting_system \from \nothing;
+    ensures Log_Net_Initialized;
+ */
 void Log_Net_Initialize(void);
 
 /*@ requires \valid_read(Transmit_Buffer + (0 .. total - 1));
