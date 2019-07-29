@@ -87,14 +87,14 @@ void update_barcode_state( bool barcode_scanned ) {
     switch ( the_state.BS ) {
     case BARCODE_NOT_PRESENT:
         if ( barcode_scanned ) {
-            char barcode[BARCODE_MAX_LENGTH] = {0};
+            char local_barcode[BARCODE_MAX_LENGTH] = {0};
             barcode_length_t xReceiveLength = 0;
             xReceiveLength = xStreamBufferReceive(xScannerStreamBuffer,
-                                                  barcode,
+                                                  local_barcode,
                                                   BARCODE_MAX_LENGTH,
                                                   SCANNER_BUFFER_RX_BLOCK_TIME_MS);
             if ( xReceiveLength > 0 ) {
-                set_received_barcode(barcode, xReceiveLength);
+                set_received_barcode(local_barcode, xReceiveLength);
                 CHANGE_STATE(the_state, BS, BARCODE_PRESENT_AND_RECORDED);
             }
         }

@@ -304,7 +304,7 @@ void prvBarcodeScannerTask(void *pvParameters)
     (void)pvParameters;
 
     uint8_t idx = 0;
-    char barcode[BARCODE_MAX_LENGTH] = {0};
+    char local_barcode[BARCODE_MAX_LENGTH] = {0};
     char buffer[17] = {0};
     buffer[16] = '\0';
     int len;
@@ -329,8 +329,8 @@ void prvBarcodeScannerTask(void *pvParameters)
                 {
                     /* Send the barcode */
                     /* Debug print below */
-                    barcode[idx] = '\0';
-                    printf("Barcode, idx=%u: %s\r\n", idx, barcode);
+                    local_barcode[idx] = '\0';
+                    printf("Barcode, idx=%u: %s\r\n", idx, local_barcode);
                     /* We have a barcode, send it over stream buffer and fire the event */
                     size_t bytes_available =
                         xStreamBufferSpacesAvailable(xScannerStreamBuffer);
@@ -341,20 +341,20 @@ void prvBarcodeScannerTask(void *pvParameters)
                                      pdPASS);
                     }
                     configASSERT(xStreamBufferSend(xScannerStreamBuffer,
-                                                   (void *)barcode, (size_t)idx,
+                                                   (void *)local_barcode, (size_t)idx,
                                                    0) == idx);
                     /* Broadcast the event */
                     xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
                     /* reset state */
                     idx = 0;
-                    memset(barcode, 0, BARCODE_MAX_LENGTH);
+                    memset(local_barcode, 0, BARCODE_MAX_LENGTH);
                 }
                 else
                 {
                     // copy over
-                    barcode[idx] = buffer[i];
+                    local_barcode[idx] = buffer[i];
                     idx++;
-                    idx %= sizeof(barcode);
+                    idx %= sizeof(local_barcode);
                 }
             }
         }

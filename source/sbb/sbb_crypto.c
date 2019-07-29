@@ -53,7 +53,7 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
     return b_valid;
 }
 
-barcode_validity crypto_check_barcode_valid(barcode_t barcode,
+barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
                                             barcode_length_t length) {
     /**
        timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
@@ -73,7 +73,7 @@ barcode_validity crypto_check_barcode_valid(barcode_t barcode,
         r = mbedtls_base64_decode(&decoded_barcode[0],
                                   BASE64_DECODED_BUFFER_BYTES,
                                   &olen,
-                                  &barcode[BASE64_ENCODING_START],
+                                  (const unsigned char *)&the_barcode[BASE64_ENCODING_START],
                                   BASE64_ENCODED_LENGTH);
 
         if (r == 0 && BASE64_DECODED_BYTES == olen)
@@ -83,7 +83,7 @@ barcode_validity crypto_check_barcode_valid(barcode_t barcode,
             // Check the timestamp to make sure it's not from the future
 
             // The barcode must not have expired (i.e. the expiry date should be > now)
-            if (timestamp_lte_now((const uint8_t *)&barcode[0]))
+            if (timestamp_lte_now((const uint8_t *)&the_barcode[0]))
             {
                 // 2. b
                 // Now set up the message for aes_cbc_mac. The formula is:
@@ -92,7 +92,7 @@ barcode_validity crypto_check_barcode_valid(barcode_t barcode,
                 uint8_t our_digest_input[CBC_MAC_MESSAGE_LENGTH_BYTES] = {0};
                 uint8_t our_digest_output[AES_BLOCK_LENGTH_BYTES] = {0};
                 // { input |-> ... }
-                memcpy(&our_digest_input[0], &barcode[0],
+                memcpy(&our_digest_input[0], &the_barcode[0],
                        TIMESTAMP_LENGTH_BYTES);
                 // { input[0..15] |-> timestamp[0..5] }
                 memcpy(&our_digest_input[TIMESTAMP_LENGTH_BYTES],
