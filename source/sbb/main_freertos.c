@@ -276,16 +276,19 @@ void prvBallotBoxMainTask(void *pvParameters)
 /**
  * The infamous malware task
  */
+static bool should_jump;
 void prvMalwareTask(void *pvParameters)
 {
     (void)pvParameters;
     printf("Starting prvMalwareTask\r\n");
     void (*function_handle)(void) = NULL;
+    should_jump = false;
 
     for (;;) {
-        if (function_handle != NULL) {
+        if ((function_handle != NULL) && should_jump) {
             printf("Jumping to malware task function handle...\r\n");
             (*function_handle)();
+            should_jump = false;
         }
         msleep(100);
     }
