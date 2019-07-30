@@ -48,27 +48,25 @@ static void *addressToVoidPtr( long long int address )
 #define NOP1024 NOP256 NOP256 NOP256 NOP256
 #define NOP4096 NOP1024 NOP1024 NOP1024 NOP1024
 
-// start and end of the malware function body; note that it includes
-// 4096 NOPs plus a return, each of which is 32 bits (4 bytes) long
-static long malware_region_start = 0;
-static long malware_region_end = 0;
-
 static size_t malware (void *ptr, size_t num) {
     (void) ptr;
     (void) num;
     
-    NOP;
-    
-nop_start:
+    NOP256;
     NOP4096;
-
-nop_end:
-    NOP;
+    NOP256;
     
-    malware_region_start = (long) &&nop_start;
-    malware_region_end = (long) &&nop_end;
     return 0;
 }
+
+// start and end of the malware function body; note that it includes
+// 4096 NOPs plus a return, each of which is 32 bits (4 bytes) long,
+// plus buffers on both sides - we're effectively providing a region
+// of 4352 NOPs, with a bunch of NOPs and function frame setup on
+// either side
+static const long malware_region_start = ((long) &malware) + 128;
+static const long malware_region_end = ((long) &malware) + 128 + 4096;
+
 
 /* Stateful functions to split a slash-separated string of numbers. */
 
