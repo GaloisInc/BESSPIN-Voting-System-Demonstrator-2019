@@ -6,6 +6,13 @@
 #include <task.h>
 #include "log_t.h"
 
+/**
+ * @mpodhradsky
+ * Adding missing function declarations
+ */
+void take_step(void);
+logic_state debug_state_change(logic_state then, logic_state now);
+
 /*@ requires SBB_Machine_Invariant;
   @ requires 0 < length && length <= LOG_ENTRY_LENGTH;
   @ requires \valid_read(event_entry + (0 .. length - 1));

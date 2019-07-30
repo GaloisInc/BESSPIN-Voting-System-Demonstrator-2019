@@ -45,9 +45,9 @@ connected. */
 /* Set to 1 to print out debug messages.  If ipconfigHAS_DEBUG_PRINTF is set to
 1 then FreeRTOS_debug_printf should be defined to the function used to print
 out the debugging messages. */
-#define ipconfigHAS_DEBUG_PRINTF	1
+#define ipconfigHAS_DEBUG_PRINTF	0
 #if( ipconfigHAS_DEBUG_PRINTF == 1 )
-	#define FreeRTOS_debug_printf(X)	printf X
+	#define FreeRTOS_debug_printf(X);	{printf X ; printf("\r\n"); } 
 #endif
 
 /* Set to 1 to print out non debugging messages, for example the output of the
@@ -56,7 +56,7 @@ then FreeRTOS_printf should be set to the function used to print out the
 messages. */
 #define ipconfigHAS_PRINTF			1
 #if( ipconfigHAS_PRINTF == 1 )
-	#define FreeRTOS_printf(X)			printf X
+	#define FreeRTOS_printf(X);		{printf X ; printf("\r\n"); }
 #endif
 
 /* Define the byte order of the target MCU (the MCU FreeRTOS+TCP is executing
@@ -109,7 +109,7 @@ task.  This setting is less important when the FreeRTOS Win32 simulator is used
 as the Win32 simulator only stores a fixed amount of information on the task
 stack.  FreeRTOS includes optional stack overflow detection, see:
 http://www.freertos.org/Stacks-and-stack-overflow-checking.html */
-#define ipconfigIP_TASK_STACK_SIZE_WORDS	( configMINIMAL_STACK_SIZE * 20 )
+#define ipconfigIP_TASK_STACK_SIZE_WORDS	( configMINIMAL_STACK_SIZE * 100 )
 
 /* ipconfigRAND32() is called by the IP stack to generate random numbers for
 things such as a DHCP transaction number or initial sequence number.  Random
@@ -238,7 +238,7 @@ be divisible by 8. */
 
 /* Set ipconfigUSE_DNS to 1 to include a basic DNS client/resolver.  DNS is used
 through the FreeRTOS_gethostbyname() API function. */
-#define ipconfigUSE_DNS			0
+#define ipconfigUSE_DNS			1
 
 /* If ipconfigREPLY_TO_INCOMING_PINGS is set to 1 then the IP stack will
 generate replies to incoming ICMP echo (ping) requests. */
@@ -285,9 +285,11 @@ simultaneously, one could define TCP_WIN_SEG_COUNT as 120. */
 
 /* Each TCP socket has a circular buffers for Rx and Tx, which have a fixed
 maximum size.  Define the size of Rx buffer for TCP sockets. */
-#define ipconfigTCP_RX_BUFFER_LENGTH			( 1000 )
+// @mpodhradsky: Use default value of 5840 bytes
+#define ipconfigTCP_RX_BUFFER_LENGTH			( 1000 ) 
 
 /* Define the size of Tx buffer for TCP sockets. */
+// @mpodhradsky: Use default value of 5840 bytes
 #define ipconfigTCP_TX_BUFFER_LENGTH			( 1000 )
 
 /* When using call-back handlers, the driver may check if the handler points to
@@ -307,6 +309,16 @@ disconnecting stage will timeout after a period of non-activity. */
 #define ipconfigZERO_COPY_RX_DRIVER			( 0 )
 #define ipconfigZERO_COPY_TX_DRIVER			( 0 )
 
+/* Demo config */
+/* The address of an echo server that will be used by the two demo echo client
+tasks.
+http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Clients.html
+http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
+#define configECHO_SERVER_ADDR0	10
+#define configECHO_SERVER_ADDR1 88
+#define configECHO_SERVER_ADDR2 88
+#define configECHO_SERVER_ADDR3 1
+
 /* Default MAC address configuration.  The demo creates a virtual network
 connection that uses this MAC address by accessing the raw Ethernet/WiFi data
 to and from a real network connection on the host PC.  See the
@@ -322,21 +334,22 @@ configure the real network connection to use. */
 /* Default IP address configuration.  Used in ipconfigUSE_DNS is set to 0, or
 ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
 #define configIP_ADDR0		10
-#define configIP_ADDR1		5
-#define configIP_ADDR2		5
-#define configIP_ADDR3		1
+#define configIP_ADDR1		88
+#define configIP_ADDR2		88
+#define configIP_ADDR3		2
 
 // IP address of Reporter.  
-#define configRptrIP_ADDR0		10
-#define configRptrIP_ADDR1		5
-#define configRptrIP_ADDR2		5
-#define configRptrIP_ADDR3		2
+#define configRptrIP_ADDR0		192
+#define configRptrIP_ADDR1		168
+#define configRptrIP_ADDR2		56
+#define configRptrIP_ADDR3		10
+
 
 /* Default gateway IP address configuration.  Used in ipconfigUSE_DNS is set to
 0, or ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
 #define configGATEWAY_ADDR0	10
-#define configGATEWAY_ADDR1	5
-#define configGATEWAY_ADDR2	5
+#define configGATEWAY_ADDR1	88
+#define configGATEWAY_ADDR2	88
 #define configGATEWAY_ADDR3	1
 
 /* Default DNS server configuration.  OpenDNS addresses are 208.67.222.222 and

@@ -16,6 +16,14 @@ typedef log_name secure_log_name;
 typedef log_file secure_log;
 typedef log_io_stream secure_log_io_stream;
 
+// @mpodhradsky
+// Add missing function prototypes
+bool valid_first_entry(secure_log_entry root_entry);
+
+bool valid_log_entry(const secure_log_entry this_entry,
+                     const sha256_digest prev_hash);
+
+
 // @spec kiniry These functions need ACSL specifications, based upon
 // an axiomatic spec of logs in `secure_log.acsl` that algebraically
 // matches that which was specified by Joey in Cryptol.

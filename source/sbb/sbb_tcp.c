@@ -42,17 +42,14 @@
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 
+#include "sbb_freertos.h"
+
 #include "peekpoke.h"
 
 
 /* Define a name that will be used for LLMNR and NBNS searches. */
 #define mainHOST_NAME "RTOSDemo"
 #define mainDEVICE_NICK_NAME "fpga_demo"
-
-/*
- * Just seeds the simple pseudo random number generator.
- */
-static void prvSRand(UBaseType_t ulSeed);
 
 /*
  * Miscellaneous initialisation including preparing the logging and seeding the
@@ -80,11 +77,6 @@ bool the_network_status = false;
 void sbb_tcp(void);
 void reportIPStatus(void);
 
-/* Smart Ballot Box Tasks and priorities*/
-#define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY+3
-#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+2
-#define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+1
-
 void prvBallotBoxMainTask(void *pvParameters);
 void prvBarcodeScannerTask(void *pvParameters);
 void prvInputTask(void *pvParameters);
@@ -92,8 +84,10 @@ void prvInputTask(void *pvParameters);
 
 void sbb_tcp(void)
 {
+	printf("Smart Ballot Box starting...\r\n");
+
 	/* Miscellaneous initialisation including preparing the logging and seeding
-	   the random number generator. */
+	the random number generator. */
 	prvMiscInitialisation();
 
 	/* Initialise the network interface.
@@ -122,13 +116,21 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 	{
 		vTaskDelay(pdMS_TO_TICKS(2000));
 		the_network_status = true;
+		if (prvStartupTaskHandle != NULL) {
+			vTaskDelete( prvStartupTaskHandle );
+		}
 		/* Create the tasks that use the IP stack if they have not already been
 		   created. */
 		if (xTasksAlreadyCreated == pdFALSE)
 		{
-			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
-			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-			xTaskCreate(prvInputTask, "prvInputTask", configMINIMAL_STACK_SIZE * 2U, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+			printf("Smart Ballot Box: starting tasks...\r\n");
+			xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
+			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
+			xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+			xTaskCreate(prvMalwareTask, "prvMalwareTask", SBB_MALWARE_TASK_STACK_SIZE, NULL, SBB_MALWARE_TASK_PRIORITY, NULL);
+			#ifdef NETWORK_LOGS
+			xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
+			#endif
 			xTasksAlreadyCreated = pdTRUE;
 		}
 
@@ -159,13 +161,16 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 }
 /*-----------------------------------------------------------*/
 
-static void prvSRand(UBaseType_t ulSeed)
+void prvSRand(UBaseType_t ulSeed)
 {
 	/* Utility function to seed the pseudo random number generator. */
 	ulNextRand = ulSeed;
 }
 /*-----------------------------------------------------------*/
 
+/**
+ * This has to be called after the scheduler is started
+ */
 static void prvMiscInitialisation(void)
 {
 	uint32_t seed = 42;

@@ -41,17 +41,21 @@ Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry)
     return write_result;
 }
 
-
+// Not required for DEFCON'19 where we always verify an _entire_
+// log file using verify_log_well_formedness() and import_log()
+// below
 bool verify_log_entry_well_formedness(const log_entry a_log_entry)
 {
-    // Not required for DEFCON'19 where we always verify an _entire_
-    // log file using verify_log_well_formedness() and import_log()
-    // below
+    (void)a_log_entry;
     return false;
 }
 
 // Not required and not implemented for DEFCON'19
-void export_log(const log_file the_log, log_io_stream a_target) { return; }
+void export_log(const log_file the_log, log_io_stream a_target) { 
+    (void)the_log;
+    (void)a_target;
+    return;
+}
 
 
 bool verify_log_well_formedness(log_file the_log)

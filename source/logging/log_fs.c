@@ -4,12 +4,6 @@
 
 #ifdef TARGET_OS_FreeRTOS
 
-#ifdef TARGET_FS_LittleFS
-
-#error "TARGET_FS_LittleFS not yet implemented"
-
-#else
-
 // Assume Target Filesystem is FatFS
 
 ////////////////////////////////////////////
@@ -170,8 +164,6 @@ void Log_FS_Seek(Log_Handle *stream, file_offset new_offset)
     res1 = f_lseek(&stream->the_file, (FSIZE_t)new_offset);
     (void)res1; // suppress warning on res1 unused.
 }
-
-#endif // TARGET_FS_LittleFS
 
 #else
 

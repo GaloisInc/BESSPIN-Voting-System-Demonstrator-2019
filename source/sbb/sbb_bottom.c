@@ -12,10 +12,10 @@ void initialize(void) {
     ;
 }
 
-bool is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
+barcode_validity is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {
     assert(false);
     //@ assert false;
-    return false;
+    return 0;
 }
 
 bool is_cast_button_pressed(void) {
@@ -36,9 +36,10 @@ bool has_a_barcode(void) {
     return false;
 }
 
-void what_is_the_barcode(barcode_t the_barcode, barcode_length_t its_length) {
+barcode_length_t what_is_the_barcode(barcode_t the_barcode) {
     assert(false);
     //@ assert false;
+    return 0;
 }
 
 void spoil_button_light_on(void) {

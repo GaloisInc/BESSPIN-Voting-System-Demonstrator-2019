@@ -21,6 +21,7 @@ const uint8_t app_event_entries[] = { 'C', 'S' };
 
 bool import_and_verify(log_file the_file) {
     #ifdef SIMULATION
+    (void) the_file;
     return false;
     #else
     bool b_success = false;
@@ -37,6 +38,9 @@ bool load_or_create(log_file the_file,
                     const log_name the_name,
                     const http_endpoint endpoint) {
     #ifdef SIMULATION
+    (void) the_file;
+    (void) the_name;
+    (void) endpoint;
     return false;
     #else
 
@@ -80,6 +84,7 @@ bool load_or_create_logs(void) {
 
 bool log_system_message(const char *new_entry, int length) {
     #ifdef SIMULATION
+    (void) length;
     debug_printf("System LOG: %s\r\n", new_entry);
     return true;
     #else
@@ -87,17 +92,24 @@ bool log_system_message(const char *new_entry, int length) {
     memset(&event_entry[0], 0x20, sizeof(log_entry));
     memcpy(&event_entry[0], new_entry, length);
     Log_FS_Result res = write_entry(&system_log_handle, event_entry);
+    #ifdef SD_CARD_LOGGING
     return (res == LOG_FS_OK);
-    #endif
+    #else
+    (void)res;
+    return true;
+    #endif /* SD_CARD_LOGGING */
+    #endif /* SIMULATION */
 }
 
-void log_or_abort(SBB_state *the_state, const char *the_entry, int length) {
+void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length) {
     debug_printf((char *)the_entry);
     #ifdef SIMULATION
+    (void) the_local_state;
+    (void) length;
     debug_printf("LOG: %s\r\n", the_entry);
     #else
     if (!log_system_message(the_entry, length)) {
-        the_state->L = ABORT;
+        the_local_state->L = ABORT;
     }
     #endif
 }

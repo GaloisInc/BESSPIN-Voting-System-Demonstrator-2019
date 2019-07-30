@@ -1,2 +1,3 @@
-CFLAGS += -I$(LOGGING_DIR) -DSIMULATION
-include ./Makefile.freertos
+DEFAULT_PROG=default_ballot_box_sim
+CFLAGS += -DSIMULATION
+include Makefile.freertos

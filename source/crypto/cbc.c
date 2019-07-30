@@ -80,6 +80,8 @@ void CRYPTO_cbc128_encrypt(const uint8_t *in, uint8_t *out, size_t len,
   } else {
     while (len >= 16) {
       for (n = 0; n < 16; n += sizeof(size_t)) {
+        // @mpodhradsky Supress warnings in GCC
+	      #pragma GCC diagnostic ignored "-Wcast-align"
         *(size_t *)(out + n) = *(size_t *)(in + n) ^ *(size_t *)(iv + n);
       }
       (*block)(out, out, key);

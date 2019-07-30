@@ -112,6 +112,6 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length);
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \
         const char state_change_message[] = "State change: " #_field " := " #_new_state; \
-        log_or_abort(&(_state), state_change_message, sizeof(state_change_message));        \
+        log_or_abort(&(_state), state_change_message, strlen(state_change_message));        \
     } while (0)
 #endif

@@ -51,6 +51,8 @@
 
 #include "base.h"
 
+#include "crypto_t.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -80,6 +82,12 @@ typedef struct aes_key_st AES_KEY;
  *
  * WARNING: unlike other OpenSSL functions, this returns zero on success and a
  * negative number on error. */
+/*@ requires \valid_read(key + (0 .. AES256_KEY_LENGTH_BYTES - 1));
+  @ requires \separated(key, aeskey);
+  @ requires bits == AES256_KEY_LENGTH_BITS;
+  @ assigns *aeskey \from bits, *key;
+  @ ensures \valid(aeskey);
+  @*/
 OPENSSL_EXPORT int AES_set_encrypt_key(const uint8_t *key, unsigned bits,
                                        AES_KEY *aeskey);
 
@@ -88,16 +96,36 @@ OPENSSL_EXPORT int AES_set_encrypt_key(const uint8_t *key, unsigned bits,
  *
  * WARNING: unlike other OpenSSL functions, this returns zero on success and a
  * negative number on error. */
+/*@ requires \valid_read(key + (0 .. AES256_KEY_LENGTH_BYTES - 1));
+  @ requires \separated(key, aeskey);
+  @ requires bits == AES256_KEY_LENGTH_BITS;
+  @ assigns *aeskey \from bits, *key;
+  @ ensures \valid(aeskey);
+  @*/
 OPENSSL_EXPORT int AES_set_decrypt_key(const uint8_t *key, unsigned bits,
                                        AES_KEY *aeskey);
 
 /* AES_encrypt encrypts a single block from |in| to |out| with |key|. The |in|
  * and |out| pointers may overlap. */
+/*@ requires \valid_read(in + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
+  @ requires \valid_read(key + (0 .. AES256_KEY_LENGTH_BYTES - 1));
+  @ requires \separated(in, out, key);
+  @ assigns out[0 .. AES_BLOCK_LENGTH_BYTES - 1] \from *in, *key;
+  @ ensures \initialized(out);
+  @ ensures \valid(out + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
+  @*/
 OPENSSL_EXPORT void AES_encrypt(const uint8_t *in, uint8_t *out,
                                 const AES_KEY *key);
 
 /* AES_decrypt decrypts a single block from |in| to |out| with |key|. The |in|
  * and |out| pointers may overlap. */
+/*@ requires \valid_read(in + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
+  @ requires \valid_read(key + (0 .. AES256_KEY_LENGTH_BYTES - 1));
+  @ requires \separated(in, out, key);
+  @ assigns out[0 .. AES_BLOCK_LENGTH_BYTES - 1] \from *in, *key;
+  @ ensures \initialized(out);
+  @ ensures \valid(out + (0 .. AES_BLOCK_LENGTH_BYTES - 1));
+  @*/
 OPENSSL_EXPORT void AES_decrypt(const uint8_t *in, uint8_t *out,
                                 const AES_KEY *key);
 

@@ -14,6 +14,7 @@
 #include "sbb_t.h"
 #include "sbb.acsl"
 #include "sbb_logging.h"
+#include "sbb_io_constants.h"
 
 extern char barcode[BARCODE_MAX_LENGTH];
 extern barcode_length_t barcode_length;
@@ -29,6 +30,7 @@ extern const uint8_t sbb_default_gateway_address[4]; // in case DHCP doesn't wor
 extern const uint8_t sbb_default_dns_server_address[4]; // in case DHCP doesn't work
 
 // Display strings
+extern const char *empty;
 extern const char *welcome_text;
 extern const char *insert_ballot_text;
 extern const char *barcode_detected_text;
@@ -110,20 +112,6 @@ extern firmware_state the_firmware_state;
 // above I think we probably want some ghost `uint8_t` array to model
 // these reads/writes.
 extern uint8_t gpio_mem[8];
-
-/* Button defines */
-#define BUTTON_CAST_LED 3
-#define BUTTON_SPOIL_LED 1
-#define BUTTON_CAST_IN 2
-#define BUTTON_SPOIL_IN 0
-
-/* Paper sensor inputs */
-#define PAPER_SENSOR_OUT 6
-#define PAPER_SENSOR_IN 7
-
-// Motor defines
-#define MOTOR_0 4
-#define MOTOR_1 5
 
 /*@ assigns \nothing; */
 uint8_t gpio_read(uint8_t i);
@@ -306,6 +294,10 @@ void stop_motor(void);
 */
 void display_this_text(const char* the_text, uint8_t its_length);
 
+void display_this_text_no_log(const char* the_text, uint8_t its_length);
+
+void clear_display(void);
+
 /*@ requires valid_read_string(line_1);
   @ requires valid_read_string(line_2);
   @ requires D_ASM_valid(the_state);
@@ -401,5 +393,13 @@ bool cast_or_spoil_timeout_expired(void);
   @ ensures    \false;
 */
 void ballot_box_main_loop(void);
+
+/**
+ * Get current system time
+ * @return true if the time was retrieved correctly
+ * @return false otherwise
+ */
+bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
+                      uint16_t *hour, uint16_t *minute);
 
 #endif /* __SBB_H__ */

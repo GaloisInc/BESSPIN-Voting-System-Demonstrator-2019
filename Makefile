@@ -7,8 +7,28 @@ SBB_DIR = $(SOURCE_DIR)/sbb
 LOG_DIR = $(SOURCE_DIR)/logging
 CRYPTO_DIR = $(SOURCE_DIR)/crypto
 
-# Common includes
-include $(SOURCE_DIR)/Makefile.common
+#####################################
+#
+# 		SBB Target
+#
+#####################################
+fpga:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos default
+	cp $(SBB_DIR)/default_ballot_box.* .
+
+sim:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim default
+	cp $(SBB_DIR)/default_ballot_box_sim.* .
+
+clean_all:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos clean
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim clean
+	rm -f default_ballot_box.*
+	rm -f default_ballot_box_sim.*
 
 #####################################
 #
@@ -17,11 +37,12 @@ include $(SOURCE_DIR)/Makefile.common
 #####################################
 ifeq ($(TARGET),bottom)
 
+include $(SBB_DIR)/Makefile.bottom
 include $(CRYPTO_DIR)/Makefile.bottom
 include $(LOG_DIR)/Makefile.bottom
 
-bottom_all: crypto_bottom log_bottom
-clean: crypto_bottom_clean log_bottom_clean
+bottom_all: crypto_bottom log_bottom sbb_bottom
+clean: crypto_bottom_clean log_bottom_clean sbb_bottom_clean
 
 else
 #####################################
@@ -37,7 +58,7 @@ clean: clean_crypto clean_log clean_sbb
 
 freertos_crypto:
 	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos all
+	$(MAKE) -f Makefile.freertos default
 
 clean_crypto:
 	cd $(CRYPTO_DIR) ; \
@@ -45,7 +66,7 @@ clean_crypto:
 
 freertos_log:
 	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos all
+	$(MAKE) -f Makefile.freertos default
 
 clean_log:
 	cd $(LOG_DIR) ; \
@@ -53,7 +74,7 @@ clean_log:
 
 freertos_sbb:
 	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos all
+	$(MAKE) -f Makefile.freertos default
 
 clean_sbb:
 	cd $(SBB_DIR) ; \
@@ -122,7 +143,17 @@ ifeq ($(TARGET),hosttests)
 # Apple's clang and use the HomeBrew one instead...
 export CC := clang
 
-HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -DNETWORK_LOGS -Wno-macro-redefined -fsanitize=address
+HOST  := $(shell uname -s)
+ifeq (${HOST},Linux)
+    LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+    PLATFORM_INCLUDES = -I/usr/include
+else
+    # Assumed to be Host = Darwin
+    LLVM_LINK := llvm-link
+    PLATFORM_INCLUDES = -I/usr/include
+endif
+
+HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(PLATFORM_INCLUDES)
 
 include $(CRYPTO_DIR)/Makefile.hosttests
 include $(LOG_DIR)/Makefile.hosttests
@@ -139,37 +170,34 @@ else
 #####################################
 ifeq ($(TARGET),sim)
 
-sim_all: freertos_crypto freertos_log freertos_sbb
+sim_all: sim_crypto sim_log sim_sbb
 
 clean: clean_crypto clean_log clean_sbb
 
-freertos_crypto:
+sim_crypto:
 	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim all
+	$(MAKE) -f Makefile.freertos_sim default
 
 clean_crypto:
 	cd $(CRYPTO_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
 
-freertos_log:
+sim_log:
 	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim all
+	$(MAKE) -f Makefile.freertos_sim default
 
 clean_log:
 	cd $(LOG_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
 
-freertos_sbb:
+sim_sbb:
 	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim all
+	$(MAKE) -f Makefile.freertos_sim default
 
 clean_sbb:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
 
-
-else
-$(info unknown target type: $(TARGET) Available types are "bottom", "verification", "freertos", "hosttests")
 endif # ($(TARGET),sim)
 endif # ($(TARGET),hosttests)
 endif # ($(TARGET),verification)

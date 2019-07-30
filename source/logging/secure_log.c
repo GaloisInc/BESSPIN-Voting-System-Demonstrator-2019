@@ -16,7 +16,9 @@
 
 // Local functions
 
+
 // Refines Cryptol initialLogEntry
+#pragma GCC diagnostic ignored "-Waggregate-return"
 /*@
     requires \valid_read (msg + (0 .. LOG_ENTRY_LENGTH - 1));
     assigns \nothing;
@@ -57,6 +59,7 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
                                 const secure_log_security_policy the_policy,
                                 const http_endpoint endpoint)
 {
+    (void)the_policy;
     Log_FS_Result create_result, write_result, sync_result;
     secure_log_entry initial_entry;
 
@@ -93,6 +96,9 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
     //    that if not directly supported by ff.h
     //   What if the file create fails?
     //   What is the file write fails?
+    (void)sync_result;
+    (void)write_result;
+    (void)create_result;
     return LOG_FS_OK;
 }
 
@@ -185,6 +191,8 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
     // 6. Sync the file.
     sync_result = Log_IO_Sync(the_secure_log);
 
+    (void)write_result;
+    (void)sync_result;
     return LOG_FS_OK;
 }
 

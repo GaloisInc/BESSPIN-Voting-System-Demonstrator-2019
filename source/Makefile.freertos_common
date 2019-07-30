@@ -18,25 +18,30 @@ CCPATH =
 ARCH 		= -march=rv32im
 ABI 		= -mabi=ilp32
 
+ARCHTARGET=$(CCPATH)riscv${RISCV_XLEN}-unknown-${RISCV_LIB}
 
-RISCV_TARGET=$(CCPATH)riscv$(RISCV_XLEN)-unknown-${RISCV_LIB}
+export GCC		= $(ARCHTARGET)-gcc
+export OBJCOPY	= $(ARCHTARGET)-objcopy
+export OBJDUMP	= $(ARCHTARGET)-objdump
+export AR		= $(ARCHTARGET)-ar
+export RANLIB	= $(ARCHTARGET)-ranlib
 
-export GCC		= $(RISCV_TARGET)-gcc
-export OBJCOPY	= $(RISCV_TARGET)-objcopy
-export OBJDUMP	= $(RISCV_TARGET)-objdump
-export AR		= $(RISCV_TARGET)-ar
-export RANLIB	= $(RISCV_TARGET)-ranlib
+SOURCE_BASE_DIR = ../../source
+FREERTOS_BASE_DIR = ../../FreeRTOS-mirror
+export FREERTOS_DEMO_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS/Demo/RISC-V_Galois_P1
 
-export FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
-export FREERTOS_SOURCE_DIR	= ../../FreeRTOS-mirror/FreeRTOS/Source
-export FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
-export VOTING_SYSTEM_SOURCE_DIR = ..
-export FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
+export CRT0	= $(FREERTOS_DEMO_DIR)/bsp/boot.S
+
+export SBB_SOURCE_DIR = $(SOURCE_BASE_DIR)/sbb
+export LOG_SOURCE_DIR = $(SOURCE_BASE_DIR)/logging
+export CRYPTO_SOURCE_DIR = $(SOURCE_BASE_DIR)/crypto
+FREERTOS_SOURCE_DIR	= $(FREERTOS_BASE_DIR)/FreeRTOS/Source
+FREERTOS_PLUS_SOURCE_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS-Plus/Source
+FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
+export FREERTOS_PROTOCOLS_DIR = $(SOURCE_BASE_DIR)/protocols
 
 export WARNINGS= -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
 		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
-
-export CRT0 = $(FREERTOS_DEMO_DIR)/bsp/boot.S
 
 export FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/croutine.c \
@@ -46,32 +51,19 @@ export FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/timers.c \
 	$(FREERTOS_SOURCE_DIR)/event_groups.c \
 	$(FREERTOS_SOURCE_DIR)/stream_buffer.c \
-	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c 
-
-export FREERTOS_TCP_SRC = \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_ARP.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DNS.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DHCP.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Sockets.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_IP.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_UDP_IP.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_WIN.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Stream_Buffer.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/portable/BufferManagement/BufferAllocation_2.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/riscv_hal_eth.c \
-	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/NetworkInterface.c
+	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c
 
 export APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
 
 export PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
 export PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
 
+export FREERTOS_IP_INCLUDE = \
+	-I$(FREERTOS_TCP_SOURCE_DIR) \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/include \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/Compiler/GCC
+
 export INCLUDES = \
-	-I$(VOTING_SYSTEM_SOURCE_DIR)/protocols/include \
-	-I$(VOTING_SYSTEM_SOURCE_DIR)/logging \
-	-T$(VOTING_SYSTEM_SOURCE_DIR)/crypto \
-	-I$(VOTING_SYSTEM_SOURCE_DIR)/sbb \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
@@ -82,21 +74,16 @@ export INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio \
 	-I$(FREERTOS_SOURCE_DIR)/include \
-	-I$(FREERTOS_DEMO_DIR)../Common/include \
+	-I$(FREERTOS_DEMO_DIR)/../Common/include \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \
 	-I$(FREERTOS_DEMO_DIR)/devices \
-	-I$(FREERTOS_TCP_SOURCE_DIR)/include \
-	-I$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP/include \
-	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/Compiler/GCC
-
-export ASFLAGS  += -g $(ARCH) $(ABI)  \
-    -Wa,-Ilegacy \
-    -I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
-    -DportasmHANDLE_INTERRUPT=external_interrupt_handler
+	-I$(SBB_SOURCE_DIR) \
+	-I$(LOG_SOURCE_DIR) \
+	-I$(CRYPTO_SOURCE_DIR)
 
 export CFLAGS = $(WARNINGS) $(INCLUDES)
-export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DNETWORK_LOGS -DTARGET_OS_FreeRTOS -DDEBUG -DNO_MEMSET_S
+export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DNO_MEMSET_S
 
 export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
@@ -106,7 +93,6 @@ export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/iic.c \
 	$(FREERTOS_DEMO_DIR)/bsp/gpio.c \
 	$(FREERTOS_DEMO_DIR)/bsp/spi.c \
-	$(FREERTOS_DEMO_DIR)/bsp/rand.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_g.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_sinit.c \
@@ -150,13 +136,38 @@ export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
 	$(FREERTOS_DEMO_DIR)/devices/ff.c \
 	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
-	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c
+	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c \
+	$(FREERTOS_DEMO_DIR)/devices/ds1338rtc.c
 
 export ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
 	-DportasmHANDLE_INTERRUPT=external_interrupt_handler
 
+export FREERTOS_IP_SRC = \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_ARP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DHCP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DNS.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Sockets.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_UDP_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_WIN.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Stream_Buffer.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/BufferManagement/BufferAllocation_2.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/riscv_hal_eth.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/NetworkInterface.c \
+	$(FREERTOS_DEMO_DIR)/bsp/rand.c
+
+export FREERTOS_PEEKPOKE_SRC = \
+	$(FREERTOS_IP_SRC) \
+	$(FREERTOS_PROTOCOLS_DIR)/Common/FreeRTOS_TCP_server.c \
+	$(FREERTOS_PROTOCOLS_DIR)/HTTP/FreeRTOS_HTTP_server.c \
+	$(FREERTOS_PROTOCOLS_DIR)/HTTP/FreeRTOS_HTTP_commands.c \
+	$(FREERTOS_PROTOCOLS_DIR)/HTTP/peekpoke.c
+
 export ARFLAGS=crsv
 
-export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib -defsym=_STACK_SIZE=4K
+export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib \
+	-defsym=_STACK_SIZE=128K # NOTE: increase stack and heap size if needed
+	#-defsym=_HEAP_SIZE=512K
 export LIBS	 =  -lc -lgcc

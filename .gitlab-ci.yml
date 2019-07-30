@@ -18,6 +18,16 @@ before_script:
 # Top level tests
 #
 #-----------------------------------------------------------------------------#
+SbbFpga:
+  script:
+    - nix-shell --run 'make fpga'
+  tags: ["voting-system"]
+
+SbbSim:
+  script:
+    - nix-shell --run 'make sim'
+  tags: ["voting-system"]
+
 Bottom:
   script:
     - export TARGET=bottom

@@ -5,7 +5,9 @@
 #ifndef __SBB_FREERTOS_H__
 #define __SBB_FREERTOS_H__
 
-#include "sbb.h"
+//#include "sbb.h"
+#include "sbb_t.h"
+#include "sbb_io_constants.h"
 
 /* FreeRTOS kernel includes. */
 #include <FreeRTOS.h>
@@ -15,8 +17,41 @@
 #include "stream_buffer.h"
 #include "event_groups.h"
 
+void prvBallotBoxMainTask(void *pvParameters);
+void prvBarcodeScannerTask(void *pvParameters);
+void prvInputTask(void *pvParameters);
+void prvNetworkLogTask(void *pvParameters);
+void prvStartupTask(void *pvParameters);
+void prvMalwareTask(void *pvParameters);
+
+void sbb_tcp(void);
+void reportIPStatus(void);
+
+
+extern StreamBufferHandle_t xNetLogStreamBuffer;
 extern StreamBufferHandle_t xScannerStreamBuffer;
 extern EventGroupHandle_t xSBBEventGroup;
+
+extern TaskHandle_t prvStartupTaskHandle;
+
+/* Smart Ballot Box Tasks and priorities*/
+#define SBB_MAIN_TASK_PRIORITY tskIDLE_PRIORITY+1
+#define SBB_SCANNER_TASK_PRIORITY tskIDLE_PRIORITY+2
+#define SBB_INPUT_TASK_PRIORITY tskIDLE_PRIORITY+3
+#define SBB_NET_LOG_TASK_PRIORITY tskIDLE_PRIORITY+2
+#define SBB_STARTUP_TASK_PRIORITY tskIDLE_PRIORITY
+#define SBB_MALWARE_TASK_PRIORITY tskIDLE_PRIORITY
+
+
+#define SBB_MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*8U
+#define SBB_SCANNER_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*2U
+#define SBB_INPUT_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*2U
+#define SBB_NET_LOG_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*10U
+#define SBB_STARTUP_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
+#define SBB_MALWARE_TASK_STACK_SIZE configMINIMAL_STACK_SIZE
+
+#define sbLOG_BUFFER_SIZE 1024
+#define sbLOG_BUFFER_TRIGGER_LEVEL 331
 
 /* The number of bytes of storage in the stream buffers */
 #define sbSTREAM_BUFFER_LENGTH_BYTES	( ( size_t ) BARCODE_MAX_LENGTH )
@@ -52,5 +87,11 @@ extern EventGroupHandle_t xSBBEventGroup;
 
 /* Input defines */
 #define GPIO_READ_DELAY_MS pdMS_TO_TICKS(15)
+
+/*
+ * Just seeds the simple pseudo random number generator.
+ */
+void prvSRand(UBaseType_t ulSeed);
+
 
 #endif /* __SBB_FREERTOS_H__ */
