@@ -1,4 +1,192 @@
-module BallotFormat = AbstractBallotFormat where
+module BallotFormat where
 
-type timeBytes  = 4
-type timeDigits = 10
+import Base64 (encodeBase64, decodeBase64, Base64, Base64Length)
+import Padding
+import BaseConvert
+import AESCBC
+
+// Time encoding
+type Time = {
+  year   : [16],
+  month  : [8],
+  day    : [8],
+  hour   : [8],
+  minute : [8]
+}
+
+Months = { January   = 1  : [8],
+           February  = 2  : [8],
+           March     = 3  : [8],
+           April     = 4  : [8],
+           May       = 5  : [8],
+           June      = 6  : [8],
+           July      = 7  : [8],
+           August    = 8  : [8],
+           September = 9  : [8],
+           October   = 10 : [8],
+           November  = 11 : [8],
+           December  = 12 : [8]}
+
+daysInMonths : [16] -> [12][8]
+daysInMonths year =
+  updates (repeat 31)
+          [Months.September, Months.April, Months.June, Months.November,
+           Months.February]
+          [30, 30, 30, 30,
+           27 + leapDay]
+  where
+    leapDay =
+      if (year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0)
+      then 1
+      else 0
+
+validTime : Time -> Bool
+validTime time =
+  (time.minute < 60) /\
+  (time.hour < 24) /\
+  (time.month >= 1) /\ (time.month <= 12) /\
+  (time.day <= daysInMonths time.year @ (time.month - 1))
+
+timeToTimestamp : Time -> [16][8]
+timeToTimestamp time =
+  yearDigits # s # monthDigits # s # dayDigits # s # hourDigits # s # minuteDigits
+    where
+  s            = "+"
+  yearDigits   = drop`{back=4} (toBase`{digits=5} decimal time.year)
+  monthDigits  = drop`{back=2} (toBase`{digits=3} decimal time.month)
+  dayDigits    = drop`{back=2} (toBase`{digits=3} decimal time.day)
+  hourDigits   = drop`{back=2} (toBase`{digits=3} decimal time.hour)
+  minuteDigits = drop`{back=2} (toBase`{digits=3} decimal time.minute)
+
+timestampToTime : [16][8] -> Time
+timestampToTime digits =
+  if allSeparatorsValid
+  then {year = year, month = month, day = day, hour = hour, minute = minute}
+  else error "Invalid separator character in timestamp"
+  where
+    s1, s2, s3, s4 : [1][8]
+    yearDigits : [4][8]
+    monthDigits, dayDigits, hourDigits, minuteDigits : [2][8]
+
+    yearDigits # s1 # monthDigits # s2 # dayDigits # s3 # hourDigits # s4 # minuteDigits = digits
+
+    allSeparatorsValid = all (\s -> s == "+") [s1, s2, s3, s4]
+
+    year   = fromBase decimal yearDigits
+    month  = fromBase decimal monthDigits
+    day    = fromBase decimal dayDigits
+    hour   = fromBase decimal hourDigits
+    minute = fromBase decimal minuteDigits
+
+testTime = {
+  year   = 2019,
+  month  = Months.January,
+  day    = 1,
+  hour   = 1,
+  minute = 1
+}
+
+// Ballot encoding
+type Ballot contests positions
+  = { time     : Time,
+      unixTime : [6][8],
+      contests : [contests][positions] }
+
+encodeBallot :
+  {contests, positions, encodedLength}
+  (fin contests, fin positions,
+   encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
+  [32][8] ->
+  [32][8] ->
+  Ballot contests positions ->
+  [1 + 16 + Base64Length encodedLength][8]
+encodeBallot authKey ballotKey ballot =
+  timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
+  where
+    timeDigits      = timeToTimestamp ballot.time
+    contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
+    ballotBytes     = ballot.unixTime # contestsBytes
+    encryptedBallot = encrypt ballotKey zero (padWith`{mod=16} zero ballotBytes)
+    auth            = cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
+
+decodeBallot :
+  {contests, positions, encodedLength}
+  (fin contests, fin positions,
+   encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
+  [32][8] ->
+  [32][8] ->
+  [1 + 16 + Base64Length encodedLength][8] ->
+  Ballot contests positions
+decodeBallot authKey ballotKey encoded =
+  if auth != recomputedAuth
+  then error "Invalid authentication: ballot has been tampered with"
+  | timeSep != ":"
+  then error "Invalid time separator character"
+  | contestPadding != zero
+  then error "Non-zero padding in contest: did you ask for the right size ballot?"
+  else { time = time, unixTime = unixTime, contests = contests }
+  where
+    timeSep : [1][8]
+    timeDigits # timeSep # encryptedAndAuth = encoded
+
+    time = timestampToTime timeDigits
+
+    auth : [16][8]
+    encryptedBallot # auth =
+      decodeBase64`{encodedLength} encryptedAndAuth
+
+    recomputedAuth =
+      cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
+
+    unixTime # contestsBytes = decrypt ballotKey zero encryptedBallot
+
+    contests : [contests][positions]
+    contestBits # contestPadding = join contestsBytes
+    contests = groupBy`{each=positions} contestBits
+
+// Proofs that ballot encoding is correct
+
+// Quick and dirty hash function
+// <https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key>
+knuthMultHash : [32] -> [32]
+knuthMultHash i = i * 2654435761
+
+// This hash function is perfect because the magic number chosen above is a
+// prime number (more saliently, it's coprime to 2^32)
+property knuthMultHash_perfect s1 s2 =
+  s1 != s2 ==> knuthMultHash s1 != knuthMultHash s2
+
+// Instead of using a precondition to filter for ballots with valid times, we
+// generate only ballots with valid times. This generator maps every 32-bit
+// integer to some valid time -- if the input [32] is random, this will give a
+// relatively nice spread of times
+generateValidTime : [32] -> Time
+generateValidTime s0 =
+  { year = year, month = month, day = day, hour = hour, minute = minute }
+  where
+    generate : {n} (fin n, n <= 32, n >= 1) => [32] -> [n] -> [n] -> ([32], [n])
+    generate seed lo hi =
+      (seed', lo + drop`{32 - n} (seed' % (zero # (hi - lo + 1))))
+      where seed' = knuthMultHash seed
+
+    (s1, year)   = generate s0 0 9999
+    (s2, month)  = generate s1 1 12
+    (s3, day)    = generate s2 0 (daysInMonths year @ (month - 1))
+    (s4, hour)   = generate s3 0 23
+    (_,  minute) = generate s4 0 59
+
+// Property that generateValidTime always does what it says on the tin
+time_generate_correct : [32] -> Bool
+property time_generate_correct seed =
+  validTime (generateValidTime seed)
+
+// Decode is inverse to encode
+ballot_roundtrip :
+  {contests, positions} (fin contests, fin positions) =>
+  [32][8] -> [32][8] -> [32] -> [6][8] -> [contests][positions] -> Bool
+property ballot_roundtrip authKey ballotKey timeSeed unixTime contests =
+  decodeBallot authKey ballotKey (encodeBallot authKey ballotKey ballot) == ballot
+  where
+    ballot = { time = generateValidTime timeSeed,
+               unixTime = unixTime,
+               contests = contests }
