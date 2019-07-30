@@ -75,7 +75,7 @@ all: verify ide
 
 ide: TAGS metrics
 
-uverify: typecheck value wp wp-verbose-report # saw
+verify: typecheck value wp wp-verbose-report # saw
 
 # Typechecking code and specifications.
 

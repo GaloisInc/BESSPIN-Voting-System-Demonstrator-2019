@@ -8,29 +8,37 @@ CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/base64.c \
                 ../crypto/crypto_config_default.c
 
+LOGGING_SOURCE = ../logging/debug_io.c
+
 CFLAGS = -DHARDCODE_CURRENT_TIME \
          -DCURRENT_YEAR=2019 \
          -DCURRENT_MONTH=6 \
          -DCURRENT_DAY=22 \
          -DCURRENT_HOUR=11 \
          -DCURRENT_MINUTE=18 \
-         $(HOSTTEST_CFLAGS)
+         $(HOSTTEST_CFLAGS) \
+         -I../crypto \
+         -I../logging
 
 sbb_hosttest1:
 	cd $(SBB_DIR); \
-	$(CC) $(CFLAGS) -I../crypto -o hosttest1 hosttest1.c sbb_crypto.c $(CRYPTO_SOURCE)
+	$(CC) $(CFLAGS) -o hosttest1 hosttest1.c sbb_crypto.c \
+	$(CRYPTO_SOURCE) $(LOGGING_SOURCE)
 
 sbb_hosttest2:
 	cd $(SBB_DIR); \
-	$(CC) $(CFLAGS) -I../crypto -o hosttest2 hosttest2.c sbb_crypto.c $(CRYPTO_SOURCE)
+	$(CC) $(CFLAGS) -o hosttest2 hosttest2.c sbb_crypto.c \
+	$(CRYPTO_SOURCE) $(LOGGING_SOURCE)
 
 sbb_hosttest3:
 	cd $(SBB_DIR); \
-	$(CC) $(CFLAGS) -I../crypto -o hosttest3 hosttest3.c sbb_crypto.c $(CRYPTO_SOURCE)
+	$(CC) $(CFLAGS) -o hosttest3 hosttest3.c sbb_crypto.c \
+	$(CRYPTO_SOURCE) $(LOGGING_SOURCE)
 
 sbb_hosttest4:
 	cd $(SBB_DIR); \
-	$(CC) $(CFLAGS) -I../crypto -o hosttest4 hosttest4.c sbb_crypto.c $(CRYPTO_SOURCE)
+	$(CC) $(CFLAGS) -o hosttest4 hosttest4.c sbb_crypto.c \
+	$(CRYPTO_SOURCE) $(LOGGING_SOURCE)
 
 sbb_hosttest_clean:
 	cd $(CRYPTO_DIR); \

@@ -1,7 +1,7 @@
 # Build the bottom target
 sbb_bottom:
 	cd $(SBB_DIR); \
-	$(CC) $(CFLAGS) sbb_strings.c sbb_bottom.c -o sbb_bottom.elf; \
+	$(CC) $(CFLAGS) -I../logging -I../crypto sbb_strings.c sbb_bottom.c -o sbb_bottom.elf; \
 	rm -f *.o
 
 sbb_bottom_clean:

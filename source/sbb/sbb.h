@@ -14,6 +14,7 @@
 #include "sbb_t.h"
 #include "sbb.acsl"
 #include "sbb_logging.h"
+#include "sbb_io_constants.h"
 
 extern char barcode[BARCODE_MAX_LENGTH];
 extern barcode_length_t barcode_length;

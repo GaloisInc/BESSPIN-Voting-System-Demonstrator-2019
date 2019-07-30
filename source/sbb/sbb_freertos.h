@@ -7,6 +7,7 @@
 
 //#include "sbb.h"
 #include "sbb_t.h"
+#include "sbb_io_constants.h"
 
 /* FreeRTOS kernel includes. */
 #include <FreeRTOS.h>
@@ -64,21 +65,6 @@ extern TaskHandle_t prvStartupTaskHandle;
 #define SCANNER_BUFFER_RX_BLOCK_TIME_MS pdMS_TO_TICKS(15)
 /* How long to wait before we "see" a paper sensor "release" */
 #define PAPER_SENSOR_DEBOUNCE pdMS_TO_TICKS(1500)
-
-/* Button defines */
-#define BUTTON_CAST_LED 3
-#define BUTTON_SPOIL_LED 1
-#define BUTTON_CAST_IN 2
-#define BUTTON_SPOIL_IN 0
-
-/* Paper sensor inputs */
-#define PAPER_SENSOR_OUT 6
-#define PAPER_SENSOR_IN 7
-
-// Motor defines
-#define MOTOR_0 4
-#define MOTOR_1 5
-
 
 /* Event bit definitions. */
 #define ebPAPER_SENSOR_IN_PRESSED     ( 0x01 )

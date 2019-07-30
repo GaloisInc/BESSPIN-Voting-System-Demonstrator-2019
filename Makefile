@@ -42,7 +42,7 @@ include $(CRYPTO_DIR)/Makefile.bottom
 include $(LOG_DIR)/Makefile.bottom
 
 bottom_all: crypto_bottom log_bottom sbb_bottom
-clean: crypto_bottom_clean log_bottom_clean
+clean: crypto_bottom_clean log_bottom_clean sbb_bottom_clean
 
 else
 #####################################
@@ -143,7 +143,17 @@ ifeq ($(TARGET),hosttests)
 # Apple's clang and use the HomeBrew one instead...
 export CC := clang
 
-HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -DNETWORK_LOGS -Wno-macro-redefined -fsanitize=address
+HOST  := $(shell uname -s)
+ifeq (${HOST},Linux)
+    LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+    PLATFORM_INCLUDES = 
+else
+    # Assumed to be Host = Darwin
+    LLVM_LINK := llvm-link
+    PLATFORM_INCLUDES = -I/usr/include
+endif
+
+HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DDEBUG -DNETWORK_LOGS -Wno-macro-redefined -fsanitize=address $(PLATFORM_INCLUDES)
 
 include $(CRYPTO_DIR)/Makefile.hosttests
 include $(LOG_DIR)/Makefile.hosttests
