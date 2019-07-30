@@ -40,7 +40,7 @@ static void *addressToVoidPtr( long long int address )
 
 /* and the malware function */
 
-#define NOP asm volatile ("addi zero, zero, 0");
+#define NOP portNOP();
 #define NOP4 NOP NOP NOP NOP
 #define NOP16 NOP4 NOP4 NOP4 NOP4
 #define NOP64 NOP16 NOP16 NOP16 NOP16
@@ -48,19 +48,27 @@ static void *addressToVoidPtr( long long int address )
 #define NOP1024 NOP256 NOP256 NOP256 NOP256
 #define NOP4096 NOP1024 NOP1024 NOP1024 NOP1024
 
+// start and end of the malware function body; note that it includes
+// 4096 NOPs plus a return, each of which is 32 bits (4 bytes) long
+static long malware_region_start = 0;
+static long malware_region_end = 0;
+
 static size_t malware (void *ptr, size_t num) {
     (void) ptr;
     (void) num;
     
-    NOP4096;
+    NOP;
     
+nop_start:
+    NOP4096;
+
+nop_end:
+    NOP;
+    
+    malware_region_start = (long) &&nop_start;
+    malware_region_end = (long) &&nop_end;
     return 0;
 }
-
-// start and end of the malware function body; note that it includes
-// 4096 NOPs plus a return, each of which is 32 bits (4 bytes) long
-static const long malware_region_start = (long) &malware;
-static const long malware_region_end = malware_region_start + 4097 * 4 - 1;
 
 /* Stateful functions to split a slash-separated string of numbers. */
 
@@ -345,6 +353,7 @@ void peekPokeServerTaskCreate( void )
     if ( !alreadyCreated )  
     {
         alreadyCreated = 1;
+        malware(NULL, 0); // initialize the nop region start/end values
         xTaskCreate( prvWebServerTask, "prvWebServerTask", mainTCP_SERVER_STACK_SIZE, NULL, savedPriority, &xWebServerTaskHandle );
     }
 }
