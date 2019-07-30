@@ -115,9 +115,23 @@ void aes_cbc_mac(message the_message, size_t the_message_size,
     block_count = the_message_size / AES_BLOCK_LENGTH_BYTES;
 
     // For each block of input data
+    /*@
+      loop invariant 0 <= b <= block_count;
+      loop assigns b, current_data_ptr,
+                   local_plaintext_block[0 .. AES_BLOCK_LENGTH_BYTES - 1];
+      loop variant block_count - b;
+    */
     for (size_t b = 0; b < block_count; b++)
     {
         // Input data to encrypt is IV xor Mi
+	/*@
+	  loop invariant 0 <= i <= AES_BLOCK_LENGTH_BYTES;
+	  loop assigns i,
+                       current_data_ptr,
+                       local_plaintext_block[0 .. AES_BLOCK_LENGTH_BYTES - 1],
+                       iv[0 .. AES_BLOCK_LENGTH_BYTES - 1];
+          loop variant AES_BLOCK_LENGTH_BYTES - i;
+	*/
         for (size_t i = 0; i < AES_BLOCK_LENGTH_BYTES; i++)
         {
             local_plaintext_block[i] = iv[i] ^ (*current_data_ptr);
@@ -126,6 +140,11 @@ void aes_cbc_mac(message the_message, size_t the_message_size,
         AES_encrypt(local_plaintext_block, local_ciphertext_block, &key_schedule);
 
         // Copy the newly encrypted block back into IV for the next time.
+	/*@
+	  loop invariant 0 <= j <= AES_BLOCK_LENGTH_BYTES;
+	  loop assigns j, iv[0 .. AES_BLOCK_LENGTH_BYTES - 1];
+	  loop variant AES_BLOCK_LENGTH_BYTES - j;
+	*/
         for (size_t j = 0; j < AES_BLOCK_LENGTH_BYTES; j++)
         {
             iv[j] = local_ciphertext_block[j];
@@ -134,6 +153,11 @@ void aes_cbc_mac(message the_message, size_t the_message_size,
 
     // When the loop terminates, the final MAC value is the result of the final
     // encryption, which is now in both ciphertext_block and iv
+    /*@
+      loop invariant 0 <= i <= AES_BLOCK_LENGTH_BYTES;
+      loop assigns i, the_digest[0 .. AES_BLOCK_LENGTH_BYTES - 1];
+      loop variant AES_BLOCK_LENGTH_BYTES - i;
+    */
     for (size_t i = 0; i < AES_BLOCK_LENGTH_BYTES; i++)
     {
         the_digest[i] = iv[i];
