@@ -16,12 +16,13 @@
 
 // Local functions
 
+
 // Refines Cryptol initialLogEntry
+#pragma GCC diagnostic ignored "-Waggregate-return"
 /*@
     requires \valid_read (msg + (0 .. LOG_ENTRY_LENGTH - 1));
     assigns \nothing;
 */
-#pragma GCC diagnostic ignored "-Waggregate-return"
 static secure_log_entry initial_log_entry(const log_entry msg) // IN
 {
     secure_log_entry initial_entry = {.the_entry = {0}, .the_digest = {0}};
