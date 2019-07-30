@@ -57,6 +57,11 @@ static size_t malware (void *ptr, size_t num) {
     return 0;
 }
 
+// start and end of the malware function body; note that it includes
+// 4096 NOPs plus a return, each of which is 32 bits (4 bytes) long
+static const long malware_region_start = (long) &malware;
+static const long malware_region_end = malware_region_start + 4097 * 4 - 1;
+
 /* Stateful functions to split a slash-separated string of numbers. */
 
 static const char *urlBuf = NULL;
@@ -259,9 +264,9 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             int writeLength = getNextNumberFromURL();
             char *mem = addressToCharPtr( memAddress );
 
-            // need to change this guard such that it only allows
-            // poking into the malware function body
-            if ( memAddress != 0 && writeLength != 0 )
+            if ( malware_region_start <= memAddress &&
+                 0 < writeLength &&
+                 memAddress + writeLength <= malware_region_end )
             {
                 memcpy( mem, getHttpBody(), writeLength ); /* evil! */
                 snprintf( pcOutputBuffer, uxBufferLength,
