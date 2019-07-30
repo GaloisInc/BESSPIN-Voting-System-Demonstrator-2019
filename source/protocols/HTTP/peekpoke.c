@@ -40,11 +40,20 @@ static void *addressToVoidPtr( long long int address )
 
 /* and the malware function */
 
-static size_t malware(__attribute__((unused)) void *the_ptr,
-                      __attribute__((unused)) size_t the_int)
-{
-    // need to make this take up some specific amount of memory
-    // using either inline assembly or some other trickery
+#define NOP asm volatile ("addi zero, zero, 0");
+#define NOP4 NOP NOP NOP NOP
+#define NOP16 NOP4 NOP4 NOP4 NOP4
+#define NOP64 NOP16 NOP16 NOP16 NOP16
+#define NOP256 NOP64 NOP64 NOP64 NOP64
+#define NOP1024 NOP256 NOP256 NOP256 NOP256
+#define NOP4096 NOP1024 NOP1024 NOP1024 NOP1024
+
+static size_t malware (void *ptr, size_t num) {
+    (void) ptr;
+    (void) num;
+    
+    NOP4096;
+    
     return 0;
 }
 
