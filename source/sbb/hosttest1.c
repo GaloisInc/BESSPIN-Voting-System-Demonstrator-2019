@@ -3,7 +3,7 @@
 #include <string.h>
 #include "sbb_crypto.h"
 
-unsigned char *a_barcode =
+char *a_barcode =
   "2019+06+23+17+45:cgep2UpFCE2XLgx6QZUfW3hlVhINicNbwL9KI8UtUGM=";
 
 int main(void) {

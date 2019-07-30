@@ -21,7 +21,13 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
     uint32_t year, year_now;
     uint16_t month, day, hour, minute;
     uint16_t month_now, day_now, hour_now, minute_now;
-    int num_scanned = sscanf((const char *)barcode_time, "%lu+%hu+%hu+%hu+%hu",
+    
+    // the format string needs to be different on platforms where long is 32
+    // bits (4 bytes), in order to avoid a compiler warning
+    const char *format_string =
+        (sizeof(long) == 4) ? "%lu+%hu+%hu+%hu+%hu" : "%u+%hu+%hu+%hu+%hu";
+
+    int num_scanned = sscanf((const char *)barcode_time, format_string,
                              &year, &month, &day, &hour, &minute);
     bool b_valid = false;
     if (num_scanned == 5)
