@@ -146,7 +146,7 @@ export CC := clang
 HOST  := $(shell uname -s)
 ifeq (${HOST},Linux)
     LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    PLATFORM_INCLUDES =
+    PLATFORM_INCLUDES = -I/usr/include
 else
     # Assumed to be Host = Darwin
     LLVM_LINK := llvm-link
