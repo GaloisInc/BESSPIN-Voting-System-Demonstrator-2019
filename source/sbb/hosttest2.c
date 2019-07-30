@@ -4,11 +4,11 @@
 #include "sbb_crypto.h"
 
 // One of the bytes has been changed
-unsigned char *a_barcode =
+char *a_barcode =
     "2019+06+23+17+45:Dgep2UpFCE2XLgx6QZUfW3hlVhINicNbwL9KI8UtUGM=";
 
 // The barcode has expired
-unsigned char *another_barcode =
+char *another_barcode =
     "2019+05+26+18+13:BX99C4QSlcCUg5SIW1sfrPBufVmZl87db4xLu7lytQM=";
 
 int main(void) {
