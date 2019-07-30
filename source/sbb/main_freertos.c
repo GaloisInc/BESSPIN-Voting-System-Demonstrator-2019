@@ -272,30 +272,6 @@ void prvBallotBoxMainTask(void *pvParameters)
 }
 /*-----------------------------------------------------------*/
 
-
-/**
- * The infamous malware task
- */
-static bool should_jump;
-void prvMalwareTask(void *pvParameters)
-{
-    (void)pvParameters;
-    printf("Starting prvMalwareTask\r\n");
-    void (*function_handle)(void) = NULL;
-    should_jump = false;
-
-    for (;;) {
-        if ((function_handle != NULL) && should_jump) {
-            printf("Jumping to malware task function handle...\r\n");
-            (*function_handle)();
-            should_jump = false;
-        }
-        msleep(100);
-    }
-}
-/*-----------------------------------------------------------*/
-
-
 /**
  * Aux task polling data from the barcode scanner
  */
@@ -388,7 +364,7 @@ void prvNetworkLogTask(void *pvParameters)
     uint8_t hour = (uint8_t)hour_now;
     uint8_t minute = (uint8_t)minute_now;
     uint32_t seed = (uint32_t)(day | hour << 8 | minute << 16 | month << 24);
-    debug_printf(("Seed for randomiser: %lu\r\n", seed));
+    debug_printf("Seed for randomiser: %lu\r\n", seed);
     prvSRand((uint32_t)seed);
 
     xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
