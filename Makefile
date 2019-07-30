@@ -153,7 +153,7 @@ else
     PLATFORM_INCLUDES = -I/usr/include
 endif
 
-HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined -fsanitize=address $(PLATFORM_INCLUDES)
+HOSTTEST_CFLAGS = -g -Wall -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(PLATFORM_INCLUDES)
 
 include $(CRYPTO_DIR)/Makefile.hosttests
 include $(LOG_DIR)/Makefile.hosttests
