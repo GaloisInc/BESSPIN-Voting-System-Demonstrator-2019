@@ -22,9 +22,13 @@
 // key is asked for
 static const aes256_key mock_key = "From Russia with Love";
 
-// Local functions
+// Local function declarations
 
 // Returns a pointer to the key data for the given Key Name
+const uint8_t *fetch_key (AES_Key_Name key);
+
+// Local function bodies
+
 const uint8_t *fetch_key (AES_Key_Name key)
 {
   // The body of this function is implemented differently on FreeRTOS and POSIX

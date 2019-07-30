@@ -226,10 +226,6 @@ void vApplicationTickHook(void)
 static void prvLoggingTask(void *pvParameters)
 {
     (void)pvParameters;
-    FATFS FatFs; /* FatFs work area needed for each volume */
-    FIL Fil;     /* File object needed for each open file */
-    UINT bw;
-    uint8_t res;
 
     printf("Starting prvLoggingTask\r\n");
 
