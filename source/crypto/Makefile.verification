@@ -22,7 +22,7 @@ CLANG := clang
 HOST  := $(shell uname -s)
 ifeq (${HOST},Linux)
     LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    PLATFORM_INCLUDES := 
+    PLATFORM_INCLUDES :=
 else
     # Assumed to be Host = Darwin
     LLVM_LINK := llvm-link
@@ -59,7 +59,7 @@ SOFTWARE_SPECS := crypto.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := crypto.c 
+FRAMA_C_SOURCES := crypto.c crypto_main.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
 SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) crypto_main.c crypto_config_default.c
@@ -71,7 +71,7 @@ MAIN_ENTRY_POINT := main
 BC_OBJS  = $(FRAMA_C_SOURCES:.c=.bc)
 LL_OBJS  = $(FRAMA_C_SOURCES:.c=.ll)
 
-all: verify ide 
+all: verify ide
 
 ide: TAGS metrics
 
@@ -98,7 +98,6 @@ metrics:
           metrics/software_metrics.txt
 
 # Value analysis
-# NOT WORKING YET SINCE NEEDS A MAIN ENTRY POINY
 value:
 	frama-c -c11 -val -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES) -slevel 16 -plevel 256
 
