@@ -98,16 +98,15 @@ encodeBallot :
    encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
-  [16][8] ->
   Ballot contests positions ->
   [1 + 16 + Base64Length encodedLength][8]
-encodeBallot authKey ballotKey iv ballot =
+encodeBallot authKey ballotKey ballot =
   timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
   where
     timeDigits      = timeToTimestamp ballot.time
     contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
     ballotBytes     = ballot.unixTime # contestsBytes
-    encryptedBallot = encrypt ballotKey iv (padWith`{mod=16} zero ballotBytes)
+    encryptedBallot = encrypt ballotKey zero (padWith`{mod=16} zero ballotBytes)
     auth            = cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
 
 decodeBallot :
@@ -116,10 +115,9 @@ decodeBallot :
    encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
   [32][8] ->
   [32][8] ->
-  [16][8] ->
   [1 + 16 + Base64Length encodedLength][8] ->
   Ballot contests positions
-decodeBallot authKey ballotKey iv encoded =
+decodeBallot authKey ballotKey encoded =
   if auth != recomputedAuth
   then error "Invalid authentication: ballot has been tampered with"
   | timeSep != ":"
@@ -140,7 +138,7 @@ decodeBallot authKey ballotKey iv encoded =
     recomputedAuth =
       cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
 
-    unixTime # contestsBytes = decrypt ballotKey iv encryptedBallot
+    unixTime # contestsBytes = decrypt ballotKey zero encryptedBallot
 
     contests : [contests][positions]
     contestBits # contestPadding = join contestsBytes
@@ -185,9 +183,9 @@ property time_generate_correct seed =
 // Decode is inverse to encode
 ballot_roundtrip :
   {contests, positions} (fin contests, fin positions) =>
-  [32][8] -> [32][8] -> [16][8] -> [32] -> [6][8] -> [contests][positions] -> Bool
-property ballot_roundtrip authKey ballotKey iv timeSeed unixTime contests =
-  decodeBallot authKey ballotKey iv (encodeBallot authKey ballotKey iv ballot) == ballot
+  [32][8] -> [32][8] -> [32] -> [6][8] -> [contests][positions] -> Bool
+property ballot_roundtrip authKey ballotKey timeSeed unixTime contests =
+  decodeBallot authKey ballotKey (encodeBallot authKey ballotKey ballot) == ballot
   where
     ballot = { time = generateValidTime timeSeed,
                unixTime = unixTime,
