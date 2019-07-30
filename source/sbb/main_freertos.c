@@ -189,11 +189,11 @@ void prvStatsTask(void *pvParameters)
     {
         vTaskDelay(pdMS_TO_TICKS(10000));
         vTaskGetRunTimeStats(statsBuffer);
-        printf("prvStatsTask: xPortGetFreeHeapSize() = %u\r\n",
-               xPortGetFreeHeapSize());
-        printf(
+        debug_printf("prvStatsTask: xPortGetFreeHeapSize() = %u\r\n",
+                     xPortGetFreeHeapSize());
+        debug_printf(
             "prvStatsTask: Run-time stats\r\nTask\tAbsTime\tpercent_time\r\n");
-        printf("%s\r\n", statsBuffer);
+        debug_printf("%s\r\n", statsBuffer);
     }
 }
 #endif /* configGENERATE_RUN_TIME_STATS */
@@ -330,7 +330,7 @@ void prvBarcodeScannerTask(void *pvParameters)
                     /* Send the barcode */
                     /* Debug print below */
                     local_barcode[idx] = '\0';
-                    printf("Barcode, idx=%u: %s\r\n", idx, local_barcode);
+                    debug_printf("Barcode, idx=%u: %s\r\n", idx, local_barcode);
                     /* We have a barcode, send it over stream buffer and fire the event */
                     size_t bytes_available =
                         xStreamBufferSpacesAvailable(xScannerStreamBuffer);
@@ -388,7 +388,7 @@ void prvNetworkLogTask(void *pvParameters)
     uint8_t hour = (uint8_t)hour_now;
     uint8_t minute = (uint8_t)minute_now;
     uint32_t seed = (uint32_t)(day | hour << 8 | minute << 16 | month << 24);
-    FreeRTOS_debug_printf(("Seed for randomiser: %lu\r\n", seed));
+    debug_printf(("Seed for randomiser: %lu\r\n", seed));
     prvSRand((uint32_t)seed);
 
     xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
@@ -401,11 +401,11 @@ void prvNetworkLogTask(void *pvParameters)
 
     for (;;)
     {
-        printf("prvNetworkLogTask: wainting for data\r\n");
+        debug_printf("prvNetworkLogTask: wainting for data\r\n");
         // Wait indefinitely for new data to send
         xReceiveLength = xStreamBufferReceive(xNetLogStreamBuffer, prvNetworkLogTask_buf,
                                               sizeof(prvNetworkLogTask_buf), portMAX_DELAY);
-        printf("prvNetworkLogTask: Got %u bytes to send\r\n",
+        debug_printf("prvNetworkLogTask: Got %u bytes to send\r\n",
                      xReceiveLength);
 
         xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
@@ -415,35 +415,35 @@ void prvNetworkLogTask(void *pvParameters)
             FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress));
         
         if (res < 0 ) {
-            printf("prvNetworkLogTask: socket connect failiure code %li\r\n", res);
+            debug_printf("prvNetworkLogTask: socket connect failiure code %li\r\n", res);
 
             for (uint8_t iter = 0; iter < 3; iter++) {
                 // attempt to connect three times
-                printf("prvNetworkLogTask: reconnect attempt # %u\r\n", iter);
+                debug_printf("prvNetworkLogTask: reconnect attempt # %u\r\n", iter);
                 res =
                 FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress));
 
                 if (res == 0) {
                     break;
                 } else {
-                    printf("prvNetworkLogTask: socket connect failiure code %li\r\n", res);
+                    debug_printf("prvNetworkLogTask: socket connect failiure code %li\r\n", res);
                 }
                 msleep(100);
             }
             if (res < 0) {
-                printf("prvNetworkLogTask: reconnect failed\r\n");        
+                debug_printf("prvNetworkLogTask: reconnect failed\r\n");
                 break;
             }
         }
 
-        printf("prvNetworkLogTask: socket connected\r\n");
+        debug_printf("prvNetworkLogTask: socket connected\r\n");
 
         xLenToSend = 0;
         uint8_t iter = 0;
         do
         {
             iter++;
-            printf("prvNetworkLogTask: #%u: xLenToSend: %u, "
+            debug_printf("prvNetworkLogTask: #%u: xLenToSend: %u, "
                          "xReceiveLength: %u,\r\n",
                          iter, xLenToSend, xReceiveLength);
             xBytesSent =
@@ -455,10 +455,10 @@ void prvNetworkLogTask(void *pvParameters)
                               xReceiveLength - xLenToSend,
                               /* ulFlags. */
                               0);
-            printf("prvNetworkLogTask: returned: %li\r\n", xBytesSent);
+            debug_printf("prvNetworkLogTask: returned: %li\r\n", xBytesSent);
             if (xBytesSent < 0)
             {
-                printf("prvNetworkLogTask: ERROR writing "
+                debug_printf("prvNetworkLogTask: ERROR writing "
                              "Transmit_Buffer to socket: %li\r\n",
                              xBytesSent);
                 break;
@@ -472,7 +472,7 @@ void prvNetworkLogTask(void *pvParameters)
         } while (xLenToSend < xReceiveLength);
 
         /* Initiate graceful shutdown. */
-        printf("prvNetworkLogTask: Closing the socket\r\n");
+        debug_printf("prvNetworkLogTask: Closing the socket\r\n");
         FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
         /* The socket has shut down and is safe to close. */
         FreeRTOS_closesocket(xSocket);
@@ -494,7 +494,7 @@ void prvStartupTask(void *pvParameters)
 #ifndef SIMULATION
         display_this_text_no_log(buf, strlen(buf));
 #endif
-        printf("%s\r", buf);
+        debug_printf("%s\r", buf);
         cnt++;
         cnt %= 16;
         msleep(1000);
@@ -536,7 +536,7 @@ void prvInputTask(void *pvParameters)
             if (paper_sensor_in_input == 0)
             {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
-                printf("#paper_sensor_in_input: paper_detected");
+                debug_printf("#paper_sensor_in_input: paper_detected");
                 uxReturned = xEventGroupSetBits(xSBBEventGroup,
                                                 ebPAPER_SENSOR_IN_PRESSED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
@@ -545,7 +545,7 @@ void prvInputTask(void *pvParameters)
             else if (paper_sensor_in_input == 1)
             {
                 //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
-                printf("#paper_sensor_in_input: no paper detected");
+                debug_printf("#paper_sensor_in_input: no paper detected");
                 uxReturned = xEventGroupSetBits(xSBBEventGroup,
                                                 ebPAPER_SENSOR_IN_RELEASED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
@@ -553,15 +553,15 @@ void prvInputTask(void *pvParameters)
             }
             paper_in_timestamp = xTaskGetTickCount();
             paper_sensor_in_input_last = paper_sensor_in_input;
-            printf("uxReturned = 0x%lx\r\n", uxReturned);
+            debug_printf("uxReturned = 0x%lx\r\n", uxReturned);
         }
 
         /* Cast button */
         cast_button_input = gpio_read(BUTTON_CAST_IN);
         if (cast_button_input != cast_button_input_last)
         {
-            printf("#cast_button_input changed: %u -> %u\r\n",
-                   cast_button_input_last, cast_button_input);
+            debug_printf("#cast_button_input changed: %u -> %u\r\n",
+                         cast_button_input_last, cast_button_input);
 
             /* Broadcast the event */
             if (cast_button_input == 1)
@@ -580,7 +580,7 @@ void prvInputTask(void *pvParameters)
                 uxReturned =
                     xEventGroupClearBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
             }
-            printf("uxReturned = 0x%lx\r\n", uxReturned);
+            debug_printf("uxReturned = 0x%lx\r\n", uxReturned);
             cast_button_input_last = cast_button_input;
         }
 
@@ -588,8 +588,8 @@ void prvInputTask(void *pvParameters)
         spoil_button_input = gpio_read(BUTTON_SPOIL_IN);
         if (spoil_button_input != spoil_button_input_last)
         {
-            printf("#spoil_button_input changed: %u -> %u\r\n",
-                   spoil_button_input_last, spoil_button_input);
+            debug_printf("#spoil_button_input changed: %u -> %u\r\n",
+                         spoil_button_input_last, spoil_button_input);
 
             /* Broadcast the event */
             if (spoil_button_input == 1)
