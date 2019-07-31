@@ -20,10 +20,6 @@ uint16_t num_scanned_codes = 0;
 const uint8_t app_event_entries[] = { 'C', 'S' };
 
 bool import_and_verify(log_file the_file) {
-    #ifdef SIMULATION
-    (void) the_file;
-    return false;
-    #else
     bool b_success = false;
 
     if ( import_log(the_file) ) {
@@ -31,19 +27,11 @@ bool import_and_verify(log_file the_file) {
     }
 
     return b_success;
-    #endif
 }
 
 bool load_or_create(log_file the_file,
                     const log_name the_name,
                     const http_endpoint endpoint) {
-    #ifdef SIMULATION
-    (void) the_file;
-    (void) the_name;
-    (void) endpoint;
-    return false;
-    #else
-
     // @todo There is no API for opening a file for write, so we will overwrite for now
     bool b_success = true;
 
@@ -57,13 +45,9 @@ bool load_or_create(log_file the_file,
     }
 
     return b_success;
-    #endif
 }
 
 bool load_or_create_logs(void) {
-    #ifdef SIMULATION
-    return true;
-    #else
     bool b_success = false;
 
     if (load_or_create(&app_log_handle,
@@ -79,39 +63,24 @@ bool load_or_create_logs(void) {
       }
 
     return b_success;
-    #endif
 }
 
 bool log_system_message(const char *new_entry, int length) {
     #ifdef SIMULATION
-    (void) length;
     debug_printf("System LOG: %s\r\n", new_entry);
-    return true;
-    #else
+    #endif /* SIMULATION */
     log_entry event_entry;
     memset(&event_entry[0], 0x20, sizeof(log_entry));
     memcpy(&event_entry[0], new_entry, length);
     Log_FS_Result res = write_entry(&system_log_handle, event_entry);
-    #ifdef SD_CARD_LOGGING
     return (res == LOG_FS_OK);
-    #else
-    (void)res;
-    return true;
-    #endif /* SD_CARD_LOGGING */
-    #endif /* SIMULATION */
 }
 
 void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length) {
     debug_printf((char *)the_entry);
-    #ifdef SIMULATION
-    (void) the_local_state;
-    (void) length;
-    debug_printf("LOG: %s\r\n", the_entry);
-    #else
     if (!log_system_message(the_entry, length)) {
         the_local_state->L = ABORT;
     }
-    #endif
 }
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out
@@ -155,7 +124,6 @@ bool log_app_event(app_event event,
             debug_printf(" %hhx", (uint8_t)barcode[i]);
         }
         debug_printf("\r\n");
-        return true;
 #endif
         Log_FS_Result res = write_entry(&app_log_handle, event_entry);
         return (res == LOG_FS_OK);

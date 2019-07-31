@@ -82,7 +82,7 @@ export INCLUDES = \
 	-I$(LOG_SOURCE_DIR) \
 	-I$(CRYPTO_SOURCE_DIR)
 
-export CFLAGS = $(WARNINGS) $(INCLUDES)
+export CFLAGS += $(WARNINGS) $(INCLUDES)
 export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DNO_MEMSET_S
 
 export APP_SRC = \

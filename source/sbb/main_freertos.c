@@ -157,15 +157,15 @@ int main(void)
     sbb_tcp();
 
 #if configGENERATE_RUN_TIME_STATS
-    xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 2,
-                NULL, tskIDLE_PRIORITY, NULL);
+    xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 10,
+                NULL, SBB_STATS_TASK_PRIORITY, NULL);
 #endif
 
     /* 
 	 * Tells the peekPokeServer what its priority will be. The task won't
 	 * launch until peekPokeServerTaskCreate() is called.
 	 */
-    peekPokeServerTaskPriority(SBB_MAIN_TASK_PRIORITY);
+    peekPokeServerTaskPriority(SBB_PEEKPOKE_TASK_PRIORITY);
 
     /* If all is well, the scheduler will now be running, and the following
        line will never be reached.  If the following line does execute, then
@@ -179,22 +179,57 @@ int main(void)
 }
 /*-----------------------------------------------------------*/
 
-#if configGENERATE_RUN_TIME_STATS
-void prvStatsTask(void *pvParameters)
-{
-    (void)pvParameters;
-    printf(("prvStatsTask: starting\r\n"));
 
-    for (;;)
-    {
-        vTaskDelay(pdMS_TO_TICKS(10000));
-        vTaskGetRunTimeStats(statsBuffer);
-        debug_printf("prvStatsTask: xPortGetFreeHeapSize() = %u\r\n",
-                     xPortGetFreeHeapSize());
-        debug_printf(
-            "prvStatsTask: Run-time stats\r\nTask\tAbsTime\tpercent_time\r\n");
-        debug_printf("%s\r\n", statsBuffer);
-    }
+#if configGENERATE_RUN_TIME_STATS
+
+// Returns percentage utilization of the ISR stack
+#include "portmacro.h"
+extern const StackType_t xISRStackTop;
+extern const uint32_t _stack_end[];
+const StackType_t xISRStackEnd = ( StackType_t ) _stack_end;
+
+static uint8_t prvIsrStackUtilization(void)
+{
+	uint8_t percent = 0;
+	uint32_t idx;
+	uint32_t stack_len = (xISRStackTop - xISRStackEnd)/4; // # words
+	uint32_t *stack_ptr = (uint32_t*) xISRStackEnd;
+
+	//printf("xISRStackTop: 0x%lx\r\n",xISRStackTop);
+	//printf("xISRStackEnd 0x%lx\r\n", xISRStackEnd);
+	//printf("Stack len %lu\r\n",stack_len);
+
+	for (idx=0; idx<stack_len; idx++) {
+		//printf("stack ptr addr %p\r\n", stack_ptr);
+		//printf("stack ptr val 0x%lx\r\n", *stack_ptr);
+		if (*stack_ptr != 0xabababab) {
+			//printf("end of usable region\r\n");
+			break;
+		}
+		stack_ptr++;
+	}
+	//printf("idx = %lu\r\n",idx);
+
+	percent = 100 - idx*100/stack_len;
+
+	return percent;
+}
+
+static void prvStatsTask(void *pvParameters)
+{
+	(void)pvParameters;
+	printf(("prvStatsTask: starting\r\n"));
+	vTaskDelay(pdMS_TO_TICKS(1000));
+
+	for (;;)
+	{
+		vTaskGetRunTimeStats(statsBuffer);
+		printf("prvStatsTask: xPortGetFreeHeapSize() = %u\r\n", xPortGetFreeHeapSize());
+		printf("prvStatsTask: prvIsrStackUtilization() = %u\r\n", prvIsrStackUtilization());
+		printf("prvStatsTask: Run-time stats\r\nTask\t\tAbsTime\t\t%%time\tStackHighWaterMark\r\n");
+		printf("%s\r\n", statsBuffer);
+		vTaskDelay(pdMS_TO_TICKS(10000));
+	}
 }
 #endif /* configGENERATE_RUN_TIME_STATS */
 
@@ -596,6 +631,8 @@ void prvInputTask(void *pvParameters)
 void prvInputTask(void *pvParameters)
 {
     (void)pvParameters;
+    char buffer[17] = {0};
+    int len;
 
     char *intro = "Choose a scenario:\r\n\
     1 - cast valid ballot\r\n\
@@ -609,34 +646,34 @@ void prvInputTask(void *pvParameters)
 
     for (;;)
     {
-        char c = uart0_rxchar();
-        if (c == 0xFF)
-        {
-            continue;
+        len = uart1_rxbuffer(buffer, 16);
+        if (len > 0) {
+            char c = buffer[0];
+            printf("%c\r\n", c);
+            switch (c)
+            {
+            case '1':
+                run_scenario_1();
+                break;
+            case '2':
+                run_scenario_2();
+                break;
+            case '3':
+                run_scenario_3();
+                break;
+            case '0':
+                manual_input();
+                break;
+            case 't':
+                reportIPStatus();
+                break;
+            default:
+                printf("Unknown command\r\n");
+                printf("%s", intro);
+                break;
+            }
         }
-        printf("%c\r\n", c);
-        switch (c)
-        {
-        case '1':
-            run_scenario_1();
-            break;
-        case '2':
-            run_scenario_2();
-            break;
-        case '3':
-            run_scenario_3();
-            break;
-        case '0':
-            manual_input();
-            break;
-        case 't':
-            reportIPStatus();
-            break;
-        default:
-            printf("Unknown command\r\n");
-            printf("%s", intro);
-            break;
-        }
+        msleep(1);
     }
 }
 
@@ -763,6 +800,8 @@ static void run_scenario_3(void)
  */
 static void manual_input(void)
 {
+    char buffer[17] = {0};
+    int len;
     char *help = "You can toggle the following events:\r\n \
      a - press Cast button (ebCAST_BUTTON_PRESSED)\r\n \
      b - release Cast button (ebCAST_BUTTON_RELEASED)\r\n \
@@ -778,70 +817,70 @@ static void manual_input(void)
 
     for (;;)
     {
-        char c = uart0_rxchar();
-        if (c == 0xFF)
-        {
-            continue;
+        len = uart1_rxbuffer(buffer, 16);
+        if (len > 0) {
+            char c = buffer[0];
+            printf("%c\r\n", c);
+            switch (c)
+            {
+            case 'a':
+                printf("SIM: ebCAST_BUTTON_PRESSED\r\n");
+                xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
+                xEventGroupClearBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
+                msleep(500);
+                break;
+            case 'b':
+                printf("SIM: ebCAST_BUTTON_RELEASED\r\n");
+                xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
+                xEventGroupClearBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
+                msleep(500);
+                break;
+            case 'c':
+                printf("SIM: ebSPOIL_BUTTON_PRESSED\r\n");
+                xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
+                xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
+                msleep(500);
+                break;
+            case 'd':
+                printf("SIM: ebSPOIL_BUTTON_RELEASED\r\n");
+                xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
+                xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
+                msleep(500);
+                break;
+            case 'e':
+                printf("SIM: ebPAPER_SENSOR_IN_PRESSED\r\n");
+                xEventGroupSetBits(xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
+                xEventGroupClearBits(xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
+                msleep(500);
+                break;
+            case 'f':
+                printf("SIM: ebPAPER_SENSOR_IN_RELEASED\r\n");
+                xEventGroupSetBits(xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
+                xEventGroupClearBits(xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
+                msleep(500);
+                break;
+            case 'g':
+                printf("SIM: ebBARCODE_SCANNED\r\n");
+                xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
+                xStreamBufferSend(xScannerStreamBuffer, (void *)valid_barcode,
+                                sizeof(valid_barcode),
+                                SCANNER_BUFFER_TX_BLOCK_TIME_MS);
+                xEventGroupClearBits(xSBBEventGroup, ebBARCODE_SCANNED);
+                msleep(500);
+                break;
+            case 'x':
+                printf("Returning to main menu\r\n");
+                return;
+            case 'h':
+                printf("%s", help);
+                break;
+            default:
+                printf("Unknown command\r\n");
+                printf("%s", help);
+                break;
+            }
         }
-        printf("%c\r\n", c);
-        switch (c)
-        {
-        case 'a':
-            printf("SIM: ebCAST_BUTTON_PRESSED\r\n");
-            xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
-            xEventGroupClearBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
-            msleep(500);
-            break;
-        case 'b':
-            printf("SIM: ebCAST_BUTTON_RELEASED\r\n");
-            xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
-            xEventGroupClearBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
-            msleep(500);
-            break;
-        case 'c':
-            printf("SIM: ebSPOIL_BUTTON_PRESSED\r\n");
-            xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
-            xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
-            msleep(500);
-            break;
-        case 'd':
-            printf("SIM: ebSPOIL_BUTTON_RELEASED\r\n");
-            xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
-            xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
-            msleep(500);
-            break;
-        case 'e':
-            printf("SIM: ebPAPER_SENSOR_IN_PRESSED\r\n");
-            xEventGroupSetBits(xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
-            xEventGroupClearBits(xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
-            msleep(500);
-            break;
-        case 'f':
-            printf("SIM: ebPAPER_SENSOR_IN_RELEASED\r\n");
-            xEventGroupSetBits(xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED);
-            xEventGroupClearBits(xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED);
-            msleep(500);
-            break;
-        case 'g':
-            printf("SIM: ebBARCODE_SCANNED\r\n");
-            xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
-            xStreamBufferSend(xScannerStreamBuffer, (void *)valid_barcode,
-                              sizeof(valid_barcode),
-                              SCANNER_BUFFER_TX_BLOCK_TIME_MS);
-            xEventGroupClearBits(xSBBEventGroup, ebBARCODE_SCANNED);
-            msleep(500);
-            break;
-        case 'x':
-            printf("Returning to main menu\r\n");
-            return;
-        case 'h':
-            printf("%s", help);
-            break;
-        default:
-            printf("Unknown command\r\n");
-            printf("%s", help);
-            break;
-        }
+        msleep(1);
     }
 }
 #endif

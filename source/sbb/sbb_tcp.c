@@ -128,7 +128,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 			xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
 			xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 			#ifdef NETWORK_LOGS
-			xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
+				xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
 			#endif
 			xTasksAlreadyCreated = pdTRUE;
 		}
