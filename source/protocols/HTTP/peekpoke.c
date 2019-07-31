@@ -346,7 +346,6 @@ void peekPokeServerTaskCreate( void )
     if ( !alreadyCreated )  
     {
         alreadyCreated = 1;
-        malware(NULL, 0); // initialize the nop region start/end values
         xTaskCreate( prvWebServerTask, "prvWebServerTask", mainTCP_SERVER_STACK_SIZE, NULL, savedPriority, &xWebServerTaskHandle );
     }
 }
