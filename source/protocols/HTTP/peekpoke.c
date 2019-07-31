@@ -199,10 +199,10 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
 
             /* useful for a hacker to have a stack addr */
             snprintf( pcOutputBuffer, uxBufferLength,
-                      "It's dark here; you may be eaten by a grue.\n\n&stackBuffer = %p\n&heapBuffer = %p\nBUF_SIZE = %d\nuxBufferLength = %d\nstackBuffer = %s\nheapBuffer = %s\nentryAddress = %p\navailableBytes = %ld\n",
+                      "It's dark here; you may be eaten by a grue.\n\n&stackBuffer = %p\n&heapBuffer = %p\nBUF_SIZE = %d\nuxBufferLength = %d\nstackBuffer = %s\nheapBuffer = %s\nentryAddress = %p\navailableBytes = %td\n",
                       &stackBuffer, &heapBuffer, BUF_SIZE, uxBufferLength,
                       stackBuffer, heapBuffer, malware_region_start,
-                      (long) (malware_region_end - malware_region_start) );
+                      (malware_region_end - malware_region_start) );
 
 
             /* all this print logging to help debug the HTTP header processing */
