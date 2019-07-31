@@ -64,8 +64,8 @@ static size_t malware (void *ptr, size_t num) {
 // plus buffers on both sides - we're effectively providing a region
 // of 4352 NOPs, with a bunch of NOPs and function frame setup on
 // either side
-static const long malware_region_start = ((long) &malware) + 128;
-static const long malware_region_end = ((long) &malware) + 128 + 4096;
+static const long malware_region_start = ((long) &malware) + 128 * 4;
+static const long malware_region_end = ((long) &malware) + (128 + 4096) * 4;
 
 
 /* Stateful functions to split a slash-separated string of numbers. */
@@ -206,8 +206,10 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
 
             /* useful for a hacker to have a stack addr */
             snprintf( pcOutputBuffer, uxBufferLength,
-                      "It's dark here; you may be eaten by a grue.\n\n&stackBuffer = %p\n&heapBuffer = %p\nBUF_SIZE = %d\nuxBufferLength = %d\nstackBuffer = %s\nheapBuffer = %s\n",
-                      &stackBuffer, &heapBuffer, BUF_SIZE, uxBufferLength, stackBuffer, heapBuffer );
+                      "It's dark here; you may be eaten by a grue.\n\n&stackBuffer = %p\n&heapBuffer = %p\nBUF_SIZE = %d\nuxBufferLength = %d\nstackBuffer = %s\nheapBuffer = %s\nentryAddress = %p\navailableBytes = %ld",
+                      &stackBuffer, &heapBuffer, BUF_SIZE, uxBufferLength,
+                      stackBuffer, heapBuffer, (void *) malware_region_start,
+                      malware_region_end - malware_region_start );
 
 
             /* all this print logging to help debug the HTTP header processing */
