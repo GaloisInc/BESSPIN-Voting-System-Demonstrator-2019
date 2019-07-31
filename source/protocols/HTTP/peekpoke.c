@@ -24,18 +24,11 @@
 
 /* First, some helper functions. */
 
-static char *addressToCharPtr( long long int address )
+static uint8_t *addressToUInt8Ptr( long long int address )
 {
     /* convert first to unsigned 32-bit int */
     unsigned int tmp = address & 0xffffffff;
-    return (char *) tmp; /* evil! */
-}
-
-static void *addressToVoidPtr( long long int address )
-{
-    /* convert first to unsigned 32-bit int */
-    unsigned int tmp = address & 0xffffffff;
-    return (void *) tmp; /* evil! */
+    return (uint8_t *) tmp; /* evil! */
 }
 
 /* and the malware function */
@@ -48,7 +41,7 @@ static void *addressToVoidPtr( long long int address )
 #define NOP1024 NOP256 NOP256 NOP256 NOP256
 #define NOP4096 NOP1024 NOP1024 NOP1024 NOP1024
 
-static size_t malware (void *ptr, size_t num) {
+static size_t malware (uint8_t *ptr, size_t num) {
     (void) ptr;
     (void) num;
     
@@ -64,8 +57,8 @@ static size_t malware (void *ptr, size_t num) {
 // plus buffers on both sides - we're effectively providing a region
 // of 4352 NOPs, with a bunch of NOPs and function frame setup on
 // either side
-static const long malware_region_start = ((long) &malware) + 128 * 4;
-static const long malware_region_end = ((long) &malware) + (128 + 4096) * 4;
+static const uint8_t *malware_region_start = ((uint8_t *) &malware) + 128 * 4;
+static const uint8_t *malware_region_end = ((uint8_t *) &malware) + (128 + 4096) * 4;
 
 
 /* Stateful functions to split a slash-separated string of numbers. */
@@ -208,8 +201,8 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             snprintf( pcOutputBuffer, uxBufferLength,
                       "It's dark here; you may be eaten by a grue.\n\n&stackBuffer = %p\n&heapBuffer = %p\nBUF_SIZE = %d\nuxBufferLength = %d\nstackBuffer = %s\nheapBuffer = %s\nentryAddress = %p\navailableBytes = %ld",
                       &stackBuffer, &heapBuffer, BUF_SIZE, uxBufferLength,
-                      stackBuffer, heapBuffer, (void *) malware_region_start,
-                      malware_region_end - malware_region_start );
+                      stackBuffer, heapBuffer, malware_region_start,
+                      (long) (malware_region_end - malware_region_start) );
 
 
             /* all this print logging to help debug the HTTP header processing */
@@ -233,7 +226,7 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             loadRequestData(pcURLData + 6, pxClient->pcRestData);
             long long int memAddress = getNextNumberFromURL();
             size_t readLength = getNextNumberFromURL();
-            const char *mem = addressToCharPtr( memAddress );
+            const uint8_t *mem = addressToUInt8Ptr( memAddress );
 
             if ( memAddress != 0 && readLength != 0 )
             {
@@ -255,7 +248,7 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             loadRequestData(pcURLData + 5, pxClient->pcRestData);
             long long int malware_pointer_address = getNextNumberFromURL();
             size_t malware_int = getNextNumberFromURL();
-            void *malware_pointer = addressToVoidPtr( malware_pointer_address );
+            uint8_t *malware_pointer = addressToUInt8Ptr( malware_pointer_address );
 
             // execute the malware function with the specified parameters
             return malware(malware_pointer, malware_int);
@@ -270,11 +263,11 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             
             int memAddress = getNextNumberFromURL();
             int writeLength = getNextNumberFromURL();
-            char *mem = addressToCharPtr( memAddress );
+            uint8_t *mem = addressToUInt8Ptr( memAddress );
 
-            if ( malware_region_start <= memAddress &&
+            if ( malware_region_start <= mem &&
                  0 < writeLength &&
-                 memAddress + writeLength <= malware_region_end )
+                 mem + writeLength <= malware_region_end )
             {
                 memcpy( mem, getHttpBody(), writeLength ); /* evil! */
                 snprintf( pcOutputBuffer, uxBufferLength,
