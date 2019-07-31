@@ -378,6 +378,11 @@ void prvBarcodeScannerTask(void *pvParameters)
 /*-----------------------------------------------------------*/
 
 static uint8_t prvNetworkLogTask_buf[sbLOG_BUFFER_SIZE] = {0};
+/* ipconfigTCP_KEEP_ALIVE_INTERVAL defined in FreeRTOSIPConfig.h
+ * is set to 20 seconds, hence sending a "ping" every 10 seconds
+ * should be appropriate
+ */
+#define SBB_NETWORK_LOG_TASK_KEEP_ALIVE_DELAY pdMS_TO_TICKS(10000)
 void prvNetworkLogTask(void *pvParameters)
 {
     (void)pvParameters;
@@ -411,44 +416,32 @@ void prvNetworkLogTask(void *pvParameters)
         FreeRTOS_inet_addr_quick(configRptrIP_ADDR0, configRptrIP_ADDR1,
                                  configRptrIP_ADDR2, configRptrIP_ADDR3);
 
+    xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
+                                  FREERTOS_IPPROTO_TCP);
+    configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
+
+    res = FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress));
+    configASSERT(res == 0);
+    debug_printf("prvNetworkLogTask: socket connected\r\n");
+
     for (;;)
     {
         debug_printf("prvNetworkLogTask: wainting for data\r\n");
         // Wait indefinitely for new data to send
         xReceiveLength = xStreamBufferReceive(xNetLogStreamBuffer, prvNetworkLogTask_buf,
-                                               sizeof(prvNetworkLogTask_buf), portMAX_DELAY);
+                                               sizeof(prvNetworkLogTask_buf), SBB_NETWORK_LOG_TASK_KEEP_ALIVE_DELAY);
         debug_printf("prvNetworkLogTask: Got %u bytes to send\r\n",
                      xReceiveLength);
 
-        xSocket = FreeRTOS_socket(FREERTOS_AF_INET, FREERTOS_SOCK_STREAM,
-                                  FREERTOS_IPPROTO_TCP);
-        configASSERT(xSocket != FREERTOS_INVALID_SOCKET);
-        res =
-            FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress));
-        
-        if (res < 0 ) {
-            debug_printf("prvNetworkLogTask: socket connect failiure code %li\r\n", res);
-
-            for (uint8_t iter = 0; iter < 3; iter++) {
-                // attempt to connect three times
-                debug_printf("prvNetworkLogTask: reconnect attempt # %u\r\n", iter);
-                res =
-                FreeRTOS_connect(xSocket, &xRemoteAddress, sizeof(xRemoteAddress));
-
-                if (res == 0) {
-                    break;
-                } else {
-                    debug_printf("prvNetworkLogTask: socket connect failiure code %li\r\n", res);
-                }
-                msleep(100);
-            }
-            if (res < 0) {
-                debug_printf("prvNetworkLogTask: reconnect failed\r\n");
-                break;
-            }
+        if (xReceiveLength == 0) {
+            /* @mpodhradsky: TODO: this should either be sending some HTTP request 
+             * or the reporter needs to distinguish between valid data and "keep-alive"
+             * content.
+             */
+            debug_printf("prvNetworkLogTask: No new data available, sending keep alive packet\r\n");
+            xReceiveLength = 124;
+            memset(prvNetworkLogTask_buf, '!', 124);
         }
-
-        debug_printf("prvNetworkLogTask: socket connected\r\n");
 
         xLenToSend = 0;
         uint8_t iter = 0;
@@ -482,13 +475,12 @@ void prvNetworkLogTask(void *pvParameters)
             }
             xLenToSend += xBytesSent;
         } while (xLenToSend < xReceiveLength);
-
-        /* Initiate graceful shutdown. */
-        debug_printf("prvNetworkLogTask: Closing the socket\r\n");
-        FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
-        /* The socket has shut down and is safe to close. */
-        FreeRTOS_closesocket(xSocket);
     }
+    /* Initiate graceful shutdown. */
+    debug_printf("prvNetworkLogTask: Closing the socket\r\n");
+    FreeRTOS_shutdown(xSocket, FREERTOS_SHUT_RDWR);
+    /* The socket has shut down and is safe to close. */
+    FreeRTOS_closesocket(xSocket);
 }
 
 void prvStartupTask(void *pvParameters)

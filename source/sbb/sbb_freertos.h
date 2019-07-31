@@ -49,7 +49,7 @@ extern TaskHandle_t prvStartupTaskHandle;
 #define SBB_NET_LOG_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*10U
 #define SBB_STARTUP_TASK_STACK_SIZE configMINIMAL_STACK_SIZE*4
 
-#define sbLOG_BUFFER_SIZE 1024
+#define sbLOG_BUFFER_SIZE 2048
 #define sbLOG_BUFFER_TRIGGER_LEVEL 331
 
 /* The number of bytes of storage in the stream buffers */
