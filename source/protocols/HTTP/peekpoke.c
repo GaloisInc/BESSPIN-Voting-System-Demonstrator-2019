@@ -24,12 +24,42 @@
 
 /* First, some helper functions. */
 
-static char *addressToCharPtr( long long int address )
+static uint8_t *addressToUInt8Ptr( long long int address )
 {
     /* convert first to unsigned 32-bit int */
     unsigned int tmp = address & 0xffffffff;
-    return (char *) tmp; /* evil! */
+    return (uint8_t *) tmp; /* evil! */
 }
+
+/* and the malware function */
+
+#define NOP portNOP();
+#define NOP4 NOP NOP NOP NOP
+#define NOP16 NOP4 NOP4 NOP4 NOP4
+#define NOP64 NOP16 NOP16 NOP16 NOP16
+#define NOP256 NOP64 NOP64 NOP64 NOP64
+#define NOP1024 NOP256 NOP256 NOP256 NOP256
+#define NOP4096 NOP1024 NOP1024 NOP1024 NOP1024
+
+static size_t malware (uint8_t *ptr, size_t num) {
+    (void) ptr;
+    (void) num;
+    
+    NOP256;
+    NOP4096;
+    NOP256;
+    
+    return 0;
+}
+
+// start and end of the malware function body; note that it includes
+// 4096 NOPs plus a return, each of which is 32 bits (4 bytes) long,
+// plus buffers on both sides - we're effectively providing a region
+// of 4352 NOPs, with a bunch of NOPs and function frame setup on
+// either side
+static const uint8_t *malware_region_start = ((uint8_t *) &malware) + 128 * 4;
+static const uint8_t *malware_region_end = ((uint8_t *) &malware) + (128 + 4096) * 4;
+
 
 /* Stateful functions to split a slash-separated string of numbers. */
 
@@ -162,15 +192,17 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
     switch ( xIndex )
     {
     case ECMD_GET:
-        // could be "/hello" or "/peek/address/length"
+        // could be "/hello" or "/peek/address/length" or "/run/pointer/integer"
         if ( 0 == strncmp( "/hello", pcURLData, 6 ) )
         {
             strcpy( pxClient->pxParent->pcContentsType, "text/plain" );
 
             /* useful for a hacker to have a stack addr */
             snprintf( pcOutputBuffer, uxBufferLength,
-                      "It's dark here; you may be eaten by a grue.\n\n&stackBuffer = %p\n&heapBuffer = %p\nBUF_SIZE = %d\nuxBufferLength = %d\nstackBuffer = %s\nheapBuffer = %s\n",
-                      &stackBuffer, &heapBuffer, BUF_SIZE, uxBufferLength, stackBuffer, heapBuffer );
+                      "It's dark here; you may be eaten by a grue.\n\n&stackBuffer = %p\n&heapBuffer = %p\nBUF_SIZE = %d\nuxBufferLength = %d\nstackBuffer = %s\nheapBuffer = %s\nentryAddress = %p\navailableBytes = %td\n",
+                      &stackBuffer, &heapBuffer, BUF_SIZE, uxBufferLength,
+                      stackBuffer, heapBuffer, malware_region_start,
+                      (malware_region_end - malware_region_start) );
 
 
             /* all this print logging to help debug the HTTP header processing */
@@ -194,7 +226,7 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             loadRequestData(pcURLData + 6, pxClient->pcRestData);
             long long int memAddress = getNextNumberFromURL();
             size_t readLength = getNextNumberFromURL();
-            const char *mem = addressToCharPtr( memAddress );
+            const uint8_t *mem = addressToUInt8Ptr( memAddress );
 
             if ( memAddress != 0 && readLength != 0 )
             {
@@ -209,6 +241,18 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
                 return readLength;
             }
         }
+        else if ( 0 == strncmp( "/run/", pcURLData, 5 ) )
+        {
+            strcpy( pxClient->pxParent->pcContentsType, "application/octet-stream" );
+
+            loadRequestData(pcURLData + 5, pxClient->pcRestData);
+            long long int malware_pointer_address = getNextNumberFromURL();
+            size_t malware_int = getNextNumberFromURL();
+            uint8_t *malware_pointer = addressToUInt8Ptr( malware_pointer_address );
+
+            // execute the malware function with the specified parameters
+            return malware(malware_pointer, malware_int);
+        }
         break;
     case ECMD_PATCH:
         // could be "/poke/address/length" with body having attack bytes
@@ -219,14 +263,22 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             
             int memAddress = getNextNumberFromURL();
             int writeLength = getNextNumberFromURL();
-            char *mem = addressToCharPtr( memAddress );
+            uint8_t *mem = addressToUInt8Ptr( memAddress );
 
-            if ( memAddress != 0 && writeLength != 0 )
+            if ( malware_region_start <= mem &&
+                 0 < writeLength &&
+                 mem + writeLength <= malware_region_end )
             {
                 memcpy( mem, getHttpBody(), writeLength ); /* evil! */
+                snprintf( pcOutputBuffer, uxBufferLength,
+                          "Wrote %d bytes to %p for 'ya!\n", writeLength, mem );
+            }
+            else
+            {
+                snprintf( pcOutputBuffer, uxBufferLength,
+                          "Couldn't write that amount of data to that address!\n");
             }
 
-            snprintf( pcOutputBuffer, uxBufferLength, "Wrote %d bytes to %p for 'ya!\n", writeLength, mem );
             return strlen( pcOutputBuffer );
         }
         break;
