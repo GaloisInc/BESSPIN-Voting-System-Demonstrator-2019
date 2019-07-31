@@ -390,6 +390,9 @@ void prvNetworkLogTask(void *pvParameters)
 
     printf("Starting prvNetworkLogTask\r\n");
 
+#ifdef SIMULATION
+    uint32_t seed = uptimeMs();
+#else
     uint32_t year_now;
     uint16_t month_now, day_now, hour_now, minute_now;
     configASSERT(get_current_time(&year_now, &month_now, &day_now, &hour_now,
@@ -399,13 +402,11 @@ void prvNetworkLogTask(void *pvParameters)
     uint8_t hour = (uint8_t)hour_now;
     uint8_t minute = (uint8_t)minute_now;
     uint32_t seed = (uint32_t)(day | hour << 8 | minute << 16 | month << 24);
+#endif /*S SIMULATION */
     debug_printf("Seed for randomiser: %lu\r\n", seed);
     prvSRand((uint32_t)seed);
 
     xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
-    // IP address needs to be modified for the test purpose
-    // otherwise address can be taken from log_net.h uIPAddress
-    // for now it is hardcoded before test.
     xRemoteAddress.sin_addr =
         FreeRTOS_inet_addr_quick(configRptrIP_ADDR0, configRptrIP_ADDR1,
                                  configRptrIP_ADDR2, configRptrIP_ADDR3);
@@ -415,7 +416,7 @@ void prvNetworkLogTask(void *pvParameters)
         debug_printf("prvNetworkLogTask: wainting for data\r\n");
         // Wait indefinitely for new data to send
         xReceiveLength = xStreamBufferReceive(xNetLogStreamBuffer, prvNetworkLogTask_buf,
-                                              sizeof(prvNetworkLogTask_buf), portMAX_DELAY);
+                                               sizeof(prvNetworkLogTask_buf), portMAX_DELAY);
         debug_printf("prvNetworkLogTask: Got %u bytes to send\r\n",
                      xReceiveLength);
 
@@ -646,7 +647,7 @@ void prvInputTask(void *pvParameters)
 
     for (;;)
     {
-        len = uart1_rxbuffer(buffer, 16);
+        len = uart0_rxbuffer(buffer, 16);
         if (len > 0) {
             char c = buffer[0];
             printf("%c\r\n", c);
@@ -817,7 +818,7 @@ static void manual_input(void)
 
     for (;;)
     {
-        len = uart1_rxbuffer(buffer, 16);
+        len = uart0_rxbuffer(buffer, 16);
         if (len > 0) {
             char c = buffer[0];
             printf("%c\r\n", c);
