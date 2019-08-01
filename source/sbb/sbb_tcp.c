@@ -128,6 +128,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
         the_network_status = true;
         if (prvStartupTaskHandle != NULL) {
             vTaskDelete( prvStartupTaskHandle );
+            prvStartupTaskHandle = NULL;
         }
         /* Create the tasks that use the IP stack if they have not already been
            created. */

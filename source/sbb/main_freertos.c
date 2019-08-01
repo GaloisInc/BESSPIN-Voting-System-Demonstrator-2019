@@ -190,23 +190,14 @@ static uint8_t prvIsrStackUtilization(void)
     uint32_t stack_len = (xISRStackTop - xISRStackEnd) / 4; // # words
     uint32_t *stack_ptr = (uint32_t *)xISRStackEnd;
 
-    //printf("xISRStackTop: 0x%lx\r\n",xISRStackTop);
-    //printf("xISRStackEnd 0x%lx\r\n", xISRStackEnd);
-    //printf("Stack len %lu\r\n",stack_len);
-
     for (idx = 0; idx < stack_len; idx++)
     {
-        //printf("stack ptr addr %p\r\n", stack_ptr);
-        //printf("stack ptr val 0x%lx\r\n", *stack_ptr);
         if (*stack_ptr != 0xabababab)
         {
-            //printf("end of usable region\r\n");
             break;
         }
         stack_ptr++;
     }
-    //printf("idx = %lu\r\n",idx);
-
     percent = 100 - idx * 100 / stack_len;
 
     return percent;
@@ -215,15 +206,15 @@ static uint8_t prvIsrStackUtilization(void)
 static void prvStatsTask(void *pvParameters)
 {
     (void)pvParameters;
-    printf(("prvStatsTask: starting\r\n"));
+    printf("prvStatsTask: starting\r\n");
     vTaskDelay(pdMS_TO_TICKS(1000));
 
     for (;;)
     {
         vTaskGetRunTimeStats(statsBuffer);
-        printf("prvStatsTask: xPortGetFreeHeapSize() = %u\r\n",
+        debug_printf("prvStatsTask: xPortGetFreeHeapSize() = %u",
                xPortGetFreeHeapSize());
-        printf("prvStatsTask: prvIsrStackUtilization() = %u\r\n",
+        debug_printf("prvStatsTask: prvIsrStackUtilization() = %u",
                prvIsrStackUtilization());
         printf("prvStatsTask: Run-time "
                "stats\r\nTask\t\tAbsTime\t\t%%time\tStackHighWaterMark\r\n");
