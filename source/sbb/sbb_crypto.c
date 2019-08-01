@@ -32,8 +32,17 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
     bool b_valid = false;
     if (num_scanned == 5)
     {
-        get_current_time(&year_now, &month_now, &day_now,
+#ifdef HARDCODE_CURRENT_TIME
+    year_now = CURRENT_YEAR - 2000;
+    month_now = CURRENT_MONTH;
+    day_now = CURRENT_DAY;
+    hour_now = CURRENT_HOUR;
+    minute_now = CURRENT_MINUTE;
+#else
+    get_current_time(&year_now, &month_now, &day_now,
                                     &hour_now, &minute_now);
+#endif
+        
     
         bool b_valid_by_minutes = minute >= minute_now;
         bool b_valid_by_hours =
