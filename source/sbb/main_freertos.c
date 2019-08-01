@@ -325,6 +325,7 @@ void prvBarcodeScannerTask(void *pvParameters)
     for (;;)
     {
         /* explicitly ask for at most 16 characters, as that is the FIFO limit */
+        len = uart1_rxbuffer(buffer, 16);
         if (len > 0)
         {
             for (int i = 0; i < len; i++)
