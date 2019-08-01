@@ -26,7 +26,6 @@ const log_name system_log_file_name = "default_system.log";
 const log_name app_log_file_name = "default_application.log";
 
 const uint8_t sbb_mac_address[6] = { sbb_realMAC_ADDR0, sbb_realMAC_ADDR1, sbb_realMAC_ADDR2, sbb_realMAC_ADDR3, sbb_realMAC_ADDR4, sbb_realMAC_ADDR5 };
-char AxiEthernetMAC[6] = { sbb_realMAC_ADDR0, sbb_realMAC_ADDR1, sbb_realMAC_ADDR2, sbb_realMAC_ADDR3, sbb_realMAC_ADDR4, sbb_realMAC_ADDR5 };
 const uint8_t sbb_default_ip_address[4] = { sbbIP_ADDR0, sbbIP_ADDR1, sbbIP_ADDR2, sbbIP_ADDR3 };
 const uint8_t sbb_default_netmask[4] = { configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3 };
 const uint8_t sbb_default_gateway_address[4] = { configGATEWAY_ADDR0, configGATEWAY_ADDR1, configGATEWAY_ADDR2, configGATEWAY_ADDR3 };
