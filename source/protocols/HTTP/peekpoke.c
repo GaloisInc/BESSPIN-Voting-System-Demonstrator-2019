@@ -411,6 +411,6 @@ void peekPokeServerTaskCreate( void )
     if ( !alreadyCreated )  
     {
         alreadyCreated = 1;
-        xTaskCreate( prvWebServerTask, "prvWebServerTask", mainTCP_SERVER_STACK_SIZE, NULL, savedPriority, &xWebServerTaskHandle );
+        xTaskCreate( prvWebServerTask, "WebServerTask", mainTCP_SERVER_STACK_SIZE, NULL, savedPriority, &xWebServerTaskHandle );
     }
 }

@@ -70,6 +70,7 @@ void vApplicationTickHook(void);
 uint64_t get_cycle_count(void);
 
 #if configGENERATE_RUN_TIME_STATS
+#pragma message "GENERATING RUNTIME STATS"
 /* Buffer and a task for displaying runtime stats */
 char statsBuffer[1024];
 static void prvStatsTask(void *pvParameters);
@@ -146,14 +147,14 @@ int main(void)
     configASSERT(xSBBEventGroup);
 
     // Initialize startup task
-    xTaskCreate(prvStartupTask, "prvStartupTask", SBB_STARTUP_TASK_STACK_SIZE,
+    xTaskCreate(prvStartupTask, "StartupTask", SBB_STARTUP_TASK_STACK_SIZE,
                 NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
 
     // Setup TCP IP *after* all buffers and event groups are initialized
     sbb_tcp();
 
 #if configGENERATE_RUN_TIME_STATS
-    xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 10,
+    xTaskCreate(prvStatsTask, "StatsTask", configMINIMAL_STACK_SIZE * 10,
                 NULL, SBB_STATS_TASK_PRIORITY, NULL);
 #endif
 
@@ -176,7 +177,6 @@ int main(void)
 /*-----------------------------------------------------------*/
 
 #if configGENERATE_RUN_TIME_STATS
-#pragma message "GENERATING RUNTIME STATS"
 
 // Returns percentage utilization of the ISR stack
 #include "portmacro.h"
@@ -544,7 +544,6 @@ void prvInputTask(void *pvParameters)
         {
             if (paper_sensor_in_input == 0)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
                 debug_printf("#paper_sensor_in_input: paper_detected");
                 uxReturned = xEventGroupSetBits(xSBBEventGroup,
                                                 ebPAPER_SENSOR_IN_PRESSED);
@@ -553,7 +552,6 @@ void prvInputTask(void *pvParameters)
             }
             else if (paper_sensor_in_input == 1)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
                 debug_printf("#paper_sensor_in_input: no paper detected");
                 uxReturned = xEventGroupSetBits(xSBBEventGroup,
                                                 ebPAPER_SENSOR_IN_RELEASED);
@@ -575,7 +573,6 @@ void prvInputTask(void *pvParameters)
             /* Broadcast the event */
             if (cast_button_input == 1)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_PRESSED ) & ebCAST_BUTTON_PRESSED);
                 uxReturned =
                     xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
@@ -583,7 +580,6 @@ void prvInputTask(void *pvParameters)
             }
             else
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_RELEASED ) & ebCAST_BUTTON_RELEASED);
                 uxReturned =
                     xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
                 uxReturned =
@@ -603,21 +599,19 @@ void prvInputTask(void *pvParameters)
             /* Broadcast the event */
             if (spoil_button_input == 1)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_PRESSED ) & ebSPOIL_BUTTON_PRESSED);
                 uxReturned =
-                    xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
+                     xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
-                                                  ebSPOIL_BUTTON_RELEASED);
+                                                   ebSPOIL_BUTTON_RELEASED);
             }
             else
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_RELEASED ) & ebSPOIL_BUTTON_RELEASED);
                 uxReturned =
                     xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
                                                   ebSPOIL_BUTTON_PRESSED);
             }
-            // printf("uxReturned = 0x%lx\r\n",uxReturned);
+            debug_printf("uxReturned = 0x%lx\r\n",uxReturned);
             spoil_button_input_last = spoil_button_input;
         }
 

@@ -125,19 +125,19 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
         if (xTasksAlreadyCreated == pdFALSE)
         {
             printf("Smart Ballot Box: starting tasks...\r\n");
-            xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask",
+            xTaskCreate(prvBallotBoxMainTask, "MainTask",
                         SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY,
                         NULL);
 #ifndef SIMULATION // Don't use these tasks in simulation
-            xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask",
+            xTaskCreate(prvBarcodeScannerTask, "BarcodeScannerTask",
                         SBB_SCANNER_TASK_STACK_SIZE, NULL,
                         SBB_SCANNER_TASK_PRIORITY, NULL);
-            xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE,
+            xTaskCreate(prvInputTask, "InputTask", SBB_INPUT_TASK_STACK_SIZE,
                         NULL, SBB_INPUT_TASK_PRIORITY, NULL);
 #endif
 #ifdef NETWORK_LOGS
 #pragma message "Including Network Logs"
-            xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask",
+            xTaskCreate(prvNetworkLogTask, "NetworkLogTask",
                         SBB_NET_LOG_TASK_STACK_SIZE, NULL,
                         SBB_NET_LOG_TASK_PRIORITY, NULL);
 #endif
