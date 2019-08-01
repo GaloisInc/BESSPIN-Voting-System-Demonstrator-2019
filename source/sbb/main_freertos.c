@@ -70,6 +70,7 @@ void vApplicationTickHook(void);
 uint64_t get_cycle_count(void);
 
 #if configGENERATE_RUN_TIME_STATS
+#pragma message "GENERATING RUNTIME STATS"
 /* Buffer and a task for displaying runtime stats */
 char statsBuffer[1024];
 static void prvStatsTask(void *pvParameters);
@@ -146,14 +147,14 @@ int main(void)
     configASSERT(xSBBEventGroup);
 
     // Initialize startup task
-    xTaskCreate(prvStartupTask, "prvStartupTask", SBB_STARTUP_TASK_STACK_SIZE,
+    xTaskCreate(prvStartupTask, "StartupTask", SBB_STARTUP_TASK_STACK_SIZE,
                 NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
 
     // Setup TCP IP *after* all buffers and event groups are initialized
     sbb_tcp();
 
 #if configGENERATE_RUN_TIME_STATS
-    xTaskCreate(prvStatsTask, "prvStatsTask", configMINIMAL_STACK_SIZE * 10,
+    xTaskCreate(prvStatsTask, "StatsTask", configMINIMAL_STACK_SIZE * 10,
                 NULL, SBB_STATS_TASK_PRIORITY, NULL);
 #endif
 
@@ -190,23 +191,14 @@ static uint8_t prvIsrStackUtilization(void)
     uint32_t stack_len = (xISRStackTop - xISRStackEnd) / 4; // # words
     uint32_t *stack_ptr = (uint32_t *)xISRStackEnd;
 
-    //printf("xISRStackTop: 0x%lx\r\n",xISRStackTop);
-    //printf("xISRStackEnd 0x%lx\r\n", xISRStackEnd);
-    //printf("Stack len %lu\r\n",stack_len);
-
     for (idx = 0; idx < stack_len; idx++)
     {
-        //printf("stack ptr addr %p\r\n", stack_ptr);
-        //printf("stack ptr val 0x%lx\r\n", *stack_ptr);
         if (*stack_ptr != 0xabababab)
         {
-            //printf("end of usable region\r\n");
             break;
         }
         stack_ptr++;
     }
-    //printf("idx = %lu\r\n",idx);
-
     percent = 100 - idx * 100 / stack_len;
 
     return percent;
@@ -215,16 +207,16 @@ static uint8_t prvIsrStackUtilization(void)
 static void prvStatsTask(void *pvParameters)
 {
     (void)pvParameters;
-    printf(("prvStatsTask: starting\r\n"));
+    printf("prvStatsTask: starting\r\n");
     vTaskDelay(pdMS_TO_TICKS(1000));
 
     for (;;)
     {
         vTaskGetRunTimeStats(statsBuffer);
-        printf("prvStatsTask: xPortGetFreeHeapSize() = %u\r\n",
-               xPortGetFreeHeapSize());
-        printf("prvStatsTask: prvIsrStackUtilization() = %u\r\n",
-               prvIsrStackUtilization());
+        debug_printf("prvStatsTask: xPortGetFreeHeapSize() = %u",
+                     xPortGetFreeHeapSize());
+        debug_printf("prvStatsTask: prvIsrStackUtilization() = %u",
+                     prvIsrStackUtilization());
         printf("prvStatsTask: Run-time "
                "stats\r\nTask\t\tAbsTime\t\t%%time\tStackHighWaterMark\r\n");
         printf("%s\r\n", statsBuffer);
@@ -552,7 +544,6 @@ void prvInputTask(void *pvParameters)
         {
             if (paper_sensor_in_input == 0)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_PRESSED) & ebPAPER_SENSOR_IN_PRESSED);
                 debug_printf("#paper_sensor_in_input: paper_detected");
                 uxReturned = xEventGroupSetBits(xSBBEventGroup,
                                                 ebPAPER_SENSOR_IN_PRESSED);
@@ -561,7 +552,6 @@ void prvInputTask(void *pvParameters)
             }
             else if (paper_sensor_in_input == 1)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebPAPER_SENSOR_IN_RELEASED) & ebPAPER_SENSOR_IN_RELEASED);
                 debug_printf("#paper_sensor_in_input: no paper detected");
                 uxReturned = xEventGroupSetBits(xSBBEventGroup,
                                                 ebPAPER_SENSOR_IN_RELEASED);
@@ -583,7 +573,6 @@ void prvInputTask(void *pvParameters)
             /* Broadcast the event */
             if (cast_button_input == 1)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_PRESSED ) & ebCAST_BUTTON_PRESSED);
                 uxReturned =
                     xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_PRESSED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
@@ -591,7 +580,6 @@ void prvInputTask(void *pvParameters)
             }
             else
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebCAST_BUTTON_RELEASED ) & ebCAST_BUTTON_RELEASED);
                 uxReturned =
                     xEventGroupSetBits(xSBBEventGroup, ebCAST_BUTTON_RELEASED);
                 uxReturned =
@@ -611,21 +599,19 @@ void prvInputTask(void *pvParameters)
             /* Broadcast the event */
             if (spoil_button_input == 1)
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_PRESSED ) & ebSPOIL_BUTTON_PRESSED);
                 uxReturned =
-                    xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
+                     xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
-                                                  ebSPOIL_BUTTON_RELEASED);
+                                                   ebSPOIL_BUTTON_RELEASED);
             }
             else
             {
-                //configASSERT(xEventGroupSetBits( xSBBEventGroup, ebSPOIL_BUTTON_RELEASED ) & ebSPOIL_BUTTON_RELEASED);
                 uxReturned =
                     xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
                 uxReturned = xEventGroupClearBits(xSBBEventGroup,
                                                   ebSPOIL_BUTTON_PRESSED);
             }
-            // printf("uxReturned = 0x%lx\r\n",uxReturned);
+            debug_printf("uxReturned = 0x%lx\r\n",uxReturned);
             spoil_button_input_last = spoil_button_input;
         }
 

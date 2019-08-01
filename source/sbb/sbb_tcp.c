@@ -25,18 +25,17 @@
  * 1 tab == 4 spaces!
  */
 
-
 /* Standard includes. */
+#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
 #include <time.h>
-#include <stdbool.h>
+#include <unistd.h>
 
 /* FreeRTOS  includes. */
 #include "FreeRTOS.h"
-#include "task.h"
 #include "sbb.h"
+#include "task.h"
 
 /* IP stack includes. */
 #include "FreeRTOS_IP.h"
@@ -45,7 +44,6 @@
 #include "sbb_freertos.h"
 
 #include "peekpoke.h"
-
 
 /* Define a name that will be used for LLMNR and NBNS searches. */
 #define mainHOST_NAME "RTOSDemo"
@@ -58,9 +56,9 @@
 static void prvMiscInitialisation(void);
 
 uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
-        uint16_t usSourcePort,
-        uint32_t ulDestinationAddress,
-        uint16_t usDestinationPort);
+                                            uint16_t usSourcePort,
+                                            uint32_t ulDestinationAddress,
+                                            uint16_t usDestinationPort);
 
 /* Set the following constant to pdTRUE to log using the method indicated by the
    name of the constant, or pdFALSE to not log using the method indicated by the
@@ -69,7 +67,8 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
    then UDP messages are sent to the IP address configured as the echo server
    address (see the configECHO_SERVER_ADDR0 definitions in FreeRTOSConfig.h) and
    the port number set by configPRINT_PORT in FreeRTOSConfig.h. */
-const BaseType_t xLogToStdout = pdTRUE, xLogToFile = pdFALSE, xLogToUDP = pdFALSE;
+const BaseType_t xLogToStdout = pdTRUE, xLogToFile = pdFALSE,
+                 xLogToUDP = pdFALSE;
 
 /*-----------------------------------------------------------*/
 
@@ -87,25 +86,15 @@ void sbb_tcp(void)
     printf("Smart Ballot Box starting...\r\n");
 
     /* Miscellaneous initialisation including preparing the logging and seeding
-    the random number generator. */
+	the random number generator. */
     prvMiscInitialisation();
 
-    // populate AxiEthernetMAC with the values from sbb_mac_address
-    // the former is used internally by the Ethernet driver, and the latter by
-    // the FreeRTOS_IPInit function as part of the default network packet
-    // header fragment, but they should be the same
-    for (int i = 0; i < 6; i++)
-    {
-        AxiEthernetMAC[i] = (char) sbb_mac_address[i];
-    }
-
     /* Initialise the network interface.
-     ***NOTE*** Tasks that use the network are created in the network event hook
-     when the network is connected and ready for use (see the definition of
-     vApplicationIPNetworkEventHook() below).  The address values passed in here
-     are used if ipconfigUSE_DHCP is set to 0, or if ipconfigUSE_DHCP is set to 1
-     but a DHCP server cannot be contacted. */
-    
+	 ***NOTE*** Tasks that use the network are created in the network event hook
+	 when the network is connected and ready for use (see the definition of
+	 vApplicationIPNetworkEventHook() below).  The address values passed in here
+	 are used if ipconfigUSE_DHCP is set to 0, or if ipconfigUSE_DHCP is set to 1
+	 but a DHCP server cannot be	contacted. */
     FreeRTOS_debug_printf(("FreeRTOS_IPInit\r\n"));
     FreeRTOS_IPInit(sbb_default_ip_address, sbb_default_netmask,
                     sbb_default_gateway_address, sbb_default_dns_server_address,
@@ -126,29 +115,39 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
     {
         vTaskDelay(pdMS_TO_TICKS(2000));
         the_network_status = true;
-        if (prvStartupTaskHandle != NULL) {
-            vTaskDelete( prvStartupTaskHandle );
+        if (prvStartupTaskHandle != NULL)
+        {
+            vTaskDelete(prvStartupTaskHandle);
+            prvStartupTaskHandle = NULL;
         }
         /* Create the tasks that use the IP stack if they have not already been
-           created. */
+		   created. */
         if (xTasksAlreadyCreated == pdFALSE)
         {
             printf("Smart Ballot Box: starting tasks...\r\n");
-            xTaskCreate(prvBallotBoxMainTask, "prvBallotBoxMainTask", SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY, NULL);
-            #ifndef SIMULATION // Don't use these tasks in simulation
-                xTaskCreate(prvBarcodeScannerTask, "prvBarcodeScannerTask", SBB_SCANNER_TASK_STACK_SIZE, NULL, SBB_SCANNER_TASK_PRIORITY, NULL);
-                xTaskCreate(prvInputTask, "prvInputTask", SBB_INPUT_TASK_STACK_SIZE, NULL, SBB_INPUT_TASK_PRIORITY, NULL);
-            #endif
-            #ifdef NETWORK_LOGS
-            #pragma message "Including Network Logs"
-                xTaskCreate(prvNetworkLogTask, "prvNetworkLogTask", SBB_NET_LOG_TASK_STACK_SIZE, NULL, SBB_NET_LOG_TASK_PRIORITY, NULL);
-            #endif
+            xTaskCreate(prvBallotBoxMainTask, "MainTask",
+                        SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY,
+                        NULL);
+#ifndef SIMULATION // Don't use these tasks in simulation
+            xTaskCreate(prvBarcodeScannerTask, "BarcodeScannerTask",
+                        SBB_SCANNER_TASK_STACK_SIZE, NULL,
+                        SBB_SCANNER_TASK_PRIORITY, NULL);
+            xTaskCreate(prvInputTask, "InputTask", SBB_INPUT_TASK_STACK_SIZE,
+                        NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+#endif
+#ifdef NETWORK_LOGS
+#pragma message "Including Network Logs"
+            xTaskCreate(prvNetworkLogTask, "NetworkLogTask",
+                        SBB_NET_LOG_TASK_STACK_SIZE, NULL,
+                        SBB_NET_LOG_TASK_PRIORITY, NULL);
+#endif
             xTasksAlreadyCreated = pdTRUE;
         }
 
         /* Print out the network configuration, which may have come from a DHCP
-           server. */
-        FreeRTOS_GetAddressConfiguration(&ulIPAddress, &ulNetMask, &ulGatewayAddress, &ulDNSServerAddress);
+		   server. */
+        FreeRTOS_GetAddressConfiguration(
+            &ulIPAddress, &ulNetMask, &ulGatewayAddress, &ulDNSServerAddress);
         FreeRTOS_inet_ntoa(ulIPAddress, cBuffer);
         FreeRTOS_printf(("\r\n\r\nIP Address: %s\r\n", cBuffer));
 
@@ -162,8 +161,8 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
         FreeRTOS_printf(("DNS Server Address: %s\r\n\r\n\r\n", cBuffer));
 
         /* 
-         * Creates a task for the "peek/poke" embedded web server.
-         */
+		 * Creates a task for the "peek/poke" embedded web server.
+		 */
         peekPokeServerTaskCreate();
     }
     else
@@ -188,17 +187,20 @@ static void prvMiscInitialisation(void)
     uint32_t seed = 42;
     FreeRTOS_debug_printf(("Seed for randomiser: %lu\r\n", seed));
     prvSRand((uint32_t)seed);
-    FreeRTOS_debug_printf(("Random numbers: %08lX %08lX %08lX %08lX\r\n", ipconfigRAND32(), ipconfigRAND32(), ipconfigRAND32(), ipconfigRAND32()));
+    FreeRTOS_debug_printf(("Random numbers: %08lX %08lX %08lX %08lX\r\n",
+                           ipconfigRAND32(), ipconfigRAND32(), ipconfigRAND32(),
+                           ipconfigRAND32()));
 }
 /*-----------------------------------------------------------*/
 
-#if (ipconfigUSE_LLMNR != 0) || (ipconfigUSE_NBNS != 0) || (ipconfigDHCP_REGISTER_HOSTNAME == 1)
+#if (ipconfigUSE_LLMNR != 0) || (ipconfigUSE_NBNS != 0) ||                     \
+    (ipconfigDHCP_REGISTER_HOSTNAME == 1)
 
 const char *pcApplicationHostnameHook(void)
 {
     /* Assign the name "FreeRTOS" to this network node.  This function will
-       be called during the DHCP: the machine will be registered with an IP
-       address plus this name. */
+	   be called during the DHCP: the machine will be registered with an IP
+	   address plus this name. */
     return mainHOST_NAME;
 }
 
@@ -212,8 +214,8 @@ BaseType_t xApplicationDNSQueryHook(const char *pcName)
     BaseType_t xReturn;
 
     /* Determine if a name lookup is for this node.  Two names are given
-       to this node: that returned by pcApplicationHostnameHook() and that set
-       by mainDEVICE_NICK_NAME. */
+	   to this node: that returned by pcApplicationHostnameHook() and that set
+	   by mainDEVICE_NICK_NAME. */
     if (_stricmp(pcName, pcApplicationHostnameHook()) == 0)
     {
         xReturn = pdPASS;
@@ -239,9 +241,9 @@ BaseType_t xApplicationDNSQueryHook(const char *pcName)
  * SYSTEMS.
  */
 uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
-        uint16_t usSourcePort,
-        uint32_t ulDestinationAddress,
-        uint16_t usDestinationPort)
+                                            uint16_t usSourcePort,
+                                            uint32_t ulDestinationAddress,
+                                            uint16_t usDestinationPort)
 {
     (void)ulSourceAddress;
     (void)usSourcePort;
@@ -258,8 +260,9 @@ void reportIPStatus(void)
     char cBuffer[16];
 
     /* Print out the network configuration, which may have come from a DHCP
-       server. */
-    FreeRTOS_GetAddressConfiguration(&ulIPAddress, &ulNetMask, &ulGatewayAddress, &ulDNSServerAddress);
+	   server. */
+    FreeRTOS_GetAddressConfiguration(&ulIPAddress, &ulNetMask,
+                                     &ulGatewayAddress, &ulDNSServerAddress);
     FreeRTOS_inet_ntoa(ulIPAddress, cBuffer);
     FreeRTOS_printf(("\r\n\r\nIP Address: %s\r\n", cBuffer));
 

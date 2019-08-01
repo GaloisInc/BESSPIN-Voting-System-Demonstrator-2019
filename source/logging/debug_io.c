@@ -47,10 +47,8 @@ int debug_printf(const char *the_format, ...)
     {
         // assuming that we successfully formatted the string,
         // we can print it in a platform-appropriate way
-        
         #ifdef TARGET_OS_FreeRTOS
-        printf("%lu.%lu[s]:", uptimeMs()/1000, uptimeMs());
-        printf("%s", buffer);
+        printf("%lu.%lu[s]: %s", uptimeMs()/1000, uptimeMs(), buffer);
         #else
         fprintf(stderr, "%s",buffer);
         #endif // TARGET_OS_FreeRTOS

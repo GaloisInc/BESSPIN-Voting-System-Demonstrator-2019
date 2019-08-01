@@ -78,9 +78,12 @@ bool log_system_message(const char *new_entry, int length) {
 
 void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length) {
     debug_printf((char *)the_entry);
-    if (!log_system_message(the_entry, length)) {
-        the_local_state->L = ABORT;
-    }
+    //if (!log_system_message(the_entry, length)) {
+    //    the_local_state->L = ABORT;
+    //}
+    (void)the_local_state;
+    (void)the_entry;
+    (void)length;
 }
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out
