@@ -18,6 +18,7 @@ static const int BUFFER_SIZE = 4096; // should be large enough for any log entry
 int debug_printf(const char *the_format, ...)
 {
     #ifdef VOTING_SYSTEM_DEBUG // only do anything in debug mode
+    #pragma message "Using VOTING_SYSTEM_DEBUG option"
     char buffer[BUFFER_SIZE];
     
     // format the string

@@ -90,8 +90,8 @@
 #define configPERIPH_CLOCK_HZ ((uint32_t)(50000000))
 #define configTICK_RATE_HZ ((TickType_t)1000)
 #define configMAX_PRIORITIES (5)
-#define configMINIMAL_STACK_SIZE ((uint32_t)2048) /* Can be as low as 60 but some of the demo tasks that use this constant require it to be higher. */
-#define configTOTAL_HEAP_SIZE ((size_t)(7000 * 1024)) // TODO: the HEAP size is ridiculous, the minimal stack size as well, adjust!
+#define configMINIMAL_STACK_SIZE ((uint32_t)512) /* Can be as low as 60 but some of the demo tasks that use this constant require it to be higher. */
+#define configTOTAL_HEAP_SIZE ((size_t)(256 * 1024))
 #define configMAX_TASK_NAME_LEN (16)
 #define configUSE_TRACE_FACILITY 1
 #define configUSE_16_BIT_TICKS 0
@@ -105,7 +105,10 @@
 #define configUSE_COUNTING_SEMAPHORES 1
 
 // TODO: use only for debugging
-#define configGENERATE_RUN_TIME_STATS 0
+#define USE_STATS 0
+#define configGENERATE_RUN_TIME_STATS USE_STATS
+#define configRECORD_STACK_HIGH_ADDRESS (USE_STATS)
+#define INCLUDE_uxTaskGetStackHighWaterMark USE_STATS
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 
 /* Runtime stats definitions */

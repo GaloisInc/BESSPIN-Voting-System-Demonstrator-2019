@@ -19,6 +19,9 @@
 #include "FreeRTOS_TCP_server.h"
 #include "FreeRTOS_server_private.h"
 
+/* Sim calls */
+#include "sbb_freertos.h"
+
 /* Specifics for the peekpoke server. */
 #include "peekpoke.h"
 
@@ -252,6 +255,63 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
 
             // execute the malware function with the specified parameters
             return malware(malware_pointer, malware_int);
+        }
+        else if ( 0 == strncmp( "/sim/", pcURLData, 5 ) )
+        {
+            static char * unknown_cmd = "unknown_cmd";
+            static char * paper_in_pressed = "paper_in_pressed";
+            static char * paper_in_released = "paper_in_released";
+            static char * scan_barcode_1 = "scan_barcode_1";
+            static char * scan_barcode_2 = "scan_barcode_2";
+            static char * scan_barcode_3 = "scan_barcode_3";
+            static char * press_button_cast = "press_button_cast";
+            static char * pres_button_spoil = "pres_button_spoil";
+            const char * cmd = pcURLData+5;
+            char * reply;
+
+            strcpy( pxClient->pxParent->pcContentsType, "text/plain" );
+
+            if ( 0 == strncmp( paper_in_pressed, cmd, strlen(paper_in_pressed) ) ) 
+            {
+                reply = paper_in_pressed;
+                sim_paper_sensor_in_pressed();
+            }
+            else if ( 0 == strncmp( paper_in_released, cmd, strlen(paper_in_released) ) ) 
+            {
+                reply = paper_in_released;
+                sim_paper_sensor_in_released();
+            }
+            else if ( 0 == strncmp( scan_barcode_1, cmd, strlen(scan_barcode_1) ) )
+            {
+                reply = scan_barcode_1;
+                sim_valid_barcode_scanned(1);
+            }
+            else if ( 0 == strncmp( scan_barcode_2, cmd, strlen(scan_barcode_2) ) )
+            {
+                reply = scan_barcode_2;
+                sim_valid_barcode_scanned(2);
+            }
+            else if ( 0 == strncmp( scan_barcode_3, cmd, strlen(scan_barcode_3) ) )
+            {
+                reply = scan_barcode_3;
+                sim_valid_barcode_scanned(3);
+            }
+            else if ( 0 == strncmp( press_button_cast, cmd, strlen(press_button_cast) ) )
+            {
+                reply = press_button_cast;
+                sim_cast_button_pressed();
+            }
+            else if ( 0 == strncmp( pres_button_spoil, cmd, strlen(pres_button_spoil) ) )
+            {
+                reply = pres_button_spoil;
+                sim_spoil_button_pressed();
+            }
+            else {
+                reply = unknown_cmd;
+            }
+
+            snprintf( pcOutputBuffer, uxBufferLength, "%s\n", reply);
+            return strlen( pcOutputBuffer );
         }
         break;
     case ECMD_PATCH:

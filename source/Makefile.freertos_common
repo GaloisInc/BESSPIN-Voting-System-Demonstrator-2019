@@ -82,7 +82,7 @@ export INCLUDES = \
 	-I$(LOG_SOURCE_DIR) \
 	-I$(CRYPTO_SOURCE_DIR)
 
-export CFLAGS = $(WARNINGS) $(INCLUDES)
+export CFLAGS += $(WARNINGS) $(INCLUDES)
 export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DNO_MEMSET_S
 
 export APP_SRC = \
@@ -167,7 +167,5 @@ export FREERTOS_PEEKPOKE_SRC = \
 
 export ARFLAGS=crsv
 
-export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib \
-	-defsym=_STACK_SIZE=128K # NOTE: increase stack and heap size if needed
-	#-defsym=_HEAP_SIZE=512K
+export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib
 export LIBS	 =  -lc -lgcc

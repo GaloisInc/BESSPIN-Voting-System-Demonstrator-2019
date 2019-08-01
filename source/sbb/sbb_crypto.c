@@ -21,14 +21,14 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
     uint32_t year, year_now;
     uint16_t month, day, hour, minute;
     uint16_t month_now, day_now, hour_now, minute_now;
-    
+
     // the format string needs to be different on platforms where long is 32
     // bits (4 bytes), in order to avoid a compiler warning
     const char *format_string =
         (sizeof(long) == 4) ? "%lu+%hu+%hu+%hu+%hu" : "%u+%hu+%hu+%hu+%hu";
 
-    int num_scanned = sscanf((const char *)barcode_time, format_string,
-                             &year, &month, &day, &hour, &minute);
+    int num_scanned = sscanf((const char *)barcode_time, format_string, &year,
+                             &month, &day, &hour, &minute);
     bool b_valid = false;
     if (num_scanned == 5)
     {
@@ -39,10 +39,9 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
         hour_now = CURRENT_HOUR;
         minute_now = CURRENT_MINUTE;
 #else
-        configASSERT(get_current_time(&year_now, &month_now, &day_now,
-                                      &hour_now, &minute_now));
-#endif
-    
+        get_current_time(&year_now, &month_now, &day_now, &hour_now,
+                         &minute_now);
+#endif /* HARDCODE_CURRENT_TIME */
         bool b_valid_by_minutes = minute >= minute_now;
         bool b_valid_by_hours =
             hour > hour_now || (hour == hour_now && b_valid_by_minutes);
@@ -60,7 +59,8 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
 }
 
 barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
-                                            barcode_length_t length) {
+                                            barcode_length_t length)
+{
     /**
        timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
     */
@@ -71,16 +71,16 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
     // 0.
     // Precondition: BASE64_ENCODING_START < length &&
     //               (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH
-    if ( BASE64_ENCODING_START < length &&
-         (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH ) {
+    if (BASE64_ENCODING_START < length &&
+        (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH)
+    {
         // 1.
         // Decode. mbedtls_base64_decode requires (srcLength/4)*3 bytes in the destination.
         uint8_t decoded_barcode[BASE64_DECODED_BUFFER_BYTES] = {0};
-        r = mbedtls_base64_decode(&decoded_barcode[0],
-                                  BASE64_DECODED_BUFFER_BYTES,
-                                  &olen,
-                                  (const unsigned char *)&the_barcode[BASE64_ENCODING_START],
-                                  BASE64_ENCODED_LENGTH);
+        r = mbedtls_base64_decode(
+            &decoded_barcode[0], BASE64_DECODED_BUFFER_BYTES, &olen,
+            (const unsigned char *)&the_barcode[BASE64_ENCODING_START],
+            BASE64_ENCODED_LENGTH);
 
         if (r == 0 && BASE64_DECODED_BYTES == olen)
         {
@@ -102,33 +102,39 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
                        TIMESTAMP_LENGTH_BYTES);
                 // { input[0..15] |-> timestamp[0..5] }
                 memcpy(&our_digest_input[TIMESTAMP_LENGTH_BYTES],
-                       &decoded_barcode[0],
-                       ENCRYPTED_BALLOT_LENGTH_BYTES);
+                       &decoded_barcode[0], ENCRYPTED_BALLOT_LENGTH_BYTES);
                 // { input[0..32] |-> timestamp[0..5] # decode_barcode[0..15] }
 
                 // 3.
                 // Compute the cbc-mac
-                aes_cbc_mac(&our_digest_input[0],
-                            CBC_MAC_MESSAGE_LENGTH_BYTES,
-                            &our_digest_output[0],
-                            Barcode_MAC_Key);
+                aes_cbc_mac(&our_digest_input[0], CBC_MAC_MESSAGE_LENGTH_BYTES,
+                            &our_digest_output[0], Barcode_MAC_Key);
 
                 // 4.
                 // Compare computed digest against cbc-mac in the barcode
                 if (0 == memcmp(&our_digest_output[0],
                                 &decoded_barcode[ENCRYPTED_BALLOT_LENGTH_BYTES],
-                                AES_BLOCK_LENGTH_BYTES)) {
+                                AES_BLOCK_LENGTH_BYTES))
+                {
                     result = BARCODE_VALID;
-                } else {
+                }
+                else
+                {
                     result = BARCODE_INVALID_SIGNATURE;
                 }
-            } else {
+            }
+            else
+            {
                 result = BARCODE_INVALID_TIMESTAMP;
             }
-        } else {
+        }
+        else
+        {
             result = BARCODE_INVALID_ENCODING;
         }
-    } else {
+    }
+    else
+    {
         result = BARCODE_INVALID_LENGTH;
     }
     return result;

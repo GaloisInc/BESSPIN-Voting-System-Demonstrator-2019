@@ -109,7 +109,7 @@ task.  This setting is less important when the FreeRTOS Win32 simulator is used
 as the Win32 simulator only stores a fixed amount of information on the task
 stack.  FreeRTOS includes optional stack overflow detection, see:
 http://www.freertos.org/Stacks-and-stack-overflow-checking.html */
-#define ipconfigIP_TASK_STACK_SIZE_WORDS	( configMINIMAL_STACK_SIZE * 100 )
+#define ipconfigIP_TASK_STACK_SIZE_WORDS	( configMINIMAL_STACK_SIZE * 20 )
 
 /* ipconfigRAND32() is called by the IP stack to generate random numbers for
 things such as a DHCP transaction number or initial sequence number.  Random
@@ -147,7 +147,7 @@ stack will revert to using the static IP address even when ipconfigUSE_DHCP is
 set to 1 if a valid configuration cannot be obtained from a DHCP server for any
 reason.  The static configuration used is that passed into the stack by the
 FreeRTOS_IPInit() function call. */
-#define ipconfigUSE_DHCP	1
+#define ipconfigUSE_DHCP	0
 
 /* When ipconfigUSE_DHCP is set to 1, DHCP requests will be sent out at
 increasing time intervals until either a reply is received from a DHCP server
@@ -285,11 +285,9 @@ simultaneously, one could define TCP_WIN_SEG_COUNT as 120. */
 
 /* Each TCP socket has a circular buffers for Rx and Tx, which have a fixed
 maximum size.  Define the size of Rx buffer for TCP sockets. */
-// @mpodhradsky: Use default value of 5840 bytes
-#define ipconfigTCP_RX_BUFFER_LENGTH			( 1000 ) 
+#define ipconfigTCP_RX_BUFFER_LENGTH			( 1000 )
 
 /* Define the size of Tx buffer for TCP sockets. */
-// @mpodhradsky: Use default value of 5840 bytes
 #define ipconfigTCP_TX_BUFFER_LENGTH			( 1000 )
 
 /* When using call-back handlers, the driver may check if the handler points to
@@ -310,40 +308,21 @@ disconnecting stage will timeout after a period of non-activity. */
 #define ipconfigZERO_COPY_TX_DRIVER			( 0 )
 
 /* Demo config */
-/* The address of an echo server that will be used by the two demo echo client
-tasks.
-http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/TCP_Echo_Clients.html
-http://www.freertos.org/FreeRTOS-Plus/FreeRTOS_Plus_TCP/UDP_Echo_Clients.html */
-#define configECHO_SERVER_ADDR0	10
-#define configECHO_SERVER_ADDR1 88
-#define configECHO_SERVER_ADDR2 88
-#define configECHO_SERVER_ADDR3 1
-
-/* Default MAC address configuration.  The demo creates a virtual network
-connection that uses this MAC address by accessing the raw Ethernet/WiFi data
-to and from a real network connection on the host PC.  See the
-configNETWORK_INTERFACE_TO_USE definition above for information on how to
-configure the real network connection to use. */
+/* Dummy MAC address configuration. This value is not used in the ballot box code,
+it is needed only for compilation. To set the MAC address, define 
+char AxiEthernetMAC[6] = { ... }; symbol in your ballot box config file.*/
 #define configMAC_ADDR0		0x00
-#define configMAC_ADDR1		0x0A
-#define configMAC_ADDR2		0x35
-#define configMAC_ADDR3		0x04
-#define configMAC_ADDR4		0xDB
-#define configMAC_ADDR5		0x77
-
-/* Default IP address configuration.  Used in ipconfigUSE_DNS is set to 0, or
-ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
-#define configIP_ADDR0		10
-#define configIP_ADDR1		88
-#define configIP_ADDR2		88
-#define configIP_ADDR3		2
+#define configMAC_ADDR1		0x01
+#define configMAC_ADDR2		0x02
+#define configMAC_ADDR3		0x03
+#define configMAC_ADDR4		0x04
+#define configMAC_ADDR5		0x05
 
 // IP address of Reporter.  
-#define configRptrIP_ADDR0		192
-#define configRptrIP_ADDR1		168
-#define configRptrIP_ADDR2		56
-#define configRptrIP_ADDR3		10
-
+#define configRptrIP_ADDR0		10
+#define configRptrIP_ADDR1		88
+#define configRptrIP_ADDR2		88
+#define configRptrIP_ADDR3		1
 
 /* Default gateway IP address configuration.  Used in ipconfigUSE_DNS is set to
 0, or ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
@@ -367,27 +346,6 @@ ipconfigUSE_DNS is set to 1 but a DNS server cannot be contacted. */
 #define configNET_MASK2		255
 #define configNET_MASK3		0
 
-/* The UDP port to which print messages are sent. */
-#define configPRINT_PORT	( 45000 )
-/*
-#define ipSTACK_TX_EVENT 42 // TODO: ???
-#define iptraceNETWORK_INTERFACE_TRANSMIT() FreeRTOS_debug_printf( ("iptraceNETWORK_INTERFACE_TRANSMIT\r\n"));
-#define iptraceETHERNET_RX_EVENT_LOST()     FreeRTOS_debug_printf( ("iptraceETHERNET_RX_EVENT_LOST\r\n"));
-#define iptraceNETWORK_INTERFACE_RECEIVE()  FreeRTOS_debug_printf( ("iptraceNETWORK_INTERFACE_RECEIVE\r\n"));
-#define iptraceNO_BUFFER_FOR_SENDTO() 		FreeRTOS_debug_printf( ("iptraceNO_BUFFER_FOR_SENDTO\r\n"));
-#define iptraceSENDTO_SOCKET_NOT_BOUND() 	FreeRTOS_debug_printf( ("iptraceSENDTO_SOCKET_NOT_BOUND\r\n"));
-#define iptraceSENDTO_DATA_TOO_LONG() 		FreeRTOS_debug_printf( ("iptraceSENDTO_DATA_TOO_LONG\r\n"));
-#define iptraceSTACK_TX_EVENT_LOST(_X)		FreeRTOS_debug_printf( ("iptraceSTACK_TX_EVENT_LOST: %u\r\n",_X));
-#define iptraceIP_TASK_STARTING() 			FreeRTOS_debug_printf( ("iptraceIP_TASK_STARTING\r\n"));
-#define ipconfigWATCHDOG_TIMER()			FreeRTOS_debug_printf( ("ipconfigWATCHDOG_TIMER\r\n"));
-#define iptraceNETWORK_EVENT_RECEIVED(_X)	FreeRTOS_debug_printf( ("iptraceNETWORK_EVENT_RECEIVED: %i\r\n",_X));
-#define iptraceSENDING_UDP_PACKET(_X)		FreeRTOS_debug_printf( ("iptraceSENDING_UDP_PACKET: addrs = %lx\r\n",_X));
-#define iptraceFAILED_TO_OBTAIN_NETWORK_BUFFER() FreeRTOS_debug_printf( ("iptraceFAILED_TO_OBTAIN_NETWORK_BUFFER\r\n"));
-#define iptraceNETWORK_BUFFER_OBTAINED(_BUF) FreeRTOS_debug_printf( ("iptraceNETWORK_BUFFER_OBTAINED: %p (%p)\r\n", _BUF, _BUF->pucEthernetBuffer) );
-#define iptraceNETWORK_BUFFER_RELEASED(_BUF) FreeRTOS_debug_printf( ("iptraceNETWORK_BUFFER_RELEASED: %p (%p)\r\n", _BUF, _BUF->pucEthernetBuffer) );
-*/
 #define ipconfigCHECK_IP_QUEUE_SPACE 1
 #define ipconfigTCP_IP_SANITY 1
-
-//#define ipconfigETHERNET_MINIMUM_PACKET_BYTES 64
 #endif /* FREERTOS_IP_CONFIG_H */
