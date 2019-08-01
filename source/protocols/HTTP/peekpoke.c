@@ -256,6 +256,8 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             // execute the malware function with the specified parameters
             return malware(malware_pointer, malware_int);
         }
+#ifdef SIMULATION
+        // allow triggering of simulation events via HTTP
         else if ( 0 == strncmp( "/sim/", pcURLData, 5 ) )
         {
             static char * unknown_cmd = "unknown_cmd";
@@ -313,6 +315,7 @@ size_t peekPokeHandler( HTTPClient_t *pxClient, BaseType_t xIndex, const char *p
             snprintf( pcOutputBuffer, uxBufferLength, "%s\n", reply);
             return strlen( pcOutputBuffer );
         }
+#endif // SIMULATION
         break;
     case ECMD_PATCH:
         // could be "/poke/address/length" with body having attack bytes

@@ -23,8 +23,11 @@ extern barcode_length_t barcode_length;
 extern const char *sbb_name; // the SBB name, for display
 extern const log_name system_log_file_name; // the system log
 extern const log_name app_log_file_name; // the application log
-extern const uint8_t sbb_mac_address[6]; // for DHCP, has no real meaning
-extern char AxiEthernetMAC[6]; // the real MAC address used by the interface
+// note there are two different MAC address variables, both of which are actually used
+// currently, AxiEthernetMAC is always initialized with the contents of sbb_mac_address
+// before network stack initialization
+extern const uint8_t sbb_mac_address[6]; // the MAC address used by part of the IP stack
+extern char AxiEthernetMAC[6]; // the MAC address used by the AXI interface
 extern const uint8_t sbb_default_ip_address[4]; // in case DHCP doesn't work
 extern const uint8_t sbb_default_netmask[4]; // in case DHCP doesn't work
 extern const uint8_t sbb_default_gateway_address[4]; // in case DHCP doesn't work
