@@ -176,6 +176,7 @@ int main(void)
 /*-----------------------------------------------------------*/
 
 #if configGENERATE_RUN_TIME_STATS
+#pragma message "GENERATING RUNTIME STATS"
 
 // Returns percentage utilization of the ISR stack
 #include "portmacro.h"
