@@ -67,7 +67,7 @@ bool load_or_create_logs(void) {
 
 bool log_system_message(const char *new_entry, int length) {
     #ifdef SIMULATION
-    debug_printf("System LOG: %s\r\n", new_entry);
+    debug_printf("System LOG: %s", new_entry);
     #endif /* SIMULATION */
     log_entry event_entry;
     memset(&event_entry[0], 0x20, sizeof(log_entry));
