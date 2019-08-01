@@ -96,7 +96,9 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 {
 #ifdef TARGET_OS_FreeRTOS
       // Send the data to the network logging taks
+      #ifdef NETWORK_LOG_DEBUG
       debug_printf("Log_Net_Send: %lu bytes\r\n", total);
+      #endif
       size_t res = xStreamBufferSend(xNetLogStreamBuffer,
                         (void *)Transmit_Buffer,
                         total,

@@ -16,35 +16,6 @@ P1_BITSTREAM_PATH ?= $(GFE_DIR)/bitstreams/soc_chisel_p1.bit
 # 		SBB Target
 #
 #####################################
-upload_binary_sim: sim
-	@echo GFE_DIR=$(GFE_DIR)
-	@echo CURRENT_PATH=$(CURRENT_PATH)
-	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
-	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf --no-bitstream
-
-upload_binary_and_bitstream_sim: sim
-	@echo GFE_DIR=$(GFE_DIR)
-	@echo CURRENT_PATH=$(CURRENT_PATH)
-	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
-	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf
-
-upload_binary_fpga: fpga
-	@echo GFE_DIR=$(GFE_DIR)
-	@echo CURRENT_PATH=$(CURRENT_PATH)
-	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
-	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf --no-bitstream
-
-upload_binary_and_bitstream_fpga: fpga
-	@echo GFE_DIR=$(GFE_DIR)
-	@echo CURRENT_PATH=$(CURRENT_PATH)
-	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
-	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf
-
-
 fpga:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos default
@@ -231,6 +202,42 @@ clean_sbb:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
 
+else
+#####################################
+#
+# 		DEPLOYMENT targets
+#
+#####################################
+ifeq ($(TARGET),deploy)
+upload_binary_sim: sim
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf --no-bitstream
+
+upload_binary_and_bitstream_sim: sim
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf
+
+upload_binary_fpga: fpga
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf --no-bitstream
+
+upload_binary_and_bitstream_fpga: fpga
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf
+
+endif # ($(TARGET),deploy)
 endif # ($(TARGET),sim)
 endif # ($(TARGET),hosttests)
 endif # ($(TARGET),verification)
