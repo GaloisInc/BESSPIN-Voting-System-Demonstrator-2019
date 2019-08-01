@@ -213,9 +213,9 @@ static void prvStatsTask(void *pvParameters)
     {
         vTaskGetRunTimeStats(statsBuffer);
         debug_printf("prvStatsTask: xPortGetFreeHeapSize() = %u",
-               xPortGetFreeHeapSize());
+                     xPortGetFreeHeapSize());
         debug_printf("prvStatsTask: prvIsrStackUtilization() = %u",
-               prvIsrStackUtilization());
+                     prvIsrStackUtilization());
         printf("prvStatsTask: Run-time "
                "stats\r\nTask\t\tAbsTime\t\t%%time\tStackHighWaterMark\r\n");
         printf("%s\r\n", statsBuffer);
