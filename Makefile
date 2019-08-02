@@ -214,7 +214,7 @@ upload_binary_sim: sim
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
 	cd $(GFE_DIR);  \
-	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf --no-bitstream
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf --no-bitfile
 
 upload_binary_and_bitstream_sim: sim
 	@echo GFE_DIR=$(GFE_DIR)
@@ -228,7 +228,7 @@ upload_binary_fpga: fpga
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
 	cd $(GFE_DIR);  \
-	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf --no-bitstream
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf --no-bitfile
 
 upload_binary_and_bitstream_fpga: fpga
 	@echo GFE_DIR=$(GFE_DIR)
