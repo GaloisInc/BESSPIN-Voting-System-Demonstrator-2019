@@ -5,58 +5,52 @@
 
 # Overview
 
-Galois and Free & Fair are pleased to present the BESSPIN Voting
-System (BVS for short).
+Galois and Free & Fair are pleased to present the BESSPIN Voting System (BVS).
 
-The goal of the BVS is to demonstrate secure CPUs developed under the
-DARPA MTO System Security Integrated Through Hardware (SSITH)
-program.  This demonstration vehicle is the focus of a long-term, open
-red team exercise, kicked off at DEF CON 27 in August, 2019.
+The purpose of the BVS is to demonstrate the secure CPUs developed under the DARPA MTO System Security Integration Through Hardware and Firmware (SSITH) program. This demonstration vehicle is the focus of a long-term, fully open process of adversarial cyber-security testing, starting at DEF CON 27 in August 2019 and continuing through the following year to DEF CON 28 in 2020 and beyond.
 
-# Project Organization
+This public repository provides prospective adversarial testers with complete information, tools, specifications, and source code that was used to develop the 2019 release of the BVS. The intent is to provide the most open possible approach to testing, enabling testers to obtain the full build environment for the BVS, to build it from original sources, assess its strengths and weaknessess, and plan and develop possible exploits to compromise the BVS.
+However, not every tester will wish to start with this “Build First” approach. Others may wish to begin with the “Attacker Quickstart” information in order to learn and use the tools and reference exploits provided for testers. Still others may wish to learn about the BVS with a more manageable “short list” of documentation and information, rather than exploring the full repository.
 
-This repository contains documentation (`docs`), presentations
-(`slides`), source code (`source`), and specifications (`specs`).
-This top-level `README.md` summarizes the project and walks the reader
-through the aforementioned artifacts in order to understand, port, and
-modify the BVS.
+# For All Testers
 
-This repository also contains submodules for dependencies that we
-manage in other git repositories, such as the FreeRTOS port to RISC-V.
+All testers should begin by reading the `Overview of BESSPIN Voting System` document at the top level of this repository. This document provides essential information about the current BVS release, the 2019 goals, and limits on testing including the threat model and win conditions.
+
+# Attacker Quickstart
+
+The top-level directory `Attacker-Quickstart` provides the next level of information after the  `Overview of BESSPIN Voting System` document document, specfically about the facilities provided for exploit development.
+
+# Documentation on BVS
+
+The top-level directory `BVS-Documents` provides the next level of information after the  `Overview of BESSPIN Voting System` document, about the BVS system’s design and functions.
+
+# Support for System Build
+
+The remainder of this repository provides the ability to build the BVS including source code (`source`); specifications (`specs`); hardware sketches and schematics (`hardware`); documentation of the build environment (`developer-documents`); the top-level `Makefile` and related files (`burn_to_flash.sh`, `startup.gdb`); and `.git*` files.
+
+In addition, there is one other source directory for a component that is not part of the BVS per se, but is part of the test environment. The `http-log-listener` directory has the source code for a software component that runs on a separate dedicated server that shares the test environment’s LAN with the BVS Smart Ballot Box systems. The logging software’s purpose is to receive log data sent by each Smart Ballot Box. Such log consolidation is an important convenience for the operators of the test environment to be able to view the activity occuring on the Smart Ballot Box units as the testers interact with them.
+
+This repository also contains submodules for dependencies that we manage in other git repositories:
+- the RISC-V port of FreeRTOS, which is the lightweight real-time OS used for the BVS Smart Ballot Box;
+- the top-level toolset for the BESSPIN project;
+- the “government furnished equipment” (GFE) repository, which contains bitstreams to be uploaded on the FPGAs, and nix shell scripts for build set-up.
+
 In order to update those submodules, remember to either clone the
 repository using the `--recursive` switch or use the `git submodule
-update --init --recursive` command to update submodules.
+update --init --recursive` command to update the submodules.
 
-# Technologies
-
-Insofar as the BVS must run on both COTS hardware as well as SSITH
+The system build process relies on several technologies:
+- The core components of the BVS are implemented in the C programming language, using the `gcc` and `clang` (LLVM)
+compilers. C is used because the BVS must run on both COTS hardware and SSITH
 secure RISC-V CPUs, and because some SSITH performers are building
-customized versions of the LLVM compiler, the core components of the
-BVS must be implemented in the C programming language.  Thus, the core
-programming technology used is C and the `gcc` and `clang` (LLVM)
-compilers.
-
-SSITH CPUs are all based upon the RISC-V Instruction Set Architecture
+customized versions of the LLVM compiler.
+- SSITH CPUs are all based upon the RISC-V Instruction Set Architecture
 (ISA).  Thus, if we must provide any low-level code blobs for the BVS
 in assembly or binary format, they will be written in RISC-V assembly
-code.  Currently there is no such code.
-
-We specify the BVS at the highest level using the *Lando*
+code.  Currently there is no such code, nor is it necessary at the moment.
+- High level specification of BVS is specified using the *Lando*
 specification language, developed under the remit of the BESSPIN
 project at Galois.  Lando is a system specification language geared
 toward describing the shape, structure, behavior, and security of
 high-assurance systems spanning hardware, firmware, and software.
-
-More detailed and low-level specifications of BVS are written in
-several different formal languages:
-
-- [Coq] The logical framework (LF) we use writing and reasoning about
-  formal models.
-
-- [Cryptol] A DSL for specifying and reasoning about bit-level
-  algorithms, particularly cryptographic algorithms and protocols.
-
-- [FreeRTOS]: Contains code to be run on the Smart Ballot Box.
-
-- [GFE]: Contains bitstreams to be uploaded on the FPGAs and nix shell
-  scripts for setting up the build environment.
+- More detailed and low-level specifications of the BVS are written in multiple formal languages. These include *Cryptol*, a DSL for specifying and reasoning about bit-level algorithms, particularly cryptographic algorithms and protocols, and *ACSL*, the ANSI/ISO C Specification Language, for specifying and reasoning about the behavior of C programs.
