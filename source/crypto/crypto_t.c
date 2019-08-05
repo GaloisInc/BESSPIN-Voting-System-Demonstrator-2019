@@ -1,0 +1,18 @@
+#include "crypto_t.h"
+
+void copy_base64_aes128_block (base64_aes128_block dst, // OUT
+      	                       base64_aes128_block src) // IN
+{
+  /*@
+    loop invariant 0 <= j <= BASE_64_AES_BLOCK_LENGTH_BYTES;
+    loop invariant \forall integer k; 0 <= k < j ==> dst[k] == src[k];
+    loop assigns j, dst[0 .. BASE_64_AES_BLOCK_LENGTH_BYTES - 1];
+    loop variant BASE_64_AES_BLOCK_LENGTH_BYTES - j;
+  */
+  for (int j = 0; j < BASE_64_AES_BLOCK_LENGTH_BYTES; j++)
+    {
+      dst[j] = src[j];
+    }
+}
+
+

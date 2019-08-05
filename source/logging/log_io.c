@@ -47,12 +47,18 @@ const size_t bytes_of_padding_required =
 // The total length of a log entry is the length of the padded log entry, plus
 // one more space, plus the Base64 MAC data, plus a final two bytes for a \r\n
 const size_t total_log_entry_length =
-    padded_log_entry_length + 3 + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+    padded_log_entry_length + 3 + BASE_64_AES_BLOCK_LENGTH_BYTES;
 
 static const char space = ' ';
 static const uint8_t carriage_return = '\r';
 static const uint8_t new_line = '\n';
 
+/*@ requires \valid(Transmit_Buffer + (0 .. Transmit_Buffer_Length - 1));
+    requires valid_string(log_file_name);
+    requires \valid(total);
+    requires \valid(first_byte_of_data_index);
+    requires 1 <= bytes_of_padding_required <= 16;
+*/
 void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
                              const char *log_file_name,        // in
                              const size_t http_content_length, // in
@@ -123,7 +129,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     // one extra space between the log entry and the MAC, plus 2 bytes for the final
     // \r\n sequence, so...
     const size_t http_content_length =
-        padded_log_entry_length + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 3;
+        padded_log_entry_length + BASE_64_AES_BLOCK_LENGTH_BYTES + 3;
 
     const size_t Transmit_Buffer_Length =
         HTTP_Header_Fixed_Part_Length + worst_case_data_length +
@@ -336,19 +342,28 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     size_t olen;
     int r;
     base64_secure_log_entry the_secure_log_entry;
-    // // Step 1 - Form the Base64 encoding of the hash
-    r = mbedtls_base64_encode(&the_secure_log_entry.the_digest[0],
+
+    // To satisfy the precondition of mbedtls_base64_encode, we need
+    // a buffer which is 2 bytes longer than strictly necessary, so
+    uint8_t base64_digest[SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2];
+
+    // Step 1 - Form the Base64 encoding of the hash
+    r = mbedtls_base64_encode(&base64_digest[0],
                               SHA256_BASE_64_DIGEST_LENGTH_BYTES + 2, &olen,
                               &the_entry.the_digest[0],
                               SHA256_DIGEST_LENGTH_BYTES,
                               false); // Don't add final \0
 
+    // Copy the result into the_secure_log_entry
+    copy_sha256_base64_digest (&the_secure_log_entry.the_digest[0],
+			       &base64_digest[0]);
+    
     (void)r; // suppress warning on r unused.
+
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
 
     // // Step 2 - Copy the data block
-    memcpy(&the_secure_log_entry.the_entry[0], &the_entry.the_entry[0],
-           LOG_ENTRY_LENGTH);
+    copy_log_entry(&the_secure_log_entry.the_entry[0], &the_entry.the_entry[0]);
 
     log_system_debug_printf("Transmit_Buffer is %zu bytes long", Transmit_Buffer_Length);
 
@@ -358,6 +373,7 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     // length of the header
     /*@
       loop invariant 0 <= i <= Transmit_Buffer_Length;
+      loop invariant \valid(Transmit_Buffer + (0 .. Transmit_Buffer_Length - 1));
       loop assigns i, Transmit_Buffer[0 .. Transmit_Buffer_Length - 1];
       loop variant Transmit_Buffer_Length - i;
     */
@@ -371,6 +387,8 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
              REQUEST_LINE_3, HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5_1,
              http_content_length, DOUBLE_CRLF);
 
+    //@ assert valid_read_string((char *) Transmit_Buffer);
+
     // After the header has been written, we have N bytes of header,
     // occupying bytes 0 .. (N-1) of Transmit_Buffer. So.. the first byte of the
     // data block will be at index N. We can use strlen to compute
@@ -378,9 +396,9 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     *first_byte_of_data_index = strlen((char *)Transmit_Buffer);
     log_system_debug_printf("Length of header block is %zu", *first_byte_of_data_index);
 
-    // add the_secure_log_entry.the_entry to the Transmit_Buffer
-    memcpy(&Transmit_Buffer[*first_byte_of_data_index],
-           &the_secure_log_entry.the_entry[0], LOG_ENTRY_LENGTH);
+    // Add the_secure_log_entry.the_entry to the Transmit_Buffer
+    copy_log_entry(&Transmit_Buffer[*first_byte_of_data_index],
+                   &the_secure_log_entry.the_entry[0]);
 
     // Add just the right number of spaces to make the data block,
     // spaces, hash and new_line an exact multiple of 16 bytes long.
@@ -402,8 +420,8 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     // Add the Base64 encoded hash value from the_secure_log_entry.the_digest
     size_t hash_index = space_index;
     log_system_debug_printf("hash index is %zu", hash_index);
-    memcpy(&Transmit_Buffer[hash_index], &the_secure_log_entry.the_digest[0],
-           SHA256_BASE_64_DIGEST_LENGTH_BYTES);
+    copy_sha256_base64_digest(&Transmit_Buffer[hash_index],
+			      &the_secure_log_entry.the_digest[0]);
 
     //    size_t new_line_index = hash_index + SHA256_BASE_64_DIGEST_LENGTH_BYTES;
     size_t second_space_index = hash_index + SHA256_BASE_64_DIGEST_LENGTH_BYTES;
@@ -417,34 +435,35 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     portable_assert(padded_log_entry_length % AES_BLOCK_LENGTH_BYTES == 0);
 
     // Compute the AES_CBC_MAC of the whole block
-    uint8_t binary_mac[AES_BLOCK_LENGTH_BYTES];
+    aes128_block binary_mac;
     aes_cbc_mac(&Transmit_Buffer[*first_byte_of_data_index],
                 padded_log_entry_length,
                 &binary_mac[0],
                 Log_Entry_MAC_Key);
 
     // Turn that MAC into Base64 format.
-    uint8_t base64_mac[BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH];
+    // To satisfy the precondition of mbedtls_base64_encode, we need
+    // a buffer which is 2 bytes longer than strictly necessary, so
+    uint8_t base64_mac[BASE_64_AES_BLOCK_LENGTH_BYTES + 2];
 
     r = mbedtls_base64_encode(&base64_mac[0],
-                              BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH + 2, &olen,
+                              BASE_64_AES_BLOCK_LENGTH_BYTES + 2, &olen,
                               &binary_mac[0], AES_BLOCK_LENGTH_BYTES,
                               false); // Don't add final \0
     (void)r;                          // suppress warning on r unused.
 
-    portable_assert(BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH == olen);
+    portable_assert(BASE_64_AES_BLOCK_LENGTH_BYTES == olen);
 
     // And append that MAC to the data to be sent
     size_t first_mac_index = second_space_index + 1;
 
     log_system_debug_printf("first mac index is %zu", first_mac_index);
 
-    memcpy(&Transmit_Buffer[first_mac_index], &base64_mac[0],
-           BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH);
+    copy_base64_aes128_block (&Transmit_Buffer[first_mac_index], &base64_mac[0]);
 
     // add \r\n
     size_t first_lineend_index =
-        first_mac_index + BASE_64_ENCODE_AES_CBC_MAC_DATA_LENGTH;
+        first_mac_index + BASE_64_AES_BLOCK_LENGTH_BYTES;
     log_system_debug_printf("first line-ending index is %zu", first_lineend_index);
     Transmit_Buffer[first_lineend_index] = carriage_return;
     Transmit_Buffer[first_lineend_index + 1] = new_line;
