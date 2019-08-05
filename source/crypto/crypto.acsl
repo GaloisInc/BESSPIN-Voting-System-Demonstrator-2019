@@ -22,13 +22,152 @@
   @   logic model_plaintext decrypt(model_ciphertext ct);
   @   logic model_ciphertext lift_ciphertext(ciphertext_block ct);
   @   logic model_plaintext lift_plaintext(plaintext_block pt);
+  @   logic model_digest model_aes_cbc_mac( model_data md, integer message_size);
+  @   logic model_data from_aes128_block(aes128_block aes_block); // injective 
   @
   @   axiom sha_digest_size:
   @     \forall model_digest d; \length(d) == SHA256_DIGEST_LENGTH_BYTES;
+  @
+  @   axiom aes_plaintext_size:
+  @     \forall model_plaintext pt; \length(pt) == AES_BLOCK_LENGTH_BYTES;
+  @
+  @   axiom aes_ciphertext_size:
+  @     \forall model_ciphertext ct; \length(ct) == AES_BLOCK_LENGTH_BYTES;
+  @
   @   axiom digest_is_a_hash:
   @     \forall model_data d, e; d == e <==> hash(d) == hash(e);
-  @   axiom symmetric:
-  @     \forall model_plaintext pt, model_ciphertext ct; decrypt(encrypt(pt)) == pt;
+  @
+  @   axiom symmetric_decrypt_encrypt:
+  @     \forall model_plaintext pt; decrypt(encrypt(pt)) == pt;
+  @
+  @   axiom symmetric_encrypt_decrypt:
+  @     \forall model_ciphertext ct; encrypt(decrypt(ct)) == ct;
+  @ 
+  @   axiom from_aes128_block_is_injective:
+  @     \forall aes128_block d, e; from_aes128_block(d) == from_aes128_block(e) ==> d == e; 
+  @  
   @ }
+  @
+  @   predicate model_plaintext_equal( model_plaintext mp1, model_plaintext mp2) =
+  @     \forall integer n; \let length = AES_BLOCK_LENGTH_BYTES;
+  @              length == \length(mp1) && length == \length(mp2) && 
+  @              0 <= n < length && \nth(mp1, n) == \nth(mp2, n);
+  @
+  @   predicate model_ciphertext_equal( model_ciphertext mc1, model_ciphertext mc2) =
+  @     \forall integer n; \let length = AES_BLOCK_LENGTH_BYTES;
+  @              length == \length(mc1) && length == \length(mc2) &&
+  @              0 <= n < length && \nth(mc1, n) == \nth(mc2, n);
+  @
+  @   // true by axiom symmetric_decrypt_encrypt - discharged by WP
+  @   lemma model_plaintext_equal_by_elements : \forall model_plaintext mp;
+  @         model_plaintext_equal(mp, decrypt(encrypt(mp)));
+  @
+  @   // true by axiom symmetric_encrypt_decrypt - discharged by WP
+  @   lemma model_ciphertext_equal_by_elements : \forall model_ciphertext mc;
+  @         model_ciphertext_equal(mc, encrypt(decrypt(mc)));
+  @
+  @   // true - discharged by WP
+  @   lemma model_plaintext_impl_model_ciphertext: 
+  @         \forall plaintext_block pt, ciphertext_block ct;
+  @         \let lfp = lift_plaintext(pt); 
+  @         \let lfc = lift_ciphertext(ct);
+  @         model_plaintext_equal(lfp, decrypt(lfc)) ==> model_ciphertext_equal(lfc,  encrypt(lfp));
+  @
+  @   // true - discharged by WP
+  @   lemma model_ciphertext_impl_model_plaintext: 
+  @         \forall plaintext_block pt, ciphertext_block ct;
+  @         \let lfp = lift_plaintext(pt); 
+  @         \let lfc = lift_ciphertext(ct);  
+  @         model_ciphertext_equal(lfc,  encrypt(lfp)) ==> model_plaintext_equal(lfp, decrypt(lfc));
+  @
+  @   // true - discharged by WP and proved by rewriting lemmas:
+  @   // lemma model_plaintext_impl_model_ciphertext and lemma model_ciphertext_impl_model_plaintext
+  @   lemma central_decrypt_encrypt_equivalence: 
+  @         \forall plaintext_block pt, ciphertext_block ct;
+  @         \let lfp = lift_plaintext(pt); 
+  @         \let lfc = lift_ciphertext(ct);  
+  @         model_ciphertext_equal(lfc,  encrypt(lfp)) <==> model_plaintext_equal(lfp, decrypt(lfc));
+  @
+  @   // direct consequence of the central_decrypt_encrypt_equivalence lemma 
+  @   predicate decrypt_encrypt_equivalent{L} 
+  @      (plaintext_block pt, ciphertext_block ct) =
+  @      \at(\let lfp = lift_plaintext(pt); 
+  @          \let lfc = lift_ciphertext(ct);
+  @             \valid(pt + (0 .. AES_BLOCK_LENGTH_BYTES - 1)) &&
+  @             \valid(ct + (0 .. AES_BLOCK_LENGTH_BYTES - 1)) && \separated (pt, ct) &&
+  @             model_plaintext_equal(lfp, decrypt(lfc)) <==> model_ciphertext_equal(lfc,  encrypt(lfp)), 
+  @           L);
+  @       
+  @   // true - discharged by WP
+  @   lemma the_digest_impl_cbc_digest:
+  @        \forall model_data md, integer m_size, message the_message, 
+  @            size_t the_message_size, block the_digest;
+  @            m_size == the_message_size &&
+  @            m_size % AES_BLOCK_LENGTH_BYTES == 0  &&
+  @            \forall integer n, aes128_block aes_block;
+  @                \let cbc_digest = model_aes_cbc_mac(md, m_size);
+  @                \let aes_blk = from_aes128_block(aes_block);
+  @                \length(aes_blk) ==  \length(cbc_digest) &&
+  @                \length(cbc_digest) == AES_BLOCK_LENGTH_BYTES &&
+  @                0 <= n < AES_BLOCK_LENGTH_BYTES &&  
+  @                aes_block[n] == the_digest[n] ==> \nth(cbc_digest, n) == \nth(aes_blk, n);
+  @
+  @
+  @   // true - discharged by WP
+  @   lemma cbc_digest_impl_the_digest:
+  @        \forall model_data md, integer m_size, message the_message, 
+  @            size_t the_message_size, block the_digest;
+  @            m_size == the_message_size &&
+  @            m_size % AES_BLOCK_LENGTH_BYTES == 0  &&
+  @            \forall integer n, aes128_block aes_block;
+  @                \let cbc_digest = model_aes_cbc_mac(md, m_size);
+  @                \let aes_blk = from_aes128_block(aes_block);
+  @                \length(aes_blk) ==  \length(cbc_digest) &&
+  @                \length(cbc_digest) == AES_BLOCK_LENGTH_BYTES &&
+  @                0 <= n < AES_BLOCK_LENGTH_BYTES &&  
+  @                \nth(cbc_digest, n) == \nth(aes_blk, n) ==> aes_block[n] == the_digest[n];
+  @
+  @
+  @   // true - discharged by WP and proved by rewriting lemmas: :cbc_digest_impl_the_digest
+  @   // and the_digest_impl_cbc_digest
+  @   lemma central_cbc_digest_equivalent_the_digest:
+  @        \forall model_data md, integer m_size, message the_message, 
+  @            size_t the_message_size, block the_digest;
+  @            m_size == the_message_size &&
+  @            m_size % AES_BLOCK_LENGTH_BYTES == 0  &&
+  @            \forall integer n, aes128_block aes_block;
+  @                \let cbc_digest = model_aes_cbc_mac(md, m_size);
+  @                \let aes_blk = from_aes128_block(aes_block);
+  @                \length(aes_blk) ==  \length(cbc_digest) &&
+  @                \length(cbc_digest) == AES_BLOCK_LENGTH_BYTES &&
+  @                0 <= n < AES_BLOCK_LENGTH_BYTES &&  
+  @                \nth(cbc_digest, n) == \nth(aes_blk, n) <==> aes_block[n] == the_digest[n];
+  @
+  @
+  @
+  @  // Based on property: the final MAC value is the result of the 
+  @  // final encryption, which is in both the_digest and ciphertext_block.
+  @  // Predicate definition: An external aes128_block (see crypto_t.h) 
+  @  // serves as a bridge between the_digest and corresponding model types (domain). 
+  @  //The predicate below is a direct consequence of the central_cbc_digest_equivalent_the_digest lemma.
+  @
+  @  predicate aes_cbc_mac_equiv_relation{L}(message the_message, 
+  @                                      size_t the_message_size, 
+  @                                      block the_digest) =    
+  @     \at(\valid_read(the_message + (0 .. the_message_size - 1)) && 
+  @         \separated(the_message, the_digest) &&
+  @         \initialized(the_digest) &&
+  @         \forall model_data md, integer m_size; 
+  @            m_size == the_message_size &&
+  @            m_size % AES_BLOCK_LENGTH_BYTES == 0  &&
+  @            \forall integer n, aes128_block aes_block; 
+  @               \let cbc_digest = model_aes_cbc_mac(md, m_size);
+  @                \let aes_blk = from_aes128_block(aes_block);
+  @                \length(aes_blk) ==  \length(cbc_digest) &&
+  @                \length(cbc_digest) == AES_BLOCK_LENGTH_BYTES &&
+  @                0 <= n < AES_BLOCK_LENGTH_BYTES &&
+  @                aes_block[n] == the_digest[n] <==>\nth(cbc_digest, n) == \nth(aes_blk, n), 
+  @         L);              
+  @
   @*/
 #endif
