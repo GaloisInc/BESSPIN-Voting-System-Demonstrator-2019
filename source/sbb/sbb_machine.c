@@ -203,6 +203,9 @@ void update_sensor_state(void) {
                                                     pdTRUE,  /* Clear events on return        */
                                                     pdFALSE, /* Wait for *any* event, not all */
                                                     pdMS_TO_TICKS(100) );
+    // We ignore events that we didn't ask for.
+    ux_Returned = ux_Returned & waitEvents;
+
     log_event_group_result(ux_Returned);
 
     /* "Run" the internal paper ASM transition */
