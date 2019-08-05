@@ -5,6 +5,8 @@ DEFAULT_PROG = test_freertos
 
 DEMO_SRC = \
     test_freertos.c \
+    log_t.c \
+    secure_log_t.c \
     log.c \
     secure_log.c \
     log_io.c \
@@ -16,6 +18,7 @@ DEMO_SRC = \
     ../crypto/cbc.c \
     ../crypto/mode_wrappers.c \
     ../crypto/sha2-openbsd.c \
+    ../crypto/crypto_t.c 
     ../crypto/crypto.c 
 
 CFLAGS += \
