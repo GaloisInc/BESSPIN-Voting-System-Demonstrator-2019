@@ -1,1 +1,1 @@
-# Slide decks used to present the BESSPIN Voting System
+# Documents describing various aspects of the BESSPIN Voting System
