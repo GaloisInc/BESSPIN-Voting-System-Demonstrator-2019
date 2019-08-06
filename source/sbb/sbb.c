@@ -60,6 +60,7 @@ extern void gpio_set_as_output(uint8_t);
 
 void initialize(void)
 {
+#ifndef SIMULATION
     gpio_set_as_input(BUTTON_CAST_IN);
     gpio_set_as_input(BUTTON_SPOIL_IN);
     gpio_set_as_input(PAPER_SENSOR_IN);
@@ -68,6 +69,7 @@ void initialize(void)
     gpio_set_as_output(MOTOR_1);
     gpio_set_as_output(BUTTON_CAST_LED);
     gpio_set_as_output(BUTTON_SPOIL_LED);
+#endif // SIMULATION
     the_state.button_illumination = 0;
     // Logging is not set up yet...we could do that here I suppose
     the_state.M = MOTORS_OFF;
