@@ -4,6 +4,14 @@
 #include "sbb_t.h"
 #include "sbb_logging.h"
 
+#ifdef SBB_NO_HTTP_ENDPOINT
+#define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_None
+#define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_None
+#else
+#define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_Sys_Log
+#define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_App_Log
+#endif
+
 extern const log_name system_log_file_name;
 extern const log_name app_log_file_name;
 
@@ -52,11 +60,11 @@ bool load_or_create_logs(void) {
 
     if (load_or_create(&app_log_handle,
                        app_log_file_name,
-                       HTTP_Endpoint_App_Log))
+                       HTTP_ENDPOINT_APP_LOG))
       {
         if (load_or_create(&system_log_handle,
                            system_log_file_name,
-                           HTTP_Endpoint_Sys_Log))
+                           HTTP_ENDPOINT_SYS_LOG))
           {
             b_success = true;
           }
@@ -95,9 +103,11 @@ void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length)
 bool log_app_event(app_event event,
                    barcode_t barcode,
                    barcode_length_t barcode_length) {
+#ifndef FILESYSTEM_DUPLICATES
     if ( num_scanned_codes >= MAX_SCANNED_CODES ) {
         return false;
     }
+#endif
 
     if ( barcode_length + 2 < LOG_ENTRY_LENGTH ) {
         log_entry event_entry;
@@ -156,7 +166,7 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
           @ loop invariant i_entry_no >= 1;
           @ loop invariant i_entry_no <= n_entries - 1;
         */
-        for (int32_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 1); i_entry_no--) {
+        for (int32_t i_entry_no = n_entries - 1; !b_found && (i_entry_no > 0); i_entry_no--) {
             debug_printf("scanning entry %d", i_entry_no);
             secure_log_entry secure_entry = Log_IO_Read_Base64_Entry(&app_log_handle, i_entry_no);
             b_found = true;
@@ -213,6 +223,6 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
         }
         debug_printf("barcode is a duplicate: %d", b_found);
     }
-    return b_found;
 #endif // FILESYSTEM_DUPLICATES
+    return b_found;
 }

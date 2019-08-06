@@ -245,7 +245,7 @@ Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
 
     // POSIX fopen allocates for us, unlike FreeRTOS there the caller passed in a
     // pointer to memory that it has allocated. This is rather ugly.
-    local_stream_ptr = fopen(name, "w");
+    local_stream_ptr = fopen(name, "a+");
     if (local_stream_ptr == NULL)
     {
         debug_printf("fopen() failed in Log_IO_Create_New\n");
