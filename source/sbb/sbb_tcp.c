@@ -89,6 +89,15 @@ void sbb_tcp(void)
 	the random number generator. */
     prvMiscInitialisation();
 
+    // populate AxiEthernetMAC with the values from sbb_mac_address
+    // the former is used internally by the Ethernet driver, and the latter by
+    // the FreeRTOS_IPInit function as part of the default network packet
+    // header fragment, but they should be the same
+    for (int i = 0; i < 6; i++)
+    {
+        AxiEthernetMAC[i] = (char) sbb_mac_address[i];
+    }
+
     /* Initialise the network interface.
 	 ***NOTE*** Tasks that use the network are created in the network event hook
 	 when the network is connected and ready for use (see the definition of
