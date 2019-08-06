@@ -58,6 +58,14 @@ static const uint8_t new_line = '\n';
     requires \valid(total);
     requires \valid(first_byte_of_data_index);
     requires 1 <= bytes_of_padding_required <= 16;
+    requires valid_read_string(REQUEST_LINE_1);
+    requires valid_read_string(REQUEST_LINE_3);
+    requires valid_read_string(HEADER_1);
+    requires valid_read_string(HEADER_2);
+    requires valid_read_string(HEADER_3);
+    requires valid_read_string(HEADER_4);
+    requires valid_read_string(HEADER_5_1);
+    requires valid_read_string(DOUBLE_CRLF);
 */
 void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
                              const char *log_file_name,        // in
@@ -357,7 +365,7 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     // Copy the result into the_secure_log_entry
     copy_sha256_base64_digest (&the_secure_log_entry.the_digest[0],
 			       &base64_digest[0]);
-    
+
     (void)r; // suppress warning on r unused.
 
     assert(SHA256_BASE_64_DIGEST_LENGTH_BYTES == olen);
@@ -383,7 +391,8 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     }
 
     snprintf((char *)Transmit_Buffer, Transmit_Buffer_Length,
-             "%s%s%s%s%s%s%s%s%zu%s", REQUEST_LINE_1, log_file_name,
+	     "%s%s%s%s%s%s%s%s%zu%s",
+             REQUEST_LINE_1, log_file_name,
              REQUEST_LINE_3, HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5_1,
              http_content_length, DOUBLE_CRLF);
 
