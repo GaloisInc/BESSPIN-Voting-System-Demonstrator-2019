@@ -1,0 +1,8 @@
+module Padding where
+
+// Pad an n-length sequence until it is a multiple of m long
+padWith, rightPadWith :
+  {mod, n, a} (fin n, fin mod, mod >= 1) =>
+  a -> [n]a -> [mod * (n /^ mod)]a
+padWith      pad items = items # repeat pad
+rightPadWith pad items = repeat pad # items

@@ -1,0 +1,22 @@
+module AESCBC where
+
+import `AES (aesEncrypt, aesDecrypt)
+import MEE_CBC (cbc_enc, cbc_dec)
+import Padding
+
+encrypt : {n} (fin n) => [32][8] -> [16][8] -> [16 * n][8] -> [16 * n][8]
+encrypt key iv plain =
+  join (cbc_enc blockEncrypt key iv (groupBy`{16} plain))
+  where
+    blockEncrypt k b =
+      groupBy`{8} (aesEncrypt (join b, join k))
+
+decrypt : {n} (fin n) => [32][8] -> [16][8] -> [16 * n][8] -> [16 * n][8]
+decrypt key iv cipher =
+  join (cbc_dec blockDecrypt key iv (groupBy`{16} cipher))
+  where
+    blockDecrypt k b =
+      groupBy`{8} (aesDecrypt (join b, join k))
+
+cbcMAC : {n} (fin n, n >= 1) => [32][8] -> [16][8] -> [16 * n][8] -> [16][8]
+cbcMAC key iv plain = last (groupBy`{16} (encrypt key iv plain))

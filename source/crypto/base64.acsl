@@ -1,0 +1,59 @@
+/**
+ * SBB Crypto ACSL specification
+ * @refine crypto.lando
+ */
+
+#ifndef __BASE64_API_ACSL__
+#define __BASE64_API_ACSL__
+
+/*@ axiomatic base64_maps {
+  @   type model_digit = octet | sextet;
+  @   type digit_list = \list<model_digit>;
+  @   type model_base64_enc_map = digit_list; 
+  @   type model_base64_dec_map = digit_list;
+  @   type model_error_message; // is that goes to model_digit as well ?
+  @   logic integer digit_size (model_digit d);
+  @   logic integer Base64Length_n (integer n) = \ceil(\ceil(4 * ((8 * n) / 6)) / 4);
+  @   type Base64_n = digit_list;
+  @   
+  @   //logic type model_error_message error(octet o); 
+  @   //logic <what is the return type ?> model_allUndefined (model_base64_enc_map enc_map) = ?;
+  @   //logic type model_error_message model_lambda ( octet o ) = error(o);
+  @
+  @
+  @
+  @   axiom model_digit_octet_size:
+  @     \forall model_digit d; d == octet ==> digit_size(octet) == 8;
+  @
+  @   axiom model_digit_sextet_size:
+  @     \forall model_digit d; d == sextet ==> digit_size(sextet) == 6;
+  @
+  @   axiom model_base64_enc_map_struct:
+  @     \forall model_base64_enc_map l; \length(l) == 64 && 
+  @     \forall integer n; 0 <= n < \length(l) ==> \nth(l, n) == octet;
+  @
+  @   axiom model_base64_dec_map_struct:
+  @     \forall model_base64_dec_map l; \length(l) == 256 && 
+  @     \forall integer n; 0 <= n < \length(l) ==> \nth(l, n) == sextet;
+  @
+  @   axiom Base64_n_lendth:
+  @      \forall Base64_n l; \forall integer n; 0 <= n ==> \length(l) == Base64Length_n(n);
+  @
+  @ }
+  @
+  @   // test lemma 1 - true - discharged by WP
+  @   lemma any_encode_digit_sized_eight_bits:
+  @      \forall model_base64_enc_map l; 
+  @      \forall integer n; 0 <= n < \length(l) ==> digit_size(\nth(l, n)) == 8;
+  @
+  @   // test lemma 2 - true - discharged by WP
+  @   lemma any_decode_digit_sized_six_bits:
+  @      \forall model_base64_dec_map l; 
+  @      \forall integer n; 0 <= n < \length(l) ==> digit_size(\nth(l, n)) == 6;
+  @
+  @   logic model_base64_enc_map Base64_map 
+  @     (model_base64_enc_map l, model_digit char62, model_digit char63) = \Cons(char63, \Cons(char62, l));
+  @
+  @
+  @*/
+#endif

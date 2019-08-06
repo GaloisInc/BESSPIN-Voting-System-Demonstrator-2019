@@ -1,74 +1,192 @@
-// A number of _contests_ where a unique _option_ among the
-// options specified by the _contest options_ is selected for each
-// contest.
+module BallotFormat where
 
-// @author Giuliano Losa <giuliano@galois.com>
-// @author Joe Kiniry <kiniry@freeandfair.us>
+import Base64 (encodeBase64, decodeBase64, Base64, Base64Length)
+import Padding
+import BaseConvert
+import AESCBC
 
-// We have a number `nct` of contests `(0,1,...,nct-1)` with a maximum
-// of `max_nopt` options `(0,1,...,max_nopt-1)` per contest. A vector
-// `co` of `nct` elements, each in between `1` and `max_nopt`, specifies
-// the contest options for each contest.
-// Given contest `ct`, a selection for option `i` where `0 <= i <
-// co@ct` is represented as a bitvector of size `max_nopt` consisting
-// exclusively of zeros except for the bit at position `i`.  A ballot is
-// a vector of size `nct` where each entry is a bitvector of length
-// `max_nopt`. Note that a contest must have at least one contest option.
+// Time encoding
+type Time = {
+  year   : [16],
+  month  : [8],
+  day    : [8],
+  hour   : [8],
+  minute : [8]
+}
 
-// This is a vector describing the number of options in each contest,
-// where `max_nopt` is the maximum number of options that any contest
-// may have. `0` is not a valid number of contest options.
-type contest_options nct max_nopt = [nct][width max_nopt]
+Months = { January   = 1  : [8],
+           February  = 2  : [8],
+           March     = 3  : [8],
+           April     = 4  : [8],
+           May       = 5  : [8],
+           June      = 6  : [8],
+           July      = 7  : [8],
+           August    = 8  : [8],
+           September = 9  : [8],
+           October   = 10 : [8],
+           November  = 11 : [8],
+           December  = 12 : [8]}
 
-type ballot nct max_nopt = [nct][max_nopt] // one bit per option
+daysInMonths : [16] -> [12][8]
+daysInMonths year =
+  updates (repeat 31)
+          [Months.September, Months.April, Months.June, Months.November,
+           Months.February]
+          [30, 30, 30, 30,
+           27 + leapDay]
+  where
+    leapDay =
+      if (year % 4 == 0) && (year % 100 != 0) || (year % 400 == 0)
+      then 1
+      else 0
 
-type constraint ballot_constraint nct max_nopt =
-  (fin nct, fin max_nopt, nct >= 1, max_nopt >= 1)
+validTime : Time -> Bool
+validTime time =
+  (time.minute < 60) /\
+  (time.hour < 24) /\
+  (time.month >= 1) /\ (time.month <= 12) /\
+  (time.day <= daysInMonths time.year @ (time.month - 1))
 
-// A ballot is valid if and only if there is exactly one choice per
-// contest and, if `ct` is a contest, then no bit is set in `ct`'s entry
-// beyond and including the bit at position `co@ct`.
-is_valid : {nct, max_nopt} ballot_constraint nct max_nopt =>
-  contest_options nct max_nopt -> ballot nct max_nopt -> Bit
-is_valid co b = all is_valid b'
-  where 
-    b' = zip b [0..(nct-1)]
-    is_valid x = ex_unique (c && m) /\ ((c && ~m) == zero)
-      where 
-        c = x.0
-        m = mask ct 
-        ct = x.1
-    ex_unique x = x != zero /\ x && (x-1) == 0 // exactly one bit is set
-    // mask to get rid of unused least-significant bits:
-    mask ct = [if i < co@ct then True else False | i <- [0..(max_nopt-1)]]
+timeToTimestamp : Time -> [16][8]
+timeToTimestamp time =
+  yearDigits # s # monthDigits # s # dayDigits # s # hourDigits # s # minuteDigits
+    where
+  s            = "+"
+  yearDigits   = drop`{back=4} (toBase`{digits=5} decimal time.year)
+  monthDigits  = drop`{back=2} (toBase`{digits=3} decimal time.month)
+  dayDigits    = drop`{back=2} (toBase`{digits=3} decimal time.day)
+  hourDigits   = drop`{back=2} (toBase`{digits=3} decimal time.hour)
+  minuteDigits = drop`{back=2} (toBase`{digits=3} decimal time.minute)
 
-// Given a valid ballot, `selection b ct == opt` if and only if
-// option `opt` is selected in contest `ct`.
-selection : {nct, nopt} ballot_constraint nct nopt =>
-  ballot nct nopt -> [width (nct-1)] -> [width (nopt-1)]
-selection b ct = (last xs).1
-  where xs = [(False, 0)] # [
-    if stop then (stop,opt) else (if (b@ct@i) then (True, i) else (False,0))
-    | i <- [0..nopt-1]
-    | (stop,opt) <- xs ]
+timestampToTime : [16][8] -> Time
+timestampToTime digits =
+  if allSeparatorsValid
+  then {year = year, month = month, day = day, hour = hour, minute = minute}
+  else error "Invalid separator character in timestamp"
+  where
+    s1, s2, s3, s4 : [1][8]
+    yearDigits : [4][8]
+    monthDigits, dayDigits, hourDigits, minuteDigits : [2][8]
 
-// example: there are 2 contests; contest 0 has two contest options and
-// contest 1 has 4 contest options (thus `max_nopt==4` and 
-// `width max_nopt==3`)
-(my_co:[2][3]) = [2,4]
-test_1 : Bit
-property test_1 = is_valid my_co [0b1000, 0b0100]
-test_selection_1 : Bit
-// option 1 is selected in contest 0:
-property test_selection_1 = selection [0b0100, 0b0100] 0 == 1
-test_selection_2 : Bit
-// option 2 is selected in contest 1:
-property test_selection_2 = selection [0b0100, 0b0010] 1 == 2
-test_2 : Bit
-property test_2 = ~(is_valid my_co [0b0010, 0b0100])
-test_3 : Bit
-property test_3 = ~(is_valid my_co [0b0000, 0b0100])
-test_4 : Bit
-property test_4 = ~(is_valid my_co [0b1000, 0b0101])
-test_5 : Bit
-property test_5 = ~(is_valid my_co [0b1000, 0b1111])
+    yearDigits # s1 # monthDigits # s2 # dayDigits # s3 # hourDigits # s4 # minuteDigits = digits
+
+    allSeparatorsValid = all (\s -> s == "+") [s1, s2, s3, s4]
+
+    year   = fromBase decimal yearDigits
+    month  = fromBase decimal monthDigits
+    day    = fromBase decimal dayDigits
+    hour   = fromBase decimal hourDigits
+    minute = fromBase decimal minuteDigits
+
+testTime = {
+  year   = 2019,
+  month  = Months.January,
+  day    = 1,
+  hour   = 1,
+  minute = 1
+}
+
+// Ballot encoding
+type Ballot contests positions
+  = { time     : Time,
+      unixTime : [6][8],
+      contests : [contests][positions] }
+
+encodeBallot :
+  {contests, positions, encodedLength}
+  (fin contests, fin positions,
+   encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
+  [32][8] ->
+  [32][8] ->
+  Ballot contests positions ->
+  [1 + 16 + Base64Length encodedLength][8]
+encodeBallot authKey ballotKey ballot =
+  timeDigits # ":" # encodeBase64 (encryptedBallot # auth)
+  where
+    timeDigits      = timeToTimestamp ballot.time
+    contestsBytes   = groupBy`{8} (padWith`{mod=8} zero (join ballot.contests))
+    ballotBytes     = ballot.unixTime # contestsBytes
+    encryptedBallot = encrypt ballotKey zero (padWith`{mod=16} zero ballotBytes)
+    auth            = cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
+
+decodeBallot :
+  {contests, positions, encodedLength}
+  (fin contests, fin positions,
+   encodedLength == 16 + 16 * ((6 + (contests * positions) /^ 8) /^ 16)) =>
+  [32][8] ->
+  [32][8] ->
+  [1 + 16 + Base64Length encodedLength][8] ->
+  Ballot contests positions
+decodeBallot authKey ballotKey encoded =
+  if auth != recomputedAuth
+  then error "Invalid authentication: ballot has been tampered with"
+  | timeSep != ":"
+  then error "Invalid time separator character"
+  | contestPadding != zero
+  then error "Non-zero padding in contest: did you ask for the right size ballot?"
+  else { time = time, unixTime = unixTime, contests = contests }
+  where
+    timeSep : [1][8]
+    timeDigits # timeSep # encryptedAndAuth = encoded
+
+    time = timestampToTime timeDigits
+
+    auth : [16][8]
+    encryptedBallot # auth =
+      decodeBase64`{encodedLength} encryptedAndAuth
+
+    recomputedAuth =
+      cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
+
+    unixTime # contestsBytes = decrypt ballotKey zero encryptedBallot
+
+    contests : [contests][positions]
+    contestBits # contestPadding = join contestsBytes
+    contests = groupBy`{each=positions} contestBits
+
+// Proofs that ballot encoding is correct
+
+// Quick and dirty hash function
+// <https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key>
+knuthMultHash : [32] -> [32]
+knuthMultHash i = i * 2654435761
+
+// This hash function is perfect because the magic number chosen above is a
+// prime number (more saliently, it's coprime to 2^32)
+property knuthMultHash_perfect s1 s2 =
+  s1 != s2 ==> knuthMultHash s1 != knuthMultHash s2
+
+// Instead of using a precondition to filter for ballots with valid times, we
+// generate only ballots with valid times. This generator maps every 32-bit
+// integer to some valid time -- if the input [32] is random, this will give a
+// relatively nice spread of times
+generateValidTime : [32] -> Time
+generateValidTime s0 =
+  { year = year, month = month, day = day, hour = hour, minute = minute }
+  where
+    generate : {n} (fin n, n <= 32, n >= 1) => [32] -> [n] -> [n] -> ([32], [n])
+    generate seed lo hi =
+      (seed', lo + drop`{32 - n} (seed' % (zero # (hi - lo + 1))))
+      where seed' = knuthMultHash seed
+
+    (s1, year)   = generate s0 0 9999
+    (s2, month)  = generate s1 1 12
+    (s3, day)    = generate s2 0 (daysInMonths year @ (month - 1))
+    (s4, hour)   = generate s3 0 23
+    (_,  minute) = generate s4 0 59
+
+// Property that generateValidTime always does what it says on the tin
+time_generate_correct : [32] -> Bool
+property time_generate_correct seed =
+  validTime (generateValidTime seed)
+
+// Decode is inverse to encode
+ballot_roundtrip :
+  {contests, positions} (fin contests, fin positions) =>
+  [32][8] -> [32][8] -> [32] -> [6][8] -> [contests][positions] -> Bool
+property ballot_roundtrip authKey ballotKey timeSeed unixTime contests =
+  decodeBallot authKey ballotKey (encodeBallot authKey ballotKey ballot) == ballot
+  where
+    ballot = { time = generateValidTime timeSeed,
+               unixTime = unixTime,
+               contests = contests }
