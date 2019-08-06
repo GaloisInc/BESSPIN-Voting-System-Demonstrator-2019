@@ -1,4 +1,4 @@
-sbb_hosttest_all: sbb_hosttest1 sbb_hosttest2 sbb_hosttest3 sbb_hosttest4
+sbb_hosttest_all: sbb_hosttest1 sbb_hosttest2 sbb_hosttest3 sbb_hosttest4 sbb_hosttest5 sbb_hosttest6
 
 CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/cbc.c \
@@ -8,7 +8,12 @@ CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/base64.c \
                 ../crypto/crypto_config_default.c
 
-LOGGING_SOURCE = ../logging/debug_io.c
+LOGGING_SOURCE = ../logging/debug_io.c \
+                 ../logging/log.c \
+                 ../logging/secure_log.c \
+                 ../logging/log_io.c \
+                 ../logging/log_fs.c \
+                 ../logging/log_net.c
 
 CFLAGS = -DHARDCODE_CURRENT_TIME \
          -DCURRENT_YEAR=2019 \
@@ -40,6 +45,18 @@ sbb_hosttest4:
 	$(CC) $(CFLAGS) -o hosttest4 hosttest4.c sbb_crypto.c \
 	$(CRYPTO_SOURCE) $(LOGGING_SOURCE)
 
+sbb_hosttest5:
+	cd $(SBB_DIR); \
+	$(CC) $(CFLAGS) -DSBB_NO_HTTP_ENDPOINT -DVOTING_SYSTEM_DEBUG -DFILESYSTEM_DUPLICATES \
+        -o hosttest5 hosttest5.c sbb_logging.c sbb_strings.c \
+	$(CRYPTO_SOURCE) $(LOGGING_SOURCE)
+
+sbb_hosttest6:
+	cd $(SBB_DIR); \
+	$(CC) $(CFLAGS) -DSBB_NO_HTTP_ENDPOINT -DVOTING_SYSTEM_DEBUG -DFILESYSTEM_DUPLICATES \
+        -o hosttest6 hosttest6.c sbb_logging.c sbb_strings.c \
+	$(CRYPTO_SOURCE) $(LOGGING_SOURCE)
+
 sbb_hosttest_clean:
-	cd $(CRYPTO_DIR); \
-	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 base64test *.o
+	cd $(SBB_DIR); \
+	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 base64test *.o \
