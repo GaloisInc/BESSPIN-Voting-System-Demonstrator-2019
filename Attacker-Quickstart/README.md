@@ -14,9 +14,9 @@ If you would like to use `malware()` to change instructions in other functions, 
 
 # Directory Contents
 
-- [AES-key-to-display](./AES-key-to-display) is the simplest example of how to use the peek-poke server. This exploit walks through how to write the ballot box LCD display value to be the location of the AES key.
+- [AES-key-to-display](./AES-key-to-display) is the simplest and most verbose example of how to use the peek-poke server. Start with this one. This exploit walks through how to write the ballot box LCD display value to be the location of the AES key.
 
-- [all-barcodes-are-valid](./all-barcodes-are-valid) is an example of how to overwrite instructions in the SBB code. You can't write directly to the SBB code, but you can write instructions to the `malware` function that will write to the SBB code. This exploit walks through how to overwrite the function responsible for validating barcodes to always return `BARCODE_VALID`.
+- [all-barcodes-are-valid](./all-barcodes-are-valid) is an example of how to overwrite instructions in the SBB code. You can't write instructions directly to the SBB code, but you can write instructions to the `malware` function that will write to the SBB code. This exploit walks through how to overwrite the function responsible for validating barcodes to always return `BARCODE_VALID`.
 
 - [accept-all-paper](./accept-all-paper) is an example of how to overwrite a function call in the SBB code with a different function call. The trick here is that functions are called using the `jal` instruction which is a relative jump, so you must compute the relative offset of the function you want to jump to. This exploit walks through how to change the control flow after a ballot has been inserted to immediately cast the ballot.
 
@@ -24,13 +24,12 @@ If you would like to use `malware()` to change instructions in other functions, 
 
 Common problems:
 
-* Make sure you're compiling for 32-bit RISC-V, not 64-bit
-* Get the entry_address for the malware function from the hello API (be careful to not smash the function setup instructions)
-    * With plenty of NOP space, you can just decide to write a little bit after the setup.
-* Mind the endianness (assembling switches the order of each byte)
-* If you're getting error messages or missing tools, make sure you're running in the nix-shell & using the RISC-V 32-bit version
-    * Try not to have a native/x86 compilers or compilation tools in your PATH at the same time so you don’t accidentally trigger any other gcc, clang, or binutils tools accidentally
+* If you're getting error messages or missing tools, make sure you're running in the nix-shell & using the RISC-V 32-bit version.
+    * Try not to have a native/x86 compilers or compilation tools in your PATH at the same time so you don’t accidentally trigger any other gcc, clang, or binutils tools accidentally.
+* Make sure you're compiling your exploits for 32-bit RISC-V, not 64-bit
+* When writing to the malware function using the peek-poke server, make sure you are writing within the `nop` space, and not smashing the stack setup instructions at the beginning of the function.
+* Mind the endianness (assembling switches the order of each byte).
 * If `run_exploit.sh` is failing: 
-    * Make sure you've set the IP of the server correctly
-    * Double-check that you have the correct `malware()` start address
+    * Make sure you've set the IP of the server correctly.
+    * Double-check that you have the correct `malware()` start address.
 * If you are poking the server manually, remember to also request that the server `run` the `malware()` function.
