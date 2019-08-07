@@ -89,6 +89,7 @@ extern TaskHandle_t prvStartupTaskHandle;
  */
 void prvSRand(UBaseType_t ulSeed);
 
+#ifdef SIMULATION
 /*
  * Functions broadcasting various events 
  */
@@ -97,4 +98,16 @@ void sim_paper_sensor_in_released(void);
 void sim_valid_barcode_scanned(uint8_t id);
 void sim_cast_button_pressed(void);
 void sim_spoil_button_pressed(void);
+
+#ifdef SIMULATION_UART
+#define SIM_COMMAND_BUFFER_LENGTH 17
+#define SIM_BARCODE_BUFFER_LENGTH 384
+/*
+ * Main UART simulator loop and barcode input function
+ */
+void sim_uart_main_loop(void);
+void sim_barcode_input(void);
+#endif // SIMULATION_UART
+#endif // SIMULATION
+
 #endif /* __SBB_FREERTOS_H__ */

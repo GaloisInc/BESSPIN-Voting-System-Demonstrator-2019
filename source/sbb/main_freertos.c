@@ -78,13 +78,14 @@ static void prvStatsTask(void *pvParameters);
 
 /*-----------------------------------------------------------*/
 /* Sample barcodes */
+#ifdef SIMULATION
 static char *valid_barcode_1 =
     "2019+07+31+22+22:1bk5cBJeyseBExT54lsVpS6Qk0hN_c3uuX4feV6D_-k=";
 static char *valid_barcode_2 =
     "2019+07+31+22+22:vlj364nx6CD7wCTA0MCZkZNl4UCdrI_tHMJtcra8eAE=";
 static char *valid_barcode_3 =
     "2019+07+31+22+20:vqj3MRalpCh5tCeiT7aq3frv9MXlY19-BOPIQEsGGtI=";
-
+#endif // SIMULATION
 /*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/
@@ -516,6 +517,9 @@ void prvStartupTask(void *pvParameters)
 void prvInputTask(void *pvParameters)
 {
     (void)pvParameters;
+#ifdef SIMULATION_UART
+    sim_uart_main_loop();
+#else // SIMULATION_UART
     EventBits_t uxReturned;
     TickType_t paper_in_timestamp = 0;
 
@@ -617,10 +621,11 @@ void prvInputTask(void *pvParameters)
 
         vTaskDelay(GPIO_READ_DELAY_MS);
     }
+#endif // SIMULATION_UART
 }
 
 /*-----------------------------------------------------------*/
-
+#ifdef SIMULATION
 void sim_paper_sensor_in_pressed(void)
 {
     printf("SIM: bPAPER_SENSOR_IN_PRESSED\r\n");
@@ -687,4 +692,87 @@ void sim_spoil_button_pressed(void)
     xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
     xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
 }
+
+#ifdef SIMULATION_UART
+#pragma message "UART Simulator Enabled"
+void sim_uart_main_loop(void)
+{
+    char buffer[SIM_COMMAND_BUFFER_LENGTH] = {0};
+    int len;
+    char *help = "You can trigger the following events:\r\n \
+    1 - momentary press of Cast button\r\n \
+    2 - momentary press of Spoil button\r\n \
+    3 - activate Paper In sensor\r\n \
+    4 - deactivate Paper In sensor\r\n \
+    5 - scan and send Barcode\r\n \
+    \r\n";
+    
+    printf("Starting simulation UART input\r\n");
+    printf("%s(buffer first=%p, last=%p)\r\n",
+           help, &buffer[0], &buffer[SIM_COMMAND_BUFFER_LENGTH - 1]);
+
+    for (;;)
+    {
+        // put buffer vulnerability here?
+        len = uart0_rxbuffer(buffer, SIM_COMMAND_BUFFER_LENGTH - 1);
+        if (len > 0) {
+            char c = buffer[0];
+            switch (c)
+            {
+                case '1':
+                    sim_cast_button_pressed();
+                    break;
+                case '2':
+                    sim_spoil_button_pressed();
+                    break;
+                case '3':
+                    sim_paper_sensor_in_pressed();
+                    break;
+                case '4':
+                    sim_paper_sensor_in_released();
+                    break;
+                case '5':
+                    sim_barcode_input();
+                    break;
+                case 'h':
+                    printf("%s(buffer first=%p, last=%p)\r\n", help,
+                           &buffer[0], &buffer[15]);
+                    break;
+                default:
+                    printf("Unknown command\r\n");
+                    printf("%s(buffer first=%p, last=%p)\r\n", help,
+                           &buffer[0], &buffer[15]);
+                    break;
+            }
+        }
+        msleep(1);
+    }
+}
+
+void sim_barcode_input()
+{
+    char buffer[SIM_BARCODE_BUFFER_LENGTH] = {0};
+    int len;
+    int read;
+    char *help = "Enter a barcode terminated with a carriage return.";
+    
+    printf("%s\r\n(buffer first=%p, last=%p)\r\n", help,
+           &buffer[0], &buffer[SIM_BARCODE_BUFFER_LENGTH - 1]);
+    
+    read = 0;
+    while (read < SIM_BARCODE_BUFFER_LENGTH &&
+           strstr(buffer, "\n") == NULL)
+    {
+        // put buffer vulnerability here?
+        len = uart0_rxbuffer(&buffer[read], SIM_BARCODE_BUFFER_LENGTH - read - 1);
+        read = read + len;
+    }
+    // now there is a "barcode" in buffer and at least one trailing \0
+    xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
+    xStreamBufferSend(xScannerStreamBuffer, (void *)buffer,
+                      strlen(buffer),
+                      SCANNER_BUFFER_TX_BLOCK_TIME_MS);
+}
+#endif // SIMULATION_UART
+#endif // SIMULATION
 /*-----------------------------------------------------------*/
