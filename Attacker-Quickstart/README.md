@@ -4,7 +4,7 @@ This directory contains several simple exploits with step-by-step directions usi
 
 # Background
 
-The Voting Village will have access to the [smart ballot box (SBB) source code](https://gitlab-ext.galois.com/ssith/voting-system/tree/master/source) running on 3 hardware implementations. The reference system is a RISC-V processor with no security hardening; the two target systems are RISC-V processors with security extensions. Each system is run as a processor emulated on an FPGA. For a quick guide to RISC-V see [RISC-V in a Nutshell](./RISC_V_NUTSHELL.md). 
+The Voting Village will have access to the [smart ballot box (SBB) source code](../source) running on 3 hardware implementations. The reference system is a RISC-V processor with no security hardening; the two target systems are RISC-V processors with security extensions. Each system is run as a processor emulated on an FPGA. For a quick guide to RISC-V see [RISC-V in a Nutshell](./RISC_V_NUTSHELL.md). 
 
 Each of the different hardware implementation is running the same software; this document shows how to implement some exploits in this software which will run on the reference system. Despite the fact that this same software is running on the target systems, the exploits described here will not work on the target systems. The target systems have security features that are intended to thwart exploits that would work on the insecure reference system; your goal is to create an exploit for the target systems using an attack which is in scope. For more context on the target systems and the acceptable win conditions, see the Overview document.
 
