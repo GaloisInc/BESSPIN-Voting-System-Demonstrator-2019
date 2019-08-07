@@ -108,7 +108,7 @@ To run `run_exploit.sh` you first need to set two environment variables.
 
 The first is the IP address of the peek/poke server, which you can find published in the Voting Village.
 
-The other is the address to which you want to write your binary payload in the malware function; one easy way to find where to write to is to look at the binary with `objdump -d`.
+The other is the address to which you want to write your binary payload in the malware function; one easy way to find where to write to is to look at the binary with `riscv32-unknown-elf-objdump -d`.
 
 You should be able to find the `malware` function, and see the address at which the `nop`s begin.
 
