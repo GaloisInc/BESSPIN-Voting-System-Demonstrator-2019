@@ -107,6 +107,7 @@ void sim_spoil_button_pressed(void);
  */
 void sim_uart_main_loop(void);
 void sim_barcode_input(void);
+void sim_malware_inject(void);
 #endif // SIMULATION_UART
 #endif // SIMULATION
 
