@@ -141,9 +141,10 @@ export SBB_IP=192.168.55.247
 export malware_start_addr='0xc001d384'
 ```
 
-Once you've set those two environment variables, you can run the script:
+Once you've set those two environment variables, you can run the script (which lives one directory down):
 
 ```
+cd ..
 ./run_exploit.sh payload.asm
 ```
 
