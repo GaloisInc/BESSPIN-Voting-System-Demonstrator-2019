@@ -110,7 +110,10 @@ The first is the IP address of the peek/poke server, which you can find publishe
 
 The other is the address to which you want to write your binary payload in the malware function; one easy way to find where to write to is to look at the binary with `riscv32-unknown-elf-objdump -d`.
 
-You should be able to find the `malware` function, and see the address at which the `nop`s begin.
+You should be able to find the `malware` function in the output of `objdump`. 
+One complication is that the peek-poke server will only let you write 512 bytes past the beginning on the malware function. (See [here](https://gitlab-ext.galois.com/ssith/voting-system/blob/master/source/protocols/HTTP/peekpoke.c#L63))
+
+So, you can grab the address where the `nop`s start, and add 0x200 to that address, since 512 = 0x200.  For example:
 
 ```
 c001d170 <malware>:
@@ -125,12 +128,17 @@ c001d18c:       00000013                nop
 ...
 ```
 
+Adding on the offset mandate by the server:
+```
+0xc001d184 + 0x200 = 0xc001d384
+```
+
 Set the values you've found as `SBB_IP` and `malware_start_addr`:
 
 ```
 # don't copy this code directly, find them for your environment as described above
 export SBB_IP=192.168.55.247
-export malware_start_addr='0xc001d184'
+export malware_start_addr='0xc001d384'
 ```
 
 Once you've set those two environment variables, you can run the script:
