@@ -24,8 +24,8 @@ typedef uint8_t sha256_base64_digest[SHA256_BASE_64_DIGEST_LENGTH_BYTES];
     ensures \forall integer i; 0 <= i < SHA256_BASE_64_DIGEST_LENGTH_BYTES ==>
        dst[i] == src[i];
 */
-void copy_sha256_base64_digest (sha256_base64_digest dst,  // OUT
-				sha256_base64_digest src); // IN
+void copy_sha256_base64_digest (sha256_base64_digest       dst,  // OUT
+				const sha256_base64_digest src); // IN
 
 
 typedef struct secure_log_entries

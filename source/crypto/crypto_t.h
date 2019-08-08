@@ -26,8 +26,8 @@ typedef uint8_t base64_aes128_block[BASE_64_AES_BLOCK_LENGTH_BYTES];
     assigns dst[0 .. BASE_64_AES_BLOCK_LENGTH_BYTES - 1];
     ensures \forall integer i; 0 <= i < BASE_64_AES_BLOCK_LENGTH_BYTES ==> dst[i] == src[i];
 */
-void copy_base64_aes128_block (base64_aes128_block dst,  // OUT
-      	                       base64_aes128_block src); // IN
+void copy_base64_aes128_block (base64_aes128_block dst,        // OUT
+      	                       const base64_aes128_block src); // IN
 
 
 #define AES128_KEY_LENGTH_BITS 128
@@ -52,11 +52,8 @@ typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
     ensures \forall integer i; 0 <= i < SHA256_DIGEST_LENGTH_BYTES ==>
        dst[i] == src[i];
 */
-void copy_sha256_digest (sha256_digest dst,  // OUT
-		         sha256_digest src); // IN
-
-
-
+void copy_sha256_digest (sha256_digest dst,        // OUT
+		         const sha256_digest src); // IN
 
 
 typedef uint8_t *block;

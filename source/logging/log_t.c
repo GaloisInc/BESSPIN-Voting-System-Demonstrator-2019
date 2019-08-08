@@ -1,7 +1,7 @@
 #include "log_t.h"
 
-void copy_log_entry (log_entry dst, // OUT
-		     log_entry src) // IN
+void copy_log_entry (log_entry dst,       // OUT
+		     const log_entry src) // IN
 {
   /*@
     loop invariant 0 <= j <= LOG_ENTRY_LENGTH;
@@ -15,4 +15,3 @@ void copy_log_entry (log_entry dst, // OUT
     }
 
 }
-

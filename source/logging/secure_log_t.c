@@ -1,7 +1,7 @@
 #include "secure_log_t.h"
 
-void copy_sha256_base64_digest (sha256_base64_digest dst, // OUT
-                                sha256_base64_digest src) // IN
+void copy_sha256_base64_digest (sha256_base64_digest dst,       // OUT
+                                const sha256_base64_digest src) // IN
 {
   /*@
     loop invariant 0 <= j <= SHA256_BASE_64_DIGEST_LENGTH_BYTES;
@@ -14,5 +14,3 @@ void copy_sha256_base64_digest (sha256_base64_digest dst, // OUT
       dst[j] = src[j];
     }
 }
-
-  

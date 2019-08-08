@@ -24,7 +24,7 @@ typedef uint8_t log_entry[LOG_ENTRY_LENGTH];
     assigns dst[0 .. LOG_ENTRY_LENGTH - 1];
     ensures \forall integer i; 0 <= i < LOG_ENTRY_LENGTH ==> dst[i] == src[i];
 */
-void copy_log_entry (log_entry dst,  // OUT
-		     log_entry src); // IN
+void copy_log_entry (log_entry dst,        // OUT
+		     const log_entry src); // IN
 
 #endif
