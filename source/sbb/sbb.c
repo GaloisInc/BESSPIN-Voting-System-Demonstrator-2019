@@ -295,6 +295,10 @@ bool cast_or_spoil_timeout_expired(void)
 bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
                       uint16_t *hour, uint16_t *minute)
 {
+#ifdef SIMULATION_UART
+    // no RTC in the UART-only simulation
+    return true;
+#else // SIMULATION_UART
     static struct rtctime_t time;
 #ifdef HARDCODE_CURRENT_TIME
     time.year = CURRENT_YEAR - 2000;
@@ -319,4 +323,5 @@ bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
     printf("Get current time: %s\r\n",time_str);
 #endif
     return true;
+#endif // SIMULATION_UART
 }

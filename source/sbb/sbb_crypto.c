@@ -18,6 +18,10 @@
 
 bool timestamp_lte_now(const uint8_t *barcode_time)
 {
+#ifdef SIMULATION_UART
+    // no time validation in the UART simulation, always return true
+    return true;
+#else // SIMULATION_UART
     uint32_t year, year_now;
     uint16_t month, day, hour, minute;
     uint16_t month_now, day_now, hour_now, minute_now;
@@ -56,6 +60,7 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
     }
 
     return b_valid;
+#endif // SIMULATION_UART
 }
 
 barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
