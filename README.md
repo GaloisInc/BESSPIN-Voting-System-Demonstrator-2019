@@ -7,7 +7,9 @@
 
 Galois and Free & Fair are pleased to present the BESSPIN Voting System (BVS).
 
-The purpose of the BVS is to demonstrate the secure CPUs developed under the DARPA MTO System Security Integration Through Hardware and Firmware (SSITH) program. This demonstration vehicle is the focus of a long-term, fully open process of adversarial cyber-security testing, starting at DEF CON 27 in August 2019 and continuing through the following year to DEF CON 28 in 2020 and beyond.
+The BESSPIN Voting System (BVS) is a demonstration system being funded by DARPA’s SSITH (System Security Integrated Through Hardware and Firmware) program. SSITH’s goal is to develop new technologies that will enable chip designers to safeguard hardware against all known classes of software-exploitable vulnerabilities, such as memory errors, information leakage, and code injection.
+
+The BVS demonstration system is intended to showcase the SSITH program’s results by showing how the innovations of “securitized hardware” could be applied to a type of critical computing system that is personally familiar both in use and in importance to millions of Americans: voting systems. BVS is a combination of voting-system demonstration software together with prototypes of securitized hardware being developed by SSITH researchers.
 
 This public repository provides prospective adversarial testers with complete information, tools, specifications, and source code that was used to develop the 2019 release of the BVS. The intent is to provide the most open possible approach to testing, enabling testers to obtain the full build environment for the BVS, to build it from original sources, assess its strengths and weaknessess, and plan and develop possible exploits to compromise the BVS.
 However, not every tester will wish to start with this “Build First” approach. Others may wish to begin with the “Attacker Quickstart” information in order to learn and use the tools and reference exploits provided for testers. Still others may wish to learn about the BVS with a more manageable “short list” of documentation and information, rather than exploring the full repository.
