@@ -708,8 +708,7 @@ void sim_uart_main_loop(void)
     \r\n";
     
     printf("Starting simulation UART input\r\n");
-    printf("%s(buffer first=%p, last=%p)\r\n",
-           help, &buffer[0], &buffer[SIM_COMMAND_BUFFER_LENGTH - 1]);
+    printf("%s\r\n", help);
 
     for (;;)
     {
@@ -735,13 +734,11 @@ void sim_uart_main_loop(void)
                     sim_barcode_input();
                     break;
                 case 'h':
-                    printf("%s(buffer first=%p, last=%p)\r\n", help,
-                           &buffer[0], &buffer[15]);
+                    printf("%s\r\n", help);
                     break;
                 default:
                     printf("Unknown command\r\n");
-                    printf("%s(buffer first=%p, last=%p)\r\n", help,
-                           &buffer[0], &buffer[15]);
+                    printf("%s\r\n", help);
                     break;
             }
         }
@@ -760,14 +757,14 @@ void sim_barcode_input()
            &buffer[0], &buffer[SIM_BARCODE_BUFFER_LENGTH - 1]);
     
     read = 0;
-    while (read < SIM_BARCODE_BUFFER_LENGTH &&
+    while (// read < SIM_BARCODE_BUFFER_LENGTH && // buffer vulnerability!
            strstr(buffer, "\n") == NULL)
     {
-        // put buffer vulnerability here?
         len = uart0_rxbuffer(&buffer[read], SIM_BARCODE_BUFFER_LENGTH - read - 1);
         read = read + len;
     }
-    // now there is a "barcode" in buffer and at least one trailing \0
+    // now there is a "barcode" in buffer and at least one trailing \0,
+    // though the buffer could have been overrun...
     xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
     xStreamBufferSend(xScannerStreamBuffer, (void *)buffer,
                       strlen(buffer),
