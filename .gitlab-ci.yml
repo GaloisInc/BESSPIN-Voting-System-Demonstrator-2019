@@ -18,12 +18,27 @@ before_script:
 # Top level tests
 #
 #-----------------------------------------------------------------------------#
-SbbFpga:
+SbbFpga_LLVM:
+  script:
+    - export USE_CLANG=yes
+    - nix-shell --run 'make fpga'
+    - unset USE_CLANG
+  tags: ["voting-system"]
+
+SbbSim_LLVM:
+  script:
+    - export USE_CLANG=yes
+    - nix-shell --run 'make sim'
+    - unset USE_CLANG
+  tags: ["voting-system"]
+
+
+SbbFpga_GCC:
   script:
     - nix-shell --run 'make fpga'
   tags: ["voting-system"]
 
-SbbSim:
+SbbSim_GCC:
   script:
     - nix-shell --run 'make sim'
   tags: ["voting-system"]
