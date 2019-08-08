@@ -42,6 +42,23 @@ typedef uint8_t aes256_key[AES256_KEY_LENGTH_BYTES];
 #define SHA256_DIGEST_LENGTH_BYTES (SHA256_DIGEST_LENGTH_BITS / 8)
 typedef uint8_t sha256_digest[SHA256_DIGEST_LENGTH_BYTES];
 
+// Whole array assignment of src[0 .. SHA256_DIGEST_LENGTH_BYTES - 1] onto
+//                           dst[0 .. SHA256_DIGEST_LENGTH_BYTES - 1]
+/*@ requires \valid(dst + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+    requires \valid_read(src + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+    requires \separated(dst + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1),
+                        src + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+    assigns dst[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
+    ensures \forall integer i; 0 <= i < SHA256_DIGEST_LENGTH_BYTES ==>
+       dst[i] == src[i];
+*/
+void copy_sha256_digest (sha256_digest dst,  // OUT
+		         sha256_digest src); // IN
+
+
+
+
+
 typedef uint8_t *block;
 typedef block plaintext_block;
 typedef block ciphertext_block;

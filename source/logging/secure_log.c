@@ -314,8 +314,8 @@ bool verify_secure_log_security(secure_log the_secure_log)
             // additional entries to use.
 
             // whole array assignment  the_secure_log->previous_hash = root_entry.the_digest;
-            memcpy (&the_secure_log->previous_hash[0], &root_entry.the_digest[0],
-                    SHA256_DIGEST_LENGTH_BYTES);
+            copy_sha256_digest (&the_secure_log->previous_hash[0],
+                                &root_entry.the_digest[0]);
             return true;
           }
         else
@@ -336,8 +336,7 @@ bool verify_secure_log_security(secure_log the_secure_log)
             // If all is well, then save the hash of the root entry to verify
             // the next one.
             // whole array assignment  prev_hash = root_entry.the_digest;
-            memcpy(&prev_hash[0], &root_entry.the_digest[0],
-                   SHA256_DIGEST_LENGTH_BYTES);
+            copy_sha256_digest(&prev_hash[0], &root_entry.the_digest[0]);
 
             /*@
               loop invariant 2 <= i <= (num_entries + 1);
@@ -355,8 +354,7 @@ bool verify_secure_log_security(secure_log the_secure_log)
                 if (valid_log_entry(this_entry, prev_hash))
                   {
                     // whole array assignment  prev_hash = this_entry.the_digest;
-                    memcpy(&prev_hash[0], &this_entry.the_digest[0],
-                           SHA256_DIGEST_LENGTH_BYTES);
+                    copy_sha256_digest(&prev_hash[0], &this_entry.the_digest[0]);
                   }
                 else
                   {
@@ -369,8 +367,7 @@ bool verify_secure_log_security(secure_log the_secure_log)
             // entries can be appended later.
             //
             // whole array assignment  the_secure_log->previous_hash = prev_hash;
-            memcpy (&the_secure_log->previous_hash[0], &prev_hash[0],
-                    SHA256_DIGEST_LENGTH_BYTES);
+            copy_sha256_digest(&the_secure_log->previous_hash[0], &prev_hash[0]);
 
             return true;
           }
