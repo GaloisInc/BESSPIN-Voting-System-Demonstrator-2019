@@ -297,6 +297,11 @@ bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
 {
 #ifdef SIMULATION_UART
     // no RTC in the UART-only simulation
+    (void) year;
+    (void) month;
+    (void) day;
+    (void) hour;
+    (void) minute;
     return true;
 #else // SIMULATION_UART
     static struct rtctime_t time;

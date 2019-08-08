@@ -20,6 +20,7 @@ bool timestamp_lte_now(const uint8_t *barcode_time)
 {
 #ifdef SIMULATION_UART
     // no time validation in the UART simulation, always return true
+    (void) barcode_time;
     return true;
 #else // SIMULATION_UART
     uint32_t year, year_now;
