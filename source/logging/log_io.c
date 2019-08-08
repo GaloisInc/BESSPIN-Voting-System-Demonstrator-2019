@@ -252,29 +252,12 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                 {
   		    // All is well... so copy the decoded digest
 		    // into secure_log_entry_result.the_digest
-
-                    /*@
-                      loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-                      loop assigns i, secure_log_entry_result.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-                      loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-                    */
-                    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-                    {
-                        secure_log_entry_result.the_digest[i] = tmpbuf[i];
-                    }
+                    copy_sha256_digest (&secure_log_entry_result.the_digest[0],
+                                        &tmpbuf[0]);
 
 		    // Now copy the data
-
-                    /*@
-                      loop invariant 0 <= k <= LOG_ENTRY_LENGTH;
-                      loop assigns k, secure_log_entry_result.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-                      loop variant LOG_ENTRY_LENGTH - k;
-                    */
-                    for (size_t k = 0; k < LOG_ENTRY_LENGTH; k++)
-                    {
-                        secure_log_entry_result.the_entry[k] =
-                            result.the_entry[k];
-                    }
+                    copy_log_entry (&secure_log_entry_result.the_entry[0],
+                                    &result.the_entry[0]);
                     return secure_log_entry_result;
                 }
                 else // decode failed
