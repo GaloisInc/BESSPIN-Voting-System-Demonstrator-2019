@@ -20,11 +20,33 @@ ABI 		= -mabi=ilp32
 
 ARCHTARGET=$(CCPATH)riscv${RISCV_XLEN}-unknown-${RISCV_LIB}
 
+# Default to GCC
+USE_CLANG ?= no
+
+# Decide which compiler to use
+ifeq ($(USE_CLANG),yes)
+GCC_SYSROOT_PATH=$(shell which riscv32-unknown-elf-gdb)
+export C_INCLUDE_PATH= $(dir $(GCC_SYSROOT_PATH))../riscv32-unknown-elf/include
+$(info C_INCLUDE_PATH=$(C_INCLUDE_PATH))
+export CC		= clang --target=riscv32
+# LLVM doesn't support linking RISC-V files yet,
+# so we have to use GCC linker to do so
 export GCC		= $(ARCHTARGET)-gcc
+export OBJCOPY	= llvm-objcopy
+export OBJDUMP	= llvm-objdump
+export AR		= llvm-ar
+export RANLIB	= llvm-ranlib
+else
+export CC		= $(ARCHTARGET)-gcc
+export GCC		= $(CC)
 export OBJCOPY	= $(ARCHTARGET)-objcopy
 export OBJDUMP	= $(ARCHTARGET)-objdump
 export AR		= $(ARCHTARGET)-ar
 export RANLIB	= $(ARCHTARGET)-ranlib
+export COMPILER_FLAGS = -mcmodel=medany
+# TODO: Use -Werror only for GCC now
+export WERROR = -Werror
+endif
 
 SOURCE_BASE_DIR = ../../source
 FREERTOS_BASE_DIR = ../../FreeRTOS-mirror
@@ -40,7 +62,7 @@ FREERTOS_PLUS_SOURCE_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 export FREERTOS_PROTOCOLS_DIR = $(SOURCE_BASE_DIR)/protocols
 
-export WARNINGS= -Werror -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
+export WARNINGS= $(WERROR) -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
 		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
 
 export FREERTOS_SRC = \
@@ -83,7 +105,7 @@ export INCLUDES = \
 	-I$(CRYPTO_SOURCE_DIR)
 
 export CFLAGS += $(WARNINGS) $(INCLUDES)
-export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany -DTARGET_OS_FreeRTOS -DNO_MEMSET_S
+export CFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) -DTARGET_OS_FreeRTOS -DNO_MEMSET_S
 
 export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
@@ -113,6 +135,7 @@ export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_sinit.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_l.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_sinit.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_selftest.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_master.c \
