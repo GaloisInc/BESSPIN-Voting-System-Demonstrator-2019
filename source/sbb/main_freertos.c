@@ -817,7 +817,10 @@ void sim_barcode_input()
                 printf("%c", buffer[read + i]);
             }
         }
-        read = read + len;
+        if (len > 0)
+        {
+            read = read + len;
+        }
         msleep(1);
     }
     // now there is a "barcode" in buffer and at least one trailing \0,
@@ -855,7 +858,10 @@ void sim_malware_inject()
                 printf("%c", malware_buffer[read + i]);
             }
         }
-        read = read + len;
+        if (len > 0)
+        {
+            read = read + len;
+        }
         msleep(1);
     }
     
