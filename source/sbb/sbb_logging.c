@@ -132,11 +132,11 @@ bool log_app_event(app_event event,
         num_scanned_codes++;
 #endif
 #ifdef SIMULATION
-        debug_printf("LOG: %c %hhu", (char)app_event_entries[event], (uint8_t)barcode_length);
+        printf("App LOG: %c %hhu", (char)app_event_entries[event], (uint8_t)barcode_length);
         for (size_t i = 0; i < barcode_length; i++) {
-            debug_printf(" %hhx", (uint8_t)barcode[i]);
+            printf("%c", barcode[i]);
         }
-        debug_printf("\r\n");
+        printf("\r\n");
 #endif
         Log_FS_Result res = write_entry(&app_log_handle, event_entry);
         return (res == LOG_FS_OK);

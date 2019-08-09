@@ -53,6 +53,7 @@
 
 /* Smart Ballot Box includes */
 #include "../logging/debug_io.h"
+#include "../crypto/base64.h"
 #include "sbb.h"
 #include "sbb_freertos.h"
 
@@ -78,13 +79,14 @@ static void prvStatsTask(void *pvParameters);
 
 /*-----------------------------------------------------------*/
 /* Sample barcodes */
+#ifdef SIMULATION
 static char *valid_barcode_1 =
     "2019+07+31+22+22:1bk5cBJeyseBExT54lsVpS6Qk0hN_c3uuX4feV6D_-k=";
 static char *valid_barcode_2 =
     "2019+07+31+22+22:vlj364nx6CD7wCTA0MCZkZNl4UCdrI_tHMJtcra8eAE=";
 static char *valid_barcode_3 =
     "2019+07+31+22+20:vqj3MRalpCh5tCeiT7aq3frv9MXlY19-BOPIQEsGGtI=";
-
+#endif // SIMULATION
 /*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/
@@ -146,10 +148,11 @@ int main(void)
     xSBBEventGroup = xEventGroupCreate();
     configASSERT(xSBBEventGroup);
 
+#ifndef DISABLE_NETWORK
     // Initialize startup task
     xTaskCreate(prvStartupTask, "StartupTask", SBB_STARTUP_TASK_STACK_SIZE,
                 NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
-
+#endif
     // Setup TCP IP *after* all buffers and event groups are initialized
     sbb_tcp();
 
@@ -516,6 +519,9 @@ void prvStartupTask(void *pvParameters)
 void prvInputTask(void *pvParameters)
 {
     (void)pvParameters;
+#ifdef SIMULATION_UART
+    sim_uart_main_loop();
+#else // SIMULATION_UART
     EventBits_t uxReturned;
     TickType_t paper_in_timestamp = 0;
 
@@ -617,10 +623,11 @@ void prvInputTask(void *pvParameters)
 
         vTaskDelay(GPIO_READ_DELAY_MS);
     }
+#endif // SIMULATION_UART
 }
 
 /*-----------------------------------------------------------*/
-
+#ifdef SIMULATION
 void sim_paper_sensor_in_pressed(void)
 {
     printf("SIM: bPAPER_SENSOR_IN_PRESSED\r\n");
@@ -687,4 +694,203 @@ void sim_spoil_button_pressed(void)
     xEventGroupSetBits(xSBBEventGroup, ebSPOIL_BUTTON_RELEASED);
     xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
 }
+
+#ifdef SIMULATION_UART
+#pragma message "UART Simulator Enabled"
+#define MALWARE_LENGTH 4096 * 4
+// malware buffer must hold 4096 * 4 Base64-encoded bytes
+#define MALWARE_BASE64_BUFFER_LENGTH 5462 * 4
+static char malware_buffer[MALWARE_BASE64_BUFFER_LENGTH] = {0};
+#define NOP portNOP();
+#define NOP4 NOP NOP NOP NOP
+#define NOP16 NOP4 NOP4 NOP4 NOP4
+#define NOP64 NOP16 NOP16 NOP16 NOP16
+#define NOP256 NOP64 NOP64 NOP64 NOP64
+#define NOP1024 NOP256 NOP256 NOP256 NOP256
+#define NOP4096 NOP1024 NOP1024 NOP1024 NOP1024
+
+static size_t malware (void) {
+    
+    NOP256;
+    NOP4096;
+    NOP256;
+    
+    return 0;
+}
+
+// start and end of the malware function body; note that it includes
+// 4096 NOPs plus a return, each of which is 32 bits (4 bytes) long,
+// plus buffers on both sides - we're effectively providing a region
+// of 4352 NOPs, with a bunch of NOPs and function frame setup on
+// either side
+static const uint8_t *malware_region_start = ((uint8_t *) &malware) + 128 * 4;
+//static const uint8_t *malware_region_end = ((uint8_t *) &malware) + (128 + 4096) * 4;
+
+void sim_uart_main_loop(void)
+{
+    char buffer[SIM_COMMAND_BUFFER_LENGTH] = {0};
+    int len;
+    char *help = "You can trigger the following events:\r\n \
+    1 - momentary press of Cast button\r\n \
+    2 - momentary press of Spoil button\r\n \
+    3 - activate Paper In sensor\r\n \
+    4 - deactivate Paper In sensor\r\n \
+    5 - scan and send Barcode\r\n \
+    6 - inject malware\r\n \
+    7 - run malware\r\n \
+    \r\n";
+    
+    printf("Starting simulation UART input\r\n");
+    printf("%s", help);
+
+    for (;;)
+    {
+        // put buffer vulnerability here?
+        len = uart0_rxbuffer(buffer, SIM_COMMAND_BUFFER_LENGTH);
+        if (len > 0) {
+            for (int i = 0; i < len; i++) {
+                printf("%c\r\n", buffer[i]);
+            }
+            char c = buffer[0];
+            switch (c)
+            {
+                case '1':
+                    sim_cast_button_pressed();
+                    break;
+                case '2':
+                    sim_spoil_button_pressed();
+                    break;
+                case '3':
+                    sim_paper_sensor_in_pressed();
+                    break;
+                case '4':
+                    sim_paper_sensor_in_released();
+                    break;
+                case '5':
+                    sim_barcode_input();
+                    break;
+                case '6':
+                    sim_malware_inject();
+                    break;
+                case '7':
+                    printf("malware return value: %d\r\n", malware());
+                    break;
+                case 'h':
+                case '?':
+                    printf("%s\r\n", help);
+                    break;
+                default:
+                    printf("Unknown command\r\n");
+                    printf("%s\r\n", help);
+                    break;
+            }
+        }
+        msleep(1);
+    }
+}
+
+void sim_barcode_input()
+{
+    char buffer[SIM_BARCODE_BUFFER_LENGTH] = {0};
+    int len;
+    int read = 0;
+    bool cr = false;
+    printf("Enter a barcode terminated with a carriage return.\r\n \
+(buffer first=%p, last=%p)\r\n",
+           &buffer[0], &buffer[SIM_BARCODE_BUFFER_LENGTH - 1]);
+    
+    while (// read < SIM_BARCODE_BUFFER_LENGTH && // buffer vulnerability!
+           !cr)
+    {
+        len = uart0_rxbuffer(&buffer[read],
+                             SIM_BARCODE_BUFFER_LENGTH /* - read */);
+        for (int i = 0; i < len; i++)
+        {
+            if (buffer[read + i] == '\r')
+            {
+                cr = true;
+                buffer[read + i] = 0; // null terminator on input string
+                printf("\r\n");
+            }
+            else
+            {
+                printf("%c", buffer[read + i]);
+            }
+        }
+        if (len >= 0)
+        {
+            read = read + len;
+        }
+        else
+        {
+            printf("\r\nnegative return value from uart0_rxbuffer: %d\r\n", len);
+        }
+    }
+    // now there is a "barcode" in buffer and at least one trailing \0,
+    // though the buffer could have been overrun...
+    printf("%d bytes of barcode received\r\n", strlen(buffer));
+    xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
+    xStreamBufferSend(xScannerStreamBuffer, (void *)buffer,
+                      strlen(buffer),
+                      SCANNER_BUFFER_TX_BLOCK_TIME_MS);
+}
+
+void sim_malware_inject()
+{
+    int len;
+    int read = 0;
+    bool cr = false;
+    
+    printf("Enter up to 4096 RV32 instructions encoded in Base64,\r\n \
+           terminated by a carriage return, to be placed at address %p\r\n",
+           malware_region_start);
+    while (!cr && read < MALWARE_BASE64_BUFFER_LENGTH)
+    {
+        len = uart0_rxbuffer(&malware_buffer[read],
+                             MALWARE_BASE64_BUFFER_LENGTH - read);
+        for (int i = 0; i < len; i++)
+        {
+            if (malware_buffer[read + i] == '\r')
+            {
+                cr = true;
+                malware_buffer[read + i] = 0; // null terminator on input string
+                printf("\r\n");
+            }
+            else
+            {
+                printf("%c", malware_buffer[read + i]);
+            }
+        }
+        if (len >= 0)
+        {
+            read = read + len;
+        }
+        else
+        {
+            printf("\r\nnegative return value from uart0_rxbuffer: %d\r\n", len);
+        }
+        msleep(1);
+    }
+    
+    // assuming we read anything, let's decode it
+    size_t olen;
+    read = strlen(malware_buffer);
+    int r = mbedtls_base64_decode((unsigned char *)malware_region_start,
+                                  3 * (read / 4),
+                                  &olen,
+                                  (const unsigned char *)&malware_buffer,
+                                  read);
+    if (r == 0)
+    {
+        printf("%d bytes of malware successfully injected.\r\n", olen);
+    }
+    else
+    {
+        printf("Base64 encoding invalid, error code %d.\r\n", r);
+    }
+    // zero out the malware buffer
+    memset(malware_buffer, 0, MALWARE_BASE64_BUFFER_LENGTH);
+}
+#endif // SIMULATION_UART
+#endif // SIMULATION
 /*-----------------------------------------------------------*/

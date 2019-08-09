@@ -60,6 +60,7 @@ extern void gpio_set_as_output(uint8_t);
 
 void initialize(void)
 {
+#ifndef SIMULATION
     gpio_set_as_input(BUTTON_CAST_IN);
     gpio_set_as_input(BUTTON_SPOIL_IN);
     gpio_set_as_input(PAPER_SENSOR_IN);
@@ -68,6 +69,7 @@ void initialize(void)
     gpio_set_as_output(MOTOR_1);
     gpio_set_as_output(BUTTON_CAST_LED);
     gpio_set_as_output(BUTTON_SPOIL_LED);
+#endif // SIMULATION
     the_state.button_illumination = 0;
     // Logging is not set up yet...we could do that here I suppose
     the_state.M = MOTORS_OFF;
@@ -293,6 +295,15 @@ bool cast_or_spoil_timeout_expired(void)
 bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
                       uint16_t *hour, uint16_t *minute)
 {
+#ifdef SIMULATION_UART
+    // no RTC in the UART-only simulation
+    (void) year;
+    (void) month;
+    (void) day;
+    (void) hour;
+    (void) minute;
+    return true;
+#else // SIMULATION_UART
     static struct rtctime_t time;
 #ifdef HARDCODE_CURRENT_TIME
     time.year = CURRENT_YEAR - 2000;
@@ -317,4 +328,5 @@ bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
     printf("Get current time: %s\r\n",time_str);
 #endif
     return true;
+#endif // SIMULATION_UART
 }

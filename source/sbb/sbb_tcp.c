@@ -75,6 +75,7 @@ const BaseType_t xLogToStdout = pdTRUE, xLogToFile = pdFALSE,
 bool the_network_status = false;
 void sbb_tcp(void);
 void reportIPStatus(void);
+void createTasks(void);
 
 void prvBallotBoxMainTask(void *pvParameters);
 void prvBarcodeScannerTask(void *pvParameters);
@@ -89,6 +90,7 @@ void sbb_tcp(void)
 	the random number generator. */
     prvMiscInitialisation();
 
+#ifndef DISABLE_NETWORK
     // populate AxiEthernetMAC with the values from sbb_mac_address
     // the former is used internally by the Ethernet driver, and the latter by
     // the FreeRTOS_IPInit function as part of the default network packet
@@ -108,8 +110,35 @@ void sbb_tcp(void)
     FreeRTOS_IPInit(sbb_default_ip_address, sbb_default_netmask,
                     sbb_default_gateway_address, sbb_default_dns_server_address,
                     sbb_mac_address);
+#else // DISABLE_NETWORK
+    createTasks();
+#endif // DISABLE_NETWORK
 }
 /*-----------------------------------------------------------*/
+
+// a helper function that creates the FreeRTOS tasks
+void createTasks(void)
+{
+    printf("Smart Ballot Box: starting tasks...\r\n");
+    xTaskCreate(prvBallotBoxMainTask, "MainTask",
+                SBB_MAIN_TASK_STACK_SIZE, NULL,
+                SBB_MAIN_TASK_PRIORITY, NULL);
+#ifndef SIMULATION // Don't use these tasks in simulation
+    xTaskCreate(prvBarcodeScannerTask, "BarcodeScannerTask",
+                SBB_SCANNER_TASK_STACK_SIZE, NULL,
+                SBB_SCANNER_TASK_PRIORITY, NULL);
+#endif // SIMULATION
+    xTaskCreate(prvInputTask, "InputTask", SBB_INPUT_TASK_STACK_SIZE,
+                NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+#ifndef DISABLE_NETWORK
+#ifdef NETWORK_LOGS
+#pragma message "Including Network Logs"
+        xTaskCreate(prvNetworkLogTask, "NetworkLogTask",
+                                     SBB_NET_LOG_TASK_STACK_SIZE, NULL,
+                                     SBB_NET_LOG_TASK_PRIORITY, NULL);
+#endif // NETWORK_LOGS
+#endif // DISABLE_NETWORK
+}
 
 /* Called by FreeRTOS+TCP when the network connects or disconnects.  Disconnect
    events are only received if implemented in the MAC driver. */
@@ -133,23 +162,7 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
 		   created. */
         if (xTasksAlreadyCreated == pdFALSE)
         {
-            printf("Smart Ballot Box: starting tasks...\r\n");
-            xTaskCreate(prvBallotBoxMainTask, "MainTask",
-                        SBB_MAIN_TASK_STACK_SIZE, NULL, SBB_MAIN_TASK_PRIORITY,
-                        NULL);
-#ifndef SIMULATION // Don't use these tasks in simulation
-            xTaskCreate(prvBarcodeScannerTask, "BarcodeScannerTask",
-                        SBB_SCANNER_TASK_STACK_SIZE, NULL,
-                        SBB_SCANNER_TASK_PRIORITY, NULL);
-            xTaskCreate(prvInputTask, "InputTask", SBB_INPUT_TASK_STACK_SIZE,
-                        NULL, SBB_INPUT_TASK_PRIORITY, NULL);
-#endif
-#ifdef NETWORK_LOGS
-#pragma message "Including Network Logs"
-            xTaskCreate(prvNetworkLogTask, "NetworkLogTask",
-                        SBB_NET_LOG_TASK_STACK_SIZE, NULL,
-                        SBB_NET_LOG_TASK_PRIORITY, NULL);
-#endif
+            createTasks();
             xTasksAlreadyCreated = pdTRUE;
         }
 
