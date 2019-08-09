@@ -60,6 +60,8 @@
 /* "Peek/poke" embedded web server */
 #include "peekpoke.h"
 
+extern const uint16_t sbb_log_port_number;
+
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented
    within this file.  See https://www.freertos.org/a00016.html */
 void vApplicationMallocFailedHook(void);
@@ -76,6 +78,13 @@ uint64_t get_cycle_count(void);
 char statsBuffer[1024];
 static void prvStatsTask(void *pvParameters);
 #endif /* configGENERATE_RUN_TIME_STATS */
+
+#if USE_LED_BLINK_TASK
+#pragma message "Using LED_BLINK_TASK"
+#include "gpio.h"
+#define MAIN_LED_DELAY_MS 100
+static void vTestLED(void *pvParameters);
+#endif
 
 /*-----------------------------------------------------------*/
 /* Sample barcodes */
@@ -159,6 +168,11 @@ int main(void)
 #if configGENERATE_RUN_TIME_STATS
     xTaskCreate(prvStatsTask, "StatsTask", configMINIMAL_STACK_SIZE * 10,
                 NULL, SBB_STATS_TASK_PRIORITY, NULL);
+#endif
+
+
+#if USE_LED_BLINK_TASK
+	xTaskCreate(vTestLED, "LED Test", 1000, NULL, 0, NULL);
 #endif
 
     /* 
@@ -402,7 +416,7 @@ void prvNetworkLogTask(void *pvParameters)
     debug_printf("Seed for randomiser: %lu\r\n", seed);
     prvSRand((uint32_t)seed);
 
-    xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
+    xRemoteAddress.sin_port = FreeRTOS_htons(sbb_log_port_number);
     xRemoteAddress.sin_addr =
         FreeRTOS_inet_addr_quick(configRptrIP_ADDR0, configRptrIP_ADDR1,
                                  configRptrIP_ADDR2, configRptrIP_ADDR3);
@@ -894,3 +908,52 @@ void sim_malware_inject()
 #endif // SIMULATION_UART
 #endif // SIMULATION
 /*-----------------------------------------------------------*/
+
+
+#if USE_LED_BLINK_TASK
+void vTestLED(void *pvParameters)
+{
+    (void)pvParameters;
+
+    printf("vTestLED starting\r\n");
+
+    for(;;)
+    {
+        /* Write to every LED */
+        led_write(0);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(1);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(2);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(3);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(4);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(5);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(6);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(7);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+
+        /* Clear every LED */
+        led_clear(0);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(1);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(2);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(3);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(4);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(5);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(6);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(7);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+    }
+}
+#endif /* USE_LED_BLINK_TASK */

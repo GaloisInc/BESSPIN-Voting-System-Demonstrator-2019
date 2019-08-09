@@ -2,18 +2,38 @@
  * Smart Ballot Box API
  * @refine sbb.lando
  */
-
 #include "sbb.h"
+#include "FreeRTOSIPConfig.h"
 
-// Configuration strings for SBB 1
+// Default configuration strings for a SBB
+/* MAC address of the box */
+#define sbb_realMAC_ADDR0		0x10
+#define sbb_realMAC_ADDR1		0x0a
+#define sbb_realMAC_ADDR2		0x35
+#define sbb_realMAC_ADDR3		0x04
+#define sbb_realMAC_ADDR4		0xdb
+#define sbb_realMAC_ADDR5		0x04
+
+// IP address of SBB in case DHCP fails.  
+#define sbbIP_ADDR0		10
+#define sbbIP_ADDR1		88
+#define sbbIP_ADDR2		88
+#define sbbIP_ADDR3		5
+
+// Port number of the logging server
+#define LOG_PORT_NUMBER 6603
+
+// Configuration strings for SBB 3
 const char *sbb_name = "SBB3";
 const log_name system_log_file_name = "sbb3_system.log";
 const log_name app_log_file_name = "sbb3_application.log";
-const uint8_t sbb_mac_address[6] = { 0x00, 0x0a, 0x35, 0x66, 0x66, 0x03 };
-const uint8_t sbb_default_ip_address[4] = { 10, 5, 5, 103 };
-const uint8_t sbb_default_netmask[4] = { 255, 255, 255, 0 };
-const uint8_t sbb_default_gateway_address[4] = { 10, 5, 5, 103 };
-const uint8_t sbb_default_dns_server_address[4] = { 10, 5, 5, 103 };
+
+const uint8_t sbb_mac_address[6] = { sbb_realMAC_ADDR0, sbb_realMAC_ADDR1, sbb_realMAC_ADDR2, sbb_realMAC_ADDR3, sbb_realMAC_ADDR4, sbb_realMAC_ADDR5 };
+const uint8_t sbb_default_ip_address[4] = { sbbIP_ADDR0, sbbIP_ADDR1, sbbIP_ADDR2, sbbIP_ADDR3 };
+const uint8_t sbb_default_netmask[4] = { configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3 };
+const uint8_t sbb_default_gateway_address[4] = { configGATEWAY_ADDR0, configGATEWAY_ADDR1, configGATEWAY_ADDR2, configGATEWAY_ADDR3 };
+const uint8_t sbb_default_dns_server_address[4] = { configDNS_SERVER_ADDR0, configDNS_SERVER_ADDR1, configDNS_SERVER_ADDR2, configDNS_SERVER_ADDR3 };
+const uint16_t sbb_log_port_number = 8066;
 
 // cryptographic keys for SBB 1
 

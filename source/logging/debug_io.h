@@ -13,8 +13,6 @@
 #define log_system_debug_printf(...)
 #endif // LOG_SYSTEM_DEBUG
 
-#define LOG_PORT_NUMBER 8066
-
 /*@ assigns \nothing; // TBD
 */
 int debug_printf(const char *the_format, ...);
