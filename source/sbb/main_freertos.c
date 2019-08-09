@@ -822,6 +822,7 @@ void sim_barcode_input()
     }
     // now there is a "barcode" in buffer and at least one trailing \0,
     // though the buffer could have been overrun...
+    printf("%d bytes of barcode received\r\n", strlen(buffer));
     xEventGroupSetBits(xSBBEventGroup, ebBARCODE_SCANNED);
     xStreamBufferSend(xScannerStreamBuffer, (void *)buffer,
                       strlen(buffer),
