@@ -817,7 +817,7 @@ void sim_barcode_input()
                 printf("%c", buffer[read + i]);
             }
         }
-        if (len > 0)
+        if (len >= 0)
         {
             read = read + len;
         }
@@ -862,7 +862,7 @@ void sim_malware_inject()
                 printf("%c", malware_buffer[read + i]);
             }
         }
-        if (len > 0)
+        if (len >= 0)
         {
             read = read + len;
         }
