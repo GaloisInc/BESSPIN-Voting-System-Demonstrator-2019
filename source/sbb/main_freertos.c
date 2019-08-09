@@ -785,7 +785,6 @@ void sim_uart_main_loop(void)
                     break;
             }
         }
-        msleep(1);
     }
 }
 
@@ -825,7 +824,6 @@ void sim_barcode_input()
         {
             printf("\r\nnegative return value from uart0_rxbuffer: %d\r\n", len);
         }
-        msleep(1);
     }
     // now there is a "barcode" in buffer and at least one trailing \0,
     // though the buffer could have been overrun...
