@@ -47,30 +47,49 @@ for the SBB software that runs on the reference system and the target systems.
 
 The centerpiece of the attackers toolset is a network service called peek-poke that was added the SBB to make it very convenient to demonstrate sample exploits, and to enable testers to come up with their own exploits. Included along with the Guide are sample exploits described in a cookbook manner, walking through several simple exploits using the peek-poke server on the reference CPU, demonstrating several techniques you may find useful for writing your exploits. 
 
-The peek-poke server provides an HTTP service that attackers can use via a browser, or via a shell and curl to send commands. This Attack-QuickStart part of the repo includes a man page with specific usage for the web service’s interfaces: hello, peek, and poke. Using the peek interface, attackers can request read the SBB’s memory at specified start address and length; if the memory region is readable, “peek” returns the contents of the memory region. Using the poke interface, attackers can access the contents of a function called `malware()`. Aside from the 1-kilobyte size of the memory region containing malware(), there are almost no restrictions on what `malware()` is permitted to do. It occupies the same memory space as the SBB code, and malware() is free to attempt to write over executable memory — which not controlled in the unprotected reference system. The malware() function is filled with NOP instructions to be overwritten with whatever you please, which will likely be binary corresponding to RISC-V 32-bit assembly instructions. You can interact with the peek-poke server by sending commands via `curl`. Check out [the peek-poke server README](./PEEKPOKE_README.md) for full usage instructions.
+The peek-poke server provides an HTTP service that attackers can use via a browser, or via a shell and curl to send commands. This Attack-QuickStart part of the repo includes a man page with specific usage for the web service’s interfaces: hello, peek, and poke. Using the peek interface, attackers can request read the SBB’s memory at specified start address and length; if the memory region is readable, “peek” returns the contents of the memory region. Using the poke interface, attackers can access the contents of a function called `malware()`. Aside from the 1-kilobyte size of the memory region containing `malware()`, there are almost no restrictions on what `malware()` is permitted to do. It occupies the same memory space as the SBB code, and `malware()` is free to attempt to write over executable memory — which not controlled in the unprotected reference system. The `malware()` function is filled with NOP instructions to be overwritten with whatever you please, which will likely be binary corresponding to RISC-V 32-bit assembly instructions. You can interact with the peek-poke server by sending commands via `curl`. Check out [the peek-poke server README](./PEEKPOKE_README.md) for full usage instructions.
 
 If you would like to use `malware()` to change instructions in other functions, you can use `objdump` to find the memory location of the section you’d like to change. You can then get the hex values of the assembly you’d like that section to contain, then send (via poke) assembly instructions that write those hex values to the memory location of your choice to live in the `malware()` function. Once it’s filled, you can run `malware()` via the peek-poke interface. If you would like to use tools like `objdump` you will need to use the RISC-V 32 bit version; Galois has provided a VM that has the RISC-V toolchain — also part of this repo.
 
 # The Reference Exploits
 
-In addition to this Guide (and other materials like supporting diagrams, the peek-poke man page, and the short intro to RISC-V) you will also find a set of reference exploits. Each one is sub-directory, containing a README that provides the cookbook-like instructions, and a C source code file, and a corresponding file of assembly language instructions. Each cookbook provides background on how the exploit was constructed, as well as specific usage with the peek-poke server to insert and run the assembly language fragment in malware().
+In addition to this Guide (and other materials like supporting
+diagrams, the peek-poke man page, and the short intro to RISC-V) you
+will also find a set of reference exploits. Each one is sub-directory
+under the `Sample-Exploits` directory, containing a README that
+provides the cookbook-like instructions, and a C source code file, and
+a corresponding file of assembly language instructions. Each cookbook
+provides background on how the exploit was constructed, as well as
+specific usage with the peek-poke server to insert and run the
+assembly language fragment in `malware()`.
 
-As an added convenience, you will also find a script run_exploit.sh that can be used to automate much of the interaction with peek-poke via curl. Each reference exploit’s README provides directions on how to use run_exploit.sh.
+As an added convenience, you will also find a script `run_exploit.sh` that can be used to automate much of the interaction with peek-poke via curl. Each reference exploit’s README provides directions on how to use `run_exploit.sh`.
 
 The reference exploits are:
 
 - [AES-key-to-display](./AES-key-to-display) is the simplest and most verbose example of how to use the peek-poke server. Start with this one. This exploit walks through how to write the ballot box LCD display value to be the location of the AES key.
 
-- [all-barcodes-are-valid](./all-barcodes-are-valid) is an example of how to overwrite instructions in the SBB code. You can't write instructions directly to the SBB code, but you can write instructions to the `malware` function that will write to the SBB code. This exploit walks through how to overwrite the function responsible for validating barcodes to always return `BARCODE_VALID`.
+- [all-barcodes-are-valid](./all-barcodes-are-valid) is an example of how to overwrite instructions in the SBB code. You can't write instructions directly to the SBB code, but you can write instructions to the `malware()` function that will write to the SBB code. This exploit walks through how to overwrite the function responsible for validating barcodes to always return `BARCODE_VALID`.
 
 - [accept-all-paper](./accept-all-paper) is an example of how to overwrite a function call in the SBB code with a different function call. The trick here is that functions are called using the `jal` instruction which is a relative jump, so you must compute the relative offset of the function you want to jump to. This exploit walks through how to change the control flow after a ballot has been inserted to immediately cast the ballot.
 
-- [accept-my-ballot](./accept-my-ballot) is a more complicated example of how to redirect control flow in the SBB code to jump into the `malware` function, perform a computation, and then jump back into different places in the SBB code depending on the result of the computation. This example also discusses the expected format for valid barcodes. This exploit walks through how to check whether a ballot has a specific barcode (one that say, you crafted yourself), and if so, validate that ballot. 
+- [accept-my-ballot](./accept-my-ballot) is a more complicated example of how to redirect control flow in the SBB code to jump into the `malware()` function, perform a computation, and then jump back into different places in the SBB code depending on the result of the computation. This example also discusses the expected format for valid barcodes. This exploit walks through how to check whether a ballot has a specific barcode (one that say, you crafted yourself), and if so, validate that ballot. 
 
-As you develop your own exploits, here are a few debug tips. First, make sure that you're compiling for 32-bit RISC-V, not 64-bit. Second, mind the endianness (assembling switches the order of each byte). Third, use the peek-poke server’s “hello” interface to get the entry_address for the malware function, but be careful to not smash the function setup instructions; with plenty of NOP space, you can just decide to write a little bit after the setup. Also, if you are poking the server manually (rather than using run_exploit.sh), remember to also request that the server `run` the `malware()` function. Finally, if run_exploit.sh` is failing: make sure you've set the IP of the server correctly; double-check that you have the correct `malware()` start address.
+As you develop your own exploits, here are a few debug tips. First, make sure that you're compiling for 32-bit RISC-V, not 64-bit. Second, mind the endianness (assembling switches the order of each byte). Third, use the peek-poke server’s “hello” interface to get the `entry_address` for the malware function, but be careful to not smash the function setup instructions; with plenty of NOP space, you can just decide to write a little bit after the setup. Also, if you are poking the server manually (rather than using `run_exploit.sh`), remember to also request that the server `run` the `malware()` function. Finally, if `run_exploit.sh` is failing: make sure you've set the IP of the server correctly; double-check that you have the correct `malware()` start address.
 
 # Process, Workflow, Submitting Exploits, and Getting Credit
 
-Last but certainly not least, we encourage you to use this repo to contribute exploits, seek feedback, and get credit — whether you are in person at DEFCON or subsequent events, or preparing exploits for later testing. Using the reference exploits as a model, you can develop your own exploits, and document them with the same structure as the sample exploits: a directory containing a README, C source, and assembly that’s used as described in the README to run the exploit via the peek-poke interface, or the run_exploit.sh script. 
+Last but certainly not least, we encourage you to use this repo to
+contribute exploits, seek feedback, and get credit — whether you are
+in person at DEFCON or subsequent events, or preparing exploits for
+later testing. Using the reference exploits as a model, you can
+develop your own exploits, and document them with the same structure
+as the sample exploits under the `Contributed-Exploits` directory: a
+directory containing a README, C source, and assembly that’s used as
+described in the README to run the exploit via the peek-poke
+interface, or the `run_exploit.sh` script.
 
-You can use this repo to: submit your exploit via a Merge Request to include your directory that contains the documentation and source of your exploit; get feedback and support via creating new Issues and tracking responses to them.
+Following this process, you can use this repo to: submit your exploit
+via a Merge Request that includes your directory that contains the
+documentation and source of your exploit; get feedback and support via
+creating new Issues and tracking responses to them.
