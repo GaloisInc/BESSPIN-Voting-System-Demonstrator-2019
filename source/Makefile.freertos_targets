@@ -43,14 +43,16 @@ $(info LDLIBS=$(LDLIBS))
 $(info CFLAGS=$(CFLAGS))
 $(info LDFLAGS=$(LDFLAGS))
 $(info ARFLAGS=$(ARFLAGS))
+$(info CC=$(CC))
+$(info GCC=$(GCC))
 
 %.o: %.c
 	@echo "    CC $<"
-	@$(GCC) -c $(CFLAGS) -o $@ $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 %.o: %.S
 	@echo "    CC $<"
-	@$(GCC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
+	@$(CC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
 
 default: $(DEFAULT_PROG).elf
 
