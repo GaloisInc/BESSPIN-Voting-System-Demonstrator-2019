@@ -11,6 +11,9 @@ CRYPTO_DIR = $(SOURCE_DIR)/crypto
 CURRENT_PATH=$(shell pwd)
 GFE_DIR ?= $(CURRENT_PATH)/../gfe
 P1_BITSTREAM_PATH ?= $(GFE_DIR)/bitstreams/soc_chisel_p1.bit
+
+# To enable the running lights task
+export USE_LED_BLINK_TASK=1
 #####################################
 #
 # 		SBB Target
@@ -209,6 +212,40 @@ else
 #
 #####################################
 ifeq ($(TARGET),deploy)
+all_boxes:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.freertos all
+	cp $(SBB_DIR)/default_ballot_box.* .
+	cp $(SBB_DIR)/ballot_box_* .
+
+upload_binary_box1: all_boxes
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_1.elf --no-bitfile
+
+upload_binary_box2: all_boxes
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_2.elf --no-bitfile
+
+upload_binary_box3: all_boxes
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_3.elf --no-bitfile
+
+upload_binary_box4: all_boxes
+	@echo GFE_DIR=$(GFE_DIR)
+	@echo CURRENT_PATH=$(CURRENT_PATH)
+	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
+	cd $(GFE_DIR);  \
+	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_4.elf --no-bitfile
+
 upload_binary_sim: sim
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)

@@ -77,6 +77,13 @@ char statsBuffer[1024];
 static void prvStatsTask(void *pvParameters);
 #endif /* configGENERATE_RUN_TIME_STATS */
 
+#if USE_LED_BLINK_TASK
+#pragma message "Using LED_BLINK_TASK"
+#include "gpio.h"
+#define MAIN_LED_DELAY_MS 100
+static void vTestLED(void *pvParameters);
+#endif
+
 /*-----------------------------------------------------------*/
 /* Sample barcodes */
 #ifdef SIMULATION
@@ -159,6 +166,11 @@ int main(void)
 #if configGENERATE_RUN_TIME_STATS
     xTaskCreate(prvStatsTask, "StatsTask", configMINIMAL_STACK_SIZE * 10,
                 NULL, SBB_STATS_TASK_PRIORITY, NULL);
+#endif
+
+
+#if USE_LED_BLINK_TASK
+	xTaskCreate(vTestLED, "LED Test", 1000, NULL, 0, NULL);
 #endif
 
     /* 
@@ -894,3 +906,52 @@ void sim_malware_inject()
 #endif // SIMULATION_UART
 #endif // SIMULATION
 /*-----------------------------------------------------------*/
+
+
+#if USE_LED_BLINK_TASK
+void vTestLED(void *pvParameters)
+{
+    (void)pvParameters;
+
+    printf("vTestLED starting\r\n");
+
+    for(;;)
+    {
+        /* Write to every LED */
+        led_write(0);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(1);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(2);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(3);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(4);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(5);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(6);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_write(7);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+
+        /* Clear every LED */
+        led_clear(0);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(1);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(2);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(3);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(4);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(5);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(6);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+        led_clear(7);
+        vTaskDelay(pdMS_TO_TICKS(MAIN_LED_DELAY_MS));
+    }
+}
+#endif /* USE_LED_BLINK_TASK */
