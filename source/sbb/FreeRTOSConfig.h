@@ -105,7 +105,7 @@
 #define configUSE_COUNTING_SEMAPHORES 1
 
 // TODO: use only for debugging
-#define USE_STATS 1
+#define USE_STATS 0
 #define configGENERATE_RUN_TIME_STATS USE_STATS
 #define configRECORD_STACK_HIGH_ADDRESS (USE_STATS)
 #define INCLUDE_uxTaskGetStackHighWaterMark USE_STATS
