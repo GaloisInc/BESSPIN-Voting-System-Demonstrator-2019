@@ -105,7 +105,11 @@
 #define configUSE_COUNTING_SEMAPHORES 1
 
 // TODO: use only for debugging
+#ifdef SIMULATION_UART
 #define USE_STATS 0
+#else // SIMULATION_UART
+#define USE_STATS 1
+#endif // SIMULATION_UART
 #define configGENERATE_RUN_TIME_STATS USE_STATS
 #define configRECORD_STACK_HIGH_ADDRESS (USE_STATS)
 #define INCLUDE_uxTaskGetStackHighWaterMark USE_STATS
