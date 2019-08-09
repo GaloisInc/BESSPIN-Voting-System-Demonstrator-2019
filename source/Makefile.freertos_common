@@ -107,7 +107,7 @@ export INCLUDES = \
 	-I$(CRYPTO_SOURCE_DIR)
 
 export CFLAGS += $(WARNINGS) $(INCLUDES)
-export CFLAGS += -O0 -g3 $(ARCH) $(ABI) -mcmodel=medany \
+export CFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) \
 	-DTARGET_OS_FreeRTOS -DNO_MEMSET_S \
 	-DUSE_LED_BLINK_TASK=$(USE_LED_BLINK_TASK)
 
