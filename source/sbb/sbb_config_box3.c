@@ -20,6 +20,9 @@
 #define sbbIP_ADDR2		88
 #define sbbIP_ADDR3		5
 
+// Port number of the logging server
+#define LOG_PORT_NUMBER 6603
+
 // Configuration strings for SBB 3
 const char *sbb_name = "SBB3";
 const log_name system_log_file_name = "sbb3_system.log";
@@ -30,6 +33,7 @@ const uint8_t sbb_default_ip_address[4] = { sbbIP_ADDR0, sbbIP_ADDR1, sbbIP_ADDR
 const uint8_t sbb_default_netmask[4] = { configNET_MASK0, configNET_MASK1, configNET_MASK2, configNET_MASK3 };
 const uint8_t sbb_default_gateway_address[4] = { configGATEWAY_ADDR0, configGATEWAY_ADDR1, configGATEWAY_ADDR2, configGATEWAY_ADDR3 };
 const uint8_t sbb_default_dns_server_address[4] = { configDNS_SERVER_ADDR0, configDNS_SERVER_ADDR1, configDNS_SERVER_ADDR2, configDNS_SERVER_ADDR3 };
+const uint16_t sbb_log_port_number = 8066;
 
 // cryptographic keys for SBB 1
 

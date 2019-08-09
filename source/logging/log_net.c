@@ -53,6 +53,8 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 
 #define portable_assert(x) configASSERT(x)
 
+extern const uint16_t sbb_log_port_number;
+
 #else
 
 ///////////////////////////////////////////
@@ -69,10 +71,10 @@ uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
 #include <unistd.h>     /* read, write, close */
 
 // #define portable_assert(x) assert(x)
-static const uint16_t PORT_NUMBER = LOG_PORT_NUMBER;
+
+const uint16_t sbb_log_port_number = 8066;
 
 #endif
-
 
 //////////////////////////////
 // Exported function bodies //
@@ -114,7 +116,7 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
       char *host = "localhost";
       struct hostent *server;
       struct sockaddr_in serv_addr;
-      printf("port_number=%hu\n", PORT_NUMBER);
+      printf("port_number=%hu\n", sbb_log_port_number);
 
       sockfd = socket(AF_INET, SOCK_STREAM, 0);
       if (sockfd < 0)
@@ -130,7 +132,7 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
         }
       memset(&serv_addr, 0, sizeof(serv_addr));
       serv_addr.sin_family = AF_INET;
-      serv_addr.sin_port = htons(PORT_NUMBER);
+      serv_addr.sin_port = htons(sbb_log_port_number);
       memcpy(&serv_addr.sin_addr.s_addr, server->h_addr, server->h_length);
 
       // connect the socket

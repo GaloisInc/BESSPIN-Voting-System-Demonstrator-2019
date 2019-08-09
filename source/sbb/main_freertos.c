@@ -60,6 +60,8 @@
 /* "Peek/poke" embedded web server */
 #include "peekpoke.h"
 
+extern const uint16_t sbb_log_port_number;
+
 /* Prototypes for the standard FreeRTOS callback/hook functions implemented
    within this file.  See https://www.freertos.org/a00016.html */
 void vApplicationMallocFailedHook(void);
@@ -414,7 +416,7 @@ void prvNetworkLogTask(void *pvParameters)
     debug_printf("Seed for randomiser: %lu\r\n", seed);
     prvSRand((uint32_t)seed);
 
-    xRemoteAddress.sin_port = FreeRTOS_htons(LOG_PORT_NUMBER);
+    xRemoteAddress.sin_port = FreeRTOS_htons(sbb_log_port_number);
     xRemoteAddress.sin_addr =
         FreeRTOS_inet_addr_quick(configRptrIP_ADDR0, configRptrIP_ADDR1,
                                  configRptrIP_ADDR2, configRptrIP_ADDR3);

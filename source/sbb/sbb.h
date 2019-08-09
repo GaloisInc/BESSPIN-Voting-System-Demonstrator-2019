@@ -32,6 +32,7 @@ extern const uint8_t sbb_default_ip_address[4]; // in case DHCP doesn't work
 extern const uint8_t sbb_default_netmask[4]; // in case DHCP doesn't work
 extern const uint8_t sbb_default_gateway_address[4]; // in case DHCP doesn't work
 extern const uint8_t sbb_default_dns_server_address[4]; // in case DHCP doesn't work
+extern const uint16_t sbb_log_port_number;
 
 // Display strings
 extern const char *empty;
