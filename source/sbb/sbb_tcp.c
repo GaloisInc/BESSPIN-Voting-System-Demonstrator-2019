@@ -127,9 +127,9 @@ void createTasks(void)
     xTaskCreate(prvBarcodeScannerTask, "BarcodeScannerTask",
                 SBB_SCANNER_TASK_STACK_SIZE, NULL,
                 SBB_SCANNER_TASK_PRIORITY, NULL);
+#endif // SIMULATION
     xTaskCreate(prvInputTask, "InputTask", SBB_INPUT_TASK_STACK_SIZE,
                 NULL, SBB_INPUT_TASK_PRIORITY, NULL);
-#endif // SIMULATION
 #ifndef DISABLE_NETWORK
 #ifdef NETWORK_LOGS
 #pragma message "Including Network Logs"

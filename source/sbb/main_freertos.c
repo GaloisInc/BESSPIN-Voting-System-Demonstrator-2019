@@ -148,10 +148,11 @@ int main(void)
     xSBBEventGroup = xEventGroupCreate();
     configASSERT(xSBBEventGroup);
 
+#ifndef DISABLE_NETWORK
     // Initialize startup task
     xTaskCreate(prvStartupTask, "StartupTask", SBB_STARTUP_TASK_STACK_SIZE,
                 NULL, SBB_STARTUP_TASK_PRIORITY, &prvStartupTaskHandle);
-
+#endif
     // Setup TCP IP *after* all buffers and event groups are initialized
     sbb_tcp();
 
