@@ -776,6 +776,7 @@ void sim_uart_main_loop(void)
                     printf("malware return value: %d\r\n", malware());
                     break;
                 case 'h':
+                case '?':
                     printf("%s\r\n", help);
                     break;
                 default:
@@ -871,7 +872,7 @@ void sim_malware_inject()
     }
     else
     {
-        printf("Base64 encoding invalid.\r\n");
+        printf("Base64 encoding invalid, error code %d.\r\n", r);
     }
     // zero out the malware buffer
     memset(malware_buffer, 0, MALWARE_BASE64_BUFFER_LENGTH);

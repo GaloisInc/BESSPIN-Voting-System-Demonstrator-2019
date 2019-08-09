@@ -90,7 +90,9 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
 
         if (r == 0 && BASE64_DECODED_BYTES == olen)
         {
-            debug_printf("crypto_check_barcode_valid: Checkig Timestamp\r\n");
+#ifndef SIMULATION_UART
+            debug_printf("crypto_check_barcode_valid: Checking Timestamp\r\n");
+#endif // SIMULATION_UART
             // 2. a
             // Check the timestamp to make sure it's not from the future
 
