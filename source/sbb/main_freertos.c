@@ -745,7 +745,7 @@ void sim_uart_main_loop(void)
     for (;;)
     {
         // put buffer vulnerability here?
-        len = uart0_rxbuffer(buffer, SIM_COMMAND_BUFFER_LENGTH - 1);
+        len = uart0_rxbuffer(buffer, SIM_COMMAND_BUFFER_LENGTH);
         if (len > 0) {
             char c = buffer[0];
             switch (c)
@@ -799,7 +799,7 @@ void sim_barcode_input()
            !cr)
     {
         len = uart0_rxbuffer(&buffer[read],
-                             SIM_BARCODE_BUFFER_LENGTH /* - read */ - 1);
+                             SIM_BARCODE_BUFFER_LENGTH /* - read */);
         for (int i = 0; i < len; i++)
         {
             cr |= buffer[read + i] == '\r';
@@ -827,7 +827,7 @@ void sim_malware_inject()
     while (!cr && read < MALWARE_BASE64_BUFFER_LENGTH)
     {
         len = uart0_rxbuffer(&malware_buffer[read],
-                             MALWARE_BASE64_BUFFER_LENGTH - read - 1);
+                             MALWARE_BASE64_BUFFER_LENGTH - read);
         for (int i = 0; i < len; i++)
         {
             cr |= malware_buffer[read + i] == '\r';
