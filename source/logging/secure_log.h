@@ -32,16 +32,17 @@ bool valid_log_entry(const secure_log_entry this_entry,
 // root block and authenticate it or, more likely, its first block
 // after the authenticated zeroed root block.
 
-/*@ requires \valid(secure_log);
+/*@ requires \valid(new_secure_log);
   @ requires \valid_read(a_log_entry_type + (0 .. LOG_ENTRY_LENGTH - 1));
-  @ requires \separated (secure_log, the_secure_log_name);
+  @ requires \separated (new_secure_log, the_secure_log_name);
   @ requires valid_string (the_secure_log_name);
-  @ assigns *secure_log \from log_fs, the_secure_log_name, a_log_entry_type, the_policy, endpoint;
-  @ ensures File_Is_Open (secure_log);
-  @ ensures \valid(secure_log);
+  @ requires Log_IO_Initialized;
+  @ assigns *new_secure_log \from log_fs, *the_secure_log_name, a_log_entry_type, endpoint;
+  @ ensures File_Is_Open (new_secure_log);
+  @ ensures \valid(new_secure_log);
   @*/
 
-Log_FS_Result create_secure_log(Log_Handle *secure_log,
+Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
                                 const secure_log_name the_secure_log_name,
                                 const log_entry a_log_entry_type,
                                 const secure_log_security_policy the_policy,
@@ -50,7 +51,9 @@ Log_FS_Result create_secure_log(Log_Handle *secure_log,
 
 /*@ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires \valid(the_secure_log);
+  @ requires valid_string(the_secure_log->remote_file_name);
   @ requires \separated(the_secure_log, a_log_entry);
+  @ requires Log_IO_Initialized;
   @ requires File_Is_Open (the_secure_log);
   @ assigns log_fs \from log_fs, the_secure_log, a_log_entry;
   @ ensures File_Is_Open (the_secure_log);
@@ -62,7 +65,10 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
 
 
 
-/*@ requires \valid_read(the_secure_log);
+/*@ requires \valid(the_secure_log);
+  @ requires \valid(&the_secure_log->previous_hash[0] + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
+  @ requires Log_IO_Initialized;
+  @ requires File_Is_Open (the_secure_log);
   @ assigns \result \from log_fs, the_secure_log;
   @
   @ behavior failure:

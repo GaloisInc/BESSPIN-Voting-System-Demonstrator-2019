@@ -59,30 +59,37 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
     // 1. Create new file, open for writing only.
     create_result = Log_IO_Create_New(new_secure_log, the_secure_log_name, endpoint);
 
-    // 2. call initial_log_entry above to create the first block
-    initial_entry = initial_log_entry(a_log_entry_type);
+    if (create_result == LOG_FS_OK) 
+      {
+	// 2. call initial_log_entry above to create the first block
+	initial_entry = initial_log_entry(a_log_entry_type);
+	
+	// keep the first hash
+	copy_sha256_digest (&new_secure_log->previous_hash[0],
+			    &initial_entry.the_digest[0]);
+	
+	// 3. Write that new block to the file.
+	write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
+	
+	// 4. sync the file.
+	sync_result = Log_IO_Sync(new_secure_log);
 
-    // keep the first hash
-    copy_sha256_digest (&new_secure_log->previous_hash[0],
-                        &initial_entry.the_digest[0]);
-
-    // 3. Write that new block to the file.
-    write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
-
-    // 4. sync the file.
-    sync_result = Log_IO_Sync(new_secure_log);
-
-    // TBDs - what about error cases?
-    //   What if the file already exists? Perhaps a pre-condition here that it doesn't
-    //    already exist, so up to the caller to spot that and do the right thing...
-    //    We may have to implement an f_exists() API (and ACSL logic function) to support
-    //    that if not directly supported by ff.h
-    //   What if the file create fails?
-    //   What is the file write fails?
-    (void)sync_result;
-    (void)write_result;
-    (void)create_result;
-    return LOG_FS_OK;
+	// TBDs - what about error cases?
+	//   What if the file already exists? Perhaps a pre-condition here that it doesn't
+	//    already exist, so up to the caller to spot that and do the right thing...
+	//    We may have to implement an f_exists() API (and ACSL logic function) to support
+	//    that if not directly supported by ff.h
+	//   What if the file create fails?
+	//   What is the file write fails?
+	(void)sync_result;
+	(void)write_result;
+	return LOG_FS_OK;
+      }
+    else
+      {
+	return LOG_FS_ERROR;
+      }
+    
 }
 
 Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
@@ -104,14 +111,14 @@ Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
     copy_log_entry (&current_entry.the_entry[0], &a_log_entry[0]);
     copy_sha256_digest (&current_entry.the_digest[0], &new_hash[0]);
 
-    // Save the new hash to previous_hash and
-    copy_sha256_digest (&the_secure_log->previous_hash[0], &new_hash[0]);
-
     // Write the new block
     write_result = Log_IO_Write_Base64_Entry(the_secure_log, current_entry);
 
     // Sync the file.
     sync_result = Log_IO_Sync(the_secure_log);
+
+    // Save the new hash to previous_hash and
+    copy_sha256_digest (&the_secure_log->previous_hash[0], &new_hash[0]);
 
     (void)write_result;
     (void)sync_result;
