@@ -748,6 +748,9 @@ void sim_uart_main_loop(void)
         // put buffer vulnerability here?
         len = uart0_rxbuffer(buffer, SIM_COMMAND_BUFFER_LENGTH);
         if (len > 0) {
+            for (int i = 0; i < len; i++) {
+                printf("%c", buffer[i]);
+            }
             char c = buffer[0];
             switch (c)
             {
@@ -770,7 +773,7 @@ void sim_uart_main_loop(void)
                     sim_malware_inject();
                     break;
                 case '7':
-                    printf("%d", malware());
+                    printf("malware return value: %d\r\n", malware());
                     break;
                 case 'h':
                     printf("%s\r\n", help);
@@ -792,7 +795,7 @@ void sim_barcode_input()
     int read;
     bool cr = false;
     printf("Enter a barcode terminated with a carriage return.\r\n \
-           (buffer first=%p, last=%p)\r\n",
+(buffer first=%p, last=%p)\r\n",
            &buffer[0], &buffer[SIM_BARCODE_BUFFER_LENGTH - 1]);
     
     read = 0;
@@ -803,9 +806,11 @@ void sim_barcode_input()
                              SIM_BARCODE_BUFFER_LENGTH /* - read */);
         for (int i = 0; i < len; i++)
         {
+            printf("%c", malware_buffer[read + i]);
             cr |= buffer[read + i] == '\r';
         }
         read = read + len;
+        msleep(1);
     }
     // now there is a "barcode" in buffer and at least one trailing \0,
     // though the buffer could have been overrun...
@@ -831,15 +836,23 @@ void sim_malware_inject()
                              MALWARE_BASE64_BUFFER_LENGTH - read);
         for (int i = 0; i < len; i++)
         {
+            printf("%c", malware_buffer[read + i]);
             cr |= malware_buffer[read + i] == '\r';
         }
         read = read + len;
+        msleep(1);
     }
     
     // assuming we read anything, let's decode it
     size_t olen;
+    size_t dlen;
+    mbedtls_base64_decode((unsigned char *)malware_region_start,
+                          0,
+                          &dlen,
+                          (const unsigned char *)&malware_buffer,
+                          read);
     int r = mbedtls_base64_decode((unsigned char *)malware_region_start,
-                                  MALWARE_LENGTH,
+                                  dlen,
                                   &olen,
                                   (const unsigned char *)&malware_buffer,
                                   read);
