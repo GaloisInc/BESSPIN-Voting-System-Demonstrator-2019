@@ -56,3 +56,61 @@ project at Galois.  Lando is a system specification language geared
 toward describing the shape, structure, behavior, and security of
 high-assurance systems spanning hardware, firmware, and software.
 - More detailed and low-level specifications of the BVS are written in multiple formal languages. These include *Cryptol*, a DSL for specifying and reasoning about bit-level algorithms, particularly cryptographic algorithms and protocols, and *ACSL*, the ANSI/ISO C Specification Language, for specifying and reasoning about the behavior of C programs.
+
+# How to Contribute: Testing the BVS
+
+We welcome all testers to not only perform testing, but also contribute exploits to this repo. For those attending DEF CON 2019 or subsequent testing events, the contents of this repo provide ample resources for detailed preparation, or minimal preparation via the Attacker Quickstart guide. The following lists the specific steps for how testers’ exploits can be contributed.
+
+1. Finish reading this README, and the overview document `Overview of the BESSPIN Voting System`. Make careful note of the threat model and win conditions of the system. Only exploits that are in-scope and also meet the win conditions with be recognized publicly as as “win” on the system.
+
+2. Choose a target machine.  At DEF CON we have three systems
+   available for hacking: 
+- A baseline RISC-V microcontroller that has no security
+      enhancements. This system can be used to test our your exploits
+      on insecure hardware to ensure that they work as expected.
+- An open hardware, open source CHERI-RISC-V processor developed
+      by SRI and the University of Cambridge.
+- A blackbox proprietary secure RISC-V processor.
+
+3. Experiment with an existing exploit in the [Attacker-Quickstart directory](../Attacker-Quickstart), or write an entirely new exploit.  In order to test the exploit, you can either run it in software
+   simulation using Verilator, or you can load it onto the target
+   machine you have chosen.  We suggest first simulating or loading it
+   into a baseline RISC-V processor.
+
+4. Ensure that your exploit provides third-party
+   reviewable/demonstrable evidence that the exploit was
+   successful. For some exploits, this might be realized via a
+   physical mechanism (i.e., you will demonstrate it to organizers
+   interactively at DEF CON), and for others, there may be digital
+   evidence (i.e., a tampered system log).
+
+5. When you are ready to contribute your exploit, create a personal fork of this repository, so that you can provide a merge/pull request when you wish to share it with the world and
+   demonstrate its capability. We suggest that your exploit be shared in the Attacker-Quickstart directory, with a subdirectory with contents that follow the conventions of the reference attacks.
+
+6. File an issue in this repo announcing your work to the test organizers. In that issue, point to your fork.
+
+7. In the issue body and using the `red-team` labels, please
+   summarize your exploit, including indicating which legal weakness
+   you exploited (e.g., labels `buffer/memory error` or `information leakage`), the behavior of the exploit on insecure hardware, its
+   behavior on one of the secure hardware systems, and what evidence
+   it provides of your success. Indicate which CPU you targeted with
+   the appropriate label, e.g. `baseline`, `SRI/Cambridge`, `proprietary`.
+
+8. Talk to an organizer to indicate that you have filed an issue so
+    that we can discuss your work face-to-face if desired. Organizers will immediately triage your issue and/or merge
+    request.
+
+9. Organizers will review the exploit and will keep you and the public up to
+    date about their findings via a public discussion on the issue, by 
+    using workflow labels `under review`, `success`, `fail`, etc.
+    "Success" in the context of a label means that the exploit works
+    on that CPU; "fail" means that it does not. Additional labels are used by organizers to label exploits or
+    other code for future analysis.
+
+10. Pay attention to the live screens in the testing venue, to see if your
+    exploit succeeds or fails.
+
+11. If your exploit is successful (a `CPU-hack` label is applied),
+    organizers will summarize your work and success in public
+    information on the projection screens at DEF CON or on social
+    media.
