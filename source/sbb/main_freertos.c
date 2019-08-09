@@ -792,13 +792,12 @@ void sim_barcode_input()
 {
     char buffer[SIM_BARCODE_BUFFER_LENGTH] = {0};
     int len;
-    int read;
+    int read = 0;
     bool cr = false;
     printf("Enter a barcode terminated with a carriage return.\r\n \
 (buffer first=%p, last=%p)\r\n",
            &buffer[0], &buffer[SIM_BARCODE_BUFFER_LENGTH - 1]);
     
-    read = 0;
     while (// read < SIM_BARCODE_BUFFER_LENGTH && // buffer vulnerability!
            !cr)
     {
@@ -814,7 +813,7 @@ void sim_barcode_input()
             }
             else
             {
-                printf("%c", malware_buffer[read + i]);
+                printf("%c", buffer[read + i]);
             }
         }
         read = read + len;
@@ -831,13 +830,12 @@ void sim_barcode_input()
 void sim_malware_inject()
 {
     int len;
-    int read;
+    int read = 0;
     bool cr = false;
     
     printf("Enter up to 4096 RV32 instructions encoded in Base64,\r\n \
            terminated by a carriage return, to be placed at address %p\r\n",
            malware_region_start);
-    read = 0;
     while (!cr && read < MALWARE_BASE64_BUFFER_LENGTH)
     {
         len = uart0_rxbuffer(&malware_buffer[read],
@@ -861,15 +859,9 @@ void sim_malware_inject()
     
     // assuming we read anything, let's decode it
     size_t olen;
-    size_t dlen;
     read = strlen(malware_buffer);
-    mbedtls_base64_decode((unsigned char *)malware_region_start,
-                          0,
-                          &dlen,
-                          (const unsigned char *)&malware_buffer,
-                          read);
     int r = mbedtls_base64_decode((unsigned char *)malware_region_start,
-                                  dlen,
+                                  3 * (read / 4),
                                   &olen,
                                   (const unsigned char *)&malware_buffer,
                                   read);
