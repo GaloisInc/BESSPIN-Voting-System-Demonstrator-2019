@@ -749,7 +749,7 @@ void sim_uart_main_loop(void)
         len = uart0_rxbuffer(buffer, SIM_COMMAND_BUFFER_LENGTH);
         if (len > 0) {
             for (int i = 0; i < len; i++) {
-                printf("%c", buffer[i]);
+                printf("%c\r\n", buffer[i]);
             }
             char c = buffer[0];
             switch (c)
@@ -806,8 +806,16 @@ void sim_barcode_input()
                              SIM_BARCODE_BUFFER_LENGTH /* - read */);
         for (int i = 0; i < len; i++)
         {
-            printf("%c", malware_buffer[read + i]);
-            cr |= buffer[read + i] == '\r';
+            if (buffer[read + i] == '\r')
+            {
+                cr = true;
+                buffer[read + i] = 0; // null terminator on input string
+                printf("\r\n");
+            }
+            else
+            {
+                printf("%c", malware_buffer[read + i]);
+            }
         }
         read = read + len;
         msleep(1);
@@ -836,8 +844,16 @@ void sim_malware_inject()
                              MALWARE_BASE64_BUFFER_LENGTH - read);
         for (int i = 0; i < len; i++)
         {
-            printf("%c", malware_buffer[read + i]);
-            cr |= malware_buffer[read + i] == '\r';
+            if (malware_buffer[read + i] == '\r')
+            {
+                cr = true;
+                malware_buffer[read + i] = 0; // null terminator on input string
+                printf("\r\n");
+            }
+            else
+            {
+                printf("%c", malware_buffer[read + i]);
+            }
         }
         read = read + len;
         msleep(1);
@@ -846,6 +862,7 @@ void sim_malware_inject()
     // assuming we read anything, let's decode it
     size_t olen;
     size_t dlen;
+    read = strlen(malware_buffer);
     mbedtls_base64_decode((unsigned char *)malware_region_start,
                           0,
                           &dlen,
@@ -864,6 +881,8 @@ void sim_malware_inject()
     {
         printf("Base64 encoding invalid.\r\n");
     }
+    // zero out the malware buffer
+    memset(malware_buffer, 0, MALWARE_BASE64_BUFFER_LENGTH);
 }
 #endif // SIMULATION_UART
 #endif // SIMULATION
