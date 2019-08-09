@@ -77,9 +77,11 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
     // 0.
     // Precondition: BASE64_ENCODING_START < length &&
     //               (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH
+    debug_printf("crypto_check_barcode_valid: checking barcode length\r\n");
     if (BASE64_ENCODING_START < length &&
         (length - BASE64_ENCODING_START) == BASE64_ENCODED_LENGTH)
     {
+        debug_printf("crypto_check_barcode_valid: base64 decoding\r\n");
         // 1.
         // Decode. mbedtls_base64_decode requires (srcLength/4)*3 bytes in the destination.
         uint8_t decoded_barcode[BASE64_DECODED_BUFFER_BYTES] = {0};
@@ -91,7 +93,7 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
         if (r == 0 && BASE64_DECODED_BYTES == olen)
         {
 #ifndef SIMULATION_UART
-            debug_printf("crypto_check_barcode_valid: Checking Timestamp\r\n");
+            debug_printf("crypto_check_barcode_valid: checking timestamp\r\n");
 #endif // SIMULATION_UART
             // 2. a
             // Check the timestamp to make sure it's not from the future
