@@ -785,6 +785,7 @@ void sim_uart_main_loop(void)
                     break;
             }
         }
+        msleep(1);
     }
 }
 
