@@ -821,6 +821,10 @@ void sim_barcode_input()
         {
             read = read + len;
         }
+        else
+        {
+            printf("\r\nnegative return value from uart0_rxbuffer: %d\r\n", len);
+        }
         msleep(1);
     }
     // now there is a "barcode" in buffer and at least one trailing \0,
@@ -861,6 +865,10 @@ void sim_malware_inject()
         if (len > 0)
         {
             read = read + len;
+        }
+        else
+        {
+            printf("\r\nnegative return value from uart0_rxbuffer: %d\r\n", len);
         }
         msleep(1);
     }
