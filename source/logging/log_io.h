@@ -51,7 +51,7 @@ typedef Log_Handle *log_file;
 Log_FS_Result Log_IO_Initialize(void);
 
 /*@ requires Log_IO_Initialized;
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     assigns \result \from *name, log_fs;
     ensures Log_IO_Initialized;
     ensures \result <==> File_Exists (name);
@@ -61,7 +61,7 @@ bool Log_IO_File_Exists(const char *name);
 
 /* Create new and empty log file. Any existing file with same name is destroyed. */
 /*@ requires Log_IO_Initialized;
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     requires \valid(stream);
     requires \separated(stream, name);
     assigns \result \from log_fs, *name, endpoint;
@@ -88,7 +88,7 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     requires \separated(stream, name);
     assigns *stream \from log_fs, name, endpoint;
     assigns \result \from log_fs, name, endpoint;
