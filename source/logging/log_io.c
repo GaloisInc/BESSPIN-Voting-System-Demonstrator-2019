@@ -87,7 +87,6 @@ static const uint8_t new_line = '\n';
     requires valid_read_string(HEADER_4);
     requires valid_read_string(HEADER_5_1);
     requires valid_read_string(DOUBLE_CRLF);
-    assigns Transmit_Buffer[0 .. Transmit_Buffer_Length - 1];
     ensures valid_string((char *) Transmit_Buffer);
     ensures strlen((char *) Transmit_Buffer) >= POST_Header_Min_Length;
     ensures strlen((char *) Transmit_Buffer) <= POST_Header_Max_Length;
