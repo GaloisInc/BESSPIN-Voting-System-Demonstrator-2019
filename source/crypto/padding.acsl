@@ -35,25 +35,24 @@
   @
   @}
   @
-  @ lemma no_padded_list: \let l = \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Nil))));
+  @ lemma no_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_not_padded (2, 4, l);
   @
-  @ lemma weak_padded_list: \let l = \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Nil))));
+  @ lemma weak_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_not_padded (2, 4, l) <==> list_is_padded(2, 4, l);
   @
-  @ lemma weak_right_padded_list: \let l = \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Nil))));
+  @ lemma weak_right_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_not_padded (2, 4, l) <==> list_is_rigth_padded(2, 4, l);
   @
-  @ lemma padded_list: \let l = \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Cons(pad, \Cons(pad, \Nil))))));
+  @ lemma padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte, pad, pad |];
   @     list_is_padded(3, 4, l);
   @
-  @ lemma right_padded_list: \let l = \Cons(pad, \Cons(pad, \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Nil))))));
+  @ lemma right_padded_list: \let l = [| pad, pad, mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_rigth_padded(3, 4, l);
   @
   @ lemma padding_equality: \forall integer mod, integer n, model_data l;
-  @    (list_is_rigth_padded(mod, n, l) <==> list_is_padded(mod, n, l)) <==>
-  @    \forall integer i; 0 <= i < \length(l) && \nth(l, i) == mod_byte;
+  @    list_is_not_padded(mod, n, l) ==>
+  @      (list_is_rigth_padded(mod, n, l) <==> list_is_padded(mod, n, l));
   @     
-  @
   @*/
 #endif
