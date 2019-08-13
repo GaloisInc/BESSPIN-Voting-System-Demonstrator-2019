@@ -12,14 +12,14 @@
   @
   @ predicate list_is_not_padded (integer mod, integer n, model_data l) = 
   @    mod >= 1 &&       
-  @    \length(l) == n &&  mod * \ceil (n / mod)  == n &&
+  @    \length(l) == n &&  mod * \ceil(n / mod)  == n &&
   @    \forall integer i; 0 <= i < n && \nth(l, i) == mod_byte;
   @
   @ predicate list_is_padded (integer mod, integer n, model_data l) = 
   @    mod >= 1 &&
   @    ( 
   @    	 list_is_not_padded(mod, n, l) || 
-  @      (\length(l) ==  mod * \ceil (n / mod) &&  mod * \ceil (n / mod) > n &&
+  @      (\length(l) ==  mod * \ceil (n / mod) &&  mod * \ceil(n / mod) > n &&
   @      \forall integer i; 0 <= i < n && \nth(l, i) == mod_byte &&
   @      \forall integer j; n <= j < \length(l) - n && \nth(l, j) == pad)
   @    );
@@ -28,13 +28,12 @@
   @    mod >= 1 && 
   @    ( 
   @      list_is_not_padded(mod, n, l) ||
-  @      (\length(l) ==  mod * \ceil (n / mod) &&  mod * \ceil (n / mod) > n &&
+  @      (\length(l) ==  mod * \ceil (n / mod) &&  mod * \ceil(n / mod) > n &&
   @      \forall integer j; 0 <= j < \length(l) - n && \nth(l, j) == pad &&
   @      \forall integer i; \length(l) - n <= i < \length(l) && \nth(l, i) == mod_byte)
   @    );
   @
   @}
-  @
   @
   @ lemma no_padded_list: \let l = \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Cons(mod_byte, \Nil))));
   @     list_is_not_padded (2, 4, l);
