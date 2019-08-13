@@ -6,6 +6,8 @@
 #ifndef __BASE64_API_ACSL__
 #define __BASE64_API_ACSL__
 
+#include "padding.acsl"
+
 /*@ axiomatic base64_maps {
   @   type model_digit = octet | sextet;
   @   type digit_list = \list<model_digit>;
