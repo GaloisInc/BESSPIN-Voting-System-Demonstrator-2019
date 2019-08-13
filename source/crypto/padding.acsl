@@ -15,7 +15,7 @@
   @    \length(l) == n &&  mod * \ceil(n / mod)  == n &&
   @    \forall integer i; 0 <= i < n && \nth(l, i) == mod_byte;
   @
-  @ predicate list_is_padded (integer mod, integer n, model_data l) = 
+  @ predicate list_is_padded(integer mod, integer n, model_data l) = 
   @    mod >= 1 &&
   @    ( 
   @    	 list_is_not_padded(mod, n, l) || 
