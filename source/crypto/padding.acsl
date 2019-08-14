@@ -10,6 +10,9 @@
 
 /*@ axiomatic padding {
   @
+  @ predicate has_equal_neighbors(model_data l, integer lower_bound, integer upper_bound) =
+  @    \forall integer i; lower_bound <= i < upper_bound  && \nth(l, i) == \nth(l, i + 1);
+  @
   @ predicate list_is_not_padded(integer mod, integer n, model_data l) = 
   @    mod >= 1 &&       
   @    \length(l) == n &&  mod * \ceil(n / mod)  == n &&
@@ -18,19 +21,25 @@
   @ predicate list_is_padded(integer mod, integer n, model_data l) = 
   @    mod >= 1 &&
   @    ( 
-  @    	 list_is_not_padded(mod, n, l) || 
-  @      (\length(l) ==  mod * \ceil (n / mod) &&  mod * \ceil(n / mod) > n &&
-  @      \forall integer i; 0 <= i < n && \nth(l, i) == mod_byte &&
-  @      \forall integer j; n <= j < \length(l) - n && \nth(l, j) == pad)
+  @    	 list_is_not_padded(mod, n, l) || // according to definition - see Padding.cry
+  @      (
+  @        \length(l) ==  mod * \ceil(n / mod) &&  mod * \ceil(n / mod) > n &&
+  @        \forall integer i; 0 <= i < n && \nth(l, i) == mod_byte &&
+  @        \forall integer j; n <= j < \length(l) - n && \nth(l, j) == pad && 
+  @        has_equal_neighbors(l, n, \length(l) - n)
+  @      )
   @    );
   @
   @ predicate list_is_rigth_padded(integer mod, integer n, model_data l) = 
   @    mod >= 1 && 
   @    ( 
-  @      list_is_not_padded(mod, n, l) ||
-  @      (\length(l) ==  mod * \ceil (n / mod) &&  mod * \ceil(n / mod) > n &&
-  @      \forall integer j; 0 <= j < \length(l) - n && \nth(l, j) == pad &&
-  @      \forall integer i; \length(l) - n <= i < \length(l) && \nth(l, i) == mod_byte)
+  @      list_is_not_padded(mod, n, l) || // according to definition - see Padding.cry
+  @      (
+  @        \length(l) ==  mod * \ceil (n / mod) &&  mod * \ceil(n / mod) > n &&
+  @        \forall integer j; 0 <= j < \length(l) - n && \nth(l, j) == pad &&
+  @        \forall integer i; \length(l) - n <= i < \length(l) && \nth(l, i) == mod_byte &&
+  @        has_equal_neighbors(l, 0, \length(l) - n)
+  @      )
   @    );
   @
   @}
