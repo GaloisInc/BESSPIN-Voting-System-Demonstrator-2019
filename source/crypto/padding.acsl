@@ -12,7 +12,7 @@
   @
   @ axiom pad_is_unique : \forall model_byte a, b; a == pad && b == pad ==> a == b;
   @
-  @}
+  @
   @ predicate has_equal_neighbors(model_data l, integer lower_bound, integer upper_bound) =
   @    \forall integer i; lower_bound <= i < upper_bound - 1 && \nth(l, i) == \nth(l, i + 1);
   @
@@ -44,23 +44,29 @@
   @        has_equal_neighbors(l, 0, \length(l) - n)
   @      )
   @    );
+  @}
   @
-  @
+  @ // true - discharged by alt-ergo
   @ lemma test_no_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_not_padded (2, 4, l);
   @
+  @ // true - discharged by alt-ergo
   @ lemma test_weak_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_not_padded (2, 4, l) <==> list_is_padded(2, 4, l);
   @
+  @ // true - discharged by alt-ergo
   @ lemma test_weak_right_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_not_padded (2, 4, l) <==> list_is_rigth_padded(2, 4, l);
   @
+  @ // true - discharged by alt-ergo
   @ lemma test_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte, pad, pad |];
   @     list_is_padded(3, 4, l);
   @
+  @ // true - discharged by alt-ergo
   @ lemma test_right_padded_list: \let l = [| pad, pad, mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_rigth_padded(3, 4, l);
   @
+  @ // true - discharged by alt-ergo
   @ lemma padding_equality: \forall integer mod, integer n, model_data l;
   @    list_is_not_padded(mod, n, l) ==>
   @      (list_is_rigth_padded(mod, n, l) <==> list_is_padded(mod, n, l));
