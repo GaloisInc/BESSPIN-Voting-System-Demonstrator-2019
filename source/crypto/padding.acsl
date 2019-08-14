@@ -10,8 +10,11 @@
 
 /*@ axiomatic padding {
   @
+  @ axiom pad_is_unique : \forall model_byte a, b; a == pad && b == pad ==> a == b;
+  @
+  @}
   @ predicate has_equal_neighbors(model_data l, integer lower_bound, integer upper_bound) =
-  @    \forall integer i; lower_bound <= i < upper_bound  && \nth(l, i) == \nth(l, i + 1);
+  @    \forall integer i; lower_bound <= i < upper_bound - 1 && \nth(l, i) == \nth(l, i + 1);
   @
   @ predicate list_is_not_padded(integer mod, integer n, model_data l) = 
   @    mod >= 1 &&       
@@ -42,7 +45,6 @@
   @      )
   @    );
   @
-  @}
   @
   @ lemma test_no_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     list_is_not_padded (2, 4, l);
