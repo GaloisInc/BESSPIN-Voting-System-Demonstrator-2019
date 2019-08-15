@@ -14,7 +14,7 @@
   @
   @ // padWith - recursive definition 
   @ logic model_data padWith(integer mod, integer n, model_data l) = 
-  @       (mod * \ceil(n / mod)  == n)? l: padWith(mod, n+1, \Cons(pad, l));
+  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: padWith(mod, n+1, \Cons(pad, l));
   @
   @ predicate has_equal_neighbors(model_data l, integer lower_bound, integer upper_bound) =
   @    \forall integer i; lower_bound <= i < upper_bound - 1 && \nth(l, i) == \nth(l, i + 1);
