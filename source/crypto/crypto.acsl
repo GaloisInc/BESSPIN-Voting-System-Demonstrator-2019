@@ -12,7 +12,7 @@
 // here, much like we have in `sbb.acsl`.
 
 /*@ axiomatic crypto {
-  @   type model_byte = mod_byte | pad;
+  @   type model_byte;
   @   type model_data = \list<model_byte>;
   @   type model_plaintext = model_data;
   @   type model_ciphertext = model_data;

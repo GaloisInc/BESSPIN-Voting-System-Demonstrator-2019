@@ -9,19 +9,21 @@
 #include "crypto.acsl"
 
 /*@ axiomatic padding {
+  @ type model_digit = mod_byte | pad;
+  @ type digit_list = \list<model_digit>; 
+  @ axiom pad_is_unique : \forall model_digit a, b; a == pad && b == pad ==> a == b;
   @
-  @ axiom pad_is_unique : \forall model_byte a, b; a == pad && b == pad ==> a == b;
+  @ axiom digit_list_not_empty: \forall digit_list l; \length(l) > 0;
   @
-  @
-  @ predicate has_equal_neighbors(model_data l, integer lower_bound, integer upper_bound) =
+  @ predicate has_equal_neighbors(digit_list l, integer lower_bound, integer upper_bound) =
   @    \forall integer i; lower_bound <= i < upper_bound - 1 && \nth(l, i) == \nth(l, i + 1);
   @
-  @ predicate list_is_not_padded(integer mod, integer n, model_data l) = 
+  @ predicate list_is_not_padded(integer mod, integer n, digit_list l) = 
   @    mod >= 1 &&       
   @    \length(l) == n &&  mod * \ceil(n / mod)  == n &&
   @    \forall integer i; 0 <= i < n && \nth(l, i) == mod_byte;
   @
-  @ predicate list_is_padded(integer mod, integer n, model_data l) = 
+  @ predicate list_is_padded(integer mod, integer n, digit_list l) = 
   @    mod >= 1 &&
   @    ( 
   @    	 list_is_not_padded(mod, n, l) || // according to definition - see Padding.cry
@@ -33,7 +35,7 @@
   @      )
   @    );
   @
-  @ predicate list_is_rigth_padded(integer mod, integer n, model_data l) = 
+  @ predicate list_is_rigth_padded(integer mod, integer n, digit_list l) = 
   @    mod >= 1 && 
   @    ( 
   @      list_is_not_padded(mod, n, l) || // according to definition - see Padding.cry
@@ -67,7 +69,7 @@
   @     list_is_rigth_padded(3, 4, l);
   @
   @ // true - discharged by alt-ergo
-  @ lemma padding_equality: \forall integer mod, integer n, model_data l;
+  @ lemma padding_equality: \forall integer mod, integer n, digit_list l;
   @    list_is_not_padded(mod, n, l) ==>
   @      (list_is_rigth_padded(mod, n, l) <==> list_is_padded(mod, n, l));
   @     
