@@ -13,8 +13,14 @@
   @ axiom pad_is_unique : \forall model_byte a, b; a == pad && b == pad ==> a == b;
   @
   @ // padWith - recursive definition 
+  @ logic model_data padWith_rec(integer mod, integer n, model_data l) = 
+  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: padWith_rec(mod, n+1, \Cons(pad, l));
+  @
+  @ logic model_data rightPadWith(integer mod, integer n, model_data l) = 
+  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: \concat (\repeat( [| pad |], mod * \ceil(n / mod) -n), l);
+  @
   @ logic model_data padWith(integer mod, integer n, model_data l) = 
-  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: padWith(mod, n+1, \Cons(pad, l));
+  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: \concat ( l , \repeat( [| pad |], mod * \ceil(n / mod) -n));
   @
   @ predicate has_equal_neighbors(model_data l, integer lower_bound, integer upper_bound) =
   @    \forall integer i; lower_bound <= i < upper_bound - 1 && \nth(l, i) == \nth(l, i + 1);
@@ -70,12 +76,20 @@
   @     list_is_rigth_padded(3, 4, l);
   @
   @ // true - discharged by alt-ergo
+  @ lemma test_rightPadWith_function: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
+  @     \let pw = rightPadWith(3,4,l); \nth(pw,0) == pad && \nth(pw,1) == pad;
+  @
+  @ // true - discharged by alt-ergo
+  @ lemma test_rightPadWith_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
+  @     \let pw = rightPadWith(3,4,l); list_is_rigth_padded(3, 4, pw);
+  @
+  @ // true - discharged by alt-ergo
   @ lemma test_padWith_function: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
   @     \let pw = padWith(3,4,l); \nth(pw,4) == pad && \nth(pw,5) == pad;
   @
   @ // true - discharged by alt-ergo
   @ lemma test_padWith_padded_list: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
-  @     \let pw = padWith(3,4,l); list_is_rigth_padded(3, 4, pw);
+  @     \let pw = padWith(3,4,l); list_is_padded(3, 4, pw);
   @
   @ // true - discharged by alt-ergo
   @ lemma padding_equality: \forall integer mod, integer n, model_data l;
