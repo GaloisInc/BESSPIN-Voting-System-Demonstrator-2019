@@ -458,9 +458,9 @@ Unlimited)_
 **Q: Who, exactly, is designing and developing the hardware itself?**
 
 A: The hardware itself comes in several parts.  The physical hardware of
-the Smart Ballot Box—its plastic components, UI, etc. is all designed
+the Smart Ballot Box—its plastic components, UI, etc.—is all designed
 and fabricated by Galois.  Much of that hardware is purchased off the
-shelf: the LCD, buttons, the repurposed filing cabinet that is the
+shelf: the LCD, the buttons, the repurposed filing cabinet that is the
 ballot box, the Epson paper feeder).  The FPGA used in the
 demonstrator comes from Xilinx.  The circuit boards used to drive the
 I/O devices of the Smart Ballot Box were designed by Galois.
@@ -468,9 +468,9 @@ I/O devices of the Smart Ballot Box were designed by Galois.
 The softcore processors that run on that FPGA are based upon existing
 open source cores.  For our demonstration at DEF CON 2019, we showed
 off two baseline open source cores—one based upon Rocket from Berkeley
-and one based upon Piccolo from Bluespec—one SSITH securitized core
-from the SRI/Cambridge team, and one anonymous core from another
-performer on the program.
+and one based upon Piccolo from Bluespec—as well as one SSITH 
+securitized core from the SRI/Cambridge team and one anonymous core 
+from another performer on the program.
 
 **Q: Does the microprocessor itself count as open source, or does that
 term only apply to software?**
@@ -478,8 +478,8 @@ term only apply to software?**
 A: Many, but not all, of the processors under development funded by
 the SSITH program are open source.  This means that the code that
 describes the processor’s behavior—written in Hardware Design
-Languages such as Chisel, Bluespec SystemVerilog, and System
-Verilog—are released to the world under a standard open source
+Languages such as Chisel, Bluespec SystemVerilog, and SystemVerilog—are 
+released to the world under a standard open source
 license.  Anyone can then read and learn from that code, and can even
 run it themselves in simulation (in software or on an FPGA, like we
 are) or, with further work, create an ASIC (silicon chip) from it for
@@ -491,10 +491,10 @@ and others.  See https://riscv.org/risc-v-cores/ for more information.
 
 For our demonstration this weekend at DEF CON, we showed off two
 baseline open source cores—one based upon Rocket from Berkeley and one
-based upon Piccolo from Bluespec—one SSITH securitized core from the
-SRI/Cambridge team, and one anonymous core from another performer on
-the program.  Performers in the program have undoubtedly already
-released many hundreds of thousands of lines of secure processor
+based upon Piccolo from Bluespec—as well as one SSITH securitized core 
+from the SRI/Cambridge team and one anonymous core from another 
+performer on the program.  Performers in the program have undoubtedly 
+already released many hundreds of thousands of lines of secure processor
 designs to the world.
 
 By the time we come back next year we should have approximately 10
@@ -505,19 +505,17 @@ open source.
 **Q: Were any vulnerabilities in the microprocessors found this
 weekend?**
 
-A: Only a handful people sat down with us and tried to run existing
+A: Only a handful of people sat down with us and tried to run existing
 exploits our internal red team had written or started writing their
 own.  We have heard reports that others are working on their own but
-they haven’t contributed them back to us yet.  One exploit to extract
-a cryptographic key which was written for a baseline processor was
-successfully applied to one of the SSITH processors.
+they haven’t contributed them back to us yet.
 
 In general, since we are so early in the program and we only had two
 "alpha" processors available, it is unsurprising that some exploits
 will work and some will not.  CPU designers are focused on different
 kinds of vulnerability classes as they move through the program, so if
 you try an exploit that leverages a weakness that they haven’t started
-tackling yet, then their chip will be vulnerable.  By the end of the
+tackling yet, their chip will be vulnerable.  By the end of the
 program, all CPUs are supposed to mitigate nearly all common
 software-based vulnerabilities.
 
@@ -525,8 +523,8 @@ software-based vulnerabilities.
 days 1 and 2 of DEF CON 2019?**
 
 The SSITH-funded "pre-alpha" CPUs were really not ready for
-demonstration.  E.g., we were receiving new CPUs from one team every
-few hours while at DEF CON.
+demonstration.  For example, we were receiving new CPUs from one 
+team every few hours while at DEF CON.
 
 By Sunday, we had four demonstrators up and running: the two SSITH
 "securitized" CPUs described above (one of which was on a bare FPGA
