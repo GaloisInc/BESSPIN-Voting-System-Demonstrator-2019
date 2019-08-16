@@ -40,7 +40,7 @@ red teaming in simulated environments that complement the hardware
 demonstrations on baseline RISC-V CPUs.
 
 We aim to have ten (10) SSITH CPUs ready for demonstration at DEF CON
-2020: five microcontrollers running FreeRTOS and five “desktop” CPUs
+2020: five microcontrollers running FreeRTOS and five "desktop" CPUs
 running Linux or FreeBSD.
 
 ** Q. What is the BESSPIN Voting System (BVS)?**
@@ -79,7 +79,7 @@ useful to this R&D?**
 
 A: Successful exploits provide valuable feedback to SSITH performers
 that are developing secure CPUs.  They help those hardware designers
-“get into the heads” of talented software and hardware hackers.
+"get into the heads" of talented software and hardware hackers.
 Exploits that succeed on the unprotected system, but fail on a system
 with a SSITH processor, are also valuable as they focus on our
 attention on where the hardware helps and the software hurts.
@@ -224,9 +224,9 @@ system’s hardware, firmware, and software from the ground up.  These
 are the same techniques we are using to formally verify cryptographic
 libraries for Amazon and others (see
 [https://galois.com/project/amazon-s2n/](https://galois.com/project/amazon-s2n/)).
-Also, all of this complements our answer to the question, “How does
+Also, all of this complements our answer to the question, "How does
 the system prove that the open source code is actually running on the
-hardware?” above.
+hardware?" above.
 
 **Q: Why implement the system in C?  Why not use a safe language like
 Rust?**
@@ -345,7 +345,7 @@ enough to be able to detect errors created by today’s easily hackable
 voting systems; we need to have voting machines that are immune to a
 broad range of cyber-attack methods. Voting machines in particular
 have a requirement that that they can only be used in the certified
-“factory-fresh” condition, with no modifications. But today’s hardware
+"factory-fresh" condition, with no modifications. But today’s hardware
 and software is simply unable to meet this requirement. Neither
 election officials nor voters have any assurance that a voting machine
 has not been tampered with. But the next generation of securitized
@@ -355,7 +355,7 @@ hardware will be able to meet this requirement.
 
 A: Free & Fair is a company devoted to doing public good research and
 development in trustworthy elections.  For the past several years,
-Free & Fair has been Galois “doing business as” Free & Fair.  By the
+Free & Fair has been Galois "doing business as" Free & Fair.  By the
 end of 2019 Free & Fair will be an Oregon public benefit (Class B)
 corporation.  Free & Fair/Galois has been responsible for several
 elections projects, including:
@@ -425,11 +425,11 @@ election auditing.
 A: No, this system contains no blockchain-based technology.  Moreover,
 we at Galois and Free & Fair believe that there is no place for
 blockchains in technology for public elections.  See the short article
-[“Blockchains and
-Elections”](https://freeandfair.us/articles/blockchains-and-elections/)
-at Free & Fair for our position, and the article [“Are Blockchains the
+["Blockchains and
+Elections"](https://freeandfair.us/articles/blockchains-and-elections/)
+at Free & Fair for our position, and the article ["Are Blockchains the
 Answer for Secure Elections? Probably
-Not”](https://www.scientificamerican.com/article/are-blockchains-the-answer-for-secure-elections-probably-not/)
+Not"](https://www.scientificamerican.com/article/are-blockchains-the-answer-for-secure-elections-probably-not/)
 at Scientific American for a longer read article with input from
 several of our scientific colleagues.
 [https://freeandfair.us/articles/blockchains-and-elections/](https://freeandfair.us/articles/blockchains-and-elections/)
@@ -452,3 +452,86 @@ Defense or the U.S. Government._
 
 _Distribution Statement "A" (Approved for Public Release, Distribution
 Unlimited)_
+
+== Post-DEF CON 2019 FAQ ==
+
+**Q: Who, exactly, is designing and developing the hardware itself?**
+
+A: The hardware itself comes in several parts.  The physical hardware of
+the Smart Ballot Box—its plastic components, UI, etc.—is all designed
+and fabricated by Galois.  Much of that hardware is purchased off the
+shelf: the LCD, the buttons, the repurposed filing cabinet that is the
+ballot box, the Epson paper feeder).  The FPGA used in the
+demonstrator comes from Xilinx.  The circuit boards used to drive the
+I/O devices of the Smart Ballot Box were designed by Galois.
+
+The softcore processors that run on that FPGA are based upon existing
+open source cores.  For our demonstration at DEF CON 2019, we showed
+off two baseline open source cores—one based upon Rocket from Berkeley
+and one based upon Piccolo from Bluespec—as well as one SSITH 
+securitized core from the SRI/Cambridge team and one anonymous core 
+from another performer on the program.
+
+**Q: Does the microprocessor itself count as open source, or does that
+term only apply to software?**
+
+A: Many, but not all, of the processors under development funded by
+the SSITH program are open source.  This means that the code that
+describes the processor’s behavior—written in Hardware Design
+Languages such as Chisel, Bluespec SystemVerilog, and SystemVerilog—are 
+released to the world under a standard open source
+license.  Anyone can then read and learn from that code, and can even
+run it themselves in simulation (in software or on an FPGA, like we
+are) or, with further work, create an ASIC (silicon chip) from it for
+free.  We are not demonstrating ASICs in this work.
+
+Several companies now exist whose entire business model is predicated
+on open source silicon like this, including SiFive, Western Digital,
+and others.  See https://riscv.org/risc-v-cores/ for more information.
+
+For our demonstration this weekend at DEF CON, we showed off two
+baseline open source cores—one based upon Rocket from Berkeley and one
+based upon Piccolo from Bluespec—as well as one SSITH securitized core 
+from the SRI/Cambridge team and one anonymous core from another 
+performer on the program.  Performers in the program have undoubtedly 
+already released many hundreds of thousands of lines of secure processor
+designs to the world.
+
+By the time we come back next year we should have approximately 10
+processors to demonstrate—5 RISC-V 32 bit microcontrollers and 5
+in-order "desktop" 64 bit RISC-V CPUs—and the vast majority will be
+open source.
+
+**Q: Were any vulnerabilities in the microprocessors found this
+weekend?**
+
+A: Only a handful of people sat down with us and tried to run existing
+exploits our internal red team had written or started writing their
+own.  We have heard reports that others are working on their own but
+they haven’t contributed them back to us yet.
+
+In general, since we are so early in the program and we only had two
+"alpha" processors available, it is unsurprising that some exploits
+will work and some will not.  CPU designers are focused on different
+kinds of vulnerability classes as they move through the program, so if
+you try an exploit that leverages a weakness that they haven’t started
+tackling yet, their chip will be vulnerable.  By the end of the
+program, all CPUs are supposed to mitigate nearly all common
+software-based vulnerabilities.
+
+**Q: What was the challenge with demonstrating SSITH secure CPUs on
+days 1 and 2 of DEF CON 2019?**
+
+The SSITH-funded "pre-alpha" CPUs were really not ready for
+demonstration.  For example, we were receiving new CPUs from one 
+team every few hours while at DEF CON.
+
+By Sunday, we had four demonstrators up and running: the two SSITH
+"securitized" CPUs described above (one of which was on a bare FPGA
+with no voting system equipment connected to it), and two of the
+baseline processors.  We were able to sit down with interested DEF CON
+attendees and walk them through our malware writing tutorials, load
+existing exploits on devices, and begin writing new exploits with
+them.
+
+
