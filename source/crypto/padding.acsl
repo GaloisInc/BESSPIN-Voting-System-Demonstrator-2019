@@ -17,10 +17,10 @@
   @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: padWith_rec(mod, n+1, \Cons(pad, l));
   @
   @ logic model_data rightPadWith(integer mod, integer n, model_data l) = 
-  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: \concat (\repeat( [| pad |], mod * \ceil(n / mod) -n), l);
+  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: \repeat( [| pad |], mod * \ceil(n / mod) -n) ^ l;
   @
   @ logic model_data padWith(integer mod, integer n, model_data l) = 
-  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l: \concat ( l , \repeat( [| pad |], mod * \ceil(n / mod) -n));
+  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? l:  l ^ \repeat( [| pad |], mod * \ceil(n / mod) -n);
   @
   @ predicate has_equal_neighbors(model_data l, integer lower_bound, integer upper_bound) =
   @    \forall integer i; lower_bound <= i < upper_bound - 1 && \nth(l, i) == \nth(l, i + 1);
