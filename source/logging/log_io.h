@@ -51,8 +51,9 @@ typedef Log_Handle *log_file;
 Log_FS_Result Log_IO_Initialize(void);
 
 /*@ requires Log_IO_Initialized;
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     assigns \result \from *name, log_fs;
+    ensures Log_IO_Initialized;
     ensures \result <==> File_Exists (name);
     ensures \result == true || \result == false;
  */
@@ -60,20 +61,23 @@ bool Log_IO_File_Exists(const char *name);
 
 /* Create new and empty log file. Any existing file with same name is destroyed. */
 /*@ requires Log_IO_Initialized;
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     requires \valid(stream);
     requires \separated(stream, name);
-    assigns log_fs \from log_fs, name;
-    assigns *stream \from log_fs, name, endpoint;
+    assigns \result \from log_fs, *name, endpoint;
+    assigns log_fs \from log_fs, *name;
+    assigns *stream \from log_fs, *name, endpoint;
 
     behavior success:
       ensures \result == LOG_FS_OK;
       ensures \valid (stream);
       ensures File_Is_Open (stream);
+      ensures Log_IO_Initialized;
 
     behavior failure:
       ensures \result == LOG_FS_ERROR;
       ensures !File_Is_Open (stream);
+      ensures Log_IO_Initialized;
 
     complete behaviors;
     disjoint behaviors;
@@ -84,7 +88,7 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
 
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     requires \separated(stream, name);
     assigns *stream \from log_fs, name, endpoint;
     assigns \result \from log_fs, name, endpoint;
@@ -92,11 +96,13 @@ Log_FS_Result Log_IO_Create_New(Log_Handle *stream, // OUT
       ensures \result == LOG_FS_OK;
       ensures \valid (stream);
       ensures File_Is_Open (stream);
+      ensures Log_IO_Initialized;
       // ensures stream is open for read AND write AND append modes
 
     behavior failure:
       ensures \result == LOG_FS_ERROR;
       ensures !File_Is_Open (stream);
+      ensures Log_IO_Initialized;
 
     complete behaviors;
     disjoint behaviors;
@@ -109,6 +115,7 @@ Log_FS_Result Log_IO_Open(Log_Handle *stream, // OUT
 /*@ requires Log_IO_Initialized;
     requires \valid(stream);
     assigns log_fs \from log_fs, stream;
+    ensures Log_IO_Initialized;
     ensures !File_Is_Open (stream);
  */
 Log_FS_Result Log_IO_Close(Log_Handle *stream); // IN
@@ -119,6 +126,7 @@ Log_FS_Result Log_IO_Close(Log_Handle *stream); // IN
     requires \valid(stream);
     requires File_Is_Open (stream);
     assigns log_fs \from log_fs, stream;
+    ensures Log_IO_Initialized;
     ensures File_Is_Open (stream);
  */
 Log_FS_Result Log_IO_Sync(Log_Handle *stream); // IN
@@ -129,6 +137,8 @@ Log_FS_Result Log_IO_Sync(Log_Handle *stream); // IN
     requires valid_string(stream->remote_file_name);
     requires File_Is_Open (stream);
     assigns log_fs \from log_fs, stream, the_entry;
+    ensures File_Is_Open (stream);
+    ensures Log_IO_Initialized;
  */
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,          // IN
                                  secure_log_entry the_entry); // IN
@@ -138,6 +148,8 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,          // IN
     requires File_Is_Open (stream);
     assigns \result \from *stream, log_fs;
     ensures \result == File_Num_Entries (stream);
+    ensures Log_IO_Initialized;
+    ensures File_Is_Open (stream);
  */
 size_t Log_IO_Num_Base64_Entries(Log_Handle *stream);
 
@@ -147,6 +159,8 @@ size_t Log_IO_Num_Base64_Entries(Log_Handle *stream);
     requires n >= 0;
     requires n <  File_Num_Entries (stream);
     assigns \result \from *stream, n, log_fs;
+    ensures Log_IO_Initialized;
+    ensures File_Is_Open (stream);
  */
 secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                    size_t n);          // IN
@@ -154,6 +168,8 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     requires \valid(stream);
     requires File_Is_Open (stream);
     assigns \result \from *stream, log_fs;
+    ensures Log_IO_Initialized;
+    ensures File_Is_Open (stream);
  */
 secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream);
 

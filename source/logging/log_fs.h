@@ -48,6 +48,10 @@ typedef struct Log_Handles
 } Log_Handle;
 #endif
 
+// A log file name must be at least 1 character long, and is limited
+// (for now) to a maximum of 255 characters
+#define LOG_FILE_NAME_MIN_LENGTH 1
+#define LOG_FILE_NAME_MAX_LENGTH 255
 
 // Abstract ghost state representing the overall state of the filesystem
 //@ ghost int log_fs;
@@ -73,6 +77,14 @@ typedef struct Log_Handles
   }
 */
 
+/*@
+   predicate valid_log_file_name{L} (char *name) =
+      valid_string(name) &&
+      strlen(name) >= LOG_FILE_NAME_MIN_LENGTH &&
+      strlen(name) >= LOG_FILE_NAME_MAX_LENGTH;
+*/
+
+
 typedef enum
 {
     LOG_FS_OK = 0, /* success */
@@ -92,7 +104,7 @@ Log_FS_Result Log_FS_Initialize(void);
 
 /* Create new and empty log file. Any existing file with same name is destroyed. */
 /*@ requires Log_FS_Initialized;
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     requires \valid(stream);
     requires \separated(stream, name);
     assigns log_fs \from log_fs, name;
@@ -118,7 +130,7 @@ Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
 
 /*@ requires Log_FS_Initialized;
     requires \valid(stream);
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     requires \separated(stream, name);
     assigns *stream \from log_fs, name;
     assigns \result \from log_fs, name;
@@ -140,7 +152,7 @@ Log_FS_Result Log_FS_Open(Log_Handle *stream, // OUT
 
 
 /*@ requires Log_FS_Initialized;
-    requires valid_string(name);
+    requires valid_log_file_name(name);
     assigns \result \from *name, log_fs;
     ensures \result <==> Log_FS_Exists (name);
  */

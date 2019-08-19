@@ -4,12 +4,15 @@ CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/cbc.c \
                 ../crypto/mode_wrappers.c \
                 ../crypto/sha2-openbsd.c \
+                ../crypto/crypto_t.c \
                 ../crypto/crypto.c \
                 ../crypto/base64.c \
                 ../crypto/crypto_config_default.c
 
 LOGGING_SOURCE = ../logging/debug_io.c \
+                 ../logging/log_t.c \
                  ../logging/log.c \
+                 ../logging/secure_log_t.c \
                  ../logging/secure_log.c \
                  ../logging/log_io.c \
                  ../logging/log_fs.c \

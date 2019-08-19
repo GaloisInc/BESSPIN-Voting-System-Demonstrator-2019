@@ -9,13 +9,16 @@ DEMO_SRC = \
 	$(SBB_SOURCE_DIR)/sbb_strings.c \
     $(SBB_SOURCE_DIR)/sbb_logging.c \
     $(SBB_SOURCE_DIR)/sbb_crypto.c \
-	$(LOG_SOURCE_DIR)/log.c \
+    $(LOG_SOURCE_DIR)/log_t.c \
+    $(LOG_SOURCE_DIR)/log.c \
+    $(LOG_SOURCE_DIR)/secure_log_t.c \
     $(LOG_SOURCE_DIR)/secure_log.c \
     $(LOG_SOURCE_DIR)/log_io.c \
     $(LOG_SOURCE_DIR)/log_fs.c \
     $(LOG_SOURCE_DIR)/log_net.c \
     $(LOG_SOURCE_DIR)/debug_io.c \
     $(CRYPTO_SOURCE_DIR)/base64.c \
+    $(CRYPTO_SOURCE_DIR)/crypto_t.c \
     $(CRYPTO_SOURCE_DIR)/crypto.c \
     $(CRYPTO_SOURCE_DIR)/sha2-openbsd.c \
     $(CRYPTO_SOURCE_DIR)/aes.c \

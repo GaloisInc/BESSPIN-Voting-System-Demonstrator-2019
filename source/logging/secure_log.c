@@ -37,16 +37,7 @@ static secure_log_entry initial_log_entry(const log_entry msg) // IN
     aes_cbc_mac((message)msg, LOG_ENTRY_LENGTH, &initial_entry.the_digest[0], Log_Root_Block_MAC_Key);
 
     // 3. Copy the msg data
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant \forall size_t j; 0 <= j < i ==> initial_entry.the_entry[j] == msg[j];
-      loop assigns i, initial_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-  */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        initial_entry.the_entry[i] = msg[i];
-    }
+    copy_log_entry (&initial_entry.the_entry[0], &msg[0]);
 
     return initial_entry; // struct by copy return
 }
@@ -68,128 +59,66 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
     // 1. Create new file, open for writing only.
     create_result = Log_IO_Create_New(new_secure_log, the_secure_log_name, endpoint);
 
-    // 2. call initial_log_entry above to create the first block
-    initial_entry = initial_log_entry(a_log_entry_type);
+    if (create_result == LOG_FS_OK) 
+      {
+	// 2. call initial_log_entry above to create the first block
+	initial_entry = initial_log_entry(a_log_entry_type);
+	
+	// keep the first hash
+	copy_sha256_digest (&new_secure_log->previous_hash[0],
+			    &initial_entry.the_digest[0]);
+	
+	// 3. Write that new block to the file.
+	write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
+	
+	// 4. sync the file.
+	sync_result = Log_IO_Sync(new_secure_log);
 
-    // keep the first hash
-    /*@
-      loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant \forall size_t k; 0 <= k < i ==> new_secure_log -> previous_hash[k] == initial_entry.the_digest[k];
-      loop assigns new_secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-      loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-  */
-    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-    {
-        new_secure_log->previous_hash[i] = initial_entry.the_digest[i];
-    }
-
-    // 3. Write that new block to the file.
-    write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
-
-    // 4. sync the file.
-    sync_result = Log_IO_Sync(new_secure_log);
-
-    // TBDs - what about error cases?
-    //   What if the file already exists? Perhaps a pre-condition here that it doesn't
-    //    already exist, so up to the caller to spot that and do the right thing...
-    //    We may have to implement an f_exists() API (and ACSL logic function) to support
-    //    that if not directly supported by ff.h
-    //   What if the file create fails?
-    //   What is the file write fails?
-    (void)sync_result;
-    (void)write_result;
-    (void)create_result;
-    return LOG_FS_OK;
+	// TBDs - what about error cases?
+	//   What if the file already exists? Perhaps a pre-condition here that it doesn't
+	//    already exist, so up to the caller to spot that and do the right thing...
+	//    We may have to implement an f_exists() API (and ACSL logic function) to support
+	//    that if not directly supported by ff.h
+	//   What if the file create fails?
+	//   What is the file write fails?
+	(void)sync_result;
+	(void)write_result;
+	return LOG_FS_OK;
+      }
+    else
+      {
+	return LOG_FS_ERROR;
+      }
+    
 }
 
 Log_FS_Result write_entry_to_secure_log(const secure_log the_secure_log,
                                         const log_entry a_log_entry)
 {
-
     Log_FS_Result write_result, sync_result;
     secure_log_entry current_entry;
     sha256_digest new_hash;
     uint8_t msg[SECURE_LOG_ENTRY_LENGTH]; // appended message
-    size_t index = 0;
 
+    // Assume a_log_entry is already padded with zeroes
 
-    // 0. Assume a_log_entry is already padded with zeroes
-
-    // 1. Removed this step - no longer required.
-
-    // 2. Form the hash value from the message and previous_hash as per the Cryptol spec.
-    // hash (paddedMsg # previousHash) is secure_log_entry I guess.
-    // adding padded a_log_entry
-
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant 0 <= index <= LOG_ENTRY_LENGTH;
-      loop invariant i == index;
-      loop assigns i, index, msg[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-  */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        msg[index] = a_log_entry[i];
-        index++;
-    }
-
-    //@ assert (index == LOG_ENTRY_LENGTH);
-
-    // adding previous_hash
-    /*@
-      loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant LOG_ENTRY_LENGTH <= index <= SECURE_LOG_ENTRY_LENGTH;
-      loop invariant index == i + LOG_ENTRY_LENGTH;
-      loop invariant \valid_read(the_secure_log->previous_hash + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
-      loop assigns msg[LOG_ENTRY_LENGTH .. SECURE_LOG_ENTRY_LENGTH - 1], i, index;
-      loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-  */
-    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-    {
-        msg[index] = the_secure_log->previous_hash[i];
-        index++;
-    }
-
-    // invoke hash ( paddedMsg # previousHash)
+    // compute new_hash = hash (a_log_entry # previousHash)
+    copy_log_entry (&msg[0], &a_log_entry[0]);
+    copy_sha256_digest (&msg[LOG_ENTRY_LENGTH], &the_secure_log->previous_hash[0]);
     hash(msg, SECURE_LOG_ENTRY_LENGTH, &new_hash[0]);
 
-    // Add the a_log_entry to the current_entry
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant \forall size_t j; 0 <= j < i ==> current_entry.the_entry[j] == a_log_entry[j];
-      loop assigns i, current_entry.the_entry[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-  */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        current_entry.the_entry[i] = a_log_entry[i];
-    }
+    // current_entry = (a_log_entry # new_hash)
+    copy_log_entry (&current_entry.the_entry[0], &a_log_entry[0]);
+    copy_sha256_digest (&current_entry.the_digest[0], &new_hash[0]);
 
-    // 3. Save the new hash to previous_hash and
-    //    copy new_hash into the current_entry
-    /*@
-      loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant \forall size_t j; 0 <= j < i ==> current_entry.the_digest[j] == new_hash[j];
-      loop invariant \forall size_t k; 0 <= k < i ==> the_secure_log -> previous_hash[k] == new_hash[k];
-      loop assigns i, current_entry.the_digest[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-      loop assigns the_secure_log -> previous_hash[0 .. SHA256_DIGEST_LENGTH_BYTES - 1];
-      loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-  */
-    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-    {
-        current_entry.the_digest[i] = new_hash[i];
-        the_secure_log->previous_hash[i] = new_hash[i];
-    }
-
-    // 4. Write the log_entry message to the_secure_log
-
-    //write_result = Log_IO_Write_Entry(the_secure_log, current_entry);
+    // Write the new block
     write_result = Log_IO_Write_Base64_Entry(the_secure_log, current_entry);
-    // 5. Write the hash block
 
-    // 6. Sync the file.
+    // Sync the file.
     sync_result = Log_IO_Sync(the_secure_log);
+
+    // Save the new hash to previous_hash and
+    copy_sha256_digest (&the_secure_log->previous_hash[0], &new_hash[0]);
 
     (void)write_result;
     (void)sync_result;
@@ -232,42 +161,14 @@ bool valid_log_entry(const secure_log_entry this_entry,
                      const sha256_digest prev_hash)
 {
     uint8_t msg[SECURE_LOG_ENTRY_LENGTH];
-    size_t index = 0;
     sha256_digest new_hash = {0};
 
-    // Concatenate this_entry and prev_hash into msg
-    /*@
-      loop invariant 0 <= i <= LOG_ENTRY_LENGTH;
-      loop invariant 0 <= index <= LOG_ENTRY_LENGTH;
-      loop invariant i == index;
-      loop assigns i, index, msg[0 .. LOG_ENTRY_LENGTH - 1];
-      loop variant LOG_ENTRY_LENGTH - i;
-    */
-    for (size_t i = 0; i < LOG_ENTRY_LENGTH; i++)
-    {
-        msg[index] = this_entry.the_entry[i];
-        index++;
-    }
-
-    //@ assert (index == LOG_ENTRY_LENGTH);
-
-    /*@
-      loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
-      loop invariant LOG_ENTRY_LENGTH <= index <= SECURE_LOG_ENTRY_LENGTH;
-      loop invariant index == i + LOG_ENTRY_LENGTH;
-      loop invariant \valid_read(prev_hash + (0 .. SHA256_DIGEST_LENGTH_BYTES - 1));
-      loop assigns msg[LOG_ENTRY_LENGTH .. SECURE_LOG_ENTRY_LENGTH - 1], i, index;
-      loop variant SHA256_DIGEST_LENGTH_BYTES - i;
-    */
-    for (size_t i = 0; i < SHA256_DIGEST_LENGTH_BYTES; i++)
-    {
-        msg[index] = prev_hash[i];
-        index++;
-    }
-
+    // Concatenate this_entry and prev_hash into msg and hash it
+    copy_log_entry (&msg[0], &this_entry.the_entry[0]);
+    copy_sha256_digest (&msg[LOG_ENTRY_LENGTH], &prev_hash[0]);
     hash(msg, SECURE_LOG_ENTRY_LENGTH, &new_hash[0]);
 
-    // 3. new_hash and this_entry.the_digest should match
+    // new_hash and this_entry.the_digest should match
     /*@
       loop invariant 0 <= i <= SHA256_DIGEST_LENGTH_BYTES;
       loop assigns i;
@@ -314,8 +215,8 @@ bool verify_secure_log_security(secure_log the_secure_log)
             // additional entries to use.
 
             // whole array assignment  the_secure_log->previous_hash = root_entry.the_digest;
-            memcpy (&the_secure_log->previous_hash[0], &root_entry.the_digest[0],
-                    SHA256_DIGEST_LENGTH_BYTES);
+            copy_sha256_digest (&the_secure_log->previous_hash[0],
+                                &root_entry.the_digest[0]);
             return true;
           }
         else
@@ -336,8 +237,7 @@ bool verify_secure_log_security(secure_log the_secure_log)
             // If all is well, then save the hash of the root entry to verify
             // the next one.
             // whole array assignment  prev_hash = root_entry.the_digest;
-            memcpy(&prev_hash[0], &root_entry.the_digest[0],
-                   SHA256_DIGEST_LENGTH_BYTES);
+            copy_sha256_digest(&prev_hash[0], &root_entry.the_digest[0]);
 
             /*@
               loop invariant 2 <= i <= (num_entries + 1);
@@ -355,8 +255,7 @@ bool verify_secure_log_security(secure_log the_secure_log)
                 if (valid_log_entry(this_entry, prev_hash))
                   {
                     // whole array assignment  prev_hash = this_entry.the_digest;
-                    memcpy(&prev_hash[0], &this_entry.the_digest[0],
-                           SHA256_DIGEST_LENGTH_BYTES);
+                    copy_sha256_digest(&prev_hash[0], &this_entry.the_digest[0]);
                   }
                 else
                   {
@@ -369,8 +268,7 @@ bool verify_secure_log_security(secure_log the_secure_log)
             // entries can be appended later.
             //
             // whole array assignment  the_secure_log->previous_hash = prev_hash;
-            memcpy (&the_secure_log->previous_hash[0], &prev_hash[0],
-                    SHA256_DIGEST_LENGTH_BYTES);
+            copy_sha256_digest(&the_secure_log->previous_hash[0], &prev_hash[0]);
 
             return true;
           }
