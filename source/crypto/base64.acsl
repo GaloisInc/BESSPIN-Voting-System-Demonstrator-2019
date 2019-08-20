@@ -21,6 +21,8 @@
   @
   @ axiom octet_size: \forall model_byte mb; \length(octet(mb)) == 8;
   @
+  @ axiom sextet_list_size:\forall sextet_list l; \length(l) == 6;
+  @
   @ logic integer Base64Length_n (integer n) = \ceil(\ceil(4 * ((8 * n) / 6)) / 4);
   @
   @ // bytes to bits
