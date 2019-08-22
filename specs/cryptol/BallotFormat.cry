@@ -14,6 +14,8 @@ type Time = {
   minute : [8]
 }
 
+// These synonyms mean we can refer to months using, for example, Months.January
+// rather than numeric values
 Months = { January   = 1  : [8],
            February  = 2  : [8],
            March     = 3  : [8],
@@ -27,6 +29,7 @@ Months = { January   = 1  : [8],
            November  = 11 : [8],
            December  = 12 : [8]}
 
+// An array representing the number of days in each month
 daysInMonths : [16] -> [12][8]
 daysInMonths year =
   updates (repeat 31)
@@ -40,6 +43,7 @@ daysInMonths year =
       then 1
       else 0
 
+// Validate that a given time is okay, i.e. that all its values are in range
 validTime : Time -> Bool
 validTime time =
   (time.minute < 60) /\
@@ -47,6 +51,8 @@ validTime time =
   (time.month >= 1) /\ (time.month <= 12) /\
   (time.day <= daysInMonths time.year @ (time.month - 1))
 
+// Format a Time as a string of characters timestamp
+// The format is YYYY+MM+DD+hh+mm
 timeToTimestamp : Time -> [16][8]
 timeToTimestamp time =
   yearDigits # s # monthDigits # s # dayDigits # s # hourDigits # s # minuteDigits
@@ -58,6 +64,9 @@ timeToTimestamp time =
   hourDigits   = drop`{back=2} (toBase`{digits=3} decimal time.hour)
   minuteDigits = drop`{back=2} (toBase`{digits=3} decimal time.minute)
 
+// Attempt to parse a timestamp back to a time, failing with an error if the
+// separator character is invalid, or if any of the components are not whole
+// decimal numbers
 timestampToTime : [16][8] -> Time
 timestampToTime digits =
   if allSeparatorsValid
@@ -86,12 +95,21 @@ testTime = {
   minute = 1
 }
 
-// Ballot encoding
+// The type of a raw (unencoded / unencrypted) ballot
 type Ballot contests positions
-  = { time     : Time,
-      unixTime : [6][8],
-      contests : [contests][positions] }
+  = { time     : Time,                 // the human-readable timestamp for the ballot
+      unixTime : [6][8],               // the unix timestamp for the ballot
+      contests : [contests][positions] // the votes in the ballot (see note below)
+    }
 
+// NOTE: Votes are represented as a [contests][positions] bit matrix, which
+// places a 1 for every selected ballot position and a 0 for every unselected
+// one. Contests with fewer positions than the width of the matrix are padded
+// out with zeroes. It is the responsibility of the producers/consumers of
+// Ballots to ensure that the votes represented in this form are valid.
+
+// Given an authentication key, a ballot encryption key, and a ballot (in that
+// order), encrypt a ballot and encode it as an ASCII string
 encodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions,
@@ -109,6 +127,15 @@ encodeBallot authKey ballotKey ballot =
     encryptedBallot = encrypt ballotKey zero (padWith`{mod=16} zero ballotBytes)
     auth            = cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
 
+// Given an authentication key, a ballot encryption key, and an encoded ballot
+// (in that order), decode an ASCII encoded ballot and decrypt it. This may fail
+// if a variety of conditions are not met, including: MAC validation failure,
+// invalid timestamp encoding, invalid separator characters, non-zero padding
+// where zero-padding was expected. It is necessary when using this function to
+// specify at the type level what ballot size is expected, since there are
+// multiple different ballot dimensions which might match a single given string.
+// So, expected use is: decodeBallot`{contests=____, positions=____} where the
+// blanks are filled with the known dimensions of the ballot.
 decodeBallot :
   {contests, positions, encodedLength}
   (fin contests, fin positions,
@@ -126,25 +153,70 @@ decodeBallot authKey ballotKey encoded =
   then error "Non-zero padding in contest: did you ask for the right size ballot?"
   else { time = time, unixTime = unixTime, contests = contests }
   where
-    timeSep : [1][8]
+    timeSep : [1][8]  // Should always be ":" (checked above)
     timeDigits # timeSep # encryptedAndAuth = encoded
 
+    // Decode the timestamp into a time, or throw an error if it's not valid
     time = timestampToTime timeDigits
 
-    auth : [16][8]
+    auth : [16][8]  // The actual MAC we expect to match one we'll recompute
     encryptedBallot # auth =
+      // The rest of the ballot is binary data encoded Base64
       decodeBase64`{encodedLength} encryptedAndAuth
 
+    // The recomputed ballot MAC we expect to match the actual ballot
     recomputedAuth =
       cbcMAC authKey zero (padWith`{mod=16} zero (timeDigits # encryptedBallot))
 
+    // The encryptedBallot is the concatenation of a unix time and the votes
     unixTime # contestsBytes = decrypt ballotKey zero encryptedBallot
 
+    // Slice up the votes into contests and save the padding to make sure it was
+    // zero (if it wasn't, something's gone wrong)
     contests : [contests][positions]
     contestBits # contestPadding = join contestsBytes
     contests = groupBy`{each=positions} contestBits
 
 // Proofs that ballot encoding is correct
+
+// Decode is inverse to encode: For any authentication key, ballot key, random
+// seed used to generate a valid ballot timestamp (see notes below), and set of
+// votes in the size of ballot specified, encoding the ballot and then decoding
+// it yields the original ballot. This also implies that any ballot when encoded
+// is valid, because testing would fail if a decoding/validation error was
+// thrown by decodeBallot during a test run.
+ballot_roundtrip :
+  {contests, positions} (fin contests, fin positions) =>
+  [32][8] -> [32][8] -> [32] -> [6][8] -> [contests][positions] -> Bool
+property ballot_roundtrip authKey ballotKey timeSeed unixTime contests =
+  decodeBallot authKey ballotKey (encodeBallot authKey ballotKey ballot) == ballot
+  where
+    ballot = { time = generateValidTime timeSeed,
+               unixTime = unixTime,
+               contests = contests }
+
+// Some implementation details for the ballot_roundtrip property...
+
+// Q: Why is the ballot_roundtrip property phrased as taking a "time seed"
+// rather than just taking an arbitrary time and adding a precondition that this
+// Time is valid?
+//
+// A: If it did the latter, the overwhelming majority of generated inputs would
+// be discarded by random testing, because the majority of values of type Time
+// are *not* valid. Furthermore, because Cryptol's clone of QuickCheck does not
+// track discards due to precondition failure, it is not possible to tell from
+// the test results that all the generated inputs were vacuously discarded,
+// which would lead to many false successes in testing. In order to make sure
+// that every test of ballot_roundtrip is meaningful, we define a mapping from
+// [32] -> Time which uses a perfect hash function to make reasonably
+// well-distributed pseudo-random results. In this way, every input to
+// generateValidTime results in a Time which is valid (this is verified by the
+// property below time_generate_correct).
+//
+// One potential issue with this approach is that it's not clear whether all
+// possible valid Time values can be produced by generateValidTime. For our
+// purposes, this is unlikely to be an issue, but it's something to bear in mind
+// should this format become more complex.
 
 // Quick and dirty hash function
 // <https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key>
@@ -180,13 +252,3 @@ time_generate_correct : [32] -> Bool
 property time_generate_correct seed =
   validTime (generateValidTime seed)
 
-// Decode is inverse to encode
-ballot_roundtrip :
-  {contests, positions} (fin contests, fin positions) =>
-  [32][8] -> [32][8] -> [32] -> [6][8] -> [contests][positions] -> Bool
-property ballot_roundtrip authKey ballotKey timeSeed unixTime contests =
-  decodeBallot authKey ballotKey (encodeBallot authKey ballotKey ballot) == ballot
-  where
-    ballot = { time = generateValidTime timeSeed,
-               unixTime = unixTime,
-               contests = contests }
