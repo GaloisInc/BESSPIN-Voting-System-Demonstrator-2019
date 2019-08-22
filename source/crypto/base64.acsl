@@ -36,18 +36,18 @@
   @       join_bits(d, n) ^ \repeat( [| Zero |] , mod * \ceil(n / mod) - n);
   @
   @ // select tuple of 6 bits
-  @ logic bits unfold_six_bits(bits d, integer n) = 
+  @ logic \list<bit> unfold_six_bits(\list<bit> d, integer n) = 
   @       (d != [| |] && 0 < n && n <= \length(d) && n % 7 != 0)? 
   @       [| Bit |] ^ unfold_six_bits(d, n + 1): [| |];
   @ 
   @ // select rest of the bits excluding first six bits
-  @ logic bits unfold_GT_six_bits(bits d, integer n) = 
+  @ logic \list<bit> unfold_GT_six_bits( \list<bit> d, integer n) = 
   @       (d != [| |] && 0 < n && n <= \length(d))?
   @       [| Bit |] ^ unfold_GT_six_bits(d, n + 1) : [| |];
   @
   @ // create sextets n should start at 1 
-  @ logic sextet_list sextets (bits b, integer n) = 
-  @       (\length(b) <= 6)? b : [| [| unfold_six_bits(b, n) |] |] ^ sextets(unfold_GT_six_bits(b, 7), n);
+  @ logic \list< \list<bit> > sextets (\list<bit> b, integer n) = 
+  @       (\length(b) <= 6)? [| b |] : [| unfold_six_bits(b, n) |] ^ sextets(unfold_GT_six_bits(b, 7), n);
   @
   @ axiom base64_def: \forall base64 b, char62 ch1, char63 ch2; \length(b) == 64 &&  // base64 map
   @  \nth(b,62) == ch1 && \nth(b,63) == ch2;
