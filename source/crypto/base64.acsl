@@ -11,7 +11,6 @@
 /*@ axiomatic base64_maps {
   @ type bit = Bit | Zero; // Bit can be true or false and zero is another constructor 
   @ type bits = \list<bit>;
-  @ type sextet_list = \list<bits>;
   @ logic bits octet(model_byte mb);
   @ type char62 = model_byte;       
   @ type char63 = model_byte;       
