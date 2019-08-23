@@ -217,6 +217,8 @@ else
 #
 #####################################
 ifeq ($(TARGET),sim)
+export OS_DIR = $(SOURCE_DIR)/os/freertos
+export CFLAGS := -DVOTING_PLATFORM_FREERTOS
 
 sim_all: sim_crypto sim_log sim_sbb
 
