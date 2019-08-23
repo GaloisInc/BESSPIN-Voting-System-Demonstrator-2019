@@ -12,11 +12,12 @@ struct voting_system_time_t {
     uint16_t minute;
 };
 
-#ifdef VOTING_PLATFORM_POSIX
+#if defined(VOTING_PLATFORM_POSIX)
 #include "os/posix/votingdefs.h"
-#endif
-#ifdef VOTING_PLATFORM_FREERTOS
+#elif defined(VOTING_PLATFORM_FREERTOS)
 #include "os/freertos/votingdefs.h"
+#else
+#error "VOTING_PLATFORM is not set"
 #endif
 
 #endif

@@ -186,6 +186,7 @@ else
 #
 #####################################
 ifeq ($(TARGET),hosttests)
+export OS_DIR = $(SOURCE_DIR)/os/freertos
 
 # Assume clang is on PATH, but needs some special setup on Darwin to override
 # Apple's clang and use the HomeBrew one instead...
@@ -201,7 +202,10 @@ else
     PLATFORM_INCLUDES = -I/usr/include
 endif
 
-HOSTTEST_CFLAGS = -g -Werror -Wall -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(PLATFORM_INCLUDES)
+INCLUDES = $(PLATFORM_INCLUDES) \
+           -I $(INCLUDE_DIR)
+
+HOSTTEST_CFLAGS = -g -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(INCLUDES)
 
 include $(CRYPTO_DIR)/Makefile.hosttests
 include $(LOG_DIR)/Makefile.hosttests

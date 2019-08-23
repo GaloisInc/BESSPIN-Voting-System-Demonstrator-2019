@@ -102,9 +102,7 @@ void aes_cbc_mac(message the_message, size_t the_message_size,
     aes128_block local_plaintext_block = {0};
     aes128_block local_ciphertext_block = {0};
 
-#ifndef TARGET_OS_FreeRTOS
     osd_assert(the_message_size % AES_BLOCK_LENGTH_BYTES == 0);
-#endif
 
     // Only fails if mock_key == NULL || &key_schedule == NULL
     AES_set_encrypt_key(fetch_key (key), AES256_KEY_LENGTH_BITS, &key_schedule);

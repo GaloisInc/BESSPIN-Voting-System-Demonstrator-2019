@@ -1,5 +1,8 @@
 # Makefile for Building the logging subsystem "host" tests - e.g. tests that run on Linux or MacOS
 
+HOSTTEST_CFLAGS += -I $(INCLUDE_DIR)/crypto \
+                   -I $(INCLUDE_DIR)/logging
+
 # Build the bottom target
 log_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 log_hosttest_test4 log_hosttest_test5 log_hosttest_test6 \
 	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport log_hosttest_remotetest11 log_hosttest_test1net

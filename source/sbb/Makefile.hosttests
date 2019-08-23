@@ -25,8 +25,9 @@ CFLAGS = -DHARDCODE_CURRENT_TIME \
          -DCURRENT_HOUR=11 \
          -DCURRENT_MINUTE=18 \
          $(HOSTTEST_CFLAGS) \
-         -I../crypto \
-         -I../logging
+         -I $(INCLUDE_DIR)/crypto \
+         -I $(INCLUDE_DIR)/logging \
+         -I $(INCLUDE_DIR)/sbb
 
 sbb_hosttest1:
 	cd $(SBB_DIR); \
