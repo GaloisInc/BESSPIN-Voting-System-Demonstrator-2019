@@ -54,7 +54,7 @@ FREERTOS_INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)/demo \
 	-I$(FREERTOS_DEMO_DIR)/devices
 
-FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V $(FREERTOS_INCLUDES) $(PLATFORM_INCLUDES) -D__riscv_xlen=32"
+FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V $(FREERTOS_INCLUDES) $(PLATFORM_INCLUDES) -D__riscv_xlen=32 -DVOTING_PLATFORM_FREERTOS"
 
 # These lists will grow as the software is developed and modules are added.
 SOFTWARE_SPECS := crypto.h
