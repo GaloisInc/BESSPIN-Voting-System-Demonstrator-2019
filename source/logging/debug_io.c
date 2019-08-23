@@ -7,8 +7,8 @@
 
 #include <string.h>
 
-#include "debug_io.h"
-#include "log_io.h"
+#include "logging/debug_io.h"
+#include "logging/log_io.h"
 
 #ifdef VOTING_SYSTEM_DEBUG
 // only declare this constant in debug mode, to avoid unused constant warnings

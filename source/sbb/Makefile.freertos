@@ -7,9 +7,9 @@ DEMO_SRC = \
 	$(SBB_SOURCE_DIR)/sbb.c \
 	$(SBB_SOURCE_DIR)/sbb_machine.c \
 	$(SBB_SOURCE_DIR)/sbb_strings.c \
+  $(OS_DIR)/time.c \
   $(SBB_SOURCE_DIR)/sbb_logging.c \
   $(SBB_SOURCE_DIR)/sbb_crypto.c \
-  $(SBB_SOURCE_DIR)/sbb_hw.c \
   $(LOG_SOURCE_DIR)/log_t.c \
   $(LOG_SOURCE_DIR)/log.c \
   $(LOG_SOURCE_DIR)/secure_log_t.c \

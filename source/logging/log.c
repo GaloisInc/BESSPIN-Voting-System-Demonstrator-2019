@@ -7,8 +7,8 @@
 #include <string.h>
 
 // Subsystem includes
-#include "log.h"
-#include "secure_log.h"
+#include "logging/log.h"
+#include "logging/secure_log.h"
 
 Log_FS_Result create_log(Log_Handle *new_log_file,
                          const log_name the_log_name,

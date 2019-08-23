@@ -4,19 +4,16 @@
  */
 
 // General includes
-#ifndef TARGET_OS_FreeRTOS
-// assert.h not supported on RISCV/FreeRTOS
-#include <assert.h>
-#endif
+#include "votingdefs.h"
 
 // Subsystem includes
-#include "crypto.h"
+#include "crypto/crypto.h"
 
 // All software implementation of AES. To be replaced when hardware HSM is available
-#include "aes.h"
+#include "crypto/aes.h"
 
 // All software implementation of SHA2. To be replaced when hardware HSM is available
-#include "sha2-openbsd.h"
+#include "crypto/sha2-openbsd.h"
 
 // the mock/default key, used for testing and returned when an unknown
 // key is asked for
@@ -106,7 +103,7 @@ void aes_cbc_mac(message the_message, size_t the_message_size,
     aes128_block local_ciphertext_block = {0};
 
 #ifndef TARGET_OS_FreeRTOS
-    assert(the_message_size % AES_BLOCK_LENGTH_BYTES == 0);
+    osd_assert(the_message_size % AES_BLOCK_LENGTH_BYTES == 0);
 #endif
 
     // Only fails if mock_key == NULL || &key_schedule == NULL

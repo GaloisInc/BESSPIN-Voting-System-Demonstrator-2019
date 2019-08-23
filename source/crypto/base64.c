@@ -19,7 +19,7 @@
  *  This file is part of mbed TLS (https://tls.mbed.org)
  */
 
-#include "base64.h"
+#include "crypto/base64.h"
 #include <assert.h>
 
 /* This table has been modified from the original for

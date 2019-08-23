@@ -46,11 +46,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  * ==================================================================== */
 
-#include "aes.h"
+#include "crypto/aes.h"
 
 // #include <assert.h>
 
-#include "internal.h"
+#include "crypto/internal.h"
 
 /* Te0[x] = S [x].[02, 01, 01, 03];
  * Te1[x] = S [x].[03, 02, 01, 01];

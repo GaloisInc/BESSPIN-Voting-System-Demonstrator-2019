@@ -1,8 +1,8 @@
-#include "log_io.h"
-#include "../crypto/crypto.h"
-#include "debug_io.h"
-#include "log_fs.h"
-#include "log_net.h"
+#include "crypto/crypto.h"
+#include "logging/log_io.h"
+#include "logging/debug_io.h"
+#include "logging/log_fs.h"
+#include "logging/log_net.h"
 #include <assert.h>
 #include <string.h>
 
@@ -37,17 +37,17 @@ static const size_t worst_case_data_length = 7;
 const size_t unpadded_log_entry_length =
     LOG_ENTRY_LENGTH + SHA256_BASE_64_DIGEST_LENGTH_BYTES;
 
-const size_t padded_log_entry_length =
-    ((unpadded_log_entry_length / AES_BLOCK_LENGTH_BYTES) + 1) *
-    AES_BLOCK_LENGTH_BYTES;
+#define padded_log_entry_length \
+    (((unpadded_log_entry_length / AES_BLOCK_LENGTH_BYTES) + 1) * \
+    AES_BLOCK_LENGTH_BYTES)
 
-const size_t bytes_of_padding_required =
-    padded_log_entry_length - unpadded_log_entry_length;
+#define bytes_of_padding_required \
+    (padded_log_entry_length - unpadded_log_entry_length)
 
 // The total length of a log entry is the length of the padded log entry, plus
 // one more space, plus the Base64 MAC data, plus a final two bytes for a \r\n
-const size_t total_log_entry_length =
-    padded_log_entry_length + 1 + BASE_64_AES_BLOCK_LENGTH_BYTES + 2;
+#define total_log_entry_length \
+  (padded_log_entry_length + 1 + BASE_64_AES_BLOCK_LENGTH_BYTES + 2)
 
 static const char space = ' ';
 static const uint8_t carriage_return = '\r';

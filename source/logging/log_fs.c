@@ -1,5 +1,5 @@
-#include "log_fs.h"
-#include "debug_io.h"
+#include "logging/log_fs.h"
+#include "logging/debug_io.h"
 #include <assert.h>
 
 #ifdef TARGET_OS_FreeRTOS

@@ -3,7 +3,7 @@
  * @refine crypto.lando
  */
 
-#include "crypto.h"
+#include "crypto/crypto.h"
 
 // defaults for cryptographic keys
 // these are only linked in for testing purposes and the default SBB

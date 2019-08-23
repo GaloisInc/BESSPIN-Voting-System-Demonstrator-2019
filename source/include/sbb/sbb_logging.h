@@ -6,8 +6,8 @@
 
 #include "sbb_t.h"
 #include "sbb_asm_prop.h"
-#include "log.h"
-#include "debug_io.h"
+#include "logging/log.h"
+#include "logging/debug_io.h"
 
 extern SBB_state the_state;
 

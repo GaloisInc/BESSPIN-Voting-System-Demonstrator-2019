@@ -1,4 +1,4 @@
-#include "log_t.h"
+#include "logging/log_t.h"
 
 void copy_log_entry (log_entry dst,       // OUT
 		     const log_entry src) // IN

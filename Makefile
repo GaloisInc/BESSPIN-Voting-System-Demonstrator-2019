@@ -2,10 +2,11 @@ TARGET ?= bottom
 $(info TARGET=$(TARGET))
 
 # List all substems directories
-SOURCE_DIR = source
-SBB_DIR = $(SOURCE_DIR)/sbb
-LOG_DIR = $(SOURCE_DIR)/logging
-CRYPTO_DIR = $(SOURCE_DIR)/crypto
+export SOURCE_DIR = $(PWD)/source
+export SBB_DIR = $(SOURCE_DIR)/sbb
+export LOG_DIR = $(SOURCE_DIR)/logging
+export CRYPTO_DIR = $(SOURCE_DIR)/crypto
+export INCLUDE_DIR = $(SOURCE_DIR)/include
 
 # Expected GFE repo location (for flash scripts)
 CURRENT_PATH=$(shell pwd)
@@ -54,10 +55,50 @@ clean: crypto_bottom_clean log_bottom_clean sbb_bottom_clean
 else
 #####################################
 #
+# 		POSIX targets
+#
+#####################################
+ifeq ($(TARGET),posix)
+export CC := clang
+export CFLAGS := -DVOTING_PLATFORM_POSIX
+export OS_DIR = $(SOURCE_DIR)/os/posix
+posix_all: posix_crypto posix_log posix_sbb
+
+clean: clean_crypto clean_log clean_sbb
+
+posix_crypto:
+	cd $(CRYPTO_DIR) ; \
+	$(MAKE) -f Makefile.posix default
+
+posix_log:
+	cd $(LOG_DIR) ; \
+	$(MAKE) -f Makefile.posix default
+
+posix_sbb:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.posix default
+
+clean_crypto:
+	cd $(CRYPTO_DIR) ; \
+	$(MAKE) -f Makefile.posix clean
+
+clean_log:
+	cd $(LOG_DIR) ; \
+	$(MAKE) -f Makefile.posix clean
+
+clean_sbb:
+	cd $(SBB_DIR) ; \
+	$(MAKE) -f Makefile.posix clean
+
+else
+#####################################
+#
 # 		FREERTOS targets
 #
 #####################################
 ifeq ($(TARGET),freertos)
+export OS_DIR = $(SOURCE_DIR)/os/freertos
+export CFLAGS := -DVOTING_PLATFORM_FREERTOS
 
 freertos_all: freertos_crypto freertos_log freertos_sbb
 
@@ -278,5 +319,6 @@ endif # ($(TARGET),deploy)
 endif # ($(TARGET),sim)
 endif # ($(TARGET),hosttests)
 endif # ($(TARGET),verification)
+endif # ($(TARGET),linux)
 endif # ($(TARGET),freertos)
 endif # ($(TARGET),bottom)

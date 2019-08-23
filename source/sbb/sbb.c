@@ -7,21 +7,13 @@
 #include <stdio.h>
 #include <string.h>
 
-// FreeRTOS specific includes
-#include "FreeRTOS.h"
-#include "semphr.h"
-#include "task.h"
+#include "votingdefs.h"
 
 // Subsystem includes
 #include "sbb.h"
 #include "sbb_hw.h"
 #include "sbb_crypto.h"
-#include "sbb_freertos.h"
 #include "sbb_logging.h"
-
-// BESSPIN Voting System devices
-#include "gpio.h"
-#include "serLcd.h"
 
 // Timeouts
 #define BALLOT_DETECT_TIMEOUT_MS 10000
@@ -29,8 +21,8 @@
 #define SPOIL_EJECT_TIMEOUT_MS 6000
 #define CAST_INGEST_TIMEOUT_MS 6000
 
-TickType_t ballot_detect_timeout = 0;
-TickType_t cast_or_spoil_timeout = 0;
+osd_timer_ticks_t ballot_detect_timeout = 0;
+osd_timer_ticks_t cast_or_spoil_timeout = 0;
 
 char barcode[BARCODE_MAX_LENGTH] = {0};
 barcode_length_t barcode_length = 0;
@@ -43,16 +35,6 @@ extern void serLcdPrintf(char *str, uint8_t len);
 //@ assigns \nothing;
 extern void serLcdPrintTwoLines(char *line_1, uint8_t len_1, char *line_2,
                                 uint8_t len_2);
-
-//@ assigns \nothing;
-extern void vTaskDelay(const TickType_t ticks);
-
-//@ assigns \nothing;
-extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
-                                       const EventBits_t uxBitsToWaitFor,
-                                       const BaseType_t xClearOnExit,
-                                       const BaseType_t xWaitForAllBits,
-                                       TickType_t xTicksToWait);
 
 // main code
 /*@ assigns the_firmware_state; */
@@ -113,7 +95,7 @@ bool is_spoil_button_pressed(void) { return the_state.B == SPOIL_BUTTON_DOWN; }
 
 void set_received_barcode(barcode_t the_barcode, barcode_length_t its_length)
 {
-    configASSERT(its_length <= BARCODE_MAX_LENGTH);
+    osd_assert(its_length <= BARCODE_MAX_LENGTH);
     memcpy(barcode, the_barcode, its_length);
     barcode_length = its_length;
 }
@@ -242,7 +224,7 @@ void eject_ballot(void)
 {
     move_motor_back();
     // run the motor for a bit to get the paper back over the switch
-    msleep(SPOIL_EJECT_TIMEOUT_MS);
+    osd_msleep(SPOIL_EJECT_TIMEOUT_MS);
     stop_motor();
 }
 
@@ -258,7 +240,7 @@ void spoil_ballot(void)
 void cast_ballot(void)
 {
     move_motor_forward();
-    msleep(SPOIL_EJECT_TIMEOUT_MS);
+    osd_msleep(CAST_INGEST_TIMEOUT_MS);
     stop_motor();
 }
 
@@ -291,28 +273,62 @@ void go_to_standby(void)
 void ballot_detect_timeout_reset(void)
 {
     ballot_detect_timeout =
-        xTaskGetTickCount() + pdMS_TO_TICKS(BALLOT_DETECT_TIMEOUT_MS);
+        osd_get_ticks() + osd_msec_to_ticks(BALLOT_DETECT_TIMEOUT_MS);
 }
 
 bool ballot_detect_timeout_expired(void)
 {
-    return (xTaskGetTickCount() > ballot_detect_timeout);
+    return (osd_get_ticks() > ballot_detect_timeout);
 }
 
 //@ assigns cast_or_spoil_timeout;
 void cast_or_spoil_timeout_reset(void)
 {
     cast_or_spoil_timeout =
-        xTaskGetTickCount() + pdMS_TO_TICKS(CAST_OR_SPOIL_TIMEOUT_MS);
+        osd_get_ticks() + osd_msec_to_ticks(CAST_OR_SPOIL_TIMEOUT_MS);
 }
 
 bool cast_or_spoil_timeout_expired(void)
 {
-    return (xTaskGetTickCount() > cast_or_spoil_timeout);
+    return (osd_get_ticks() > cast_or_spoil_timeout);
 }
 
 bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
                       uint16_t *hour, uint16_t *minute)
 {
-    return hw_get_current_time(year, month, day, hour, minute);
+#ifdef SIMULATION_UART
+    // no RTC in the UART-only simulation
+    (void) year;
+    (void) month;
+    (void) day;
+    (void) hour;
+    (void) minute;
+    return true;
+#else // SIMULATION_UART
+    //    static struct rtctime_t time;
+    static struct voting_system_time_t time;
+#ifdef HARDCODE_CURRENT_TIME
+    time.year = CURRENT_YEAR - 2000;
+    time.month = CURRENT_MONTH;
+    time.day = CURRENT_DAY;
+    time.hour = CURRENT_HOUR;
+    time.minute = CURRENT_MINUTE;
+#else
+    osd_assert(osd_read_time(&time) == 0);
+#endif /* HARDCODE_CURRENT_TIME */
+
+    *year = (uint32_t)time.year + 2000;
+    *month = (uint16_t)time.month;
+    *day = (uint16_t)time.day;
+    *hour = (uint16_t)time.hour;
+    *minute = (uint16_t)time.minute;
+
+#ifdef VOTING_SYSTEM_DEBUG
+    // A character array to hold the string representation of the time
+    static char time_str[20];
+    osd_format_time_str(&time, time_str);
+    printf("Get current time: %s\r\n",time_str);
+#endif
+    return true;
+#endif // SIMULATION_UART
 }

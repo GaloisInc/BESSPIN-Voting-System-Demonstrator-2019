@@ -59,20 +59,8 @@ extern TaskHandle_t prvStartupTaskHandle;
 #define sbTRIGGER_LEVEL_1 (1)
 /* How long we wait to send scanned barcode */
 #define SCANNER_BUFFER_TX_BLOCK_TIME_MS pdMS_TO_TICKS(15)
-/* How long we wait to receive a scanned barcode */
-#define SCANNER_BUFFER_RX_BLOCK_TIME_MS pdMS_TO_TICKS(15)
 /* How long to wait before we "see" a paper sensor "release" */
 #define PAPER_SENSOR_DEBOUNCE pdMS_TO_TICKS(1500)
-
-/* Event bit definitions. */
-#define ebPAPER_SENSOR_IN_PRESSED (0x01)
-#define ebPAPER_SENSOR_IN_RELEASED (0x02)
-#define ebBARCODE_SCANNED (0x04)
-#define ebCAST_BUTTON_PRESSED (0x08)
-#define ebCAST_BUTTON_RELEASED (0x10)
-#define ebSPOIL_BUTTON_PRESSED (0x20)
-#define ebSPOIL_BUTTON_RELEASED (0x40)
-#define ebALL_EVENTS (0x7F)
 
 #define ebALL_PAPER_SENSOR_EVENTS                                              \
     (ebPAPER_SENSOR_IN_PRESSED | ebPAPER_SENSOR_IN_RELEASED)

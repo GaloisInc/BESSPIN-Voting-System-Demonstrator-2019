@@ -2,10 +2,10 @@
 // Common include files needed by all implemenations //
 ///////////////////////////////////////////////////////
 
-#include "log_net.h"
-#include "../crypto/crypto.h"
-#include "debug_io.h"
-#include "log_io.h"
+#include "crypto/crypto.h"
+#include "logging/log_net.h"
+#include "logging/debug_io.h"
+#include "logging/log_io.h"
 
 #include <stdio.h>
 
