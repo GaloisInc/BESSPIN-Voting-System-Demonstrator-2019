@@ -2,6 +2,8 @@
 # Assume clang is on PATH, but llvm-link needs special handing on Linux
 export CLANG := clang
 export HOST  := $(shell uname -s)
+export OS_DIR  = $(SOURCE_DIR)/os/freertos
+export CFLAGS := -DVOTING_PLATFORM_FREERTOS 
 
 ifeq (${HOST},Linux)
     export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link

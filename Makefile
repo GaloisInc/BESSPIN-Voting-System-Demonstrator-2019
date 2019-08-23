@@ -97,8 +97,6 @@ else
 #
 #####################################
 ifeq ($(TARGET),freertos)
-export OS_DIR = $(SOURCE_DIR)/os/freertos
-export CFLAGS := -DVOTING_PLATFORM_FREERTOS
 
 freertos_all: freertos_crypto freertos_log freertos_sbb
 

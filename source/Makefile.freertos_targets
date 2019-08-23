@@ -6,6 +6,7 @@ BOX4_PROG ?= ballot_box_4
 
 DEFAULT_SRC = \
     $(OS_DIR)/sbb_config_default.c \
+    $(OS_DIR)/time.c \
     $(CRYPTO_DIR)/crypto_config_default.c
 
 # there is almost certainly a better way of doing this, but
