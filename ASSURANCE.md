@@ -17,10 +17,12 @@ The whole work in Cryprol has been completed and can be seen in cryptol folder.
 For static assurance we use platform frama-c, a modular static analysis framework for the C language, 
 to assure expectation based on a contract design written in ACSL and to provide an algebraic specification 
 either by extracting Cryptol specification or by formally describing some mission critical parts of the system 
-in the top-to-bottom style of the formal description. This work has been partially done.
+in the top-to-bottom style of the formal description. 
+This work has been partially done.
+
 In this phase, we have covered all methods with preconditions and postconditions seamlessly refactoring 
 code to be much more compliant with frama-c Eva plugin. We put an effort into algebraic specification trying 
-to describe the crypto submodule in order to find equivalence relations induced by the cryptographic properties.     
+to describe the crypto submodule in order to find equivalence relations induced by the cryptographic properties.
 This is still an ongoing work in progress.
   
 In parallel to this formal verification activity, unit tests have been derived from the specifications, by 
