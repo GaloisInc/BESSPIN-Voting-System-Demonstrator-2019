@@ -6,54 +6,56 @@
 #ifndef __BASE64_API_ACSL__
 #define __BASE64_API_ACSL__
 
+#include "padding.acsl"
+
 /*@ axiomatic base64_maps {
-  @   type model_digit = octet | sextet;
-  @   type digit_list = \list<model_digit>;
-  @   type model_base64_enc_map = digit_list; 
-  @   type model_base64_dec_map = digit_list;
-  @   type model_error_message; // is that goes to model_digit as well ?
-  @   logic integer digit_size (model_digit d);
-  @   logic integer Base64Length_n (integer n) = \ceil(\ceil(4 * ((8 * n) / 6)) / 4);
-  @   type Base64_n = digit_list;
-  @   
-  @   //logic type model_error_message error(octet o); 
-  @   //logic <what is the return type ?> model_allUndefined (model_base64_enc_map enc_map) = ?;
-  @   //logic type model_error_message model_lambda ( octet o ) = error(o);
+  @ type bit = Bit | Zero; // Bit can be true or false and zero is another constructor 
+  @ type bits = \list<bit>;
+  @ logic bits octet(model_byte mb);
+  @ type char62 = model_byte;       
+  @ type char63 = model_byte;       
+  @ type padChar = model_byte;
+  @ type base64 = model_data;       
+  @ type Base64_n = model_data;
   @
+  @ axiom octet_size: \forall model_byte mb; \length(octet(mb)) == 8;
   @
+  @ logic integer Base64Length_n (integer n) = \ceil(\ceil(4 * ((8 * n) / 6)) / 4);
   @
-  @   axiom model_digit_octet_size:
-  @     \forall model_digit d; d == octet ==> digit_size(octet) == 8;
+  @ // bytes to bits
+  @ logic bits join_bits(model_data d, integer n) = 
+  @     (d != [| |] &&  n < 0 && n <= \length(d))? 
+  @     octet(\nth(d, n - 1)) ^ join_bits(d, n + 1) :[| |];
   @
-  @   axiom model_digit_sextet_size:
-  @     \forall model_digit d; d == sextet ==> digit_size(sextet) == 6;
+  @ // padding with zero bits
+  @ logic bits padWith_bits(integer mod, integer n, model_data d) = 
+  @       (mod * \ceil(n / mod)  == n && mod >= 1) ? join_bits(d, \length(d)):
+  @       join_bits(d, n) ^ \repeat( [| Zero |] , mod * \ceil(n / mod) - n);
   @
-  @   axiom model_base64_enc_map_struct:
-  @     \forall model_base64_enc_map l; \length(l) == 64 && 
-  @     \forall integer n; 0 <= n < \length(l) ==> \nth(l, n) == octet;
+  @ // select tuple of 6 bits
+  @ logic \list<bit> unfold_six_bits(\list<bit> d, integer n) = 
+  @       (d != [| |] && 0 < n && n <= \length(d) && n % 7 != 0)? 
+  @       [| Bit |] ^ unfold_six_bits(d, n + 1): [| |];
+  @ 
+  @ // select rest of the bits excluding first six bits
+  @ logic \list<bit> unfold_GT_six_bits( \list<bit> d, integer n) = 
+  @       (d != [| |] && 0 < n && n <= \length(d))?
+  @       [| Bit |] ^ unfold_GT_six_bits(d, n + 1) : [| |];
   @
-  @   axiom model_base64_dec_map_struct:
-  @     \forall model_base64_dec_map l; \length(l) == 256 && 
-  @     \forall integer n; 0 <= n < \length(l) ==> \nth(l, n) == sextet;
+  @ // create sextets n should start at 1 
+  @ logic \list< \list<bit> > sextets (\list<bit> b, integer n) = 
+  @       (\length(b) <= 6)? [| b |] : [| unfold_six_bits(b, n) |] ^ sextets(unfold_GT_six_bits(b, 7), n);
   @
-  @   axiom Base64_n_lendth:
-  @      \forall Base64_n l; \forall integer n; 0 <= n ==> \length(l) == Base64Length_n(n);
+  @ axiom base64_def: \forall base64 b, char62 ch1, char63 ch2; \length(b) == 64 &&  // base64 map
+  @  \nth(b,62) == ch1 && \nth(b,63) == ch2;
   @
+  @ axiom Base64_n_def: \forall Base64_n b, integer n; n > 0 && \length(b) == Base64Length_n(n);
+  @ 
   @ }
+  @ lemma test_join_bits: \let l = [| mod_byte, mod_byte, mod_byte, mod_byte |];
+  @      \length(join_bits(l, 4)) == 32;
   @
-  @   // test lemma 1 - true - discharged by WP
-  @   lemma any_encode_digit_sized_eight_bits:
-  @      \forall model_base64_enc_map l; 
-  @      \forall integer n; 0 <= n < \length(l) ==> digit_size(\nth(l, n)) == 8;
-  @
-  @   // test lemma 2 - true - discharged by WP
-  @   lemma any_decode_digit_sized_six_bits:
-  @      \forall model_base64_dec_map l; 
-  @      \forall integer n; 0 <= n < \length(l) ==> digit_size(\nth(l, n)) == 6;
-  @
-  @   logic model_base64_enc_map Base64_map 
-  @     (model_base64_enc_map l, model_digit char62, model_digit char63) = \Cons(char63, \Cons(char62, l));
-  @
+  @ lemma test_Base64Length_n: Base64Length_n(3) == 4;
   @
   @*/
 #endif
