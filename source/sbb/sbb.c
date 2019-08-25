@@ -14,12 +14,12 @@
 
 // Subsystem includes
 #include "sbb.h"
+#include "sbb_hw.h"
 #include "sbb_crypto.h"
 #include "sbb_freertos.h"
 #include "sbb_logging.h"
 
 // BESSPIN Voting System devices
-#include "ds1338rtc.h"
 #include "gpio.h"
 #include "serLcd.h"
 
@@ -45,6 +45,9 @@ extern void serLcdPrintTwoLines(char *line_1, uint8_t len_1, char *line_2,
                                 uint8_t len_2);
 
 //@ assigns \nothing;
+extern void vTaskDelay(const TickType_t ticks);
+
+//@ assigns \nothing;
 extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
                                        const EventBits_t uxBitsToWaitFor,
                                        const BaseType_t xClearOnExit,
@@ -55,10 +58,14 @@ extern EventBits_t xEventGroupWaitBits(EventGroupHandle_t xEventGroup,
 /*@ assigns the_firmware_state; */
 extern void gpio_set_as_input(uint8_t);
 
-/*@ assigns the_firmware_state; */
-extern void gpio_set_as_output(uint8_t);
+/*@ requires 0 <= i && i < 8;
+  @ assigns the_firmware_state;
+  @ assigns gpio_mem[i];
+  @ ensures gpio_mem[i] == 0;
+ @*/
+extern void gpio_set_as_output(uint8_t i);
 
-void initialize(void)
+bool initialize(void)
 {
 #ifndef SIMULATION
     gpio_set_as_input(BUTTON_CAST_IN);
@@ -72,12 +79,16 @@ void initialize(void)
 #endif // SIMULATION
     the_state.button_illumination = 0;
     // Logging is not set up yet...we could do that here I suppose
-    the_state.M = MOTORS_OFF;
-    the_state.D = INITIALIZED_DISPLAY;
+    the_state.L  = INITIALIZE;
+    the_state.M  = MOTORS_OFF;
+    the_state.D  = INITIALIZED_DISPLAY;
     the_state.BS = BARCODE_NOT_PRESENT;
+    the_state.FS = LOG_OK;
+    the_state.P  = NO_PAPER_DETECTED;
+    the_state.button_illumination = 0;
     __assume_strings_OK();
     barcode_length = 0;
-    return;
+    return (LOG_FS_OK == Log_IO_Initialize());
 }
 
 /* global invariant Button_lighting_conditions_power_on:
@@ -112,12 +123,18 @@ bool has_a_barcode(void)
     return the_state.BS == BARCODE_PRESENT_AND_RECORDED;
 }
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-label"
 barcode_length_t what_is_the_barcode(barcode_t the_barcode)
 {
-    memcpy(the_barcode, barcode, barcode_length);
-    __assume_strings_OK();
+    char *ptr = &barcode[0];
+ Go:
+    memcpy(the_barcode, ptr, barcode_length);
+ After:
+    //@ assert Eq1:   Barcode_Eq{Go,Here}(ptr, \at(ptr, Go), barcode_length);
     return barcode_length;
 }
+#pragma GCC diagnostic pop
 
 void spoil_button_light_on(void)
 {
@@ -233,16 +250,15 @@ void spoil_ballot(void)
 {
     spoil_button_light_off();
     cast_button_light_off();
+    __assume_strings_OK();
     display_this_text(spoiling_ballot_text, strlen(spoiling_ballot_text));
     eject_ballot();
 }
 
 void cast_ballot(void)
 {
-    spoil_button_light_off();
-    cast_button_light_off();
     move_motor_forward();
-    msleep(CAST_INGEST_TIMEOUT_MS);
+    msleep(SPOIL_EJECT_TIMEOUT_MS);
     stop_motor();
 }
 
@@ -256,13 +272,19 @@ void go_to_standby(void)
     spoil_button_light_off();
     display_this_2_line_text(welcome_text, strlen(welcome_text),
                              insert_ballot_text, strlen(insert_ballot_text));
-    CHANGE_STATE(the_state, M, MOTORS_OFF);
-    CHANGE_STATE(the_state, D, SHOWING_TEXT);
-    CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
-    CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT);
-    CHANGE_STATE(the_state, S, INNER);
-    CHANGE_STATE(the_state, B, ALL_BUTTONS_UP);
-    CHANGE_STATE(the_state, L, STANDBY);
+    the_state.D  = SHOWING_TEXT;
+    the_state.P  = NO_PAPER_DETECTED;
+    the_state.BS = BARCODE_NOT_PRESENT;
+    the_state.B  = ALL_BUTTONS_UP;
+    the_state.L  = STANDBY;
+    the_state.S  = INNER;
+    //@assert FS_ASM_valid(the_state);
+    /* CHANGE_STATE(the_state, D, SHOWING_TEXT); */
+    /* CHANGE_STATE(the_state, P, NO_PAPER_DETECTED); */
+    /* CHANGE_STATE(the_state, BS, BARCODE_NOT_PRESENT); */
+    /* CHANGE_STATE(the_state, S, INNER); */
+    /* CHANGE_STATE(the_state, B, ALL_BUTTONS_UP); */
+    /* CHANGE_STATE(the_state, L, STANDBY); */
 }
 
 //@ assigns ballot_detect_timeout;
@@ -289,44 +311,8 @@ bool cast_or_spoil_timeout_expired(void)
     return (xTaskGetTickCount() > cast_or_spoil_timeout);
 }
 
-/**
- * Attempt to read current RTC time 
- */
 bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
                       uint16_t *hour, uint16_t *minute)
 {
-#ifdef SIMULATION_UART
-    // no RTC in the UART-only simulation
-    (void) year;
-    (void) month;
-    (void) day;
-    (void) hour;
-    (void) minute;
-    return true;
-#else // SIMULATION_UART
-    static struct rtctime_t time;
-#ifdef HARDCODE_CURRENT_TIME
-    time.year = CURRENT_YEAR - 2000;
-    time.month = CURRENT_MONTH;
-    time.day = CURRENT_DAY;
-    time.hour = CURRENT_HOUR;
-    time.minute = CURRENT_MINUTE;
-#else
-    configASSERT(ds1338_read_time(&time) == 0);
-#endif /* HARDCODE_CURRENT_TIME */
-
-    *year = (uint32_t)time.year + 2000;
-    *month = (uint16_t)time.month;
-    *day = (uint16_t)time.day;
-    *hour = (uint16_t)time.hour;
-    *minute = (uint16_t)time.minute;
-
-#ifdef VOTING_SYSTEM_DEBUG
-    // A character array to hold the string representation of the time
-    static char time_str[20];
-    format_time_str(&time, time_str);
-    printf("Get current time: %s\r\n",time_str);
-#endif
-    return true;
-#endif // SIMULATION_UART
+    return hw_get_current_time(year, month, day, hour, minute);
 }

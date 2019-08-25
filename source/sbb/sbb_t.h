@@ -45,7 +45,9 @@ typedef enum { ALL_BUTTONS_UP=PAPER_DETECTED+1,
                CAST_BUTTON_DOWN } buttons_state;
 typedef enum { BARCODE_NOT_PRESENT = CAST_BUTTON_DOWN+1,
                BARCODE_PRESENT_AND_RECORDED } barcode_scanner_state;
-typedef enum { INITIALIZE = BARCODE_PRESENT_AND_RECORDED+1,
+typedef enum { LOG_OK = BARCODE_PRESENT_AND_RECORDED+1,
+               LOG_FAILURE } log_state;
+typedef enum { INITIALIZE = LOG_FAILURE+1,
                STANDBY,
                WAIT_FOR_BALLOT,
                FEED_BALLOT,
@@ -116,6 +118,7 @@ typedef struct SBB_states {
     buttons_state B;
     barcode_scanner_state BS;
     start_stop_state S;
+    log_state FS;
     logic_state L;
     // @design kiniry We encode button illumination state with a 2 bit
     // wide struct bitfield.  This encoding will help test our clang and
@@ -123,11 +126,13 @@ typedef struct SBB_states {
     uint8_t button_illumination: 2;
 } SBB_state;
 
-#define cast_button_mask  (0x1 << 0)
-#define spoil_button_mask (0x1 << 1)
+#define cast_button_mask  1 // (0x1 << 0)
+#define spoil_button_mask 2 // (0x1 << 1)
 
-#define cast_button_lit(s) (s.button_illumination & cast_button_mask)
-#define spoil_button_lit(s) (s.button_illumination & spoil_button_mask)
+#define cast_button_lit(s)  (0 != (s.button_illumination & cast_button_mask))
+#define spoil_button_lit(s) (0 != (s.button_illumination & spoil_button_mask))
 #define no_buttons_lit(s) !(cast_button_lit(s) || spoil_button_lit(s))
+
+#define log_ok(s) ((s).FS == LOG_OK)
 
 #endif

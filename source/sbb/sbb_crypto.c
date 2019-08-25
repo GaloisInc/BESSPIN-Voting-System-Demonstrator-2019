@@ -106,7 +106,7 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
                 // timestamp # encryptedBallot.
                 // `encryptedBallot` is bytes 0-15 of the base64 decoding.
                 uint8_t our_digest_input[CBC_MAC_MESSAGE_LENGTH_BYTES] = {0};
-                uint8_t our_digest_output[AES_BLOCK_LENGTH_BYTES] = {0};
+                uint8_t our_digest_output[1000 /*AES_BLOCK_LENGTH_BYTES*/] = {0};
                 // { input |-> ... }
                 memcpy(&our_digest_input[0], &the_barcode[0],
                        TIMESTAMP_LENGTH_BYTES);

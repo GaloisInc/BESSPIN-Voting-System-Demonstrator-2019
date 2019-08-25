@@ -5,6 +5,7 @@
 #define __SBB_LOGGING_
 
 #include "sbb_t.h"
+#include "sbb_asm_prop.h"
 #include "log.h"
 #include "debug_io.h"
 
@@ -53,18 +54,16 @@ bool load_or_create(log_file the_file,
                     const http_endpoint endpoint);
 
 /*@ requires Log_IO_Initialized;
-  @ requires valid_read_string(app_log_file_name);
-  @ requires valid_read_string(system_log_file_name);
   @ assigns app_log_handle, system_log_handle \from log_fs;
   @ ensures Log_IO_Initialized;
   @ ensures \result == true || \result == false;
 */
 bool load_or_create_logs(void);
 
-/*@ requires Log_IO_Initialized;
-  @ requires 0 < the_length && the_length <= LOG_ENTRY_LENGTH;
-  @ requires \valid_read(the_message + (0 .. the_length - 1));
-  @ requires \separated(&system_log_handle, the_message);
+/*@ requires log_init: Log_IO_Initialized;
+  @ requires message_len: 0 < the_length && the_length <= LOG_ENTRY_LENGTH;
+  @ requires message_valid: \valid_read(the_message + (0 .. the_length - 1));
+  @ requires syslog_sep: \separated(&system_log_handle, the_message);
   @ assigns log_fs \from log_fs, the_message, system_log_handle;
   @ ensures Log_IO_Initialized;
   @ ensures \result == true || \result == false;
@@ -88,12 +87,12 @@ bool log_app_event(app_event event,
                    barcode_t barcode,
                    barcode_length_t barcode_length);
 
-/*@ requires Log_IO_Initialized;
+/*@ requires init: Log_IO_Initialized;
   // requires valid_read_string(the_message);
-  @ requires \valid_read(the_message + (0 .. message_length - 1));
-  @ requires 0 < message_length && message_length <= LOG_ENTRY_LENGTH;
-  @ requires \separated(&system_log_handle, the_message);
-  @ requires \valid(&the_state->L);
+  @ requires read: \valid_read(the_message + (0 .. message_length - 1));
+  @ requires msg_len: 0 < message_length && message_length <= LOG_ENTRY_LENGTH;
+  @ requires sep: \separated(&system_log_handle, the_message);
+  @ requires valid_state: \valid(&the_state->L);
   @
   @ assigns the_state->L;
   @ assigns log_fs \from log_fs, the_message, system_log_handle;
@@ -103,6 +102,22 @@ bool log_app_event(app_event event,
 */
 void log_or_abort(SBB_state *the_state, const char *the_message, int message_length);
 
+/*@ requires init: Log_IO_Initialized;
+// requires valid_read_string(the_message);
+@ requires read: \valid_read(the_message + (0 .. message_length - 1));
+@ requires msg_len: 0 < message_length && message_length <= LOG_ENTRY_LENGTH;
+@ requires sep: \separated(&system_log_handle, the_message);
+@ requires valid_state: \valid(&the_state->FS);
+@ requires valid_fs: the_state->FS == LOG_OK || the_state->FS == LOG_FAILURE;
+@
+@ assigns the_state->FS;
+@ assigns log_fs \from log_fs, the_message, system_log_handle;
+@
+@ ensures Log_IO_Initialized;
+@ ensures valid_fs_out: the_state->FS == LOG_OK || the_state->FS == LOG_FAILURE;
+*/
+void log_sys_record_error(SBB_state *the_state, const char *the_message, int message_length);
+
 /*@ requires \valid_read(barcode + (0 .. length-1));
   @ assigns \nothing;
   @ ensures \result == true || \result == false;
@@ -111,7 +126,7 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length);
 
 #define CHANGE_STATE(_state, _field, _new_state)                        \
     do { _state._field = _new_state;                                    \
-        const char state_change_message[] = "State change: " #_field " := " #_new_state; \
-        log_or_abort(&(_state), state_change_message, strlen(state_change_message));        \
+         const char state_change_message[] = "State change: " #_field " := " #_new_state;\
+         log_sys_record_error(&(_state), state_change_message, sizeof(state_change_message)-1); \
     } while (0)
 #endif
