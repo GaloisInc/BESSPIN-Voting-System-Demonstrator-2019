@@ -2,6 +2,9 @@
  * Smart Ballot Box Logging Implementation
  */
 #include "sbb_t.h"
+#include "sbb.acsl"
+#include "sbb_globals.h"
+#include "sbb_invariants.h"
 #include "sbb_logging.h"
 
 #ifdef SBB_NO_HTTP_ENDPOINT
@@ -56,6 +59,7 @@ bool load_or_create(log_file the_file,
 }
 
 bool load_or_create_logs(void) {
+    __assume_strings_OK();
     bool b_success = false;
 
     if (load_or_create(&app_log_handle,
@@ -94,6 +98,13 @@ void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length)
     (void)length;
 }
 
+void log_sys_record_error(SBB_state *the_local_state, const char *the_entry, int length) {
+    debug_printf((char *)the_entry);
+    if (!log_system_message(the_entry, length)) {
+       the_local_state->FS = LOG_FAILURE;
+    }
+}
+
 // @design abakst I think this is going to change as the logging implementation is fleshed out
 // For example, we should be logging time stamps as well.
 
@@ -101,51 +112,56 @@ void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length)
   @ assigns num_scanned_codes;
 */
 bool log_app_event(app_event event,
-                   barcode_t barcode,
-                   barcode_length_t barcode_length) {
+                   barcode_t this_barcode,
+                   barcode_length_t length) {
 #ifndef FILESYSTEM_DUPLICATES
     if ( num_scanned_codes >= MAX_SCANNED_CODES ) {
         return false;
     }
 #endif
 
-    if ( barcode_length + 2 < LOG_ENTRY_LENGTH ) {
+    if ( length + 2 < LOG_ENTRY_LENGTH ) {
         log_entry event_entry;
         memset(&event_entry[0], 0x20, sizeof(log_entry)); // pad with spaces
         event_entry[0] = app_event_entries[event];
         // we're guaranteed there are no spaces in the Base64 barcode, so it runs from [2] to
         // the next space in the entry
-        memcpy(&event_entry[2], barcode, barcode_length);
+        memcpy(&event_entry[2], this_barcode, length);
 #ifndef FILESYSTEM_DUPLICATES
         /*@ loop assigns i, scanned_codes[num_scanned_codes][0 .. BARCODE_MAX_LENGTH - 1];
-          @ loop invariant 0 <= i && i <= barcode_length;
+          @ loop invariant 0 <= i && i <= length;
+          @ loop invariant Log_IO_Initialized;
         */
-        for (size_t i = 0; i < barcode_length; i++) {
-            scanned_codes[num_scanned_codes][i] = (uint8_t)barcode[i];
+        for (size_t i = 0; i < length; i++) {
+            scanned_codes[num_scanned_codes][i] = (uint8_t)this_barcode[i];
         }
         /*@ loop assigns i, scanned_codes[num_scanned_codes][0 .. BARCODE_MAX_LENGTH - 1];
-          @ loop invariant barcode_length <= i && i <= BARCODE_MAX_LENGTH;
+          @ loop invariant length <= i && i <= BARCODE_MAX_LENGTH;
+          @ loop invariant Log_IO_Initialized;
         @*/
-        for (size_t i = barcode_length; i < BARCODE_MAX_LENGTH; i++) {
+        for (size_t i = length; i < BARCODE_MAX_LENGTH; i++) {
             scanned_codes[num_scanned_codes][i] = 0x20;
         }
         num_scanned_codes++;
 #endif
 #ifdef SIMULATION
-        printf("App LOG: %c %hhu", (char)app_event_entries[event], (uint8_t)barcode_length);
-        for (size_t i = 0; i < barcode_length; i++) {
-            printf("%c", barcode[i]);
+        printf("App LOG: %c %hhu", (char)app_event_entries[event], (uint8_t)length);
+        for (size_t i = 0; i < length; i++) {
+            printf("%c", this_barcode[i]);
         }
         printf("\r\n");
 #endif
+        //@ assert Log_IO_Initialized;
         Log_FS_Result res = write_entry(&app_log_handle, event_entry);
+        //@ assert Log_IO_Initialized;
         return (res == LOG_FS_OK);
     } else {
         return false;
     }
 }
 
-bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
+bool barcode_cast_or_spoiled(barcode_t this_barcode, 
+                             barcode_length_t length) {
     bool b_found = false;
 #ifdef FILESYSTEM_DUPLICATES
     size_t n_entries = Log_IO_Num_Base64_Entries(&app_log_handle);
@@ -179,7 +195,7 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
             for (size_t i_barcode_idx = 0;
                  b_found && (i_barcode_idx < length) && (i_barcode_idx < BARCODE_MAX_LENGTH);
                  i_barcode_idx++) {
-                b_found = b_found && (secure_entry.the_entry[2 + i_barcode_idx] == barcode[i_barcode_idx]);
+                b_found = b_found && (secure_entry.the_entry[2 + i_barcode_idx] == this_barcode[i_barcode_idx]);
             }
             // ensure that the next character, if any, in the previously recorded barcode
             // is a space
@@ -213,7 +229,7 @@ bool barcode_cast_or_spoiled(barcode_t barcode, barcode_length_t length) {
               @ loop invariant i_barcode_idx <= length;
               @*/
             for (size_t i_barcode_idx = 0; b_found && (i_barcode_idx < length); i_barcode_idx++) {
-                b_found = b_found && (scanned_codes[i_entry_no][i_barcode_idx] == barcode[i_barcode_idx]);
+                b_found = b_found && (scanned_codes[i_entry_no][i_barcode_idx] == this_barcode[i_barcode_idx]);
             }
             // ensure that the next character, if any, in the previously recorded barcode
             // is a space

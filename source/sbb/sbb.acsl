@@ -20,10 +20,10 @@
   @   type light = lit | dark;
   @ }
   @ axiomatic barcode_present {
-  @   type has_barcode = yes | no;
+  @   type has_barcode   = has_invalid_barcode | has_valid_barcode | no;
   @ }
   @ axiomatic paper_detect {
-  @   type paper_present = early | late | none;
+  @   type paper_present = present | none;
   @ }
   @ axiomatic motor {
   @   type motor = forward | backward | off;
@@ -34,14 +34,36 @@
   @   type cast_button_light = light;
   @   type spoil_button_light = light;
   @   type paper_feed_motor = motor;
+  @
   @   predicate lights_off(cast_button_light cbl,
   @                        spoil_button_light sbl,
   @                        SBB_state S) =
   @     (cbl == dark && sbl == dark) <==> no_buttons_lit(S);
+  @
+  @   predicate cbl_light(cast_button_light cbl, SBB_state S) =
+  @     (cbl == lit) <==> cast_button_lit(S);
+  @   predicate sbl_light(spoil_button_light sbl, SBB_state S) =
+  @     (sbl == lit) <==> spoil_button_lit(S);
+  @
   @   predicate buttons_up(cast_button cb, spoil_button sb, SBB_state S) =
   @     (cb == up && sb == up) <==> (S.B == ALL_BUTTONS_UP);
   @   predicate motor_running(motor m, SBB_state S) =
   @     (m != off) <==> (S.M == MOTORS_TURNING_FORWARD || S.M == MOTORS_TURNING_BACKWARD);
+  @
+  @   predicate
+  @     Barcode_Eq{L,M}(barcode_t bc1, barcode_t bc2, barcode_length_t length) =
+  @       \forall int i;
+  @         (0 <= i && i < \at(length, L) && \at(length, L) == \at(length,M))
+  @           ==> \at(\at(bc1, L)[i] == \at(bc2, M)[i], L);
+  @
+  @   predicate
+  @     Barcode_Valid{L}(barcode_t barcode, barcode_length_t length)
+  @       reads *(barcode + (0 .. length - 1));
+  @
+  @   axiom barcode_valid_eq{L,M}:
+  @     \forall barcode_t bc1, barcode_t bc2, barcode_length_t len;
+  @     (Barcode_Eq{L,M}(bc1, bc2, len) && Barcode_Valid{L}(bc1, len)) ==> Barcode_Valid{M}(bc2, len);
+  @
   @ }
   @ axiomatic SBB_sd_card_ASM {
   @   predicate sd_card_ASM_transition(SBB_state preS,
@@ -54,8 +76,8 @@
   @ }
   @ axiomatic SBB_barcode_scanner_ASM {
   @   predicate barcode_ASM_transition(SBB_state preS,
-  @                                  SBB_event E,
-  @                                  SBB_state postS) =
+  @                                    SBB_event E,
+  @                                    SBB_state postS) =
   @     (E == INTERNAL_BARCODE_E) ==>
   @      ((preS.BS == BARCODE_NOT_PRESENT && postS.BS == BARCODE_PRESENT_AND_RECORDED) ||
   @       (preS.BS == BARCODE_PRESENT_AND_RECORDED && postS.BS == BARCODE_NOT_PRESENT));
@@ -70,6 +92,7 @@
   @    ((preS.D == INITIALIZED_DISPLAY || preS.D == SHOWING_TEXT) && postS.D == SHOWING_TEXT));
   @ }
   @ axiomatic SBB_motor_ASM {
+  @
   @   predicate motor_ASM_valid(SBB_state S) =
   @     S.M == MOTORS_OFF ||
   @     S.M == MOTORS_TURNING_FORWARD ||
@@ -78,16 +101,19 @@
   @   predicate motor_ASM_transition(SBB_state preS,
   @                                  SBB_event E,
   @                                  SBB_state postS) =
-  @     ((E == MOTOR_OFF_E) ==>
-  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_OFF) ||
-  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) ||
-  @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_OFF)) &&
-  @     ((E == MOTOR_FORWARD_E) ==>
-  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_FORWARD) ||
-  @       (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_TURNING_FORWARD)) &&
-  @     ((E == MOTOR_BACKWARD_E) ==>
-  @       (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_BACKWARD) ||
-  @       (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_TURNING_BACKWARD));
+  @     E \in \union(MOTOR_OFF_E, MOTOR_FORWARD_E, MOTOR_BACKWARD_E) ==>
+  @       (preS.M \in \union(MOTORS_OFF, MOTORS_TURNING_FORWARD, MOTORS_TURNING_BACKWARD) &&
+  @        postS.M \in \union(MOTORS_OFF, MOTORS_TURNING_FORWARD, MOTORS_TURNING_BACKWARD));
+  @  //   ((E == MOTOR_OFF_E) ==>
+  @  //     (preS.M == MOTORS_OFF && postS.M == MOTORS_OFF) ||
+  @  //     (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_OFF) ||
+  @  //     (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_OFF)) &&
+  @  //   ((E == MOTOR_FORWARD_E) ==>
+  @  //     (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_FORWARD) ||
+  @  //     (preS.M == MOTORS_TURNING_FORWARD && postS.M == MOTORS_TURNING_FORWARD)) &&
+  @  //   ((E == MOTOR_BACKWARD_E) ==>
+  @  //     (preS.M == MOTORS_OFF && postS.M == MOTORS_TURNING_BACKWARD) ||
+  @  //     (preS.M == MOTORS_TURNING_BACKWARD && postS.M == MOTORS_TURNING_BACKWARD));
   @ }
   @ axiomatic SBB_cast_spoil_ASM {
   @  predicate cast_spoil_ASM_transition(SBB_state preS,
@@ -135,123 +161,9 @@
   @     timer_ASM_transition(preS, E, postS)        &&
   @     sd_card_ASM_transition(preS, E, postS)
   @     ;
-  @
   @ }
-  @ axiomatic SBB_States_Invariants {
   @
-  @   predicate valid_range(integer lo, integer x, integer hi) =
-  @     lo <= x && x <= hi;
-  @
-  @   predicate M_ASM_valid(SBB_state S) =
-  @     valid_range(MOTORS_OFF, S.M, MOTORS_TURNING_BACKWARD);
-  @
-  @   predicate L_ASM_valid(SBB_state S) =
-  @     valid_range(INITIALIZE, S.L, ABORT);
-  @
-  @   predicate D_ASM_valid(SBB_state S) =
-  @     valid_range(INITIALIZED_DISPLAY, S.D, SHOWING_TEXT);
-  @
-  @   predicate BS_ASM_valid(SBB_state S) =
-  @     valid_range(BARCODE_NOT_PRESENT, S.BS, BARCODE_PRESENT_AND_RECORDED);
-  @
-  @   predicate Barcode_Present(SBB_state S) =
-  @    S.BS == BARCODE_PRESENT_AND_RECORDED;
-  @
-  @   predicate Valid_ASM_States(SBB_state S) =
-  @     M_ASM_valid(S) &&
-  @     L_ASM_valid(S) &&
-  @     D_ASM_valid(S) &&
-  @     BS_ASM_valid(S);
-  @
-  @   predicate Initialize_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF   &&
-  @     !cast_button_lit(S) &&
-  @     !spoil_button_lit(S);
-  @
-  @   predicate Standby_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF   &&
-  @     !cast_button_lit(S) &&
-  @     !spoil_button_lit(S);
-  @
-  @   predicate Wait_For_Ballot_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF   &&
-  @     !cast_button_lit(S) &&
-  @     !spoil_button_lit(S);
-  @
-  @   predicate Feed_Ballot_Inv(SBB_state S) =
-  @     S.M == MOTORS_TURNING_FORWARD &&
-  @     !cast_button_lit(S)           &&
-  @     !spoil_button_lit(S);
-  @
-  @   predicate Barcode_Detected_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF     &&
-  @     Barcode_Present(S)    &&
-  @     !cast_button_lit(S)   &&
-  @     !spoil_button_lit(S);
-  @
-  @   predicate Wait_For_Decision_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF  &&
-  @     Barcode_Present(S) &&
-  @     cast_button_lit(S) &&
-  @     spoil_button_lit(S);
-  @
-  @   predicate Cast_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF   &&
-  @     Barcode_Present(S) &&
-  @     cast_button_lit(S) &&
-  @     spoil_button_lit(S);
-  @
-  @   predicate Spoil_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF   &&
-  @     Barcode_Present(S) &&
-  @     cast_button_lit(S) &&
-  @     spoil_button_lit(S);
-  @
-  @   predicate Eject_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF    &&
-  @     !cast_button_lit(S)  &&
-  @     !spoil_button_lit(S);
-  @
-  @   predicate Await_Removal_Inv(SBB_state S) =
-  @     S.M == MOTORS_OFF   &&
-  @     !cast_button_lit(S) &&
-  @     !spoil_button_lit(S);
-  @
-  @   predicate Abort_Inv(SBB_state S) =
-  @     true;
-  @ }
-  @*/
-
-/*@ predicate Ballot_Present(SBB_state S) =
-  @   S.L == BARCODE_DETECTED  ||
-  @   S.L == WAIT_FOR_DECISION ||
-  @   S.L == CAST              ||
-  @   S.L == EJECT             ||
-  @   S.L == SPOIL;
 */
-// Since we only have one sensor, we consider paper to be present
-// in some cases beyond the sensor being active
-// (like if we have fed it far enough that the sensor is no longer active)
-// Moreover, since we are polling, this definition is when we _think_ there
-// is paper present (we don't allow the sensor to pre-empt the executing SBB task)
-/*@ predicate Paper_Present(SBB_state S) =
-  @   Ballot_Present(S) || S.L == FEED_BALLOT || S.L == AWAIT_REMOVAL;
-*/
-
-/*@ predicate SBB_States_Invariant(SBB_state S) =
-      (S.L == WAIT_FOR_BALLOT   && Wait_For_Ballot_Inv(S))   ||
-      (S.L == FEED_BALLOT       && Feed_Ballot_Inv(S))       ||
-      (S.L == BARCODE_DETECTED  && Barcode_Detected_Inv(S))  ||
-      (S.L == WAIT_FOR_DECISION && Wait_For_Decision_Inv(S)) ||
-      (S.L == CAST              && Cast_Inv(S))              ||
-      (S.L == SPOIL             && Spoil_Inv(S))             ||
-      (S.L == EJECT             && Eject_Inv(S))             ||
-      (S.L == AWAIT_REMOVAL     && Await_Removal_Inv(S))     ||
-      (S.L == ABORT             && Abort_Inv(S))             ||
-      (S.L == STANDBY           && Standby_Inv(S))           ||
-      (S.L == INITIALIZE        && Initialize_Inv(S));
-*/
-
 // @spec abakst should NO_PAPER_DETECTED be reachable from the other states?
 // @spec abakst the diagram seems to indicate there is a skip transition from stopped to initialized
 
@@ -275,6 +187,7 @@
 /*@ global invariant Button_lighting_conditions_jointness:
   @   \forall cast_button_light cbl, spoil_button_light sbl;
   @     (cbl == lit) <==> (sbl == lit);
+  @
   @*/
 
 /*@ global invariant Motor_enabled_condition:

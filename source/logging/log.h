@@ -23,7 +23,7 @@
 
 
 /*@ requires \valid(new_log_file);
-  @ requires valid_string(the_log_name);
+  @ requires valid_read_string(the_log_name);
   @ requires \separated(new_log_file, the_log_name);
   @ assigns *new_log_file \from the_log_name, log_fs, endpoint;
   @*/
@@ -34,7 +34,9 @@ Log_FS_Result create_log(log_file new_log_file,
 /*@ requires \valid(the_log);
   @ requires \valid_read(a_log_entry + (0 .. LOG_ENTRY_LENGTH - 1));
   @ requires \separated(the_log, a_log_entry);
+  @ requires Log_IO_Initialized;
   @ assigns  log_fs \from log_fs, the_log, a_log_entry;
+  @ ensures  Log_IO_Initialized;
   @*/
 Log_FS_Result write_entry(const log_file the_log, const log_entry a_log_entry);
 

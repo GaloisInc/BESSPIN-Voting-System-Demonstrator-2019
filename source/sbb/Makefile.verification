@@ -61,15 +61,15 @@ FREERTOS_INCLUDES = \
 FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V -I$(FREERTOS_INCLUDES) -D__riscv_xlen=32 -DHARDCODE_CURRENT_TIME -DCURRENT_YEAR=2019 -DCURRENT_MONTH=7 -DCURRENT_DAY=22 -DCURRENT_HOUR=13 -DCURRENT_MINUTE=18"
 
 # These lists will grow as the software is developed and modules are added.
-SOFTWARE_SPECS := sbb.h sbb_logging.h sbb_lemmas.h
+SOFTWARE_SPECS := sbb.h sbb_logging.h sbb_hw.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := sbb.c sbb_machine.c sbb_logging.c sbb_strings.c sbb_lemmas.c sbb_crypto.c
+FRAMA_C_SOURCES := sbb_crypto.c sbb.c sbb_machine.c sbb_logging.c sbb_strings.c sbb_crypto.c
 FRAMA_C_SMOKETEST_SOURCES := sbb_lemma_smoketests.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) sbb_config_default.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) sbb_config_default.c sbb_hw.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 MAIN_ENTRY_POINT := ballot_box_main_loop
@@ -90,12 +90,20 @@ typecheck: $(FRAMA_C_SOURCES)
 	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
 
 # WP reasoning.
+wp_machine:
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte -wp-model typed+Cast sbb_machine.c
 
 wp:
-	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte -wp-model typed+Cast $(FRAMA_C_SOURCES) -wp-skip-fct __assume_strings_OK
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp -wp-timeout 10 -wp-par 16 -wp-rte -wp-model typed+Cast $(FRAMA_C_SOURCES) -wp-skip-fct __assume_strings_OK
+
+wp_sbb:
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte -wp-model typed+Cast sbb.c
 
 wp.%:
-	frama-c -c11 $(FRAMA_C_INCLUDES) -wp  -wp-rte $(FRAMA_C_SOURCES) -wp-model typed+Cast -wp-fct $*
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp -wp-init-const -wp-literals -wp-rte $(FRAMA_C_SOURCES) -wp-model typed -wp-fct $*
+
+wp_prop.%:
+	frama-c -c11 $(FRAMA_C_INCLUDES) -wp -wp-init-const -wp-literals -wp-rte $(FRAMA_C_SOURCES) -wp-model typed -wp-prop $*
 
 wp-verbose-report:
 	frama-c -lib-entry -c11 $(FRAMA_C_INCLUDES) -wp-verbose 0 $(FRAMA_C_SOURCES) -then -report
@@ -134,7 +142,7 @@ value:
 
 # Frama-C GUI
 gui:
-	frama-c-gui -c11 $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
+	frama-c-gui -c11 -wp-init-const -wp-literals $(FRAMA_C_INCLUDES) $(FRAMA_C_SOURCES)
 
 
 

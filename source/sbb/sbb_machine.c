@@ -29,18 +29,22 @@ firmware_state the_firmware_state;
 void update_paper_state(bool paper_in_pressed,
                         bool paper_in_released)
 {
-    switch (the_state.P) {
-    case NO_PAPER_DETECTED:
-        if ( paper_in_pressed ) {
-            CHANGE_STATE(the_state, P, PAPER_DETECTED);
-        }
-        break;
+    if ( (the_state.L == INITIALIZE) && paper_in_pressed ) {
+        CHANGE_STATE(the_state, P, PAPER_DETECTED);
+    } else {
+        switch (the_state.P) {
+        case NO_PAPER_DETECTED:
+            if ( paper_in_pressed ) {
+                CHANGE_STATE(the_state, P, PAPER_DETECTED);
+            }
+            break;
 
-    case PAPER_DETECTED:
-        if ( paper_in_released ) {
-            CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
+        case PAPER_DETECTED:
+            if ( paper_in_released ) {
+                CHANGE_STATE(the_state, P, NO_PAPER_DETECTED);
+            }
+            break;
         }
-        break;
     }
 }
 
@@ -108,10 +112,9 @@ void flush_barcodes() {
 #ifndef SIMULATION
     // this is not necessary in simulation, because simulation doesn't
     // scan barcodes multiple times based on paper location
-    /*@ loop invariant SBB_Machine_Invariant;
-      @ loop invariant the_state.L == ABORT || the_state.L == STANDBY;
-      @ loop assigns the_state.BS, the_state.L, the_state.P,
-      @ the_state.B, log_fs, barcode[0 .. BARCODE_MAX_LENGTH-1], barcode_length;
+    /*@ loop invariant SBB_Machine_Invariant(the_state, gpio_mem);
+      @ loop assigns the_state.BS, the_state.FS, the_state.P,
+      @              the_state.B, log_fs, barcode[0 .. BARCODE_MAX_LENGTH-1], barcode_length;
       @*/
     do {
         the_state.BS = BARCODE_NOT_PRESENT;
@@ -123,16 +126,20 @@ void flush_barcodes() {
 // This refines the internal paper ASM event
 //@ assigns \nothing;
 EventBits_t next_paper_event_bits(void) {
-    switch ( the_state.P ) {
-    case NO_PAPER_DETECTED:
+    if ( the_state.L == INITIALIZE ) {
         return ebPAPER_SENSOR_IN_PRESSED;
-    case PAPER_DETECTED:
-        return ebPAPER_SENSOR_IN_RELEASED;
-    default:
-        break;
-    }
+    } else {
+        switch ( the_state.P ) {
+        case NO_PAPER_DETECTED:
+            return ebPAPER_SENSOR_IN_PRESSED;
+        case PAPER_DETECTED:
+            return ebPAPER_SENSOR_IN_RELEASED;
+        default:
+            break;
+        }
 
-    return 0;
+        return 0;
+    }
 }
 
 EventBits_t next_button_event_bits(void) {
@@ -176,6 +183,7 @@ void log_single_event( EventBits_t event_bits,
 }
 
 void log_event_group_result ( EventBits_t bits ) {
+    __assume_strings_OK();
     log_single_event(bits, ebPAPER_SENSOR_IN_PRESSED, sensor_in_pressed_msg, strlen(sensor_in_pressed_msg));
     log_single_event(bits, ebPAPER_SENSOR_IN_RELEASED, sensor_in_released_msg, strlen(sensor_in_released_msg));
 
@@ -229,25 +237,32 @@ void run_await_removal(void) {
 }
 
 void run_eject(void) {
+    __assume_strings_OK();
     eject_ballot();
     display_this_text(remove_ballot_text, strlen(remove_ballot_text));
     CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
 }
 
 void run_spoil(void) {
+    __assume_strings_OK();
     spoil_ballot();
     display_this_text(remove_ballot_text, strlen(remove_ballot_text));
     CHANGE_STATE(the_state, L, AWAIT_REMOVAL);
+    //@ assert D: the_state.L == AWAIT_REMOVAL ==> Await_Removal_Inv(the_state);
 }
 
 void run_cast(void) {
+    __assume_strings_OK();
     display_this_text(casting_ballot_text,
                       strlen(casting_ballot_text));
     cast_ballot();
     CHANGE_STATE(the_state, L, STANDBY);
+    //@ assert c: barcode_length > 0;
+    //@ assert d: (!Barcode_Present(the_state) || barcode_length > 0);
 }
 
 void run_wait_for_decision(void) {
+    __assume_strings_OK();
     char this_barcode[BARCODE_MAX_LENGTH] = {0};
     barcode_length_t its_length;
     its_length = what_is_the_barcode(this_barcode);
@@ -256,6 +271,7 @@ void run_wait_for_decision(void) {
         cast_button_light_off();
         log_system_message(decision_timeout_event_msg, strlen(decision_timeout_event_msg));
         CHANGE_STATE(the_state, L, EJECT);
+        //@ assert SBB_Machine_Invariant(the_state, gpio_mem);
     } else if ( is_cast_button_pressed() ) {
         if ( !log_app_event(APP_EVENT_BALLOT_USER_CAST,
                             this_barcode,
@@ -265,6 +281,9 @@ void run_wait_for_decision(void) {
         } else {
             CHANGE_STATE(the_state, L, CAST);
         }
+        spoil_button_light_off();
+        cast_button_light_off();
+        //@ assert SBB_Machine_Invariant(the_state, gpio_mem);
     } else if ( is_spoil_button_pressed() ) {
         if ( !log_app_event(APP_EVENT_BALLOT_USER_SPOIL, this_barcode, its_length) ) {
             debug_printf("Failed to write to app log.");
@@ -272,17 +291,25 @@ void run_wait_for_decision(void) {
         } else {
             CHANGE_STATE(the_state, L, SPOIL);
         }
+        spoil_button_light_off();
+        cast_button_light_off();
+        //@ assert SBB_Machine_Invariant(the_state, gpio_mem);
     } else {
         // pass
+        //@ assert SBB_Machine_Invariant(the_state, gpio_mem);
     }
 }
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-label"
 void run_barcode_detected(void) {
     char this_barcode[BARCODE_MAX_LENGTH] = {0};
+    __assume_strings_OK();
     display_this_text(barcode_detected_text,
                      strlen(barcode_detected_text));
     barcode_length_t length = what_is_the_barcode(this_barcode);
     if ( barcode_cast_or_spoiled(this_barcode, length) ) {
-        // Eject Ballot
+        /* // Eject Ballot */
+        __assume_strings_OK();
         display_this_2_line_text(duplicate_barcode_line_1_text,
                                  strlen(duplicate_barcode_line_1_text),
                                  duplicate_barcode_line_2_text,
@@ -290,24 +317,34 @@ void run_barcode_detected(void) {
         debug_printf("previously seen barcode detected");
         CHANGE_STATE(the_state, L, EJECT);
     } else {
-        barcode_validity validity = is_barcode_valid(this_barcode, length);
+        barcode_validity validity = is_barcode_valid(&this_barcode[0], length);
         switch (validity) {
         case BARCODE_VALID:
             // Prompt the user for a decision
             debug_printf("valid barcode detected");
+        Check:
+            //@ assert valid_this: Barcode_Valid(&this_barcode[0], length);
             cast_button_light_on();
             spoil_button_light_on();
             cast_or_spoil_timeout_reset();
+            __assume_strings_OK();
             display_this_2_line_text(cast_or_spoil_line_1_text,
                                      strlen(cast_or_spoil_line_1_text),
                                      cast_or_spoil_line_2_text,
                                      strlen(cast_or_spoil_line_2_text));
             // Go to the waiting state
             CHANGE_STATE(the_state, L, WAIT_FOR_DECISION);
+            //@ assert eq1:    Barcode_Eq{Check,Here}(&this_barcode[0], &this_barcode[0], length);
+            //@ assert eq2:    Barcode_Eq{Here,Here}(&this_barcode[0], &barcode[0], length);
+            //@ assert valid_this: Barcode_Valid(&this_barcode[0], length);
+            //@ assert valid_that: Barcode_Valid(&barcode[0], length);
+
+            //@ assert SBB1: Wait_For_Decision_Inv(the_state) <==> SBB_States_Invariant(the_state);
             break;
-        
+
         case BARCODE_INVALID_TIMESTAMP:
             debug_printf("expired ballot detected");
+            __assume_strings_OK();
             display_this_2_line_text(expired_ballot_line_1_text,
                                      strlen(expired_ballot_line_1_text),
                                      expired_ballot_line_2_text,
@@ -316,17 +353,21 @@ void run_barcode_detected(void) {
                                strlen(expired_ballot_received_event_msg));
             CHANGE_STATE(the_state, L, EJECT);
             break;
-                
+
         default: // no specific messages for other failures
-            debug_printf("invalid barcode detected, type %d", validity);
+            // debug_printf("invalid barcode detected, type %d", validity);
+            debug_printf("invalid barcode detected, type 'other'");
+            __assume_strings_OK();
             display_this_text(invalid_barcode_text,
                               strlen(invalid_barcode_text));
             log_system_message(invalid_barcode_received_event_msg,
                                strlen(invalid_barcode_received_event_msg));
             CHANGE_STATE(the_state, L, EJECT);
+            break;
         }
     }
 }
+#pragma GCC diagnostic pop
 
 void run_feed_ballot(void) {
     // We want to stop the motor if we've run it for too long
@@ -334,11 +375,13 @@ void run_feed_ballot(void) {
     // to determine which state to transition to.
     if ( !ballot_detected() || ballot_detect_timeout_expired() ) {
         stop_motor();
+
         if ( has_a_barcode() ) {
             CHANGE_STATE(the_state, L, BARCODE_DETECTED);
         } else {
-            display_this_text(no_barcode_text, strlen(no_barcode_text));
             CHANGE_STATE(the_state, L, EJECT);
+            __assume_strings_OK();
+            display_this_text(no_barcode_text, strlen(no_barcode_text));
         }
     }
 }
@@ -352,10 +395,11 @@ void run_wait_for_ballot(void) {
 }
 
 void run_initialize(void) {
-    initialize();
-    if ( LOG_FS_OK == Log_IO_Initialize() ) {
+    bool init_ok = initialize();
+    if ( init_ok ) {
         if ( load_or_create_logs() ) {
             update_sensor_state();
+
             if ( ballot_detected() ) {
                 CHANGE_STATE(the_state, L, EJECT);
             } else {
@@ -373,19 +417,21 @@ void run_initialize(void) {
 
 void run_standby(void) {
     flush_barcodes();
+    __assume_strings_OK();
     go_to_standby();
     CHANGE_STATE(the_state, L, WAIT_FOR_BALLOT);
 }
 
 void run_abort(void) {
+    __assume_strings_OK();
     display_this_2_line_text(error_line_1_text,
                              strlen(error_line_1_text),
                              error_line_2_text,
                              strlen(error_line_2_text));
 }
 
-/*@ requires SBB_Machine_Invariant;
-  @ ensures SBB_Machine_Invariant;
+/*@ requires SBB_Machine_Invariant(the_state, gpio_mem);
+  @ ensures SBB_Machine_Invariant(the_state, gpio_mem);
 */
 void take_step(void) {
     switch ( the_state.L ) {
@@ -452,7 +498,7 @@ void ballot_box_main_loop(void) {
     logic_state old = 0;
     run_initialize();
 
-    /*@ loop invariant SBB_Machine_Invariant;
+    /*@ loop invariant SBB_Machine_Invariant(the_state, gpio_mem);
      */
     for(;;) {
         debug_state_change(old, the_state.L);
