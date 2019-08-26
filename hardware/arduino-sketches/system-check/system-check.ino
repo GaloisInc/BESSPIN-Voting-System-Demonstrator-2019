@@ -88,34 +88,30 @@ void loop() {
       lcd.clear();
       log("SPOIL BUTTON DOWN");
       delay(100);
-    }
+     }
     last_spoil_state = 1;
     return;
   } else {
-    if(last_spoil_state) {
       // State changed from ON to OFF  
       log("SPOIL BUTTON UP");
       delay(100);
       // TODO: Log state change
       last_spoil_state = 0;
     }
-  }
   
   if(digitalRead(CAST_BTN)) {
     if(!last_cast_state) {
-      lcd.clear();
-      log("CAST BUTTON UP");
-      delay(100);
+     lcd.clear();
+     log("CAST BUTTON UP");
+     delay(100);
     }
     last_cast_state = 1;
     return;
   } else {
-    if(last_cast_state) {
-      log("CAST BUTTON UP");
-      delay(100);
-      last_cast_state = 0;
+     log("CAST BUTTON UP");
+     delay(100);
+     last_cast_state = 0;
     }
-  }
 
   struct RTCx::tm tm;
   if (millis() - last_time > 1000) {
