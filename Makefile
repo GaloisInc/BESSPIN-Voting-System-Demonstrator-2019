@@ -203,7 +203,7 @@ endif
 INCLUDES = $(PLATFORM_INCLUDES) \
            -I $(INCLUDE_DIR)
 
-HOSTTEST_CFLAGS = -g -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined -fsanitize=address $(INCLUDES)
+HOSTTEST_CFLAGS = -g -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(INCLUDES)
 
 include $(CRYPTO_DIR)/Makefile.hosttests
 include $(LOG_DIR)/Makefile.hosttests
