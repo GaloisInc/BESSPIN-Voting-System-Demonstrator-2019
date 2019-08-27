@@ -61,7 +61,7 @@ else
 ifeq ($(TARGET),posix)
 export CC := clang
 export CFLAGS := -DVOTING_PLATFORM_POSIX -fsanitize=address
-export OS_DIR = $(SOURCE_DIR)/os/posix
+export OS_DIR = $(SOURCE_DIR)/os/freertos
 posix_all: posix_crypto posix_log posix_sbb
 
 clean: clean_crypto clean_log clean_sbb

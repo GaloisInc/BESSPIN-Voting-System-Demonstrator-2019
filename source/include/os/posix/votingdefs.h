@@ -48,7 +48,7 @@ typedef uint32_t osd_stream_buffer_handle_t;
   @ ensures \result <= xBufferLengthBytes;
 */
 uint32_t osd_stream_buffer_receive(osd_stream_buffer_handle_t handle,
-                                   void *pRxData,
+                                   void *pvRxData,
                                    size_t xBufferLengthBytes,
                                    osd_timer_ticks_t max_block_time_ms);
 
