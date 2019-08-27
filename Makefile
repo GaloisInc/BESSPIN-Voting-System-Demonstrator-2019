@@ -133,6 +133,7 @@ else
 #
 #####################################
 ifeq ($(TARGET),verification)
+export OS_DIR = $(SOURCE_DIR)/os/posix
 
 typecheck_all: typecheck_crypto typecheck_sbb typecheck_log
 
