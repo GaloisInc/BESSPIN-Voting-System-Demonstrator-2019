@@ -184,7 +184,7 @@ else
 #
 #####################################
 ifeq ($(TARGET),hosttests)
-export OS_DIR = $(SOURCE_DIR)/os/freertos
+export OS_DIR = $(SOURCE_DIR)/os/posix
 
 # Assume clang is on PATH, but needs some special setup on Darwin to override
 # Apple's clang and use the HomeBrew one instead...
