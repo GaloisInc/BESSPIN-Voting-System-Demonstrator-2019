@@ -16,7 +16,7 @@ LOGGING_SOURCE = ../logging/debug_io.c \
                  ../logging/secure_log.c \
                  ../logging/log_io.c \
                  $(OS_DIR)/log_fs.c \
-                 ../logging/log_net.c
+                 $(OS_DIR)/log_net.c
 
 CFLAGS = -DHARDCODE_CURRENT_TIME \
          -DCURRENT_YEAR=2019 \
