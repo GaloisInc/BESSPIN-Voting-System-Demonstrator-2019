@@ -17,7 +17,7 @@ DEMO_SRC = \
   $(LOG_SOURCE_DIR)/log_io.c \
   $(OS_DIR)/log_fs.c \
   $(OS_DIR)/log_net.c \
-  $(LOG_SOURCE_DIR)/debug_io.c \
+  $(OS_DIR)/debug_io.c \
   $(CRYPTO_SOURCE_DIR)/base64.c \
   $(CRYPTO_SOURCE_DIR)/crypto_t.c \
   $(CRYPTO_SOURCE_DIR)/crypto.c \

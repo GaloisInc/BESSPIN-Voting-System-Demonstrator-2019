@@ -12,7 +12,7 @@ DEMO_SRC = \
     log_io.c \
     $(OS_DIR)/log_fs.c \
     $(OS_DIR)/log_net.c \
-    debug_io.c \
+    $(OS_DIR)/debug_io.c \
     ../crypto/aes.c \
     ../crypto/base64.c \
     ../crypto/cbc.c \

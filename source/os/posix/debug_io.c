@@ -1,9 +1,4 @@
-#ifdef TARGET_OS_FreeRTOS
-#include <FreeRTOS.h>
-#include <FreeRTOSConfig.h>
-#else // POSIX
 #include <stdio.h>
-#endif // TARGET_OS_FreeRTOS
 
 #include <string.h>
 
@@ -47,11 +42,7 @@ int debug_printf(const char *the_format, ...)
     {
         // assuming that we successfully formatted the string,
         // we can print it in a platform-appropriate way
-        #ifdef TARGET_OS_FreeRTOS
-        printf("%lu.%lu[s]: %s", uptimeMs()/1000, uptimeMs(), buffer);
-        #else
         fprintf(stderr, "%s",buffer);
-        #endif // TARGET_OS_FreeRTOS
     }
     #else // not in debug mode
     int result = 0;
@@ -92,13 +83,8 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
         // assuming that we successfully formatted the string,
         // we can print it in a platform-appropriate way
         
-        #ifdef TARGET_OS_FreeRTOS
-        f_printf(&the_io_stream->the_file, "%8s", buffer);
-        f_sync(&the_io_stream->the_file);
-        #else
         fprintf(&the_io_stream->the_file, "%s", buffer);
         fflush(&the_io_stream->the_file);
-        #endif // TARGET_OS_FreeRTOS
     }
     #else // not in debug mode
     int result = 0;
@@ -106,4 +92,3 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
     
     return result;
 }
-

@@ -9,12 +9,12 @@ CRYPTO_SOURCE = ../crypto/aes.c \
                 ../crypto/base64.c \
                 ../crypto/crypto_config_default.c
 
-LOGGING_SOURCE = ../logging/debug_io.c \
-                 ../logging/log_t.c \
+LOGGING_SOURCE = ../logging/log_t.c \
                  ../logging/log.c \
                  ../logging/secure_log_t.c \
                  ../logging/secure_log.c \
                  ../logging/log_io.c \
+                 $(OS_DIR)/debug_io.c \
                  $(OS_DIR)/log_fs.c \
                  $(OS_DIR)/log_net.c
 
@@ -63,4 +63,4 @@ sbb_hosttest6:
 
 sbb_hosttest_clean:
 	cd $(SBB_DIR); \
-	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 base64test *.o \
+	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 hosttest6 base64test *.o \
