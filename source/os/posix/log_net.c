@@ -31,32 +31,6 @@
 // we allocate up to 7 characters for this to be printed in decimal in the HTTP header.
 // static const size_t worst_case_data_length = 7;
 
-#ifdef TARGET_OS_FreeRTOS
-
-uint32_t ulApplicationGetNextSequenceNumber(uint32_t ulSourceAddress,
-                                            uint16_t usSourcePort,
-                                            uint32_t ulDestinationAddress,
-                                            uint16_t usDestinationPort);
-
-
-//////////////////////////////////////////////
-// FreeRTOS-specific includes and constants //
-//////////////////////////////////////////////
-
-/* FreeRTOS and IP stack includes. */
-#include "FreeRTOS.h"
-#include "FreeRTOS_IP.h"
-#include "FreeRTOS_Sockets.h"
-#include "list.h"
-
-#include "sbb_freertos.h"
-
-#define portable_assert(x) configASSERT(x)
-
-extern const uint16_t sbb_log_port_number;
-
-#else
-
 ///////////////////////////////////////////
 // POSIX-specific includes and constants //
 ///////////////////////////////////////////
@@ -74,8 +48,6 @@ extern const uint16_t sbb_log_port_number;
 
 const uint16_t sbb_log_port_number = 8066;
 
-#endif
-
 //////////////////////////////
 // Exported function bodies //
 //////////////////////////////
@@ -83,12 +55,6 @@ const uint16_t sbb_log_port_number = 8066;
 #ifdef NETWORK_LOGS
 void Log_Net_Initialize()
 {
-#ifdef TARGET_OS_FreeRTOS
-    // On FreeRTOS, this is currently null.
-    //
-    // We assume that FreeRTOS_IPInit() has been called already
-    // by the main program.
-#endif
     // On POSIX, implementation is null
     return;
 }
@@ -96,20 +62,6 @@ void Log_Net_Initialize()
 // Send network logs in simulation as well
 void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 {
-#ifdef TARGET_OS_FreeRTOS
-      // Send the data to the network logging taks
-      #ifdef NETWORK_LOG_DEBUG
-      debug_printf("Log_Net_Send: %lu bytes\r\n", total);
-      #endif
-      size_t res = xStreamBufferSend(xNetLogStreamBuffer,
-                        (void *)Transmit_Buffer,
-                        total,
-                        0);
-      if (res != total) {
-        printf("Log_Net_Send Warning: attempted to send %u bytes, but sent only %u\r\n", total, res);
-      }
-
-#else
       // POSIX-specific implementation of socket handling code
       int sockfd;
       int bytes, sent;
@@ -158,7 +110,6 @@ void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total)
 
       close(sockfd);
 
-#endif // TARGET_OS_FreeRTOS
 }
 #else // NETWORK_LOGS
 
