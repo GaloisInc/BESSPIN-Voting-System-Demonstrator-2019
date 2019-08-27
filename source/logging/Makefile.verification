@@ -55,7 +55,7 @@ SOFTWARE_SPECS := log.h secure_log.h debug_io.h log_io.h
 FRAMA_C_SOURCES := log_t.c secure_log_t.c log.c secure_log.c log_main.c debug_io.c log_io.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
-SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) log_fs.c log_net.c
+SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) $(OS_DIR)/log_fs.c log_net.c
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 # MAIN_ENTRY_POINT := log_main_loop

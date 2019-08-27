@@ -10,7 +10,7 @@ DEMO_SRC = \
     log.c \
     secure_log.c \
     log_io.c \
-    log_fs.c \
+    $(OS_DIR)/log_fs.c \
     log_net.c \
     debug_io.c \
     ../crypto/aes.c \

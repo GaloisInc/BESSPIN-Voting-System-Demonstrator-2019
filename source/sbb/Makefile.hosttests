@@ -15,7 +15,7 @@ LOGGING_SOURCE = ../logging/debug_io.c \
                  ../logging/secure_log_t.c \
                  ../logging/secure_log.c \
                  ../logging/log_io.c \
-                 ../logging/log_fs.c \
+                 $(OS_DIR)/log_fs.c \
                  ../logging/log_net.c
 
 CFLAGS = -DHARDCODE_CURRENT_TIME \
