@@ -1,3 +1,0 @@
-DEFAULT_PROG=default_ballot_box_sim
-CFLAGS += -DSIMULATION
-include Makefile.freertos

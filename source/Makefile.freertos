@@ -1,3 +1,23 @@
+# Voting System Definitions
+include Makefile.common
+
+OS_SRC = $(OS_DIR)/time.c \
+         $(OS_DIR)/log_fs.c \
+         $(OS_DIR)/log_net.c \
+         $(OS_DIR)/debug_io.c
+
+DEMO_SRC = $(OS_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)
+
+FREERTOS_SRC += $(FREERTOS_PEEKPOKE_SRC)
+
+CFLAGS += \
+    $(FREERTOS_IP_INCLUDE) \
+	-I$(FREERTOS_PROTOCOLS_DIR)/include \
+    -DVOTING_SYSTEM_DEBUG #\
+    -DNETWORK_LOGS \
+    -DAXI_DEBUG_PRINT=1 \
+    -DNETWORK_LOG_DEBUG=1
+
 DEFAULT_PROG ?= default_ballot_box
 BOX1_PROG ?= ballot_box_1
 BOX2_PROG ?= ballot_box_2
@@ -37,7 +57,7 @@ OBJS_BOX2 = $(OBJS) $(BOX2_SRC:.c=.o)
 OBJS_BOX3 = $(OBJS) $(BOX3_SRC:.c=.o)
 OBJS_BOX4 = $(OBJS) $(BOX4_SRC:.c=.o)
 
-
+$(info OS_LIB=$(OS_DIR)/os.a)
 $(info ASFLAGS=$(ASFLAGS))
 $(info LDLIBS=$(LDLIBS))
 $(info CFLAGS=$(CFLAGS))
