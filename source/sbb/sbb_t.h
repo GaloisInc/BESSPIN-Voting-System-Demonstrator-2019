@@ -90,6 +90,8 @@ typedef enum { //motor_ASM
               TIMER_TICK_UNDER_E,
               TIMER_TICK_OVER_E,
               RESET_TIMER_E,
+              //controller_ASM
+              INTERNAL_CONTROLLER_E
 } SBB_event;
 
 typedef enum { // invalid barcode classifications
