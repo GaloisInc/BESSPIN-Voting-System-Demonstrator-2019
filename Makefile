@@ -21,19 +21,19 @@ export USE_LED_BLINK_TASK=1
 #
 #####################################
 fpga:
-	cd $(SBB_DIR) ; \
+	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos default
-	cp $(SBB_DIR)/default_ballot_box.* .
+	cp $(SOURCE_DIR)/default_ballot_box.* .
 
 sim:
-	cd $(SBB_DIR) ; \
+	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim default
-	cp $(SBB_DIR)/default_ballot_box_sim.* .
+	cp $(SOURCE_DIR)/default_ballot_box_sim.* .
 
 clean_all:
-	cd $(SBB_DIR) ; \
+	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
-	cd $(SBB_DIR) ; \
+	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean
 	rm -f default_ballot_box.*
 	rm -f default_ballot_box_sim.*
@@ -98,32 +98,16 @@ else
 #####################################
 ifeq ($(TARGET),freertos)
 
-freertos_all: freertos_crypto freertos_log freertos_sbb
+freertos_all: freertos_sbb
 
-clean: clean_crypto clean_log clean_sbb
-
-freertos_crypto:
-	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos default
-
-clean_crypto:
-	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos clean
-
-freertos_log:
-	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos default
-
-clean_log:
-	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos clean
+clean: clean_sbb
 
 freertos_sbb:
-	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos default
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos sbb
 
 clean_sbb:
-	cd $(SBB_DIR) ; \
+	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
 
 else
