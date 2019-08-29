@@ -12,9 +12,13 @@
 #include "gpio.h"
 #include "serLcd.h"
 #include "ds1338rtc.h"
+#include "crypto/crypto.h"
 
 /* Macros */
 #define osd_assert configASSERT
+
+/* Crypto */
+const uint8_t *osd_fetch_key(AES_Key_Name key);
 
 /* Time */
 typedef TickType_t osd_timer_ticks_t;

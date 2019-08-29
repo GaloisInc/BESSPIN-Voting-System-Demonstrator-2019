@@ -62,36 +62,34 @@ else
 #
 #####################################
 ifeq ($(TARGET),posix)
-export CC := clang
-export CFLAGS := -DVOTING_PLATFORM_POSIX -fsanitize=address
-export OS_DIR = $(SOURCE_DIR)/os/posix
-posix_all: posix_crypto posix_log posix_sbb
 
-clean: clean_crypto clean_log clean_sbb
+posix_all: posix_crypto posix_logging posix_sbb
+
+clean: clean_crypto clean_logging clean_sbb
 
 posix_crypto:
-	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.posix default
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.posix crypto
 
-posix_log:
-	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.posix default
+posix_logging:
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.posix logging
 
 posix_sbb:
-	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.posix default
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.posix sbb
 
 clean_crypto:
-	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.posix clean
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.posix clean_crypto
 
-clean_log:
-	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.posix clean
+clean_logging:
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.posix clean_logging
 
 clean_sbb:
-	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.posix clean
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.posix clean_sbb
 
 else
 #####################################

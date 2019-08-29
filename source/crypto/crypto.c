@@ -17,50 +17,18 @@
 
 // the mock/default key, used for testing and returned when an unknown
 // key is asked for
-static const aes256_key mock_key = "From Russia with Love";
+const aes256_key mock_key = "From Russia with Love";
 
 // Local function declarations
 
 // Returns a pointer to the key data for the given Key Name
 const uint8_t *fetch_key (AES_Key_Name key);
 
-// Local function bodies
+/* // Local function bodies */
 
 const uint8_t *fetch_key (AES_Key_Name key)
 {
-  // The body of this function is implemented differently on FreeRTOS and POSIX
-
-#ifdef TARGET_OS_FreeRTOS
-    const uint8_t *result;
-    
-    // we simply return addresses of the hard-coded keys that were linked
-    // in at compile time, with the mock key returned in any situation
-    // where one of the 3 "real" keys is not asked for
-    switch (key) {
-    case Barcode_MAC_Key:
-        result = &barcode_mac_key[0];
-        break;
-    
-    case Log_Root_Block_MAC_Key:
-        result = &log_root_block_mac_key[0];
-        break;
-        
-    case Log_Entry_MAC_Key:
-        result = &log_entry_mac_key[0];
-        break;
-        
-    default:
-        result = &mock_key[0];
-        break;
-    }
-
-    return result;
-#else // POSIX systems
-
-  // For host testing, we return the same mock key for all cases
-  return mock_key;
-
-#endif // TARGET_OS_FreeRTOS
+    return osd_fetch_key(key);
 }
 
 // Export function bodies

@@ -3,17 +3,21 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <sys/unistd.h>
+#include <unistd.h>
 #include <time.h>
 #include <assert.h>
+#include "crypto/crypto.h"
 
 /* Macros */
 #define osd_assert(x) assert(x)
 
+/* Crypto */
+const uint8_t *osd_fetch_key (AES_Key_Name key);
+
 /* Time */
 typedef uint32_t osd_timer_ticks_t;
 osd_timer_ticks_t osd_get_ticks(void);
-#define osd_ticks_to_msec(x) (x)
+#define osd_msec_to_ticks(x) (x)
 #define osd_msleep(_x) usleep(1000*(_x))
 
 uint8_t

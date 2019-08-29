@@ -15,16 +15,16 @@ int debug_printf(const char *the_format, ...)
     #ifdef VOTING_SYSTEM_DEBUG // only do anything in debug mode
     #pragma message "Using VOTING_SYSTEM_DEBUG option"
     char buffer[BUFFER_SIZE];
-    
+
     // format the string
-    
+
     va_list args;
     va_start(args, the_format);
     int result = vsnprintf(buffer, BUFFER_SIZE, the_format, args);
     va_end(args);
-    
+
     if (result >= BUFFER_SIZE - 2) {
-        // the buffer was overrun or almost filled, so replace 
+        // the buffer was overrun or almost filled, so replace
         // the last three characters with a CR/LF and a null terminator
         buffer[BUFFER_SIZE - 3] = '\r';
         buffer[BUFFER_SIZE - 2] = '\n';
@@ -37,7 +37,7 @@ int debug_printf(const char *the_format, ...)
         buffer[len + 1] = '\n';
         buffer[len + 2] = 0;
     }
-    
+
     if (result >= 0)
     {
         // assuming that we successfully formatted the string,
@@ -46,8 +46,9 @@ int debug_printf(const char *the_format, ...)
     }
     #else // not in debug mode
     int result = 0;
+    (void)the_format;
     #endif // VOTING_SYSTEM_DEBUG
-    
+
     return result;
 }
 
@@ -55,16 +56,16 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
 {
     #ifdef VOTING_SYSTEM_DEBUG // only do anything in debug mode
     char buffer[BUFFER_SIZE];
-    
+
     // format the string
-    
+
     va_list args;
     va_start(args, the_format);
     int result = vsnprintf(buffer, BUFFER_SIZE, the_format, args);
     va_end(args);
-    
+
     if (result >= BUFFER_SIZE - 2) {
-        // the buffer was overrun or almost filled, so replace 
+        // the buffer was overrun or almost filled, so replace
         // the last three characters with a CR/LF and a null terminator
         buffer[BUFFER_SIZE - 3] = '\r';
         buffer[BUFFER_SIZE - 2] = '\n';
@@ -77,18 +78,20 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
         buffer[len + 1] = '\n';
         buffer[len + 2] = 0;
     }
-    
+
     if (result >= 0)
     {
         // assuming that we successfully formatted the string,
         // we can print it in a platform-appropriate way
-        
+
         fprintf(&the_io_stream->the_file, "%s", buffer);
         fflush(&the_io_stream->the_file);
     }
     #else // not in debug mode
+    (void)the_format;
+    (void)the_io_stream;
     int result = 0;
     #endif // VOTING_SYSTEM_DEBUG
-    
+
     return result;
 }

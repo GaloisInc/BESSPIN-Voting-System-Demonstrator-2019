@@ -212,7 +212,10 @@ export LIBS	 =  -lc -lgcc
 OS_SRC = $(OS_DIR)/time.c \
          $(OS_DIR)/log_fs.c \
          $(OS_DIR)/log_net.c \
-         $(OS_DIR)/debug_io.c
+         $(OS_DIR)/debug_io.c \
+         $(OS_DIR)/sbb_tcp.c \
+         $(OS_DIR)/fetch_key.c \
+         main_freertos.c
 
 DEMO_SRC = $(OS_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)
 
@@ -265,7 +268,6 @@ OBJS_BOX2 = $(OBJS) $(BOX2_SRC:.c=.o)
 OBJS_BOX3 = $(OBJS) $(BOX3_SRC:.c=.o)
 OBJS_BOX4 = $(OBJS) $(BOX4_SRC:.c=.o)
 
-$(info OS_LIB=$(OS_DIR)/os.a)
 $(info ASFLAGS=$(ASFLAGS))
 $(info LDLIBS=$(LDLIBS))
 $(info CFLAGS=$(CFLAGS))
