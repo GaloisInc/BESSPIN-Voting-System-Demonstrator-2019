@@ -233,7 +233,7 @@ sbb_hosttest_clean:
 	cd $(SOURCE_DIR); \
 	$(MAKE) -f Makefile.hosttests sbb_hosttest_clean
 
-hosts_all: crypto_hosttest_all logging_hosttest_all sbb_hosttest_all
+hosttest_all: crypto_hosttest_all logging_hosttest_all sbb_hosttest_all
 clean: crypto_hosttest_clean logging_hosttest_clean sbb_hosttest_clean
 
 else
@@ -347,6 +347,6 @@ endif # ($(TARGET),deploy)
 endif # ($(TARGET),sim)
 endif # ($(TARGET),hosttests)
 endif # ($(TARGET),verification)
-endif # ($(TARGET),linux)
+endif # ($(TARGET),posix)
 endif # ($(TARGET),freertos)
 endif # ($(TARGET),bottom)

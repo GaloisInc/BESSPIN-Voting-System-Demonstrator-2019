@@ -70,7 +70,7 @@ FreeRTOS:
 HostTests:
   script:
     - export TARGET=hosttests
-    - nix-shell --run 'make hosts_all'
+    - nix-shell --run 'make hosttest_all'
   tags: ["voting-system"]
 
 Simulator:
