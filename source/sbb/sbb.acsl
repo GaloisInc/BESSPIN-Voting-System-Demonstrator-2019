@@ -149,10 +149,34 @@
   @   ((E == INTERNAL_TIMER_E) ==>
   @     (preS.T == STOPPED && postS.T == INITIALIZED)); 
   @ }
+  @ axiomatic SBB_controller_ASM {
+  @   predicate controller_ASM_transition(SBB_state preS,
+  @                                       SBB_event E,
+  @                                       SBB_state postS) =
+  @    (postS.L == ABORT) ||
+  @    (((E == SPOIL_E) ==>
+  @      (preS.L == WAIT_FOR_DECISION && postS.L == SPOIL)) &&
+  @     ((E == CAST_E) ==>
+  @       (preS.L == WAIT_FOR_DECISION && postS.L == CAST)) &&
+  @     ((E == INTERNAL_CONTROLLER_E) ==>
+  @       ((preS.L == INITIALIZE && postS.L == STANDBY) ||
+  @        (preS.L == STANDBY && postS.L == WAIT_FOR_BALLOT) ||
+  @        (preS.L == WAIT_FOR_BALLOT && postS.L == FEED_BALLOT) ||
+  @        (preS.L == FEED_BALLOT && postS.L == BARCODE_DETECTED) ||
+  @        (preS.L == FEED_BALLOT && postS.L == EJECT) ||
+  @        (preS.L == BARCODE_DETECTED && postS.L == WAIT_FOR_DECISION) ||
+  @        (preS.L == BARCODE_DETECTED && postS.L == EJECT) ||
+  @        (preS.L == WAIT_FOR_DECISION && postS.L == EJECT) ||
+  @        (preS.L == CAST && postS.L == STANDBY) ||
+  @        (preS.L == SPOIL && postS.L == AWAIT_REMOVAL) ||
+  @        (preS.L == EJECT && postS.L == AWAIT_REMOVAL) ||
+  @        (preS.L == AWAIT_REMOVAL && postS.L == STANDBY))));
+  @ }
   @ axiomatic SBB_ASM {
   @   predicate ASM_transition(SBB_state preS,
   @                            SBB_event E,
   @                            SBB_state postS) =
+  @     controller_ASM_transition(preS, E, postS)   &&
   @     motor_ASM_transition(preS, E, postS)        &&
   @     cast_spoil_ASM_transition(preS, E, postS)   &&
   @     barcode_ASM_transition(preS, E, postS)      &&
