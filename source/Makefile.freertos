@@ -286,17 +286,11 @@ default: $(DEFAULT_PROG).elf
 
 all: $(DEFAULT_PROG).elf $(BOX1_PROG).elf $(BOX2_PROG).elf $(BOX3_PROG).elf $(BOX4_PROG).elf
 
-crypto: $(CRYPTO_SRC)
-	@$(GCC) -o $@ $(LDFLAGS) $(CRYPTO_SRC:.c=.o) $(LIBS)
+crypto: $(CRYPTO_SRC:.c=.o)
 
-logging: $(LOGGING_SRC)
-	@$(GCC) -o $@ $(LDFLAGS) $(LOGGING_SRC:.c=.o) $(LIBS)
+logging: $(LOGGING_SRC:.c=.o)
 
-sbb: $(SBB_SRC:.c=.o)
-	@ar -crs sbb.a $(SBB_SRC:.c=.o)
-
-os: $(OS_SRC)
-	@$(GCC) -o $@ $(LDFLAGS) $(OS_SRC:.c=.o) $(LIBS)
+sbb: default
 
 $(DEFAULT_PROG).elf  : $(OBJS_DEFAULT)
 	@echo Linking....
@@ -327,6 +321,12 @@ $(BOX4_PROG).elf  : $(OBJS_BOX4)
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX4) $(LIBS)
 	@$(OBJDUMP) -S $(BOX4_PROG).elf > $(BOX4_PROG).asm
 	@echo Completed $@
+
+clean_crypto :
+	@rm -f $(CRYPTO_SRC:.c=.o)
+
+clean_logging :
+	@rm -f $(LOGGING_SRC:.c=.o)
 
 clean_sbb :
 	@rm -f $(SBB_SRC:.c=.o)

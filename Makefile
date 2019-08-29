@@ -98,17 +98,33 @@ else
 #####################################
 ifeq ($(TARGET),freertos)
 
-freertos_all: freertos_sbb
+freertos_all: freertos_crypto freertos_logging freertos_sbb
 
-clean: clean_sbb
+clean: clean_sbb clean_crypto clean_logging
+
+freertos_crypto:
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos crypto
+
+freertos_logging:
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos logging
 
 freertos_sbb:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos sbb
 
-clean_sbb:
+clean_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
+
+clean_logging:
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos clean
+
+clean_sbb:
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos clean_sbb
 
 else
 #####################################
@@ -212,28 +228,28 @@ sim_all: sim_crypto sim_log sim_sbb
 clean: clean_crypto clean_log clean_sbb
 
 sim_crypto:
-	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim default
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim crypto
 
 clean_crypto:
-	cd $(CRYPTO_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim clean
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim clean_crypto
 
 sim_log:
-	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim default
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim logging
 
 clean_log:
-	cd $(LOG_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim clean
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim clean_logging
 
 sim_sbb:
-	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim default
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim sbb
 
 clean_sbb:
-	cd $(SBB_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim clean
+	cd $(SOURCE_DIR) ; \
+	$(MAKE) -f Makefile.freertos_sim clean_sbb
 
 else
 #####################################
