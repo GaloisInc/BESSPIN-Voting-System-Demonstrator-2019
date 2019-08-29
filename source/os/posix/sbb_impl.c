@@ -51,11 +51,3 @@ uint32_t osd_stream_buffer_receive(osd_stream_buffer_handle_t handle,
     osd_assert(0);
     return 0;
 }
-
-int
-main(int argc, char **argv)
-{
-    //TBD
-    osd_assert(0);
-    return 0;
-}

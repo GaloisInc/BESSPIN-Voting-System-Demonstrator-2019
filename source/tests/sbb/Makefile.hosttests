@@ -1,0 +1,55 @@
+sbb_hosttest_all: sbb_hosttest1 # sbb_hosttest2 sbb_hosttest3 sbb_hosttest4 sbb_hosttest5 sbb_hosttest6
+
+$(info SOURCE_DIR=$(SOURCE_DIR))
+$(info CRYPTO_SRC=$(CRYPTO_DIR))
+$(info CRYPTO_SRC=$(CRYPTO_SRC))
+OSD_SRC = $(OS_DIR)/debug_io.c \
+          $(OS_DIR)/log_fs.c \
+          $(OS_DIR)/log_net.c \
+          $(OS_DIR)/sbb_impl.c
+
+CFLAGS += -DHARDCODE_CURRENT_TIME \
+          -DCURRENT_YEAR=2019 \
+          -DCURRENT_MONTH=6 \
+          -DCURRENT_DAY=22 \
+          -DCURRENT_HOUR=11 \
+          -DCURRENT_MINUTE=18
+
+sbb_hosttest1:
+	$(CC) $(CFLAGS) $(HOSTTEST_CFLAGS) -o hosttest1 hosttest1.c \
+	$(CRYPTO_SRC) $(LOGGING_SRC) $(OSD_SRC) \
+	$(SBB_DIR)/sbb_crypto.c \
+
+sbb_hosttest2:
+	$(CC) $(CFLAGS) $(HOSTTEST_CFLAGS) -o hosttest2 hosttest2.c \
+	$(CRYPTO_SRC) $(LOGGING_SRC) $(OSD_SRC) \
+	$(SBB_DIR)/sbb_crypto.c \
+
+sbb_hosttest3:
+	$(CC) $(CFLAGS) $(HOSTTEST_CFLAGS) -o hosttest3 hosttest3.c \
+	$(CRYPTO_SRC) $(LOGGING_SRC) $(OSD_SRC) \
+	$(SBB_DIR)/sbb_crypto.c \
+
+sbb_hosttest4:
+	$(CC) $(CFLAGS) $(HOSTTEST_CFLAGS) -o hosttest4 hosttest4.c \
+	$(CRYPTO_SRC) $(LOGGING_SRC) $(OSD_SRC) \
+	$(SBB_DIR)/sbb_crypto.c \
+
+sbb_hosttest5:
+	cd $(SBB_DIR); \
+	$(CC) $(CFLAGS) -DSBB_NO_HTTP_ENDPOINT -DVOTING_SYSTEM_DEBUG -DFILESYSTEM_DUPLICATES \
+        -o hosttest5 hosttest5.c $(SBB_DIR)/sbb_logging.c $(SBB_DIR)/sbb_strings.c \
+	$(CRYPTO_SRC) $(LOGGING_SRC) $(OSD_SRC) \
+
+sbb_hosttest6:
+	cd $(SBB_DIR); \
+	$(CC) $(CFLAGS) -DSBB_NO_HTTP_ENDPOINT -DVOTING_SYSTEM_DEBUG -DFILESYSTEM_DUPLICATES \
+        -o hosttest6 hosttest6.c $(SBB_DIR)/sbb_logging.c $(SBB_DIR)/sbb_strings.c \
+	$(CRYPTO_SRC) $(LOGGING_SRC) $(OSD_SRC) \
+
+sbb_hosttest_clean:
+	rm -f hosttest1 hosttest2 hosttest3 hosttest4 hosttest5 hosttest6 base64test *.o \
+	rm -f $(CRYPTO_SRC:.c=.o)
+	rm -f $(LOGGING_SRC:.c=.o)
+	rm -f $(SBB_SRC:.c=.o)
+	rm -f $(OSD_SRC:.c=.o)

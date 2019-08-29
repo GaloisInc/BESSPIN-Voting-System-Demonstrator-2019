@@ -6,6 +6,9 @@ export SOURCE_DIR = $(PWD)/source
 export SBB_DIR = $(SOURCE_DIR)/sbb
 export LOG_DIR = $(SOURCE_DIR)/logging
 export CRYPTO_DIR = $(SOURCE_DIR)/crypto
+export CRYPTO_TEST_DIR = $(SOURCE_DIR)/tests/crypto
+export LOGGING_TEST_DIR = $(SOURCE_DIR)/tests/logging
+export SBB_TEST_DIR = $(SOURCE_DIR)/tests/sbb
 export INCLUDE_DIR = $(SOURCE_DIR)/include
 
 # Expected GFE repo location (for flash scripts)
@@ -204,14 +207,34 @@ endif
 INCLUDES = $(PLATFORM_INCLUDES) \
            -I $(INCLUDE_DIR)
 
-HOSTTEST_CFLAGS = -g -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(INCLUDES)
+export HOSTTEST_CFLAGS = -g -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(INCLUDES)
 
-include $(CRYPTO_DIR)/Makefile.hosttests
-include $(LOG_DIR)/Makefile.hosttests
-include $(SBB_DIR)/Makefile.hosttests
+crypto_hosttest_all:
+	cd $(SOURCE_DIR); \
+	$(MAKE) -f Makefile.hosttests crypto_hosttest_all
 
-hosts_all: crypto_hosttest_all log_hosttest_all sbb_hosttest_all
-clean: crypto_hosttest_clean log_hosttest_clean sbb_hosttest_clean
+crypto_hosttest_clean:
+	cd $(SOURCE_DIR); \
+	$(MAKE) -f Makefile.hosttests crypto_hosttest_clean
+
+logging_hosttest_all:
+	cd $(SOURCE_DIR); \
+	$(MAKE) -f Makefile.hosttests logging_hosttest_all
+
+logging_hosttest_clean:
+	cd $(SOURCE_DIR); \
+	$(MAKE) -f Makefile.hosttests logging_hosttest_clean
+
+sbb_hosttest_all:
+	cd $(SOURCE_DIR); \
+	$(MAKE) -f Makefile.hosttests sbb_hosttest_all
+
+sbb_hosttest_clean:
+	cd $(SOURCE_DIR); \
+	$(MAKE) -f Makefile.hosttests sbb_hosttest_clean
+
+hosts_all: crypto_hosttest_all logging_hosttest_all sbb_hosttest_all
+clean: crypto_hosttest_clean logging_hosttest_clean sbb_hosttest_clean
 
 else
 #####################################

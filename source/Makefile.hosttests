@@ -1,0 +1,29 @@
+include Makefile.common
+
+export CFLAGS += -I $(INCLUDE_DIR)/sbb \
+	               -I $(INCLUDE_DIR)/crypto \
+	               -I $(INCLUDE_DIR)/logging
+
+crypto_hosttest_all:
+	cd $(CRYPTO_TEST_DIR) ; \
+	$(MAKE) -f Makefile.hosttests crypto_hosttest_all
+
+crypto_hosttest_clean:
+	cd $(CRYPTO_TEST_DIR) ; \
+	$(MAKE) -f Makefile.hosttests crypto_hosttest_clean
+
+logging_hosttest_all:
+	cd $(LOGGING_TEST_DIR) ; \
+	$(MAKE) -f Makefile.hosttests logging_hosttest_all
+
+logging_hosttest_clean:
+	cd $(LOGGING_TEST_DIR) ; \
+	$(MAKE) -f Makefile.hosttests logging_hosttest_clean
+
+sbb_hosttest_all:
+	cd $(SBB_TEST_DIR) ; \
+	$(MAKE) -f Makefile.hosttests sbb_hosttest_all
+
+sbb_hosttest_clean:
+	cd $(SBB_TEST_DIR) ; \
+	$(MAKE) -f Makefile.hosttests sbb_hosttest_clean

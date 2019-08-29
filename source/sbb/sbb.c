@@ -11,7 +11,6 @@
 
 // Subsystem includes
 #include "sbb.h"
-#include "sbb_hw.h"
 #include "sbb_crypto.h"
 #include "sbb_logging.h"
 
