@@ -8,10 +8,6 @@ box.
 
 component Smart Ballot Box API
   The top-level API that is independent of the hardware and the type of the ballot box.
-// @design kiniry Is this feature meant to provide a placeholder for a
-// SBB that may be able to perform tabulation?  Our DEF CON 2019 SBB
-// need not tabulate.
-  Perform tabulation!
   Is this barcode valid?
 
 component Barcode

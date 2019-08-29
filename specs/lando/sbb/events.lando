@@ -13,34 +13,25 @@ Motor backward.
 Move motor backward, to feed paper out of the ballot box.
 
 Paper detected.
-No paper sensor detects a paper then a sheet of paper is inserted into
-the paper feeder and is detected by the early paper sensor.
+The paper sensor does not detect any paper then a sheet of paper is inserted into
+the paper feeder and is detected by the paper sensor.
 
 Paper inserted.
-The early paper sensor detects some paper and the later paper sensor
-does not, then a sheet of paper is detected by the later paper sensor.
+The paper sensor detects some paper.
 
 Paper accepted.
-Both early and late paper sensors detect some paper, then the early
-paper sensor does not, then the later paper sensor does not, and
+The paper sensor detects some paper, then does not, and then 
 the paper is deposited inside the ballot box.
 
 Paper returned.
-Both early and late paper sensors detect some paper, then the later
-paper sensor does not, then the early paper sensor does not, thus
+The paper sensor detects some paper, then does not, thus
 paper has been removed from the feeder tray.
 
-Early paper sensor trigger.
-The early paper sensor detects paper.
+Paper sensor trigger.
+The paper sensor detects paper.
 
 Early paper sensor is released.
-The early paper sensor detects no paper.
-
-Late paper sensor trigger.
-The late paper sensor detects paper.
-
-Late paper sensor is released.
-The late paper sensor detects no paper.
+The paper sensor detects no paper.
 
 Display some text.
 Some text is diplayed on the LCD display.
