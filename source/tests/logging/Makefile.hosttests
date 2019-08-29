@@ -5,7 +5,8 @@ HOSTTEST_CFLAGS += -I $(INCLUDE_DIR)/crypto \
 
 OSD_SRC = $(OS_DIR)/debug_io.c \
           $(OS_DIR)/log_fs.c \
-          $(OS_DIR)/log_net.c
+          $(OS_DIR)/log_net.c \
+          $(OS_DIR)/fetch_key.c
 
 # Build the bottom target
 logging_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 log_hosttest_test4 log_hosttest_test5 log_hosttest_test6 \

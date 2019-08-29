@@ -3,7 +3,7 @@ HOSTTEST_CFLAGS += -I $(INCLUDE_DIR)/crypto
 
 crypto_hosttest_all: crypto_hosttest1 crypto_hosttest2 crypto_hosttest3 crypto_hosttest4 crypto_hosttest5 crypto_base64test
 
-CRYPTO_SOURCE = $(CRYPTO_SRC) $(CRYPTO_DIR)/crypto_config_default.c
+CRYPTO_SOURCE = $(CRYPTO_SRC) $(CRYPTO_DIR)/crypto_config_default.c $(OS_DIR)/fetch_key.c
 
 crypto_hosttest1:
 	$(CC) $(HOSTTEST_CFLAGS) -o hosttest1 hosttest1.c $(CRYPTO_SOURCE)
