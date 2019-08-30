@@ -4,49 +4,15 @@
 #include <stdint.h>
 #include "secure_log_t.h"
 #include "log_net_t.h"
-
-#ifdef TARGET_OS_FreeRTOS
-
-
-#ifdef TARGET_FS_LittleFS
-
-#error "TARGET_FS_LittleFS not yet implemented"
-
-#else
-
-// Assume Target Filesystem is FatFS
-
-#include "ff.h"
-
-typedef FSIZE_t file_offset;
+#include "votingdefs.h"
 
 typedef struct Log_Handles
 {
-  FIL the_file;
-  sha256_digest previous_hash; // This should really be in secure_log
-  http_endpoint endpoint;      // Endpoint to echo the log to over HTTP
-  char *remote_file_name;      // Filename for the log in the HTTP POST request
+    osd_file_stream the_file;
+    sha256_digest previous_hash; // This should really be in secure_log
+    http_endpoint endpoint;      // Endpoint to echo the log to over HTTP
+    char *remote_file_name;      // Filename for the log in the HTTP POST request
 } Log_Handle;
-
-#endif // TARGET_FS_LittleFS
-
-
-#else
-
-// !TARGET_OS_FreeRTOS so assume POSIX stdio filesystem.
-
-#include <stdio.h>
-
-typedef off_t file_offset;
-
-typedef struct Log_Handles
-{
-  FILE the_file;
-  sha256_digest previous_hash; // This should really be in secure_log
-  http_endpoint endpoint;      // Endpoint to echo the log to over HTTP
-  char *remote_file_name;      // Filename for the log in the HTTP POST request
-} Log_Handle;
-#endif
 
 // A log file name must be at least 1 character long, and is limited
 // (for now) to a maximum of 255 characters

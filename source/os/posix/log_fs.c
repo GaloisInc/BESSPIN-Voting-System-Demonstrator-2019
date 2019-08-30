@@ -29,7 +29,7 @@ Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
     {
         // Possibly undefined behaviour to attempt to
         // copy a FILE struct like this.
-        memcpy(&stream->the_file, local_stream_ptr, sizeof(FILE));
+        stream->the_file = local_stream_ptr;
     }
 
     return LOG_FS_OK;
@@ -52,7 +52,7 @@ Log_FS_Result Log_FS_Open(Log_Handle *stream, const char *name)
     else
     {
         // as above
-        memcpy(&stream->the_file, local_stream_ptr, sizeof(FILE));
+        stream->the_file = local_stream_ptr;
     }
 
     return LOG_FS_OK;
@@ -75,7 +75,7 @@ bool Log_FS_File_Exists(const char *name)
 
 Log_FS_Result Log_FS_Close(Log_Handle *stream)
 {
-    if (fclose(&stream->the_file) == 0)
+    if (fclose(stream->the_file) == 0)
     {
         return LOG_FS_OK;
     }
@@ -87,7 +87,7 @@ Log_FS_Result Log_FS_Close(Log_Handle *stream)
 
 Log_FS_Result Log_FS_Sync(Log_Handle *stream)
 {
-    if (fflush(&stream->the_file) == 0)
+    if (fflush(stream->the_file) == 0)
     {
         return LOG_FS_OK;
     }
@@ -100,14 +100,14 @@ Log_FS_Result Log_FS_Sync(Log_Handle *stream)
 /* returns number of bytes written, or 0 on failure */
 size_t Log_FS_Write(Log_Handle *stream, const uint8_t *data, size_t length)
 {
-    return fwrite(data, 1, length, &stream->the_file);
+    return fwrite(data, 1, length, stream->the_file);
 }
 
 /* returns number of bytes read, or 0 on failure */
 size_t Log_FS_Read(Log_Handle *stream, uint8_t *data, size_t bytes_to_read)
 {
     size_t result;
-    result = fread(data, 1, bytes_to_read, &stream->the_file);
+    result = fread(data, 1, bytes_to_read, stream->the_file);
     if (result == bytes_to_read)
     {
         return result;
@@ -123,17 +123,17 @@ size_t Log_FS_Size(Log_Handle *stream)
 {
     off_t N, position;
 
-    position = ftell(&stream->the_file);
-    fseek(&stream->the_file, 0L, SEEK_END);
-    N = ftell(&stream->the_file);
-    fseek(&stream->the_file, position, SEEK_SET);
+    position = ftell(stream->the_file);
+    fseek(stream->the_file, 0L, SEEK_END);
+    N = ftell(stream->the_file);
+    fseek(stream->the_file, position, SEEK_SET);
     return (size_t)N;
 }
 
 /* returns value of current file pointer */
 file_offset Log_FS_Tell(Log_Handle *stream)
 {
-    return (file_offset)ftell(&stream->the_file);
+    return (file_offset)ftell(stream->the_file);
 }
 
 /* Sets current file pointer, relative to position 0
@@ -141,5 +141,5 @@ file_offset Log_FS_Tell(Log_Handle *stream)
 void Log_FS_Seek(Log_Handle *stream, file_offset new_offset)
 {
     int dummy;
-    dummy = fseek(&stream->the_file, new_offset, SEEK_SET);
+    dummy = fseek(stream->the_file, new_offset, SEEK_SET);
 }

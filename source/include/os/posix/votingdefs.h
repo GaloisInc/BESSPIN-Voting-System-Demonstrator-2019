@@ -7,6 +7,7 @@
 #include <time.h>
 #include <assert.h>
 #include "crypto/crypto.h"
+#include "log_os_defs.h"
 
 /* Macros */
 #define osd_assert(x) assert(x)

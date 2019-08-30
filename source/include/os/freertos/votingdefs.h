@@ -13,6 +13,7 @@
 #include "serLcd.h"
 #include "ds1338rtc.h"
 #include "crypto/crypto.h"
+#include "log_os_defs.h"
 
 /* Macros */
 #define osd_assert configASSERT
