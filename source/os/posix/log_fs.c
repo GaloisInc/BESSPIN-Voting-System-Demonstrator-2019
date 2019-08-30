@@ -27,8 +27,6 @@ Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
     }
     else
     {
-        // Possibly undefined behaviour to attempt to
-        // copy a FILE struct like this.
         stream->the_file = local_stream_ptr;
     }
 
