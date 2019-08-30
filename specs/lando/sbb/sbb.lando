@@ -9,33 +9,17 @@ box.
 component Smart Ballot Box API
   The top-level API that is independent of the hardware and the type of the ballot box.
   Is this barcode valid?
-
+  
 component Barcode
   How long is this barcode?
   Is this barcode valid?
   What is the maximum number of bits this barcode can encode?
 
-component Ballot Box
+component Ballot Box inherit Smart Ballot Box API
   A low-level API for a specific ballot box and its hardware.
   Initialize this ballot box!
   Deposit this ballot!
   Reject this ballot!
-  Does the current ballot have a barcode?
-  What are the contents of the barcode of the currently held ballot?
-  Is the cast button pressed?
-  Is the spoil button pressed?
-  Is the cast button released?
-  Is the spoil button released?
-  Turn the spoil button light on!
-  Turn the spoil button light off!
-  Turn the cast button light on!
-  Turn the cast button light off!
-  Tell the motor to rotate forward!
-  Tell the motor to continuously rotate backward!
-  Stop the motor!
-  Display this text!
-  Ballot detected?
-  Ballot inserted?
   Spoil this ballot!
   Cast this ballot!
 // @design dmz the following query is really asking whether, if a ballot is
@@ -49,3 +33,34 @@ component Ballot Box
   Reset the cast or spoil timeout!
   Has the cast or spoil timeout expired?
   The motor can only rotate forward or backward.
+  
+  component Motor
+    Tell the motor to rotate forward!
+    Tell the motor to rotate backward!
+    Stop the motor!
+  
+  component Buttons
+    Is the cast button pressed?
+    Is the spoil button pressed?
+    Is the cast button released?
+    Is the spoil button released?
+  
+  component Button Lights
+    Turn the spoil button light on!
+    Turn the spoil button light off!
+    Turn the cast button light on!
+    Turn the cast button light off!
+  
+  component Paper Sensors
+    Ballot detected?
+    Ballot inserted?
+    Does the current ballot have a barcode?
+    What are the contents of the barcode of the currently held ballot?
+
+  component LCD
+    Display this text!
+
+Ballot Box client Barcode
+Ballot Box client Secure System Log
+Ballot Box client Secure Application Log
+Ballot Box client Crypto
