@@ -2,8 +2,6 @@
 #define __LOG_FS_FREERTOS_DEFS__H__
 
 #include <stdint.h>
-#include "secure_log_t.h"
-#include "log_net_t.h"
 
 #ifdef TARGET_FS_LittleFS
 
