@@ -21,5 +21,5 @@ barcode_validity crypto_check_barcode_valid(barcode_t barcode,
 /*@ assigns \nothing;
   @ ensures \result == true || \result == false;
 */
-bool timestamp_lte_now(const uint8_t *barcode_time);
+bool timestamp_after_now(const uint8_t *barcode_time);
 #endif //__SBB_CRYPTO__

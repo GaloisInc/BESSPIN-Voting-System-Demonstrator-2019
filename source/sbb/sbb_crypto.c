@@ -17,7 +17,7 @@
     (((CBC_MAC_INPUT_DATA_LENGTH_BYTES) + (AES_BLOCK_LENGTH_BYTES - 1)) &      \
      (~(AES_BLOCK_LENGTH_BYTES - 1)))
 
-bool timestamp_lte_now(const uint8_t *barcode_time)
+bool timestamp_after_now(const uint8_t *barcode_time)
 {
 #ifdef SIMULATION_UART
     // no time validation in the UART simulation, always return true
@@ -100,7 +100,7 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
             // Check the timestamp to make sure it's not from the future
 
             // The barcode must not have expired (i.e. the expiry date should be > now)
-            if (timestamp_lte_now((const uint8_t *)&the_barcode[0]))
+            if (timestamp_after_now((const uint8_t *)&the_barcode[0]))
             {
                 // 2. b
                 // Now set up the message for aes_cbc_mac. The formula is:

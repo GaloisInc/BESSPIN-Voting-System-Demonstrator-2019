@@ -1,7 +1,7 @@
 #include <assert.h>
-#include "log.h"
-#include "log_io.h"
-#include "sbb_logging.h"
+#include "logging/log.h"
+#include "logging/log_io.h"
+#include "sbb/sbb_logging.h"
 
 const log_name system_log_file_name = "sbb_test_system.log";
 const log_name app_log_file_name = "sbb_test_app.log";
