@@ -4,24 +4,24 @@ include Makefile.common
 # All binaries necessary to run rules.
 # Assume clang is on PATH, but llvm-link needs special handing on Linux
 export CLANG := clang
-export HOST  := $(shell uname -s)
+export HOST	 := $(shell uname -s)
 export OS_DIR  = $(SOURCE_DIR)/os/freertos
 export CFLAGS += -DVOTING_PLATFORM_FREERTOS
 
 ifeq (${HOST},Linux)
-    export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    export PLATFORM_INCLUDES :=
+	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+	export PLATFORM_INCLUDES :=
 else
-    # Assumed to be Host = Darwin
-    export LLVM_LINK := llvm-link
-    export PLATFORM_INCLUDES = -I/usr/include
+	# Assumed to be Host = Darwin
+	export LLVM_LINK := llvm-link
+	export PLATFORM_INCLUDES = -I/usr/include
 endif
 
 RISCV_XLEN ?= 32
 RISCV_LIB  ?= elf
 CCPATH =
-ARCH 		= -march=rv32im
-ABI 		= -mabi=ilp32
+ARCH		= -march=rv32im
+ABI			= -mabi=ilp32
 
 ARCHTARGET=$(CCPATH)riscv${RISCV_XLEN}-unknown-${RISCV_LIB}
 
@@ -60,7 +60,7 @@ INCLUDE_BASE_DIR = $(SOURCE_DIR)/include
 FREERTOS_BASE_DIR = ../FreeRTOS-mirror
 export FREERTOS_DEMO_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS/Demo/RISC-V_Galois_P1
 
-export CRT0	= $(FREERTOS_DEMO_DIR)/bsp/boot.S
+export CRT0 = $(FREERTOS_DEMO_DIR)/bsp/boot.S
 
 export SBB_SOURCE_DIR = $(SOURCE_BASE_DIR)/sbb
 export LOG_SOURCE_DIR = $(SOURCE_BASE_DIR)/logging
@@ -69,7 +69,7 @@ export SBB_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/sbb
 export LOG_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/logging
 export CRYPTO_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/crypto
 export OS_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/os/freertos
-FREERTOS_SOURCE_DIR	= $(FREERTOS_BASE_DIR)/FreeRTOS/Source
+FREERTOS_SOURCE_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS/Source
 FREERTOS_PLUS_SOURCE_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 export FREERTOS_PROTOCOLS_DIR = $(SOURCE_BASE_DIR)/protocols
@@ -112,7 +112,7 @@ export INCLUDES = \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \
 	-I$(FREERTOS_DEMO_DIR)/devices \
-  -I$(INCLUDE_DIR)\
+	-I$(INCLUDE_DIR)\
 	-I$(OS_INCLUDE_DIR) \
 	-I$(SBB_INCLUDE_DIR) \
 	-I$(LOG_INCLUDE_DIR) \
@@ -178,7 +178,7 @@ export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c \
 	$(FREERTOS_DEMO_DIR)/devices/ds1338rtc.c
 
-export ASFLAGS  += -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
+export ASFLAGS	+= -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
 	-DportasmHANDLE_INTERRUPT=external_interrupt_handler
 
@@ -207,27 +207,27 @@ export FREERTOS_PEEKPOKE_SRC = \
 export ARFLAGS=crsv
 
 export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib
-export LIBS	 =  -lc -lgcc
+export LIBS	 =	-lc -lgcc
 
 OS_SRC = $(OS_DIR)/time.c \
-         $(OS_DIR)/log_fs.c \
-         $(OS_DIR)/log_net.c \
-         $(OS_DIR)/debug_io.c \
-         $(OS_DIR)/sbb_tcp.c \
-         $(OS_DIR)/fetch_key.c \
-         main_freertos.c
+		 $(OS_DIR)/log_fs.c \
+		 $(OS_DIR)/log_net.c \
+		 $(OS_DIR)/debug_io.c \
+		 $(OS_DIR)/sbb_tcp.c \
+		 $(OS_DIR)/fetch_key.c \
+		 main_freertos.c
 
 DEMO_SRC = $(OS_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)
 
 FREERTOS_SRC += $(FREERTOS_PEEKPOKE_SRC)
 
 CFLAGS += \
-    $(FREERTOS_IP_INCLUDE) \
+	$(FREERTOS_IP_INCLUDE) \
 	-I$(FREERTOS_PROTOCOLS_DIR)/include \
-    -DVOTING_SYSTEM_DEBUG #\
-    -DNETWORK_LOGS \
-    -DAXI_DEBUG_PRINT=1 \
-    -DNETWORK_LOG_DEBUG=1
+	-DVOTING_SYSTEM_DEBUG #\
+	-DNETWORK_LOGS \
+	-DAXI_DEBUG_PRINT=1 \
+	-DNETWORK_LOG_DEBUG=1
 
 DEFAULT_PROG ?= default_ballot_box
 BOX1_PROG ?= ballot_box_1
@@ -236,8 +236,8 @@ BOX3_PROG ?= ballot_box_3
 BOX4_PROG ?= ballot_box_4
 
 DEFAULT_SRC = \
-    $(OS_DIR)/sbb_config_default.c \
-    $(CRYPTO_DIR)/crypto_config_default.c
+	$(OS_DIR)/sbb_config_default.c \
+	$(CRYPTO_DIR)/crypto_config_default.c
 
 # there is almost certainly a better way of doing this, but
 # this will work for now
@@ -256,7 +256,7 @@ BOX4_SRC = $(OS_DIR)/sbb_config_box4.c
 #
 RTOS_OBJ = $(FREERTOS_SRC:.c=.o)
 RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
-APP_OBJ  = $(APP_SRC:.c=.o)
+APP_OBJ	 = $(APP_SRC:.c=.o)
 PORT_OBJ = $(PORT_SRC:.c=.o)
 DEMO_OBJ = $(DEMO_SRC:.c=.o)
 PORT_ASM_OBJ = $(PORT_ASM:.S=.o)
@@ -277,11 +277,11 @@ $(info CC=$(CC))
 $(info GCC=$(GCC))
 
 %.o: %.c
-	@echo "    CC $<"
+	@echo "	   CC $<"
 	@$(CC) -c $(CFLAGS) -o $@ $<
 
 %.o: %.S
-	@echo "    CC $<"
+	@echo "	   CC $<"
 	@$(CC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
 
 default: $(DEFAULT_PROG).elf
@@ -294,7 +294,7 @@ logging: $(LOGGING_SRC:.c=.o)
 
 sbb: default
 
-$(DEFAULT_PROG).elf  : $(OBJS_DEFAULT)
+$(DEFAULT_PROG).elf	 : $(OBJS_DEFAULT)
 	@echo Linking....
 	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_DEFAULT) $(LIBS)
 	@$(OBJDUMP) -S $(DEFAULT_PROG).elf > $(DEFAULT_PROG).asm

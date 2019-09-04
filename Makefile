@@ -20,7 +20,7 @@ P1_BITSTREAM_PATH ?= $(GFE_DIR)/bitstreams/soc_chisel_p1.bit
 export USE_LED_BLINK_TASK=1
 #####################################
 #
-# 		SBB Target
+#		SBB Target
 #
 #####################################
 fpga:
@@ -43,7 +43,7 @@ clean_all:
 
 #####################################
 #
-# 		BOTTOM targets
+#		BOTTOM targets
 #
 #####################################
 ifeq ($(TARGET),bottom)
@@ -58,7 +58,7 @@ clean: crypto_bottom_clean log_bottom_clean sbb_bottom_clean
 else
 #####################################
 #
-# 		POSIX targets
+#		POSIX targets
 #
 #####################################
 ifeq ($(TARGET),posix)
@@ -94,7 +94,7 @@ clean_sbb:
 else
 #####################################
 #
-# 		FREERTOS targets
+#		FREERTOS targets
 #
 #####################################
 ifeq ($(TARGET),freertos)
@@ -130,7 +130,7 @@ clean_sbb:
 else
 #####################################
 #
-# 		VERIFICATION targets
+#		VERIFICATION targets
 #
 #####################################
 ifeq ($(TARGET),verification)
@@ -182,7 +182,7 @@ clean_log:
 else
 #####################################
 #
-# 		HOSTTESTS targets
+#		HOSTTESTS targets
 #
 #####################################
 ifeq ($(TARGET),hosttests)
@@ -194,16 +194,16 @@ export CC := clang
 
 HOST  := $(shell uname -s)
 ifeq (${HOST},Linux)
-    LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    PLATFORM_INCLUDES = -I/usr/include
+	LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+	PLATFORM_INCLUDES = -I/usr/include
 else
-    # Assumed to be Host = Darwin
-    LLVM_LINK := llvm-link
-    PLATFORM_INCLUDES = -I/usr/include
+	# Assumed to be Host = Darwin
+	LLVM_LINK := llvm-link
+	PLATFORM_INCLUDES = -I/usr/include
 endif
 
 INCLUDES = $(PLATFORM_INCLUDES) \
-           -I $(INCLUDE_DIR)
+		   -I $(INCLUDE_DIR)
 
 export HOSTTEST_CFLAGS = -g -m64 -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(INCLUDES)
 
@@ -237,7 +237,7 @@ clean: crypto_hosttest_clean logging_hosttest_clean sbb_hosttest_clean
 else
 #####################################
 #
-# 		SIMULATION targets
+#		SIMULATION targets
 #
 #####################################
 ifeq ($(TARGET),sim)
@@ -275,7 +275,7 @@ clean_sbb:
 else
 #####################################
 #
-# 		DEPLOYMENT targets
+#		DEPLOYMENT targets
 #
 #####################################
 ifeq ($(TARGET),deploy)
@@ -289,56 +289,56 @@ upload_binary_box1: all_boxes
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_1.elf --no-bitfile
 
 upload_binary_box2: all_boxes
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_2.elf --no-bitfile
 
 upload_binary_box3: all_boxes
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_3.elf --no-bitfile
 
 upload_binary_box4: all_boxes
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/ballot_box_4.elf --no-bitfile
 
 upload_binary_sim: sim
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf --no-bitfile
 
 upload_binary_and_bitstream_sim: sim
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box_sim.elf
 
 upload_binary_fpga: fpga
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf --no-bitfile
 
 upload_binary_and_bitstream_fpga: fpga
 	@echo GFE_DIR=$(GFE_DIR)
 	@echo CURRENT_PATH=$(CURRENT_PATH)
 	@echo P1_BITSTREAM_PATH=$(P1_BITSTREAM_PATH)
-	cd $(GFE_DIR);  \
+	cd $(GFE_DIR);	\
 	./upload_flash_simple.sh $(P1_BITSTREAM_PATH) $(CURRENT_PATH)/default_ballot_box.elf
 
 endif # ($(TARGET),deploy)

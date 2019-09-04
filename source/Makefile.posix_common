@@ -1,15 +1,15 @@
 # All binaries necessary to run rules.
 # Assume clang is on PATH, but llvm-link needs special handing on Linux
 export CLANG := clang
-export HOST  := $(shell uname -s)
+export HOST	 := $(shell uname -s)
 
 ifeq (${HOST},Linux)
-    export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    export PLATFORM_INCLUDES :=
+	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+	export PLATFORM_INCLUDES :=
 else
-    # Assumed to be Host = Darwin
-    export LLVM_LINK := llvm-link
-    export PLATFORM_INCLUDES = -I/usr/include
+	# Assumed to be Host = Darwin
+	export LLVM_LINK := llvm-link
+	export PLATFORM_INCLUDES = -I/usr/include
 endif
 
 # Default to GCC
@@ -24,9 +24,9 @@ export WERROR = -Werror
 endif
 
 SOURCE_BASE_DIR = $(PWD)
-export OSD_SOURCE_DIR    = $(SOURCE_BASE_DIR)/os/posix
-export SBB_SOURCE_DIR    = $(SOURCE_BASE_DIR)/sbb
-export LOG_SOURCE_DIR    = $(SOURCE_BASE_DIR)/logging
+export OSD_SOURCE_DIR	 = $(SOURCE_BASE_DIR)/os/posix
+export SBB_SOURCE_DIR	 = $(SOURCE_BASE_DIR)/sbb
+export LOG_SOURCE_DIR	 = $(SOURCE_BASE_DIR)/logging
 export CRYPTO_SOURCE_DIR = $(SOURCE_BASE_DIR)/crypto
 
 export WARNINGS= $(WERROR) -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \

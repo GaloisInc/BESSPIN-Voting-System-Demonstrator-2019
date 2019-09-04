@@ -1,8 +1,8 @@
 include Makefile.common
 
 export CFLAGS += -I $(INCLUDE_DIR)/sbb \
-	               -I $(INCLUDE_DIR)/crypto \
-	               -I $(INCLUDE_DIR)/logging
+				   -I $(INCLUDE_DIR)/crypto \
+				   -I $(INCLUDE_DIR)/logging
 
 crypto_hosttest_all:
 	cd $(CRYPTO_TEST_DIR) ; \

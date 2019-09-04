@@ -3,17 +3,17 @@ include Makefile.common
 # All binaries necessary to run rules.
 # Assume clang is on PATH, but llvm-link needs special handing on Linux
 export CLANG := clang
-export HOST  := $(shell uname -s)
+export HOST	 := $(shell uname -s)
 export OS_DIR = $(SOURCE_DIR)/os/posix
 export CFLAGS += -DVOTING_PLATFORM_POSIX -U_FORTIFY_SOURCE
 
 ifeq (${HOST},Linux)
-    export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    export PLATFORM_INCLUDES :=
+	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+	export PLATFORM_INCLUDES :=
 else
-    # Assumed to be Host = Darwin
-    export LLVM_LINK := llvm-link
-    export PLATFORM_INCLUDES = -I/usr/include
+	# Assumed to be Host = Darwin
+	export LLVM_LINK := llvm-link
+	export PLATFORM_INCLUDES = -I/usr/include
 endif
 
 # Default to GCC
@@ -31,27 +31,27 @@ export WARNINGS= $(WERROR) -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function
 		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
 
 export INCLUDES += -I $(INCLUDE_DIR) \
-                   -I $(INCLUDE_DIR)/crypto \
-                   -I $(INCLUDE_DIR)/logging \
-                   -I $(INCLUDE_DIR)/sbb
+				   -I $(INCLUDE_DIR)/crypto \
+				   -I $(INCLUDE_DIR)/logging \
+				   -I $(INCLUDE_DIR)/sbb
 
 export CFLAGS += -DSIMULATION -DNO_MEMSET_S
 export CFLAGS += $(WARNINGS) $(INCLUDES)
 export CFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS)
 
 OS_SRC = $(OS_DIR)/log_fs.c \
-         $(OS_DIR)/log_net.c \
-         $(OS_DIR)/fetch_key.c \
-         $(OS_DIR)/debug_io.c \
-         $(OS_DIR)/sbb_impl.c \
-         $(OS_DIR)/sbb_config_default.c \
-	       main_posix.c
+		 $(OS_DIR)/log_net.c \
+		 $(OS_DIR)/fetch_key.c \
+		 $(OS_DIR)/debug_io.c \
+		 $(OS_DIR)/sbb_impl.c \
+		 $(OS_DIR)/sbb_config_default.c \
+		   main_posix.c
 
 DEMO_SRC = $(OS_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)
 DEMO_OBJ = $(DEMO_SRC:.c=.o)
 
 %.o: %.c
-	@echo "    CC $<"
+	@echo "	   CC $<"
 	@$(CC) -c $(CFLAGS) -o $@ $<
 
 crypto: $(CRYPTO_SRC:.c=.o)
