@@ -40,8 +40,10 @@ CRYPTO_DIR = ../crypto
 FREERTOS_INCLUDES = \
     $(PLATFORM_INCLUDES) \
     -I. \
-    -I $(LOGGING_DIR) \
-    -I $(CRYPTO_DIR) \
+    -I $(INCLUDE_DIR) \
+    -I $(INCLUDE_DIR)/sbb \
+    -I $(INCLUDE_DIR)/logging \
+    -I $(INCLUDE_DIR)/crypto \
     -I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
@@ -58,10 +60,12 @@ FREERTOS_INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)/demo \
 	-I$(FREERTOS_DEMO_DIR)/devices
 
-FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V -I$(FREERTOS_INCLUDES) -D__riscv_xlen=32 -DHARDCODE_CURRENT_TIME -DCURRENT_YEAR=2019 -DCURRENT_MONTH=7 -DCURRENT_DAY=22 -DCURRENT_HOUR=13 -DCURRENT_MINUTE=18"
+FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V -I$(FREERTOS_INCLUDES) -DVOTING_PLATFORM_POSIX -D__riscv_xlen=32 -DHARDCODE_CURRENT_TIME -DCURRENT_YEAR=2019 -DCURRENT_MONTH=7 -DCURRENT_DAY=22 -DCURRENT_HOUR=13 -DCURRENT_MINUTE=18"
 
 # These lists will grow as the software is developed and modules are added.
-SOFTWARE_SPECS := sbb.h sbb_logging.h sbb_hw.h
+SOFTWARE_SPECS := $(INCLUDE_DIR)/sbb/sbb.h \
+	$(INCLUDE_DIR)/sbb/sbb_logging.h \
+	$(INCLUDE_DIR)/sbb/sbb_lemmas.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
@@ -159,7 +163,7 @@ gui:
 bytecode/all.bc: $(BC_OBJS)
 	$(LLVM_LINK) -o=bytecode/all.bc $^
 	rm -f $^
-	
+
 bytecode/all.ll: $(LL_OBJS)
 	mv $(LL_OBJS) bytecode
 

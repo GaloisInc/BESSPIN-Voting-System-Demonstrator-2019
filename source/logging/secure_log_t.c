@@ -1,4 +1,4 @@
-#include "secure_log_t.h"
+#include "logging/secure_log_t.h"
 
 void copy_sha256_base64_digest (sha256_base64_digest dst,       // OUT
                                 const sha256_base64_digest src) // IN

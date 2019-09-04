@@ -6,9 +6,9 @@
 // General includes
 
 // Subsystem includes
-#include "secure_log.h"
-#include "../crypto/crypto.h"
-#include "debug_io.h"
+#include "logging/secure_log.h"
+#include "logging/debug_io.h"
+#include "crypto/crypto.h"
 
 // Local constants
 

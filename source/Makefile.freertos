@@ -1,0 +1,340 @@
+# Voting System Definitions
+include Makefile.common
+
+# All binaries necessary to run rules.
+# Assume clang is on PATH, but llvm-link needs special handing on Linux
+export CLANG := clang
+export HOST	 := $(shell uname -s)
+export OS_DIR  = $(SOURCE_DIR)/os/freertos
+export CFLAGS += -DVOTING_PLATFORM_FREERTOS
+
+ifeq (${HOST},Linux)
+	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
+	export PLATFORM_INCLUDES :=
+else
+	# Assumed to be Host = Darwin
+	export LLVM_LINK := llvm-link
+	export PLATFORM_INCLUDES = -I/usr/include
+endif
+
+RISCV_XLEN ?= 32
+RISCV_LIB  ?= elf
+CCPATH =
+ARCH		= -march=rv32im
+ABI			= -mabi=ilp32
+
+ARCHTARGET=$(CCPATH)riscv${RISCV_XLEN}-unknown-${RISCV_LIB}
+
+# Default to GCC
+USE_CLANG ?= no
+
+# Decide which compiler to use
+ifeq ($(USE_CLANG),yes)
+GCC_SYSROOT_PATH=$(shell which riscv32-unknown-elf-gdb)
+export C_INCLUDE_PATH= $(dir $(GCC_SYSROOT_PATH))../riscv32-unknown-elf/include
+$(info C_INCLUDE_PATH=$(C_INCLUDE_PATH))
+export CC		= clang --target=riscv32
+# LLVM doesn't support linking RISC-V files yet,
+# so we have to use GCC linker to do so
+USE_LED_BLINK_TASK ?= 0
+
+export GCC		= $(ARCHTARGET)-gcc
+export OBJCOPY	= llvm-objcopy
+export OBJDUMP	= llvm-objdump
+export AR		= llvm-ar
+export RANLIB	= llvm-ranlib
+else
+export CC		= $(ARCHTARGET)-gcc
+export GCC		= $(CC)
+export OBJCOPY	= $(ARCHTARGET)-objcopy
+export OBJDUMP	= $(ARCHTARGET)-objdump
+export AR		= $(ARCHTARGET)-ar
+export RANLIB	= $(ARCHTARGET)-ranlib
+export COMPILER_FLAGS = -mcmodel=medany
+# TODO: Use -Werror only for GCC now
+export WERROR = -Werror
+endif
+
+SOURCE_BASE_DIR = $(SOURCE_DIR)
+INCLUDE_BASE_DIR = $(SOURCE_DIR)/include
+FREERTOS_BASE_DIR = ../FreeRTOS-mirror
+export FREERTOS_DEMO_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS/Demo/RISC-V_Galois_P1
+
+export CRT0 = $(FREERTOS_DEMO_DIR)/bsp/boot.S
+
+export SBB_SOURCE_DIR = $(SOURCE_BASE_DIR)/sbb
+export LOG_SOURCE_DIR = $(SOURCE_BASE_DIR)/logging
+export CRYPTO_SOURCE_DIR = $(SOURCE_BASE_DIR)/crypto
+export SBB_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/sbb
+export LOG_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/logging
+export CRYPTO_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/crypto
+export OS_INCLUDE_DIR = $(INCLUDE_BASE_DIR)/os/freertos
+FREERTOS_SOURCE_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS/Source
+FREERTOS_PLUS_SOURCE_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS-Plus/Source
+FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
+export FREERTOS_PROTOCOLS_DIR = $(SOURCE_BASE_DIR)/protocols
+
+export WARNINGS= $(WERROR) -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
+		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
+
+export FREERTOS_SRC = \
+	$(FREERTOS_SOURCE_DIR)/croutine.c \
+	$(FREERTOS_SOURCE_DIR)/list.c \
+	$(FREERTOS_SOURCE_DIR)/queue.c \
+	$(FREERTOS_SOURCE_DIR)/tasks.c \
+	$(FREERTOS_SOURCE_DIR)/timers.c \
+	$(FREERTOS_SOURCE_DIR)/event_groups.c \
+	$(FREERTOS_SOURCE_DIR)/stream_buffer.c \
+	$(FREERTOS_SOURCE_DIR)/portable/MemMang/heap_4.c
+
+export APP_SOURCE_DIR	= $(FREERTOS_DEMO_DIR)/../Common/Minimal
+
+export PORT_SRC = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/port.c
+export PORT_ASM = $(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/portASM.S
+
+export FREERTOS_IP_INCLUDE = \
+	-I$(FREERTOS_TCP_SOURCE_DIR) \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/include \
+	-I$(FREERTOS_TCP_SOURCE_DIR)/portable/Compiler/GCC
+
+export INCLUDES = \
+	-I$(FREERTOS_DEMO_DIR)/bsp \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550 \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi \
+	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio \
+	-I$(FREERTOS_SOURCE_DIR)/include \
+	-I$(FREERTOS_DEMO_DIR)/../Common/include \
+	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
+	-I$(FREERTOS_DEMO_DIR)/demo \
+	-I$(FREERTOS_DEMO_DIR)/devices \
+	-I$(INCLUDE_DIR)\
+	-I$(OS_INCLUDE_DIR) \
+	-I$(SBB_INCLUDE_DIR) \
+	-I$(LOG_INCLUDE_DIR) \
+	-I$(CRYPTO_INCLUDE_DIR)
+
+export CFLAGS += $(WARNINGS) $(INCLUDES)
+export CFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) \
+	-DTARGET_OS_FreeRTOS -DNO_MEMSET_S \
+	-DUSE_LED_BLINK_TASK=$(USE_LED_BLINK_TASK)
+
+export APP_SRC = \
+	$(FREERTOS_DEMO_DIR)/bsp/bsp.c \
+	$(FREERTOS_DEMO_DIR)/bsp/plic_driver.c \
+	$(FREERTOS_DEMO_DIR)/bsp/syscalls.c \
+	$(FREERTOS_DEMO_DIR)/bsp/uart.c \
+	$(FREERTOS_DEMO_DIR)/bsp/iic.c \
+	$(FREERTOS_DEMO_DIR)/bsp/gpio.c \
+	$(FREERTOS_DEMO_DIR)/bsp/spi.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_stats.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_options.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/uartns550/xuartns550_l.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bd.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_bdring.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axidma/xaxidma_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_control.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/axiethernet/xaxiethernet_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_l.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_master.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/iic/xiic_stats.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/spi/xspi_options.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_extra.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_g.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_intr.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_selftest.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/gpio/xgpio_sinit.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xbasic_types.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_io.c \
+	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c \
+	$(FREERTOS_DEMO_DIR)/devices/serLcd.c \
+	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
+	$(FREERTOS_DEMO_DIR)/devices/ff.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
+	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c \
+	$(FREERTOS_DEMO_DIR)/devices/ds1338rtc.c
+
+export ASFLAGS	+= -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
+	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V/chip_specific_extensions/RV32I_CLINT_no_extensions \
+	-DportasmHANDLE_INTERRUPT=external_interrupt_handler
+
+export FREERTOS_IP_SRC = \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_ARP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DHCP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_DNS.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Sockets.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_UDP_IP.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_TCP_WIN.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/FreeRTOS_Stream_Buffer.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/BufferManagement/BufferAllocation_2.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/riscv_hal_eth.c \
+	$(FREERTOS_TCP_SOURCE_DIR)/portable/NetworkInterface/RISC-V/NetworkInterface.c \
+	$(FREERTOS_DEMO_DIR)/bsp/rand.c
+
+export FREERTOS_PEEKPOKE_SRC = \
+	$(FREERTOS_IP_SRC) \
+	$(FREERTOS_PROTOCOLS_DIR)/Common/FreeRTOS_TCP_server.c \
+	$(FREERTOS_PROTOCOLS_DIR)/HTTP/FreeRTOS_HTTP_server.c \
+	$(FREERTOS_PROTOCOLS_DIR)/HTTP/FreeRTOS_HTTP_commands.c \
+	$(FREERTOS_PROTOCOLS_DIR)/HTTP/peekpoke.c
+
+export ARFLAGS=crsv
+
+export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib
+export LIBS	 =	-lc -lgcc
+
+OS_SRC = $(OS_DIR)/time.c \
+		 $(OS_DIR)/log_fs.c \
+		 $(OS_DIR)/log_net.c \
+		 $(OS_DIR)/debug_io.c \
+		 $(OS_DIR)/sbb_tcp.c \
+		 $(OS_DIR)/fetch_key.c \
+		 main_freertos.c
+
+DEMO_SRC = $(OS_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)
+
+FREERTOS_SRC += $(FREERTOS_PEEKPOKE_SRC)
+
+CFLAGS += \
+	$(FREERTOS_IP_INCLUDE) \
+	-I$(FREERTOS_PROTOCOLS_DIR)/include \
+	-DVOTING_SYSTEM_DEBUG #\
+	-DNETWORK_LOGS \
+	-DAXI_DEBUG_PRINT=1 \
+	-DNETWORK_LOG_DEBUG=1
+
+DEFAULT_PROG ?= default_ballot_box
+BOX1_PROG ?= ballot_box_1
+BOX2_PROG ?= ballot_box_2
+BOX3_PROG ?= ballot_box_3
+BOX4_PROG ?= ballot_box_4
+
+DEFAULT_SRC = \
+	$(OS_DIR)/sbb_config_default.c \
+	$(CRYPTO_DIR)/crypto_config_default.c
+
+# there is almost certainly a better way of doing this, but
+# this will work for now
+#
+# note that the "sbb_config_box*" files contain both crypto and
+# TCP/naming configurations; the crypto default configuration in
+# the crypto directory exists solely to allow crypto tests to be
+# run on their own
+BOX1_SRC = $(OS_DIR)/sbb_config_box1.c
+BOX2_SRC = $(OS_DIR)/sbb_config_box2.c
+BOX3_SRC = $(OS_DIR)/sbb_config_box3.c
+BOX4_SRC = $(OS_DIR)/sbb_config_box4.c
+
+#
+# Define all object files.
+#
+RTOS_OBJ = $(FREERTOS_SRC:.c=.o)
+RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
+APP_OBJ	 = $(APP_SRC:.c=.o)
+PORT_OBJ = $(PORT_SRC:.c=.o)
+DEMO_OBJ = $(DEMO_SRC:.c=.o)
+PORT_ASM_OBJ = $(PORT_ASM:.S=.o)
+CRT0_OBJ = $(CRT0:.S=.o)
+OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(RTOS_TCP_OBJ) $(DEMO_OBJ) $(APP_OBJ)
+OBJS_DEFAULT = $(OBJS) $(DEFAULT_SRC:.c=.o)
+OBJS_BOX1 = $(OBJS) $(BOX1_SRC:.c=.o)
+OBJS_BOX2 = $(OBJS) $(BOX2_SRC:.c=.o)
+OBJS_BOX3 = $(OBJS) $(BOX3_SRC:.c=.o)
+OBJS_BOX4 = $(OBJS) $(BOX4_SRC:.c=.o)
+
+$(info ASFLAGS=$(ASFLAGS))
+$(info LDLIBS=$(LDLIBS))
+$(info CFLAGS=$(CFLAGS))
+$(info LDFLAGS=$(LDFLAGS))
+$(info ARFLAGS=$(ARFLAGS))
+$(info CC=$(CC))
+$(info GCC=$(GCC))
+
+%.o: %.c
+	@echo "	   CC $<"
+	@$(CC) -c $(CFLAGS) -o $@ $<
+
+%.o: %.S
+	@echo "	   CC $<"
+	@$(CC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
+
+default: $(DEFAULT_PROG).elf
+
+all: $(DEFAULT_PROG).elf $(BOX1_PROG).elf $(BOX2_PROG).elf $(BOX3_PROG).elf $(BOX4_PROG).elf
+
+crypto: $(CRYPTO_SRC:.c=.o)
+
+logging: $(LOGGING_SRC:.c=.o)
+
+sbb: default
+
+$(DEFAULT_PROG).elf	 : $(OBJS_DEFAULT)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_DEFAULT) $(LIBS)
+	@$(OBJDUMP) -S $(DEFAULT_PROG).elf > $(DEFAULT_PROG).asm
+	@echo Completed $@
+
+$(BOX1_PROG).elf  : $(OBJS_BOX1)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX1) $(LIBS)
+	@$(OBJDUMP) -S $(BOX1_PROG).elf > $(BOX1_PROG).asm
+	@echo Completed $@
+
+$(BOX2_PROG).elf  : $(OBJS_BOX2)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX2) $(LIBS)
+	@$(OBJDUMP) -S $(BOX2_PROG).elf > $(BOX2_PROG).asm
+	@echo Completed $@
+
+$(BOX3_PROG).elf  : $(OBJS_BOX3)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX3) $(LIBS)
+	@$(OBJDUMP) -S $(BOX3_PROG).elf > $(BOX3_PROG).asm
+	@echo Completed $@
+
+$(BOX4_PROG).elf  : $(OBJS_BOX4)
+	@echo Linking....
+	@$(GCC) -o $@ $(LDFLAGS) $(OBJS_BOX4) $(LIBS)
+	@$(OBJDUMP) -S $(BOX4_PROG).elf > $(BOX4_PROG).asm
+	@echo Completed $@
+
+clean_crypto :
+	@rm -f $(CRYPTO_SRC:.c=.o)
+
+clean_logging :
+	@rm -f $(LOGGING_SRC:.c=.o)
+
+clean_sbb :
+	@rm -f $(SBB_SRC:.c=.o)
+
+clean :
+	@rm -f $(OBJS_DEFAULT) $(OBJS_BOX1) $(OBJS_BOX2) $(OBJS_BOX3) $(OBJS_BOX4)
+	@rm -f $(DEFAULT_PROG).elf $(BOX1_PROG).elf $(BOX2_PROG).elf $(BOX3_PROG).elf $(BOX4_PROG).elf
+	@rm -f $(DEFAULT_PROG).map $(BOX1_PROG).map $(BOX2_PROG).map $(BOX3_PROG).map $(BOX4_PROG).map
+	@rm -f $(DEFAULT_PROG).asm $(BOX1_PROG).asm $(BOX2_PROG).asm $(BOX3_PROG).asm $(BOX4_PROG).asm

@@ -38,7 +38,7 @@
 //#include <sys/systm.h>
 //#include <crypto/sha2.h>
 
-#include "sha2-openbsd.h"
+#include "crypto/sha2-openbsd.h"
 
 #ifdef NO_MEMSET_S
 // See https://llvm.org/bugs/show_bug.cgi?id=15495

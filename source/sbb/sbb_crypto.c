@@ -1,6 +1,7 @@
+#include "crypto/base64.h"
+#include "crypto/crypto.h"
+
 #include "sbb_crypto.h"
-#include "base64.h"
-#include "crypto.h"
 #include "sbb.h"
 #include <assert.h>
 #include <string.h>

@@ -36,6 +36,8 @@ FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 
 FREERTOS_INCLUDES = \
     -I. \
+  -I $(INCLUDE_DIR) \
+  -I $(INCLUDE_DIR)/crypto \
 	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
@@ -52,7 +54,7 @@ FREERTOS_INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)/demo \
 	-I$(FREERTOS_DEMO_DIR)/devices
 
-FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V $(FREERTOS_INCLUDES) $(PLATFORM_INCLUDES) -D__riscv_xlen=32"
+FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V $(FREERTOS_INCLUDES) $(PLATFORM_INCLUDES) -D__riscv_xlen=32 -DVOTING_PLATFORM_FREERTOS"
 
 # These lists will grow as the software is developed and modules are added.
 SOFTWARE_SPECS := crypto.h

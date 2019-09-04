@@ -7,16 +7,13 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "votingdefs.h"
 // SBB subsystem includes
 #include "sbb.h"
-#include "sbb_freertos.h"
 #include "sbb.acsl"
 // SBB private includes
 #include "sbb_logging.h"
 #include "sbb_machine.h"
-
-#include <FreeRTOS.h>
-#include <task.h>
 
 // @design kiniry Here is the explicit encoding of the SBB state.
 SBB_state the_state = { .S = START };
@@ -77,26 +74,16 @@ void update_button_state(bool cast_button_pressed,
     }
 }
 
-/*@ requires \valid((char *)pvRxData + (0 .. xBufferLengthBytes-1));
-  @ assigns *((char *)pvRxData + (0 .. \result - 1));
-  @ ensures 0 <= \result;
-  @ ensures \result <= xBufferLengthBytes;
-*/
-extern size_t xStreamBufferReceive(StreamBufferHandle_t xStreamBuffer,
-                                   void *pvRxData,
-                                   size_t xBufferLengthBytes,
-                                   TickType_t xTicksToWait);
-
 void update_barcode_state( bool barcode_scanned ) {
     switch ( the_state.BS ) {
     case BARCODE_NOT_PRESENT:
         if ( barcode_scanned ) {
             char local_barcode[BARCODE_MAX_LENGTH] = {0};
             barcode_length_t xReceiveLength = 0;
-            xReceiveLength = xStreamBufferReceive(xScannerStreamBuffer,
-                                                  local_barcode,
-                                                  BARCODE_MAX_LENGTH,
-                                                  SCANNER_BUFFER_RX_BLOCK_TIME_MS);
+            xReceiveLength = osd_stream_buffer_receive(xScannerStreamBuffer,
+                                                       local_barcode,
+                                                       BARCODE_MAX_LENGTH,
+                                                       SCANNER_BUFFER_RX_BLOCK_TIME_MS);
             if ( xReceiveLength > 0 ) {
                 set_received_barcode(local_barcode, xReceiveLength);
                 CHANGE_STATE(the_state, BS, BARCODE_PRESENT_AND_RECORDED);
@@ -125,7 +112,7 @@ void flush_barcodes() {
 
 // This refines the internal paper ASM event
 //@ assigns \nothing;
-EventBits_t next_paper_event_bits(void) {
+osd_event_mask_t next_paper_event_bits(void) {
     if ( the_state.L == INITIALIZE ) {
         return ebPAPER_SENSOR_IN_PRESSED;
     } else {
@@ -142,7 +129,7 @@ EventBits_t next_paper_event_bits(void) {
     }
 }
 
-EventBits_t next_button_event_bits(void) {
+osd_event_mask_t next_button_event_bits(void) {
     switch ( the_state.B ) {
     case ALL_BUTTONS_UP:
         return (ebCAST_BUTTON_PRESSED | ebSPOIL_BUTTON_PRESSED);
@@ -157,7 +144,7 @@ EventBits_t next_button_event_bits(void) {
     return 0;
 }
 
-EventBits_t next_barcode_event_bits(void) {
+osd_event_mask_t next_barcode_event_bits(void) {
     switch ( the_state.BS ) {
     case BARCODE_NOT_PRESENT:
         return ebBARCODE_SCANNED;
@@ -168,11 +155,8 @@ EventBits_t next_barcode_event_bits(void) {
     return 0;
 }
 
-extern EventBits_t xEventGroupSetBits( EventGroupHandle_t xEventGroup,
-                                       const EventBits_t uxBitsToSet );
-
-void log_single_event( EventBits_t event_bits,
-                       EventBits_t log_bit,
+void log_single_event( osd_event_mask_t event_bits,
+                       osd_event_mask_t log_bit,
                        const char *event_entry,
                        int length ) {
     if ( event_bits & log_bit ) {
@@ -182,7 +166,7 @@ void log_single_event( EventBits_t event_bits,
     }
 }
 
-void log_event_group_result ( EventBits_t bits ) {
+void log_event_group_result ( osd_event_mask_t bits ) {
     __assume_strings_OK();
     log_single_event(bits, ebPAPER_SENSOR_IN_PRESSED, sensor_in_pressed_msg, strlen(sensor_in_pressed_msg));
     log_single_event(bits, ebPAPER_SENSOR_IN_RELEASED, sensor_in_released_msg, strlen(sensor_in_released_msg));
@@ -196,7 +180,7 @@ void log_event_group_result ( EventBits_t bits ) {
 }
 
 void update_sensor_state(void) {
-    EventBits_t waitEvents = 0;
+    osd_event_mask_t waitEvents = 0;
     waitEvents |= next_paper_event_bits();
     waitEvents |= next_button_event_bits();
     waitEvents |= next_barcode_event_bits();
@@ -206,11 +190,13 @@ void update_sensor_state(void) {
 
     // @todo the demo has a timeout of 100msec when waiting for a barcode..does that matter?
     // @todo what about timer ASM? does that need to go here?
-    EventBits_t ux_Returned =  xEventGroupWaitBits( xSBBEventGroup,
-                                                    waitEvents,
-                                                    pdTRUE,  /* Clear events on return        */
-                                                    pdFALSE, /* Wait for *any* event, not all */
-                                                    pdMS_TO_TICKS(100) );
+    osd_event_mask_t ux_Returned = osd_wait_for_event( xSBBEventGroup,
+                                                       waitEvents,
+                                                       /* Clear events on return        */
+                                                       CLEAR_ON_EXIT,
+                                                       /* Wait for *any* event, not all */
+                                                       WAIT_ANY,
+                                                       osd_msec_to_ticks(100) );
     // We ignore events that we didn't ask for.
     ux_Returned = ux_Returned & waitEvents;
 
@@ -476,7 +462,7 @@ void take_step(void) {
 
     case ABORT:
         run_abort();
-        configASSERT(false);
+        osd_assert(false);
         break;
         //default:
         //assert(false);

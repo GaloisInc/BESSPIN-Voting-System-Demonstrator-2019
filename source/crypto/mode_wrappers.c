@@ -46,11 +46,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  * ==================================================================== */
 
-#include "aes.h"
+#include "crypto/aes.h"
 
 // #include "assert.h"
 
-#include "modes.h"
+#include "crypto/modes.h"
 
 /*
 void AES_ctr128_encrypt(const uint8_t *in, uint8_t *out, size_t len,

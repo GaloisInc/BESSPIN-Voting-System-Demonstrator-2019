@@ -45,12 +45,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  * ==================================================================== */
-#include "modes.h"
+#include "crypto/modes.h"
 
 // #include <assert.h>
 #include <string.h>
 
-#include "internal.h"
+#include "crypto/internal.h"
 
 
 #ifndef STRICT_ALIGNMENT
