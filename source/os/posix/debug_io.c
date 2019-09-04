@@ -42,7 +42,7 @@ int debug_printf(const char *the_format, ...)
     {
         // assuming that we successfully formatted the string,
         // we can print it in a platform-appropriate way
-        fprintf(stderr, "%s",buffer);
+        fprintf(stderr, "%s", buffer);
     }
     #else // not in debug mode
     int result = 0;
