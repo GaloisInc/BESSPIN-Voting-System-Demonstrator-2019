@@ -1,1 +1,1 @@
-tool-suite/nix/dev/gfe.nix
+tool-suite/nix/dev/voting-system-public.nix
