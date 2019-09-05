@@ -1,4 +1,4 @@
-#ifndef __LOG_FS_FREERTOS_DEFS_H__
+#ifndef __LOG_FS_FREERTOS_DEFS__H__
 #define __LOG_FS_FREERTOS_DEFS__H__
 
 #include <stdint.h>
