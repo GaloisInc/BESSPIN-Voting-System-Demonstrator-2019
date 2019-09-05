@@ -1,9 +1,9 @@
 # Build the bottom target
 crypto_bottom:
-	cd $(CRYPTO_DIR); \
-	$(CC) crypto_main.c crypto_bottom.c -o crypto_bottom.elf; \
+	cd $(CRYPTO_DIR) &&\
+	$(CC) $(CFLAGS) crypto_main.c crypto_bottom.c -o crypto_bottom.elf && \
 	rm -f *.o
 
 crypto_bottom_clean:
-	cd $(CRYPTO_DIR); \
+	cd $(CRYPTO_DIR) && \
 	rm -f crypto_bottom.elf

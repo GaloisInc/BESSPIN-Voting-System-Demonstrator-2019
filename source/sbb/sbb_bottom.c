@@ -3,13 +3,14 @@
  * @refine sbb.lando
  */
 
-#include "sbb.h"
+#include "sbb/sbb.h"
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
 
-void initialize(void) {
-    ;
+bool initialize(void) {
+    assert(false);
+    return false;
 }
 
 barcode_validity is_barcode_valid(barcode_t the_barcode, barcode_length_t its_length) {

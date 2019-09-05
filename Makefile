@@ -1,4 +1,6 @@
-TARGET ?= bottom
+# fpga/sim are unconditionally defined,
+# so set the default target to freertos
+TARGET ?= freertos
 $(info TARGET=$(TARGET))
 
 # List all substems directories
@@ -47,6 +49,12 @@ clean_all:
 #
 #####################################
 ifeq ($(TARGET),bottom)
+export OS_DIR  = $(SOURCE_DIR)/os/bottom
+export CFLAGS += -I $(INCLUDE_DIR) \
+                 -I $(INCLUDE_DIR)/crypto \
+                 -I $(INCLUDE_DIR)/logging \
+                 -I $(INCLUDE_DIR)/sbb \
+                 -DVOTING_PLATFORM_BOTTOM
 
 include $(SBB_DIR)/Makefile.bottom
 include $(CRYPTO_DIR)/Makefile.bottom
@@ -192,20 +200,10 @@ export OS_DIR = $(SOURCE_DIR)/os/posix
 # Apple's clang and use the HomeBrew one instead...
 export CC := clang
 
-HOST  := $(shell uname -s)
-ifeq (${HOST},Linux)
-	LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-	PLATFORM_INCLUDES = -I/usr/include
-else
-	# Assumed to be Host = Darwin
-	LLVM_LINK := llvm-link
-	PLATFORM_INCLUDES = -I/usr/include
-endif
-
-INCLUDES = $(PLATFORM_INCLUDES) \
-		   -I $(INCLUDE_DIR)
-
-export HOSTTEST_CFLAGS = -g -m64 -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S -DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG -Wno-macro-redefined $(INCLUDES)
+export HOSTTEST_CFLAGS = \
+	-g -m64 -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S \
+	-DVOTING_SYSTEM_DEBUG -DNETWORK_LOGS -DLOG_SYSTEM_DEBUG \
+	-Wno-macro-redefined -I$(INCLUDE_DIR)
 
 crypto_hosttest_all:
 	cd $(SOURCE_DIR); \

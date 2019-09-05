@@ -3,7 +3,7 @@
  * @refine sbb.lando
  */
 
-#include "sbb.h"
+#include "sbb/sbb.h"
 
 // String constant defines
 const char *empty = " ";

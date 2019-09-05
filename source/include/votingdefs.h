@@ -12,7 +12,9 @@ struct voting_system_time_t {
     uint16_t minute;
 };
 
-#if defined(VOTING_PLATFORM_POSIX)
+#if defined(VOTING_PLATFORM_BOTTOM)
+#include "os/bottom/votingdefs.h"
+#elif defined(VOTING_PLATFORM_POSIX)
 #include "os/posix/votingdefs.h"
 #elif defined(VOTING_PLATFORM_FREERTOS)
 #include "os/freertos/votingdefs.h"
