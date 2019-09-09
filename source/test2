@@ -1,0 +1,21 @@
+#!/usr/bin/expect -f
+#
+# This tests that an expired ballot can not be cast
+
+set timeout -1
+
+spawn ./posix_sbb
+
+expect "DISPLAY: Welcome, Voter!\r"
+send -- "3\n"
+
+expect "State change: L := FEED_BALLOT\r"
+send -- "5\n"
+send -- "2017+06+23+17+45:cgep2UpFCE2XLgx6QZUfW3hlVhINicNbwL9KI8UtUGM=\r"
+send -- "4\n"
+
+set timeout 5
+expect { 
+  "LINETWO:  time expired."    { exit 0 }
+  default                      { exit 1 }
+}

@@ -1,0 +1,39 @@
+#!/usr/bin/expect -f
+#
+# This tests that a ballot can not be cast twice.
+
+set timeout -1
+
+spawn ./posix_sbb
+
+expect "DISPLAY: Welcome, Voter!\r"
+send -- "3\n"
+
+expect "State change: L := FEED_BALLOT\r"
+send -- "5\n"
+send -- "2019+06+23+17+45:cgep2UpFCE2XLgx6QZUfW3hlVhINicNbwL9KI8UtUGM=\r"
+send -- "4\n"
+
+expect "DISPLAY:  Cast or Spoil?"
+send -- "1\n"
+
+set timeout 5
+expect {
+  "DISPLAY: Casting ballot.\r" { }
+  default                      { exit 1 }
+}
+set timeout -1
+
+expect "DISPLAY: Welcome, Voter!\r"
+send -- "3\n"
+
+expect "State change: L := FEED_BALLOT\r"
+send -- "5\n"
+send -- "2019+06+23+17+45:cgep2UpFCE2XLgx6QZUfW3hlVhINicNbwL9KI8UtUGM=\r"
+send -- "4\n"
+
+set timeout 5
+expect {
+  "LINETWO: cast or spoiled.\r" { exit 0 }
+  default                       { exit 1 }
+}

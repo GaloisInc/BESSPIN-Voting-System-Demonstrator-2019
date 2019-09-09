@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <assert.h>
+#include <pthread.h>
 #include "crypto/crypto.h"
 #include "log_os_defs.h"
 
@@ -19,7 +20,7 @@ const uint8_t *osd_fetch_key (AES_Key_Name key);
 typedef uint32_t osd_timer_ticks_t;
 osd_timer_ticks_t osd_get_ticks(void);
 #define osd_msec_to_ticks(x) (x)
-#define osd_msleep(_x) usleep(1000*(_x))
+void osd_msleep(uint64_t msec);
 
 uint8_t
 osd_read_time(struct voting_system_time_t *time);
@@ -27,7 +28,7 @@ void
 osd_format_time_str(struct voting_system_time_t *time, char *buf);
 
 /* Events */
-typedef uint32_t osd_event_group_handle_t;
+typedef pthread_cond_t* osd_event_group_handle_t;
 typedef uint32_t osd_event_mask_t;
 
 typedef enum { CLEAR_ON_EXIT, DO_NOT_CLEAR_ON_EXIT } osd_event_clear_t;
@@ -45,7 +46,12 @@ osd_wait_for_event(osd_event_group_handle_t event_group,
                    osd_timer_ticks_t        timeout);
 
 /* Streaming */
-typedef uint32_t osd_stream_buffer_handle_t;
+typedef struct stream_buffer_handle {
+    char *pBuf;
+    size_t size;
+    pthread_mutex_t *lock;
+} osd_stream_buffer_handle;
+typedef osd_stream_buffer_handle* osd_stream_buffer_handle_t;
 
 /*@ requires \valid((char *)pvRxData + (0 .. xBufferLengthBytes-1));
   @ assigns *((char *)pvRxData + (0 .. \result - 1));

@@ -22,4 +22,13 @@ struct voting_system_time_t {
 #error "VOTING_PLATFORM is not set"
 #endif
 
+void osd_sim_initialize(void);
+void osd_sim_barcode_input(void);
+void osd_sim_paper_sensor_in_pressed(void);
+void osd_sim_paper_sensor_in_released(void);
+void osd_sim_cast_button_pressed(void);
+void osd_sim_cast_button_released(void);
+void osd_sim_spoil_button_pressed(void);
+void osd_sim_spoil_button_released(void);
+
 #endif

@@ -5,7 +5,13 @@ include Makefile.common
 export CLANG := clang
 export HOST	 := $(shell uname -s)
 export OS_DIR = $(SOURCE_DIR)/os/posix
-export CFLAGS += -DVOTING_PLATFORM_POSIX -U_FORTIFY_SOURCE
+export CFLAGS += -DVOTING_PLATFORM_POSIX -U_FORTIFY_SOURCE -DSIMULATION -DVOTING_SYSTEM_DEBUG
+export CFLAGS += -DHARDCODE_CURRENT_TIME \
+                 -DCURRENT_YEAR=2019 \
+                 -DCURRENT_MONTH=6 \
+                 -DCURRENT_DAY=20 \
+                 -DCURRENT_HOUR=11 \
+                 -DCURRENT_MINUTE=18
 
 ifeq (${HOST},Linux)
 	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
@@ -52,7 +58,7 @@ DEMO_OBJ = $(DEMO_SRC:.c=.o)
 
 %.o: %.c
 	@echo "	   CC $<"
-	@$(CC) -c $(CFLAGS) -o $@ $<
+	@$(CC) -c $(CFLAGS) -o $@  -pthread $<
 
 crypto: $(CRYPTO_SRC:.c=.o)
 
