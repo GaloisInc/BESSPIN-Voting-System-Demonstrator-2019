@@ -490,7 +490,7 @@ void ballot_box_main_loop(void) {
         debug_state_change(old, the_state.L);
         old = the_state.L;
         take_step();
-        
+
         if (the_state.L != ABORT)
           update_sensor_state();
     }
