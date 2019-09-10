@@ -23,12 +23,14 @@ specification either by extracting Cryptol specifications to C or by
 formally describing some mission critical parts of the system in a
 top-to-bottom style. This work is partially complete.
 
-In this phase, we have covered all methods with preconditions and
-postconditions seamlessly refactoring code to be much more compliant
-with the Frama-C EVA plugin. We put effort into algebraic specification,
-trying to describe the crypto submodule in order to find equivalence
-relations induced by the cryptographic properties. This is still an work
-in progress.
+In this first phase of development [BVS
+2019](https://gitlab-ext.galois.com/ssith/voting-system/-/milestones/19),
+we have covered all methods with preconditions and postconditions
+seamlessly refactoring code to be much more compliant with the Frama-C
+EVA plugin. We put effort into algebraic specification, trying to
+describe the crypto submodule in order to find equivalence relations
+induced by the cryptographic properties. This is still an work in
+progress.
 
 In parallel to this formal verification activity, unit tests have been
 derived from the specifications by using a slicing technique providing
@@ -40,8 +42,11 @@ safety critical systems. Various tests can be seen in the `logging`,
 
 # Future Work
 
-In the future we expect to finish the following specifications: 
-- base64.acsl 
-- secure_log.acsl 
-- extended contracts for the AES specific functions 
-- global and typed invariances based on algebraic specification
+In the future we plan to finish the following specifications and
+formally verify their implementations:
+- `base64.acsl` (see `Base64.cry`)
+- `secure_log.acsl` (see `Logging.cry`)
+- extended contracts for the AES-specific C functions (see `AES.cry` and
+  related Cryptol specs)
+- global and typed invariants based on algebraic specification
+
