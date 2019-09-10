@@ -11,7 +11,7 @@ MacOS.
 # Linux host
 
 For compatibility with the GFE project, we assume the baseline Linux
-distribution is Debian 10 "Buster", currently in its "RC1" release.
+distribution is Debian 10 "Buster", released as of 7 September 2019.
 
 # MacOS host
 
