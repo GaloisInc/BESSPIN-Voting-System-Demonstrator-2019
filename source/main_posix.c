@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     (void)argv;
     pthread_t main_thread;
     osd_sim_initialize();
-    pthread_create(&main_thread, NULL, ballot_box_main_loop, NULL);
+    pthread_create(&main_thread, NULL, (void *(*)(void *))ballot_box_main_loop, NULL);
     sim_main_loop();
     return 0;
 }

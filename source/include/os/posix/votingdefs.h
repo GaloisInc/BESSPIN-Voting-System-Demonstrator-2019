@@ -49,7 +49,7 @@ osd_wait_for_event(osd_event_group_handle_t event_group,
 typedef struct stream_buffer_handle {
     char *pBuf;
     size_t size;
-    pthread_mutex_t *lock;
+    pthread_mutex_t lock;
 } osd_stream_buffer_handle;
 typedef osd_stream_buffer_handle* osd_stream_buffer_handle_t;
 
