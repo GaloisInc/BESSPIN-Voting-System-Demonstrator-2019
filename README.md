@@ -189,3 +189,43 @@ how testers’ exploits can be contributed.
     organizers will summarize your work and success in public
     information on the projection screens at DEF CON or on social
     media.
+
+# Credits
+
+This DARPA-funded R&D represents the hard work of the following
+employees of Galois and Free & Fair:
+ - Alexander Bakst
+ - Annie Cherkaev
+ - Dan Wallach
+ - Dan Zimmmerman
+ - Daniel Wagner 
+ - Dragan Stosic
+ - Dylan Hand
+ - Eric Wolridge
+ - Flemming Andersen
+ - Georgios Dimou
+ - Haneef Mubarak
+ - Jason Graalum
+ - Joe Kiniry
+ - Joey Dodds
+ - John Sebes
+ - Kenny Foner
+ - Luke Myers
+ - Max Waugaman
+ - Michael Podhradsky
+ - Nes Cohen
+ - Niki Carroll
+ - Noah Rich
+ - Parker Southwick
+ - Reuben Broadfoot
+ - Rod Chapman
+ - Shpatar Morina
+ - Steven Osborn
+ - Stuart Pernsteiner
+
+The BMD we are using for DEF CON 2019 is based upon the open source
+BMD developed by our friends at [Voting
+Works](https://voting.works/). Thanks especially to Ben Adida.
+
+Our fork of Voting Works's BMD for our DEF CON 2019 demonstration is
+found on GitHub: https://github.com/GaloisInc/BESSPIN-BMD-2019
