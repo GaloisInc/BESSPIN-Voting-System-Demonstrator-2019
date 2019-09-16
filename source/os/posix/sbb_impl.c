@@ -100,11 +100,11 @@ uint32_t osd_stream_buffer_receive(osd_stream_buffer_handle_t handle,
                                    size_t xBufferLengthBytes,
                                    osd_timer_ticks_t max_block_time_ms)
 {
-    pthread_mutex_lock(handle->lock);
+    pthread_mutex_lock(&handle->lock);
     size_t size = xBufferLengthBytes < handle->size ? xBufferLengthBytes
                                                     : handle->size;
     memcpy(pRxData, handle->pBuf, size);
-    pthread_mutex_unlock(handle->lock);
+    pthread_mutex_unlock(&handle->lock);
     (void)max_block_time_ms;
 
     return size;
@@ -143,7 +143,7 @@ void osd_sim_paper_sensor_in_released() {
 }
 
 void osd_sim_barcode_input() {
-    pthread_mutex_lock(xScannerStreamBuffer->lock);
+    pthread_mutex_lock(&xScannerStreamBuffer->lock);
     if (xScannerStreamBuffer->pBuf) {
         free(xScannerStreamBuffer->pBuf);
     }
@@ -153,7 +153,7 @@ void osd_sim_barcode_input() {
     printf("\n");
     xScannerStreamBuffer->size = strlen(xScannerStreamBuffer->pBuf);
     printf("Read: [%s] Size: [%lu]\n", xScannerStreamBuffer->pBuf, xScannerStreamBuffer->size);
-    pthread_mutex_unlock(xScannerStreamBuffer->lock);
+    pthread_mutex_unlock(&xScannerStreamBuffer->lock);
     set_event_flags(ebBARCODE_SCANNED);
 }
 
@@ -169,5 +169,5 @@ void osd_sim_initialize() {
 
     xScannerStreamBuffer->pBuf = NULL;
     xScannerStreamBuffer->size = 0;
-    osd_assert(0 == pthread_mutex_init(xScannerStreamBuffer->lock, NULL));
+    osd_assert(0 == pthread_mutex_init(&xScannerStreamBuffer->lock, NULL));
 }
