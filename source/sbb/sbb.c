@@ -26,38 +26,16 @@ osd_timer_ticks_t cast_or_spoil_timeout = 0;
 char barcode[BARCODE_MAX_LENGTH] = {0};
 barcode_length_t barcode_length = 0;
 
-// Assigns declarations for FreeRTOS functions; these may not be
-// accurate but are currently required to avoid crashing wp.
-
-//@ assigns \nothing;
-extern void serLcdPrintf(char *str, uint8_t len);
-//@ assigns \nothing;
-extern void serLcdPrintTwoLines(char *line_1, uint8_t len_1, char *line_2,
-                                uint8_t len_2);
-
-// main code
-/*@ assigns the_firmware_state; */
-extern void gpio_set_as_input(uint8_t);
-
-/*@ requires 0 <= i && i < 8;
-  @ assigns the_firmware_state;
-  @ assigns gpio_mem[i];
-  @ ensures gpio_mem[i] == 0;
- @*/
-extern void gpio_set_as_output(uint8_t i);
-
 bool initialize(void)
 {
-#ifndef SIMULATION
-    gpio_set_as_input(BUTTON_CAST_IN);
-    gpio_set_as_input(BUTTON_SPOIL_IN);
-    gpio_set_as_input(PAPER_SENSOR_IN);
-    gpio_set_as_input(PAPER_SENSOR_OUT);
-    gpio_set_as_output(MOTOR_0);
-    gpio_set_as_output(MOTOR_1);
-    gpio_set_as_output(BUTTON_CAST_LED);
-    gpio_set_as_output(BUTTON_SPOIL_LED);
-#endif // SIMULATION
+    osd_gpio_set_as_input(BUTTON_CAST_IN);
+    osd_gpio_set_as_input(BUTTON_SPOIL_IN);
+    osd_gpio_set_as_input(PAPER_SENSOR_IN);
+    osd_gpio_set_as_input(PAPER_SENSOR_OUT);
+    osd_gpio_set_as_output(MOTOR_0);
+    osd_gpio_set_as_output(MOTOR_1);
+    osd_gpio_set_as_output(BUTTON_CAST_LED);
+    osd_gpio_set_as_output(BUTTON_SPOIL_LED);
     the_state.button_illumination = 0;
     // Logging is not set up yet...we could do that here I suppose
     the_state.L  = INITIALIZE;
@@ -119,102 +97,70 @@ barcode_length_t what_is_the_barcode(barcode_t the_barcode)
 
 void spoil_button_light_on(void)
 {
-#ifndef SIMULATION
-    gpio_write(BUTTON_SPOIL_LED);
-#endif
+    osd_gpio_write(BUTTON_SPOIL_LED);
     the_state.button_illumination |= spoil_button_mask;
 }
 
 void spoil_button_light_off(void)
 {
-#ifndef SIMULATION
-    gpio_clear(BUTTON_SPOIL_LED);
-#endif
+    osd_gpio_clear(BUTTON_SPOIL_LED);
     the_state.button_illumination &= ~spoil_button_mask;
 }
 
 void cast_button_light_on(void)
 {
-#ifndef SIMULATION
-    gpio_write(BUTTON_CAST_LED);
-#endif
+    osd_gpio_write(BUTTON_CAST_LED);
     the_state.button_illumination |= cast_button_mask;
 }
 
 void cast_button_light_off(void)
 {
-#ifndef SIMULATION
-    gpio_clear(BUTTON_CAST_LED);
-#endif
+    osd_gpio_clear(BUTTON_CAST_LED);
     the_state.button_illumination &= ~cast_button_mask;
 }
 
 void move_motor_forward(void)
 {
-#ifndef SIMULATION
-    gpio_clear(MOTOR_0);
-    gpio_write(MOTOR_1);
-#endif
+    osd_gpio_clear(MOTOR_0);
+    osd_gpio_write(MOTOR_1);
     CHANGE_STATE(the_state, M, MOTORS_TURNING_FORWARD);
 }
 
 void move_motor_back(void)
 {
-#ifndef SIMULATION
-    gpio_write(MOTOR_0);
-    gpio_clear(MOTOR_1);
-#endif
+    osd_gpio_write(MOTOR_0);
+    osd_gpio_clear(MOTOR_1);
     CHANGE_STATE(the_state, M, MOTORS_TURNING_BACKWARD);
 }
 
 void stop_motor(void)
 {
-#ifndef SIMULATION
-    gpio_clear(MOTOR_0);
-    gpio_clear(MOTOR_1);
-#endif
+    osd_gpio_clear(MOTOR_0);
+    osd_gpio_clear(MOTOR_1);
     CHANGE_STATE(the_state, M, MOTORS_OFF);
 }
 
 void clear_display(void)
 {
-#ifndef SIMULATION
-    serLcdClear();
-#endif
+    osd_clear_lcd();
 }
 
 void display_this_text_no_log(const char *the_text, uint8_t its_length)
 {
-#ifdef SIMULATION
-    (void)its_length;
-    debug_printf("DISPLAY: %s\r\n", the_text);
-#else
-    serLcdPrintf((char *)the_text, its_length);
-#endif    
+    osd_lcd_printf((char *)the_text, its_length);
 }
 
 void display_this_text(const char *the_text, uint8_t its_length)
 {
-#ifdef SIMULATION
-    (void)its_length;
-    debug_printf("DISPLAY: %s\r\n", the_text);
-#else
-    serLcdPrintf((char *)the_text, its_length);
-#endif
+    osd_lcd_printf((char *)the_text, its_length);
     CHANGE_STATE(the_state, D, SHOWING_TEXT);
 }
 
 void display_this_2_line_text(const char *line_1, uint8_t length_1,
                               const char *line_2, uint8_t length_2)
 {
-#ifdef SIMULATION
-    (void)length_1;
-    (void)length_2;
-    debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", line_1, line_2);
-#else
     CHANGE_STATE(the_state, D, SHOWING_TEXT);
-    serLcdPrintTwoLines((char *)line_1, length_1, (char *)line_2, length_2);
-#endif
+    osd_lcd_printf_two_lines((char *)line_1, length_1, (char *)line_2, length_2);
 }
 
 bool ballot_detected(void) { return (the_state.P == PAPER_DETECTED); }
@@ -295,16 +241,6 @@ bool cast_or_spoil_timeout_expired(void)
 bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
                       uint16_t *hour, uint16_t *minute)
 {
-#ifdef SIMULATION_UART
-    // no RTC in the UART-only simulation
-    (void) year;
-    (void) month;
-    (void) day;
-    (void) hour;
-    (void) minute;
-    return true;
-#else // SIMULATION_UART
-    //    static struct rtctime_t time;
     static struct voting_system_time_t time;
 #ifdef HARDCODE_CURRENT_TIME
     time.year = CURRENT_YEAR - 2000;
@@ -329,5 +265,4 @@ bool get_current_time(uint32_t *year, uint16_t *month, uint16_t *day,
     printf("Get current time: %s\r\n",time_str);
 #endif
     return true;
-#endif // SIMULATION_UART
 }

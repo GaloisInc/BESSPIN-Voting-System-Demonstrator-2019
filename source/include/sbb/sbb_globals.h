@@ -52,9 +52,4 @@ extern const char *error_line_1_text;
 extern const char *error_line_2_text;
 
 extern SBB_state the_state;
-
-// @spec abakst Specifications needed for for hardware, related to the
-// above I think we probably want some ghost `uint8_t` array to model
-// these reads/writes.
-extern uint8_t gpio_mem[8];
 #endif

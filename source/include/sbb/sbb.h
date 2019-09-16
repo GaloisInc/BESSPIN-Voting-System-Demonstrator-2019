@@ -36,14 +36,6 @@ extern osd_event_group_handle_t xSBBEventGroup;
 #define ebSPOIL_BUTTON_RELEASED    (0x40)
 #define ebALL_EVENTS               (0x7F)
 
-// @todo kiniry This is a placeholder state representation so that we
-// can talk about the state of memory-mapped firmware.  It should
-// probably be refined to a separate memory-mapped region (or more
-// than one) per device and an invariant should stipulate that the
-// memory regions are distinct.
-typedef bool firmware_state;
-extern firmware_state the_firmware_state;
-
 /*@ assigns \nothing;
     ensures \result == gpio_mem[i];
  */

@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 /////////////////////////////
 // Common Type Definitions //
@@ -14,6 +15,19 @@ struct voting_system_time_t {
     uint16_t hour;
     uint16_t minute;
 };
+
+// @spec abakst Specifications needed for for hardware, related to the
+// above I think we probably want some ghost `uint8_t` array to model
+// these reads/writes.
+extern uint8_t gpio_mem[8];
+
+// @todo kiniry This is a placeholder state representation so that we
+// can talk about the state of memory-mapped firmware.  It should
+// probably be refined to a separate memory-mapped region (or more
+// than one) per device and an invariant should stipulate that the
+// memory regions are distinct.
+typedef bool firmware_state;
+extern firmware_state the_firmware_state;
 
 #if defined(VOTING_PLATFORM_BOTTOM)
 #include "os/bottom/votingdefs.h"
