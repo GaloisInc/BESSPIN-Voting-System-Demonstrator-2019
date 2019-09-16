@@ -1,27 +1,27 @@
 #!/bin/bash
-./test1 >test_results/test1.out
+./test1 >test_results/test1.out 2>&1
 mv test1log.txt test_results
 
-./test2 >test_results/test2.out
+./test2 >test_results/test2.out 2>&1
 mv test2log.txt test_results
 
-./test3 >test_results/test3.out
+./test3 >test_results/test3.out 2>&1
 mv test3log.txt test_results
 
-./test4 >test_results/test4.out
+./test4 >test_results/test4.out 2>&1
 mv test4log.txt test_results
 
-./test5 >test_results/test5.out
+./test5 >test_results/test5.out 2>&1
 mv test5log.txt test_results
 
-./test6 >test_results/test6.out
+./test6 >test_results/test6.out 2>&1
 mv test61log.txt test_results
 mv test62log.txt test_results
 
-./test7 >test_results/test7.out
+./test7 >test_results/test7.out 2>&1
 mv test7*.txt test_results
 
-./test8 >test_results/test8.out
+./test8 >test_results/test8.out 2>&1
 mv test8log.txt test_results
 
 ./test9 test_data/good1.txt >test_results/test9.out 2>&1

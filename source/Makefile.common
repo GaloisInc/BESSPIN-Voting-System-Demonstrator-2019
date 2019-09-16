@@ -10,7 +10,8 @@ export LOGGING_SRC = $(LOG_DIR)/log_t.c \
 					 $(LOG_DIR)/log.c \
 					 $(LOG_DIR)/secure_log_t.c \
 					 $(LOG_DIR)/secure_log.c \
-					 $(LOG_DIR)/log_io.c
+					 $(LOG_DIR)/log_io.c \
+					 $(LOG_DIR)/log_net.c
 
 export SBB_SRC = $(SBB_DIR)/sbb.c \
 				 $(SBB_DIR)/sbb_machine.c \

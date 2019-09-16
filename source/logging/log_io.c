@@ -6,28 +6,9 @@
 #include <assert.h>
 #include <string.h>
 
-#define portable_assert(x) assert(x)
-
 // Local constants
 
 const secure_log_entry null_secure_log_entry = {{0}, {0}};
-
-///////////////////////////////////////////////////
-// Common constants needed by all implemenations //
-///////////////////////////////////////////////////
-
-static const char *REQUEST_LINE_1 = "POST /";
-static const char *REQUEST_LINE_3 = " HTTP/1.1\r\n";
-static const char *HEADER_1 = "Host: 10.6.6.253\r\n";
-static const char *HEADER_2 = "User-Agent: sbb/2019\r\n";
-static const char *HEADER_3 = "Accept: */*\r\n";
-static const char *HEADER_4 = "Content-Type: application/octet-stream\r\n";
-static const char *HEADER_5_1 = "Content-Length: ";
-static const char *DOUBLE_CRLF = "\r\n\r\n";
-
-// We assume that a log entry data block can't be more than 9_999_999 bytes long, so
-// we allocate up to 7 characters for this to be printed in decimal in the HTTP header.
-static const size_t worst_case_data_length = 7;
 
 // In order to compute the CBC_AES_MAC of a log entry, we require the full data block
 // to be an exact multiple of AES_BLOCK_LENGTH_BYTES long.
@@ -53,72 +34,20 @@ static const char space = ' ';
 static const uint8_t carriage_return = '\r';
 static const uint8_t new_line = '\n';
 
-/////////////////////////////
-// Local ACSL declarations //
-/////////////////////////////
-
-/*@
-    logic integer POST_Header_Fixed_Part_Length =
-        strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
-        strlen(HEADER_2) + strlen(HEADER_3) + strlen(HEADER_4) +
-        strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
-
-    logic integer POST_Header_Min_Length = POST_Header_Fixed_Part_Length +
-                                           worst_case_data_length +
-                                           LOG_FILE_NAME_MIN_LENGTH;
-
-    logic integer POST_Header_Max_Length = POST_Header_Fixed_Part_Length +
-                                           worst_case_data_length +
-                                           LOG_FILE_NAME_MAX_LENGTH;
-
-*/
-
 /////////////////////////////////
 // Local function declarations //
 /////////////////////////////////
 
-/*@ requires \valid(Transmit_Buffer + (0 .. Transmit_Buffer_Length - 1));
-    requires valid_log_file_name(log_file_name);
-    requires valid_read_string(REQUEST_LINE_1);
-    requires valid_read_string(REQUEST_LINE_3);
-    requires valid_read_string(HEADER_1);
-    requires valid_read_string(HEADER_2);
-    requires valid_read_string(HEADER_3);
-    requires valid_read_string(HEADER_4);
-    requires valid_read_string(HEADER_5_1);
-    requires valid_read_string(DOUBLE_CRLF);
-    ensures valid_string((char *) Transmit_Buffer);
-    ensures strlen((char *) Transmit_Buffer) >= POST_Header_Min_Length;
-    ensures strlen((char *) Transmit_Buffer) <= POST_Header_Max_Length;
-*/
-void Initialize_POST_Header(const char *log_file_name,        // in
-                            uint8_t *Transmit_Buffer,         // out by ref
-                            size_t Transmit_Buffer_Length);   // in
 
-
-/*@ requires \valid(Transmit_Buffer + (0 .. Transmit_Buffer_Length - 1));
-    requires valid_log_file_name(log_file_name);
+/*@ requires \valid(Transmit_Buffer + (0 .. total_log_entry_length - 1));
     requires \valid(total);
-    requires \valid(first_byte_of_data_index);
     requires 1 <= bytes_of_padding_required <= 16;
-    requires valid_read_string(REQUEST_LINE_1);
-    requires valid_read_string(REQUEST_LINE_3);
-    requires valid_read_string(HEADER_1);
-    requires valid_read_string(HEADER_2);
-    requires valid_read_string(HEADER_3);
-    requires valid_read_string(HEADER_4);
-    requires valid_read_string(HEADER_5_1);
-    requires valid_read_string(DOUBLE_CRLF);
-    assigns Transmit_Buffer[0 .. Transmit_Buffer_Length - 1];
+    assigns Transmit_Buffer[0 .. total_log_entry_length - 1];
     assigns *total;
-    assigns *first_byte_of_data_index;
 */
 void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
-                             const char *log_file_name,        // in
                              uint8_t *Transmit_Buffer,         // out by ref
-                             size_t *total,                    // out by ref
-                             size_t *first_byte_of_data_index, // out by ref
-                             size_t Transmit_Buffer_Length);   // in
+                             size_t *total);                   // out by ref
 
 //////////////////////////////////////////////
 // Common Implementation, built on log_fs.h //
@@ -130,7 +59,7 @@ Log_FS_Result Log_IO_Initialize()
     log_system_debug_printf("  padded: %zu", padded_log_entry_length);
     log_system_debug_printf("  spaces: %zu", bytes_of_padding_required);
 
-    Log_Net_Initialize();
+    osd_Log_Net_Initialize();
     return Log_FS_Initialize();
 }
 
@@ -171,42 +100,26 @@ bool Log_IO_File_Exists(const char *name) { return Log_FS_File_Exists(name); }
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
                                         secure_log_entry the_entry)
 {
-    // Step 1 - Calculate the length of the fixed parts of the HTTP POST Header
-    const size_t HTTP_Header_Fixed_Part_Length =
-        strlen(REQUEST_LINE_1) + strlen(REQUEST_LINE_3) + strlen(HEADER_1) +
-        strlen(HEADER_2) + strlen(HEADER_3) + strlen(HEADER_4) +
-        strlen(HEADER_5_1) + strlen(DOUBLE_CRLF);
-
-    // Now add room for the filename, the ASCII representation of the length
-    // of the payload, and the payload itself
-    const size_t Transmit_Buffer_Length =
-        HTTP_Header_Fixed_Part_Length + worst_case_data_length +
-        strlen(stream->remote_file_name) + total_log_entry_length;
-
-    uint8_t Transmit_Buffer[Transmit_Buffer_Length];
+    // Step 1 - Allocate the buffer that will contain the 
+    // message to send to disk and network
+    uint8_t Transmit_Buffer[total_log_entry_length];
     size_t total = 0;
-    size_t first_byte_of_data_index = 0;
 
-    // Step 2 - Prepare data to be sent, including the HTTP POST
-    // header for the network.
-    Prepare_Transmit_Buffer(the_entry, stream->remote_file_name,
-                            Transmit_Buffer, &total,
-                            &first_byte_of_data_index, Transmit_Buffer_Length);
+    // Step 2 - Prepare data to be sent
+    Prepare_Transmit_Buffer(the_entry, Transmit_Buffer, &total);
 
     log_system_debug_printf("total passed back is %zu", total);
-    log_system_debug_printf("first byte of data index is %zu", first_byte_of_data_index);
+    osd_assert( total == total_log_entry_length );
 
     // Step 3 - Write (data # spaces # base64_hash # space # mac # \r\n) to file
-    size_t written =
-        Log_FS_Write(stream, &Transmit_Buffer[first_byte_of_data_index],
-                     total - first_byte_of_data_index);
+    size_t written = Log_FS_Write(stream, &Transmit_Buffer[0], total);
 
     // Step 4 - Write HTTP header plus same data over
     // network to the Reporting System if
     // requested by the client when this log file was initialized.
     if (stream->endpoint != HTTP_Endpoint_None)
     {
-        Log_Net_Send(Transmit_Buffer, total);
+        Log_Net_Send(stream->remote_file_name, Transmit_Buffer, total_log_entry_length);
     }
 
     if (written == total)
@@ -365,38 +278,9 @@ secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
 ///////////////////////////
 // Local function bodies //
 ///////////////////////////
-
-void Initialize_POST_Header(const char *log_file_name,     // in
-                            uint8_t *Transmit_Buffer,      // out by ref
-                            size_t Transmit_Buffer_Length) // in
-{
-    // Initialize Transmit_Buffer to all 0x00 so we can dynamically calculate the
-    // length of the header
-    /*@
-      loop invariant 0 <= i <= Transmit_Buffer_Length;
-      loop invariant \valid(Transmit_Buffer + (0 .. Transmit_Buffer_Length - 1));
-      loop assigns i, Transmit_Buffer[0 .. Transmit_Buffer_Length - 1];
-      loop variant Transmit_Buffer_Length - i;
-    */
-    for (size_t i = 0; i < Transmit_Buffer_Length; i++)
-    {
-        Transmit_Buffer[i] = 0x00;
-    }
-
-    snprintf((char *)Transmit_Buffer, Transmit_Buffer_Length,
-	     "%s%s%s%s%s%s%s%s%zu%s",
-             REQUEST_LINE_1, log_file_name,
-             REQUEST_LINE_3, HEADER_1, HEADER_2, HEADER_3, HEADER_4, HEADER_5_1,
-             total_log_entry_length, DOUBLE_CRLF);
-}
-
-
 void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
-                             const char *log_file_name,        // in
                              uint8_t *Transmit_Buffer,         // out by ref
-                             size_t *total,                    // out by ref
-                             size_t *first_byte_of_data_index, // out by ref
-                             size_t Transmit_Buffer_Length)    // in
+                             size_t *total)                    // out by ref
 {
     size_t olen;
     int r;
@@ -424,26 +308,17 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
     // // Step 2 - Copy the data block
     copy_log_entry(&the_secure_log_entry.the_entry[0], &the_entry.the_entry[0]);
 
-    log_system_debug_printf("Transmit_Buffer is %zu bytes long", Transmit_Buffer_Length);
+    /* log_system_debug_printf("Transmit_Buffer is %zu bytes long", Transmit_Buffer_Length); */
 
-    log_system_debug_printf("HTTP Content-Length is %zu bytes", total_log_entry_length);
-
-    Initialize_POST_Header (log_file_name, Transmit_Buffer, Transmit_Buffer_Length);
-    
-    // After the header has been written, we have N bytes of header,
-    // occupying bytes 0 .. (N-1) of Transmit_Buffer. So.. the first byte of the
-    // data block will be at index N. We can use strlen to compute
-    // this since Transmit_Buffer was previously populated with all 0x00 bytes.
-    *first_byte_of_data_index = strlen((char *)Transmit_Buffer);
-    log_system_debug_printf("Length of header block is %zu", *first_byte_of_data_index);
+    /* log_system_debug_printf("HTTP Content-Length is %zu bytes", total_log_entry_length); */
 
     // Add the_secure_log_entry.the_entry to the Transmit_Buffer
-    copy_log_entry(&Transmit_Buffer[*first_byte_of_data_index],
+    copy_log_entry(&Transmit_Buffer[0],
                    &the_secure_log_entry.the_entry[0]);
 
     // Add just the right number of spaces to make the data block,
     // spaces, hash and new_line an exact multiple of 16 bytes long.
-    size_t space_index = *first_byte_of_data_index + LOG_ENTRY_LENGTH;
+    size_t space_index = LOG_ENTRY_LENGTH;
     log_system_debug_printf("space index is %zu", space_index);
     /*@
       loop invariant 0 <= space_count <= bytes_of_padding_required;
@@ -471,13 +346,12 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
 
     // The total length of the data block, spaces, hash
     // should be as expected and should be a multiple of AES_BLOCK_LENGTH_BYTES
-    portable_assert((second_space_index - *first_byte_of_data_index) ==
-                    padded_log_entry_length);
-    portable_assert(padded_log_entry_length % AES_BLOCK_LENGTH_BYTES == 0);
+    osd_assert(second_space_index == padded_log_entry_length);
+    osd_assert(padded_log_entry_length % AES_BLOCK_LENGTH_BYTES == 0);
 
     // Compute the AES_CBC_MAC of the whole block
     aes128_block binary_mac;
-    aes_cbc_mac(&Transmit_Buffer[*first_byte_of_data_index],
+    aes_cbc_mac(&Transmit_Buffer[0],
                 padded_log_entry_length,
                 &binary_mac[0],
                 Log_Entry_MAC_Key);
@@ -493,7 +367,7 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
                               false); // Don't add final \0
     (void)r;                          // suppress warning on r unused.
 
-    portable_assert(BASE_64_AES_BLOCK_LENGTH_BYTES == olen);
+    osd_assert(BASE_64_AES_BLOCK_LENGTH_BYTES == olen);
 
     // And append that MAC to the data to be sent
     size_t first_mac_index = second_space_index + 1;

@@ -10,19 +10,27 @@
 //@ ghost int reporting_system;
 
 /*@
+  axiomatic log_net_axioms {
+
   predicate
-    Log_Net_Initialized{L} = \true; // abstract
+    Log_Net_Initialized{L}; // abstract
+  }
 */
 
 
 /*@ assigns reporting_system \from \nothing;
     ensures Log_Net_Initialized;
  */
-void Log_Net_Initialize(void);
+void osd_Log_Net_Initialize(void);
 
 /*@ requires \valid_read(Transmit_Buffer + (0 .. total - 1));
     assigns  reporting_system \from reporting_system, Transmit_Buffer, total;
- */
-void Log_Net_Send(uint8_t *Transmit_Buffer, size_t total);
+*/
+void Log_Net_Send(const char *remote_file_name, uint8_t *Transmit_Buffer, size_t total);
+
+/*@ requires \valid_read(Transmit_Buffer + (0 .. total - 1));
+    assigns  reporting_system \from reporting_system, Transmit_Buffer, total;
+*/
+void osd_Log_Net_Send(uint8_t *Transmit_Buffer, size_t total);
 
 #endif /* __LOG_NET_H__ */
