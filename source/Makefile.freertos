@@ -211,7 +211,7 @@ export LIBS	 =	-lc -lgcc
 
 OS_SRC = $(OS_DIR)/time.c \
 		 $(OS_DIR)/log_fs.c \
-		 $(OS_DIR)/log_net.c \
+		 $(OS_DIR)/log_net_osd.c \
 		 $(OS_DIR)/debug_io.c \
 		 $(OS_DIR)/sbb_tcp.c \
 		 $(OS_DIR)/fetch_key.c \

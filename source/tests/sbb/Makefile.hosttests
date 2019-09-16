@@ -5,7 +5,7 @@ $(info CRYPTO_SRC=$(CRYPTO_DIR))
 $(info CRYPTO_SRC=$(CRYPTO_SRC))
 OSD_SRC = $(OS_DIR)/debug_io.c \
           $(OS_DIR)/log_fs.c \
-          $(OS_DIR)/log_net.c \
+          $(OS_DIR)/log_net_osd.c \
           $(OS_DIR)/sbb_impl.c \
           $(OS_DIR)/fetch_key.c
 

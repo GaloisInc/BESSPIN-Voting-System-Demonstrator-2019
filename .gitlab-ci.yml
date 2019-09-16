@@ -105,6 +105,21 @@ HostTests:
     - make hosttest_all
   tags: ["voting-system"]
 
+Posix:
+# Host tests shouldn't need tools from nix-shell 
+  script:
+    - export TARGET=posix
+    - make posix_sbb
+  tags: ["voting-system"]
+
+Posix_Network_Logs:
+# Host tests shouldn't need tools from nix-shell 
+  script:
+    - export NETWORK_LOGS=yes
+    - export TARGET=posix
+    - make posix_sbb
+  tags: ["voting-system"]
+
 Simulator:
   script:
     - export TARGET=sim

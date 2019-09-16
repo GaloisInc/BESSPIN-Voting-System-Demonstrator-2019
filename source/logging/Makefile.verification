@@ -52,7 +52,7 @@ SOFTWARE_SPECS := log.h secure_log.h debug_io.h log_io.h
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := log_t.c secure_log_t.c log.c secure_log.c log_main.c $(OS_DIR)/debug_io.c log_io.c
+FRAMA_C_SOURCES := log_t.c secure_log_t.c log.c secure_log.c log_main.c log_net.c $(OS_DIR)/debug_io.c log_io.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
 SOFTWARE_SOURCES := $(FRAMA_C_SOURCES) $(OS_DIR)/log_fs.c $(OS_DIR)/log_net.c

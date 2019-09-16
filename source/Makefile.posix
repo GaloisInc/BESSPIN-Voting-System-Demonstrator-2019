@@ -13,6 +13,10 @@ export CFLAGS += -DHARDCODE_CURRENT_TIME \
                  -DCURRENT_HOUR=11 \
                  -DCURRENT_MINUTE=18
 
+ifeq ($(NETWORK_LOGS),yes)
+	export CFLAGS += -DNETWORK_LOGS
+endif
+
 ifeq (${HOST},Linux)
 	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
 	export PLATFORM_INCLUDES :=
@@ -46,7 +50,7 @@ export CFLAGS += $(WARNINGS) $(INCLUDES)
 export CFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS)
 
 OS_SRC = $(OS_DIR)/log_fs.c \
-		 $(OS_DIR)/log_net.c \
+		 $(OS_DIR)/log_net_osd.c \
 		 $(OS_DIR)/fetch_key.c \
 		 $(OS_DIR)/debug_io.c \
 		 $(OS_DIR)/sbb_impl.c \
@@ -58,7 +62,7 @@ DEMO_OBJ = $(DEMO_SRC:.c=.o)
 
 %.o: %.c
 	@echo "	   CC $<"
-	@$(CC) -c $(CFLAGS) -o $@  -pthread $<
+	@$(CC) -c $(CFLAGS) -o $@ $<
 
 crypto: $(CRYPTO_SRC:.c=.o)
 
@@ -71,7 +75,7 @@ clean_logging:
 	rm -f $(LOGGING_SRC:.c=.o)
 
 sbb: $(DEMO_OBJ)
-	$(CC) $(DEMO_OBJ) -o posix_sbb
+	$(CC) $(DEMO_OBJ) -pthread -o posix_sbb
 
 clean_sbb:
 	rm -f $(DEMO_OBJ)
