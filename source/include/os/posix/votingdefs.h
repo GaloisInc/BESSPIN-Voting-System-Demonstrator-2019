@@ -27,6 +27,23 @@ osd_read_time(struct voting_system_time_t *time);
 void
 osd_format_time_str(struct voting_system_time_t *time, char *buf);
 
+#define noop ((void)0)
+/* Display */
+#define osd_clear_lcd()                                  noop
+#define osd_lcd_printf(_text, _len)                                     \
+    do { (void)(_len); debug_printf("DISPLAY: %s\r\n", (_text)); } while(0)
+#define osd_lcd_printf_two_lines(_text1, _len1, _text2, _len2)          \
+    do { (void)(_len1);                                                 \
+         (void)(_len2);                                                 \
+         debug_printf("DISPLAY: %s\r\nLINETWO: %s\r\n", (_text1), (_text2)); \
+    } while(0)
+
+/* GPIO */
+#define osd_gpio_set_as_input(x)  noop
+#define osd_gpio_set_as_output(x) noop
+#define osd_gpio_write(x)         noop
+#define osd_gpio_clear(x)         noop
+
 /* Events */
 typedef pthread_cond_t* osd_event_group_handle_t;
 typedef uint32_t osd_event_mask_t;

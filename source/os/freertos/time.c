@@ -3,6 +3,7 @@
 uint8_t
 osd_read_time(struct voting_system_time_t *time)
 {
+#ifndef SIMULATION_UART
     struct rtctime_t rtc_time;
     ds1338_read_time(&rtc_time);
 
@@ -11,6 +12,9 @@ osd_read_time(struct voting_system_time_t *time)
     time->day    = rtc_time.day;
     time->hour   = rtc_time.hour;
     time->minute = rtc_time.minute;
+#else
+    (void)time;
+#endif
 
     return 0;
 }
