@@ -33,11 +33,32 @@ static const log_entry test02_entry =
 //uint8_t empty_log_entry[LOG_ENTRY_LENGTH];
 Log_Handle log_handle;
 
+static const char *dummy_name = "test.log";
+
+/*@ axiomatic Log_Main_Axioms {
+  @
+  @   predicate Good_String(char *s) =
+  @     1 <= strlen(s) && strlen(s) <= 255 && valid_read_string(s);
+  @
+  @   predicate Good_Strings_Invariant =
+  @     Good_String(dummy_name);
+  @ }
+*/
+
+
+/*@ assigns \nothing;
+    ensures Good_Strings_Invariant;
+*/
+void assume_dummy_name_OK (void);
+
+/*@ ensures valid_log_file_name(\result); */
 static log_name generate_log_name(void) {
-  return "test.log";
+  assume_dummy_name_OK();
+  return dummy_name;
 }
 
 
+/*@ requires Log_IO_Initialized; */
 static log_io_stream generate_log_io_stream(void) {
   log_name name = generate_log_name();
   Log_IO_Create_New(&log_handle,name, HTTP_Endpoint_None);
@@ -84,7 +105,6 @@ Log_FS_Result compare_logs_by_hash(log_name log_file, Log_Handle *second_log, lo
 void Empty_Log_Smoketest(const log_name the_log_name,
                          const log_io_stream a_target) {
   Log_Handle test_log;
-  Log_IO_Initialize();
   create_log(&test_log, the_log_name, HTTP_Endpoint_None);
   export_log(&test_log, a_target);
   Log_IO_Close(&test_log);
@@ -94,7 +114,6 @@ void Empty_Log_Smoketest(const log_name the_log_name,
 void Import_Export_Empty_Log(const log_name the_log_name,
                              const log_io_stream a_target) {
   Log_Handle first_log;
-  Log_IO_Initialize();
   create_log(&first_log, the_log_name, HTTP_Endpoint_None);
   verify_log_well_formedness(&first_log);
 
@@ -112,7 +131,6 @@ void Import_Export_Empty_Log(const log_name the_log_name,
 void Non_Empty_Log_Smoketest(const log_name the_log_name,
                              const log_io_stream a_target) {
   Log_Handle test_log;
-  Log_IO_Initialize();
   create_log (&test_log, the_log_name, HTTP_Endpoint_None);
   write_entry (&test_log, test01_entry);
   write_entry (&test_log, test02_entry);
@@ -125,7 +143,6 @@ void Non_Empty_Log_Smoketest(const log_name the_log_name,
 void Import_Export_Non_Empty_Log(const log_name the_log_name,
                                  const log_io_stream a_target) {
   Log_Handle test_log;
-  Log_IO_Initialize();
   create_log (&test_log, the_log_name, HTTP_Endpoint_None);
   write_entry (&test_log, test01_entry);
   write_entry (&test_log, test02_entry);
@@ -148,6 +165,7 @@ int main(int argc, char* argv[]) {
   // @todo kiniry The use of `stderr` and `printf` needs to be
   // refactored to use appropriate calls on FreeRTOS when building to
   // that target.
+  Log_IO_Initialize();
   log_io_stream stream = generate_log_io_stream();
   if (argc == 1)
     Empty_Log_Smoketest(generated_name, stream);
