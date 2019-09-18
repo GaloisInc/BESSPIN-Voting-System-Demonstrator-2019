@@ -33,7 +33,7 @@ static const log_entry test02_entry =
 //uint8_t empty_log_entry[LOG_ENTRY_LENGTH];
 Log_Handle log_handle;
 
-static const char *dummy_name = "test.log";
+static char *dummy_name = "test.log";
 
 /*@ axiomatic Log_Main_Axioms {
   @
@@ -52,6 +52,8 @@ static const char *dummy_name = "test.log";
     ensures Good_Strings_Invariant;
 */
 void assume_dummy_name_OK (void);
+
+void assume_dummy_name_OK (void) { }
 
 /*@ ensures valid_log_file_name(\result); */
 static log_name generate_log_name(void) {
