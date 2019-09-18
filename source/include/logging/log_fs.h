@@ -30,7 +30,7 @@ typedef struct Log_Handles
   axiomatic log_fs_axioms {
 
   predicate
-    Log_FS_Initialized{L}; // abstract
+    Log_FS_Initialized{L} reads log_fs; // abstract
 
   predicate
     Log_FS_File_Is_Open{L}(Log_Handle *f) reads *f, log_fs; // abstract

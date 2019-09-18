@@ -13,7 +13,7 @@
   axiomatic log_net_axioms {
 
   predicate
-    Log_Net_Initialized{L}; // abstract
+    Log_Net_Initialized{L} reads reporting_system; // abstract
   }
 */
 
