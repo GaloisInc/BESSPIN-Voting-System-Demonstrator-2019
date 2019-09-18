@@ -38,7 +38,9 @@ static const char *dummy_name = "test.log";
 /*@ axiomatic Log_Main_Axioms {
   @
   @   predicate Good_String(char *s) =
-  @     1 <= strlen(s) && strlen(s) <= 255 && valid_read_string(s);
+  @     strlen(s) >= LOG_FILE_NAME_MIN_LENGTH && 
+  @     strlen(s) <= LOG_FILE_NAME_MAX_LENGTH &&
+  @     valid_read_string(s);
   @
   @   predicate Good_Strings_Invariant =
   @     Good_String(dummy_name);
