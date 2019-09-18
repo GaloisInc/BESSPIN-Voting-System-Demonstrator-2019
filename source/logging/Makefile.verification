@@ -113,6 +113,9 @@ $(EVA_RESULTS) : $(FRAMA_C_SOURCES) $(SOFTWARE_SPECS)
 value:
 	frama-c -c11 -eva -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(EVA_DEPTH_OPTIONS) $(FRAMA_C_SOURCES)
 
+valueg:
+	frama-c-gui -c11 -eva -main $(MAIN_ENTRY_POINT) $(FRAMA_C_INCLUDES) $(EVA_DEPTH_OPTIONS) $(FRAMA_C_SOURCES)
+
 
 
 # Frama-C GUI
