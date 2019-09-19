@@ -1,0 +1,13 @@
+module ElectionReporting where
+
+import Base64
+
+type ElectionReport destBytes contentBytes = {
+  dest    : [destBytes][8],
+  content : Base64 contentBytes
+}
+
+makeReport : {a, dest_len, n} (fin dest_len, fin n) =>
+  (a -> Base64 n) -> [dest_len][8] -> a -> ElectionReport dest_len n
+makeReport serialize dest_name data
+  = { dest = dest_name, content = serialize data }
