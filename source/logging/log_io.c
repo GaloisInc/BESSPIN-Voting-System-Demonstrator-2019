@@ -2,6 +2,7 @@
 #include "logging/log_io.h"
 #include "logging/debug_io.h"
 #include "logging/log_fs.h"
+#include "logging/log_election_reporting.h"
 #include "logging/log_net.h"
 #include <assert.h>
 #include <string.h>
@@ -169,9 +170,12 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     // Step 4 - Write HTTP header plus same data over
     // network to the Reporting System if
     // requested by the client when this log file was initialized.
-    if (stream->endpoint != HTTP_Endpoint_None)
+    if (stream->endpoint == HTTP_Endpoint_App_Log)
     {
-        Log_Net_Send(stream->remote_file_name, Transmit_Buffer, total_log_entry_length);
+        char endpoint_name[255] = {0};
+        osd_assert(ER_OK == Election_Report_Endpoint_Name("simple", endpoint_name, sizeof endpoint_name - 1));
+        Election_Report_System_Entry(endpoint_name, Transmit_Buffer, total_log_entry_length);
+        //    Log_Net_Send(stream->remote_file_name, Transmit_Buffer, total_log_entry_length);
     }
     #else
     (void)stream;

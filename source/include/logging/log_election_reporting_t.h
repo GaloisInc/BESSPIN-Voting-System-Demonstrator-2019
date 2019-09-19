@@ -4,8 +4,8 @@
 #include "logging/log_t.h"
 #include "logging/secure_log_t.h"
 
-typedef char*            endpoint_t;
-typedef char*            election_name_t;
-typedef secure_log_entry election_report_t;
+typedef char* endpoint_t;
+typedef char* election_name_t;
+typedef unsigned char* election_report_t;
 
 #endif
