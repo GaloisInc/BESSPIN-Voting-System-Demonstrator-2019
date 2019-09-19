@@ -69,7 +69,7 @@ SOFTWARE_SPECS := $(INCLUDE_DIR)/sbb/sbb.h \
 
 # FRAMA_C_SOURCES are modules that ARE written in the Frama-C/ACSL
 # subset and are intended for verification with the Frama-C plugins
-FRAMA_C_SOURCES := sbb_crypto.c sbb.c sbb_machine.c sbb_logging.c sbb_strings.c sbb_crypto.c
+FRAMA_C_SOURCES := sbb_crypto.c sbb.c sbb_machine.c sbb_logging.c sbb_strings.c
 FRAMA_C_SMOKETEST_SOURCES := sbb_lemma_smoketests.c
 
 # SOFTWARE_SOURCES adds modules are NOT Frama-C compatible
@@ -126,7 +126,8 @@ metrics:
 # Enhanced Value (EVA) analysis
 
 # Analytical depth options for EVA. To be revised for Frama-C v19
-EVA_DEPTH_OPTIONS = -slevel 16 -plevel 256
+# 11 is maximum depth for Frama-C 19 - see frama-c -eva-h
+EVA_DEPTH_OPTIONS = -eva-precision 5
 
 EVA_RESULTS  = $(FRAMA_C_SOURCES:.c=.evar)
 $(EVA_RESULTS) : $(FRAMA_C_SOURCES) $(SOFTWARE_SPECS)
