@@ -93,8 +93,9 @@ metrics:
 
 # Enhanced Value (EVA) analysis
 
-# Analytical depth options for EVA. To be revised for Frama-C v19
-EVA_DEPTH_OPTIONS = -slevel 16 -plevel 256
+# Analytical depth options for EVA.
+# 11 is maximum depth for Frama-C 19 - see frama-c -eva-h
+EVA_DEPTH_OPTIONS = -eva-precision 11 
 
 # Frama-C VAL plugin needs to know the name of the "main" function. For now, it's...
 MAIN_ENTRY_POINT := main
