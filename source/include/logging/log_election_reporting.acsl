@@ -1,0 +1,15 @@
+#include "logging/log_t.acsl"
+#include "logging/secure_log_t.acsl"
+
+#include "logging/log_election_reporting_t.h"
+
+/*@ axiomatic election_reporting_theory {
+  @   type Endpoint  = endpoint_t;
+  @   type Election  = election_name_t;
+  @   type Report<a> = Report(endpoint_t endpoint, a report);
+  @
+  @   logic Endpoint CastSpoilEndpoint(Election);
+  @   logic Endpoint SysLogEndpoint(Election);
+  @   logic Report<secure_log_entry_t> model_make_report(Endpoint e, model_secure_log_entry r);
+  @ }
+*/

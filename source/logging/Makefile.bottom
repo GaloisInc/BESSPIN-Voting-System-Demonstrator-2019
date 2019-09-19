@@ -6,10 +6,25 @@ INCLUDES = -I. \
 	-I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/bsp \
 	-I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/devices
 
+BOTTOM_SOURCE = log_main.c \
+	              log_bottom.c \
+	              secure_log_bottom.c \
+	              log_t.c \
+	              secure_log_t.c \
+                log_io.c \
+                log_net.c \
+	              log_election_reporting_bottom.c \
+                $(OS_DIR)/log_fs.c \
+                $(OS_DIR)/log_net_osd.c \
+                $(OS_DIR)/debug_io.c \
+                ../crypto/crypto_t.c \
+                ../crypto/base64.c \
+                ../crypto/crypto_bottom.c
+
 # Build the bottom target
 log_bottom:
 	cd $(LOG_DIR) && \
-	$(CC) $(CFLAGS) -D__riscv_xlen=32 log_main.c log_bottom.c secure_log_bottom.c log_t.c secure_log_t.c log_io.c log_net.c $(OS_DIR)/log_fs.c $(OS_DIR)/log_net_osd.c $(OS_DIR)/debug_io.c ../crypto/crypto_t.c ../crypto/base64.c ../crypto/crypto_bottom.c -o secure_log_bottom.elf && \
+	$(CC) $(CFLAGS) -D__riscv_xlen=32 $(BOTTOM_SOURCE) -o secure_log_bottom.elf && \
 	rm -f *.o $(OS_DIR)/*.o
 
 log_bottom_clean:
