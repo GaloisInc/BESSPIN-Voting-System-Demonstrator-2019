@@ -118,7 +118,11 @@ about the election via the Evidence Server.
    unmarked paper ballot.  In the former case, the voter takes their
    digitally cast ballot to the Smart Ballot Box.
    
-7. (*Core*) A *Smart Ballot Box* (SBB), which permits a voter to         securely store a legal, marked paper ballot. The main function of     the SBB is to accept and store a legal ballot for the current         election and reject ballots that are not part of the current          election.
+7. (*Core*) A *Smart Ballot Box* (SBB), which permits a voter to
+   securely store a legal, marked paper ballot. The main function of
+   the SBB is to accept and store a legal ballot for the current 
+   election and reject ballots that are not part of the current
+   election.
    
 8. (*Core*) An *Evidence Server* (ES) (also known as a Bulletin Board in the
    E2E-V literature) shares all evidence of an election to the public
