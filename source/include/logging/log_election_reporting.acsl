@@ -4,14 +4,13 @@
 #include "logging/log_election_reporting_t.h"
 
 /*@ axiomatic election_reporting_theory {
-  @   type Endpoint   = endpoint_t;
-  @   type Election   = election_name_t;
-  @   type Report<a>  = Report(endpoint_t endpoint, a report);
+  @   type Endpoint   = endpoint_name_t;
+  @   type Report<a>  = Report(Endpoint endpoint, a report);
   @   type ASCIISerialized<a>;
   @   type ReportedEntry = ASCIISerialized<model_secure_log_entry_t>;
   @
-  @   logic Endpoint CastSpoilEndpoint(Election);
-  @   logic Endpoint SysLogEndpoint(Election);
+  @   logic Endpoint CastSpoilEndpoint(Endpoint);
+  @   logic Endpoint SysLogEndpoint(Endpoint);
   @   logic ReportedEntry model_ASCIISerializeLogEntry(model_secure_log_entry_t e);
   @   logic Report<secure_log_entry_t> model_make_report(Endpoint e, ReportedEntry r);
   @ }

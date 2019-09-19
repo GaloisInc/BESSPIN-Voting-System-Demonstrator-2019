@@ -8,6 +8,7 @@
 #include <string.h>
 
 // Local constants
+#define MAX_ENDPOINT_NAME_LENGTH 255
 
 const secure_log_entry null_secure_log_entry = {{0}, {0}};
 
@@ -172,10 +173,11 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     // requested by the client when this log file was initialized.
     if (stream->endpoint == HTTP_Endpoint_App_Log)
     {
-        char endpoint_name[255] = {0};
-        osd_assert(ER_OK == Election_Report_Endpoint_Name("simple", endpoint_name, sizeof endpoint_name - 1));
-        Election_Report_System_Entry(endpoint_name, Transmit_Buffer, total_log_entry_length);
-        //    Log_Net_Send(stream->remote_file_name, Transmit_Buffer, total_log_entry_length);
+        char endpoint_name[MAX_ENDPOINT_NAME_LENGTH] = {0};
+        osd_assert(ER_OK == Election_Report_Endpoint_Name(stream->remote_file_name,
+                                                          endpoint_name,
+                                                          sizeof endpoint_name - 1));
+        Election_Report_Application_Entry(endpoint_name, Transmit_Buffer, total_log_entry_length);
     }
     #else
     (void)stream;
