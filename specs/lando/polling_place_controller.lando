@@ -1,7 +1,8 @@
-subsystem Polling Place Controller
-  indexing
-    owner: TBD2
-    
+subsystem Polling Place Controller (PPC)
+The Controller is a central hub for data storage and communication
+between (at least) all Voting Terminals (BMDs) and Smart Ballot Boxes
+(SBBs).  No Controller exists in the BVS 2019 system.
+
 component Ballot Manager
   Spoil this ballot card!
   Is this ballot card legitimate?

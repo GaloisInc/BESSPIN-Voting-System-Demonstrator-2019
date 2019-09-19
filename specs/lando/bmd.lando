@@ -1,8 +1,11 @@
 subsystem Ballot Marking Device
-  indexing
-    owner: Luke Myers <lmyers@galois.com> 
-           Dragan Stosic <dragan.stosic@freeandfair.us>
-           
+A Voting Terminal that permits voters to cast a well-formed paper
+ballot via a digital interface.
+
+indexing
+  owner: Luke Myers <lmyers@galois.com> 
+         Dragan Stosic <dragan.stosic@freeandfair.us> 
+
 component Ballot Encryption
   What is the encryption of this ballot and nonce?
 component Random Number Generator

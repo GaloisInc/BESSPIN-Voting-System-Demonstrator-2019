@@ -1,8 +1,13 @@
-Ballot Marking Device
-subsystem Ballot Marking Device
-  indexing
-    owner: Luke Myers <lmyers@galois.com> 
-      Dragan Stosic <dragan.stosic@freeandfair.us>
+subsystem Ballot Marking Device (BMD)
+The Ballot Marking Deviced used for the BVS.  Our BMD is based upon
+Voting Works's open source BMD.
+
+indexing
+  owner: Luke Myers <lmyers@galois.com>
+  contributors: Dragan Stosic <dragan.stosic@freeandfair.us>
+                Haneef Mubarak <hmubarak@galois.com>
+  project_url: https://gitlab-ext.galois.com/ssith/bmd-defcon-2019
+         
 component Power Button
   Turn on the bmd!
   Turn off the bmd!

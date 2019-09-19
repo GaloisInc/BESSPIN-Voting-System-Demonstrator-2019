@@ -1,4 +1,5 @@
 subsystem Crypto
+All cryptographic data and behavior necessary for the BVS.
 
 component Protocol
   Communications protocol between the BMD and the SBB.

@@ -1,16 +1,16 @@
 events Crypto
 
-Load key.
+Load key
 Load key K into the HSM.
 
-Encrypt.
+Encrypt
 Encrypt data D.
 
-Decrypt.
+Decrypt
 Decrypt data D.
 
-Hash.
+Hash
 Hash data D.
 
-HMAC.
+HMAC
 HMAC data D using key K.
