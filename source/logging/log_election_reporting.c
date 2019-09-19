@@ -2,7 +2,7 @@
 #include "logging/log_net.h"
 #include "logging/log_election_reporting_t.h"
 #include "logging/log_election_reporting.h"
-#include <stdio.h>
+#include <string.h>
 
 #define TOPLEVEL_ENDPOINT_PREFIX "elections"
 
@@ -16,8 +16,7 @@ ER_STATUS Election_Report_Endpoint_Name(endpoint_name_t resource_name,
     const size_t resource_size = strlen(resource_name);
 
     if ( prefix_size + resource_size <= endpoint_max_size ) {
-        int write = snprintf(endpoint_name,
-                             endpoint_max_size,
+        int write = snprintf(endpoint_name, endpoint_max_size,
                              "%s/%s",
                              TOPLEVEL_ENDPOINT_PREFIX,
                              resource_name);

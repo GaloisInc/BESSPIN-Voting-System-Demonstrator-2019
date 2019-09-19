@@ -6,12 +6,17 @@
 
 typedef enum { ER_OK, ER_ERR } ER_STATUS;
 
-// Build the endpoint name
+/*@ requires valid_read_string(resource_name);
+  @ requires \valid(endpoint_name + (0 .. endpoint_max_size - 1));
+  // @ assigns *(endpoint_name + (0 .. endpoint_max_size - 1));
+*/
 ER_STATUS Election_Report_Endpoint_Name(endpoint_name_t resource_name,     //IN
                                         endpoint_name_t endpoint_name,     //OUT
                                         size_t          endpoint_max_size);//IN
 
-// Send a log_entry as a report
+/*@ requires valid_read_string(endpoint);
+  @ requires \valid_read(report + (0 .. report_size - 1));
+*/
 ER_STATUS Election_Report_Application_Entry(endpoint_name_t   endpoint,    //IN
                                             election_report_t report,      //IN
                                             size_t            report_size);//IN
