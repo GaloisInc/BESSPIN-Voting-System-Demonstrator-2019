@@ -1,11 +1,10 @@
 #!/usr/bin/expect -f
 #
-# This tests that after entering a valid ballot, the 
-# log eventually records a timeout if no decision is made
+# This tests that the user can cast a valid ballot
 
 set timeout -1
 
-spawn ./posix_sbb
+spawn ../../posix_sbb
 
 expect "DISPLAY: Welcome, Voter!\r"
 send -- "3\n"
@@ -15,10 +14,11 @@ send -- "5\n"
 send -- "2019+06+23+17+45:cgep2UpFCE2XLgx6QZUfW3hlVhINicNbwL9KI8UtUGM=\r"
 send -- "4\n"
 
-set timeout 35
+expect "DISPLAY:  Cast or Spoil?"
+send -- "1\n"
+
+set timeout 5
 expect {
-  "System LOG: User cast/spoil decision timeout"
-    { exit 0 }
-  default
-    { exit 1 }
+  "DISPLAY: Casting ballot.\r" { exit 0 }
+  default                      { exit 1 }
 }

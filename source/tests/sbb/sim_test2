@@ -4,7 +4,7 @@
 
 set timeout -1
 
-spawn ./posix_sbb
+spawn ../../posix_sbb
 
 expect "DISPLAY: Welcome, Voter!\r"
 send -- "3\n"
