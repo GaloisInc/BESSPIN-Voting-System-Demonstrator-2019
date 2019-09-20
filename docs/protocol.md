@@ -117,24 +117,39 @@ BS   := Ballot Style
 CB   := Cast Ballot
 CE   := Current Election
 CR   := Certified Result
+CS   := Controller System
 CVR  := Cast Vote Record
 E    := Evidence
+EA   := Election Assistant
 EC   := Electoral Commission
 L    := Logs
 M    := Map of Polling Places
 MP   := Member of the Public
+PBS  := Paper Ballot Scanner
+PK   := Privacy Kiosk
 PP   := Polling Place
 PR   := Provisional Result
 R    := Receipt
 RS   := Registration Server
 RV   := Registered Voters
+S    := Supervisor
 SB   := Spoiled Ballot
 V    := Voter
 VA   := Voter Authenticator
 VPII := Voter V’s PII
+VVD  := Voter Verification Device
 XB   := Challenged Ballot
 
-This protocol description is a sequence of labeled steps.
+Each protocol description is a set of sequences of labeled steps.
+Several different subprotocols exist: one for the pre-election key
+ceremony, one for election day in the polling place, and three for
+post-election activities.  Each step in the protocol takes place at a
+partcular device, sometimes with an election official assisting or
+otherwise interacting with the voter.
+
+### Pre-Election Key Ceremony
+
+### Election Day
 
 1. *VoterCheckIn* A voter V arrives at a polling place PP to check in
    for election CE.
@@ -162,7 +177,7 @@ This protocol description is a sequence of labeled steps.
 // @design kiniry Determine what the BS token should be.
 
 2. *Ballot Printing* The BPS, on consuming the anonymous BS Token,
-   produces an unmarked paper Ballot which V takes.
+   produces an unmarked paper Ballot B which V takes.
    
 2.a. Ballots can either be printed on-demand (what is called a
      Ballot-on-Demand system) or, with a sufficiently small set of
@@ -173,8 +188,85 @@ This protocol description is a sequence of labeled steps.
 
 // @design kiniry Should all ballots of a given BS be identical?
 
-3. *Voting Terminal* 
+3.a. *Voting Terminal* Voter V decides to vote on B using random,
+     voter-chosen BMD<sub>i</sub>.
+
+     Blank ballot B indicates to BMD<sub>i</sub> which BS it
+     encodes. The BMD facilitates V's independent voting using B,
+     producing at the end of the voting session, a Marked Ballot B'.
+
+3.b. *Privacy Kiosk* Voter V decides to vote on B using a pen in
+     Privacy Kiosk PK.
+
+     Voter V independently produces a (Hand) Marked Ballot B'.
 
 // @design kiniry Should images of all spoiled ballots part of E?
 
+4. *Voter Verification Device* Voter V takes B' to random,
+   voter-chosen VVD<sub>j</sub> and uses VVD<sub>j</sub> to confirm
+   that B' captures their casting intentions.
 
+4.a. If V determines that B' does not capture their intentions and
+     they used BMD<sub>i</sub>, they report to the Supervisor a
+     problem with BMD<sub>i</sub>.  B' is spoiled and kept by S for
+     investigation and auditing purposes.
+
+     V is then escorted to the *Controller System* CS where they are
+     given a new BS Token, an they return to step 2 above.
+
+4.b. If V determines that B' does not capture their intentions and
+     they do not believe that, if they used a BMD, it acted
+     improperly, then they go to the Polling Place's *Controller
+     System*, which is managed by the Supervisor S, to spoil their
+     ballot and start over. Go to step 5.
+
+4.c. If V determines that B' does capture their intentions, or they do
+     not care to double-check their ballot, then they go to the
+     random, voter-chosen *Ballot Scanning Device* (a *Paper Ballot
+     Scanner*, PBS<sub>k</sub>) to cast or challenge their vote. Go to
+     step 6.
+
+5. *Controller Device* V spoils their ballot and starts over.
+
+   Voter V interacts with Supervisor S responsible for the Polling
+   Place Controller Server CS.  S spoils voter V's ballot B, and keeps
+   the spoiled ballot SB for auditing purposes.  S gives V a new BS
+   Token and V returns to the BPS.  Go to step 2.
+
+6. *Ballot Scanning Device* V inserts B into PBS<sub>k</sub> and the
+   PBS determines if B is a legal ballot. If B is not a legal ballot,
+   it is rejected, otherwise B is a legal ballot, and B is interpreted
+   into a CVR, the PBS commits to that interpretation and emits a
+   receipt R, and the voter V is asked if he or she wishes to *cast*
+   or *challenge* the device.
+
+6.a. *Challenge* If V challenges the PBS, then B is cryptographically
+     spoiled and returned to the voter and they are told to return to
+     CS. There, they show their spoiled ballot B and receipt R to S
+     and obtain a new BS Token, and V returns to the BPS.  Go to step
+     2.
+
+6.b. *Cast* If V chooses to cast B, then B is returned to them and
+     they are told to insert B into a random, voter-chosen *Smart
+     Ballot Box* (SBB).
+
+7. *Smart Ballot Box* V inserts cryptographically cast ballot B into
+   their chosen SBB. If B is a legal, cryptographically cast ballot
+   for the election, it is accepted by SBB and stored securely for
+   tabulation and auditing, otherwise B is rejected.
+
+7.a. *Rejected Cast Ballot* If V insists that B is a cryptographically
+     cast ballot, they may return to the CS for an investigation. This
+     should never happen.
+
+7.b. *Rejected Ballot* If V attempts to cast an irregular ballot B,
+     then it is either not a ballot, is a tampered ballot, is a
+     spoiled ballot, is a challenged ballot, or is an uncast ballot.
+     In the latter case, the voter is sent back to the PBS; go to step
+     6.  For all other cases, an EA will assist the voter.
+
+### Post-Election Subprotocol: Concluding an Election
+
+### Post-Election Subprotocol: Third Party Verification
+
+### Post-Election Subprotocol: Voter Verification
