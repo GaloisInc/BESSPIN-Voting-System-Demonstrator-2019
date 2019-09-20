@@ -30,7 +30,7 @@ typedef struct Log_Handles
   axiomatic log_fs_axioms {
 
   predicate
-    Log_FS_Initialized{L}; // abstract
+    Log_FS_Initialized{L} reads log_fs; // abstract
 
   predicate
     Log_FS_File_Is_Open{L}(Log_Handle *f) reads *f, log_fs; // abstract
@@ -45,9 +45,9 @@ typedef struct Log_Handles
 
 /*@
    predicate valid_log_file_name{L} (char *name) =
-      valid_string(name) &&
+      valid_read_string(name) &&
       strlen(name) >= LOG_FILE_NAME_MIN_LENGTH &&
-      strlen(name) >= LOG_FILE_NAME_MAX_LENGTH;
+      strlen(name) <= LOG_FILE_NAME_MAX_LENGTH;
 */
 
 
@@ -62,6 +62,7 @@ typedef enum
 // All ACSL to come - mostly copied from existing log_io.h
 
 /*@ assigns log_fs \from \nothing;
+    assigns \result \from \nothing;
     ensures Log_FS_Initialized;
  */
 Log_FS_Result Log_FS_Initialize(void);
@@ -74,6 +75,7 @@ Log_FS_Result Log_FS_Initialize(void);
     requires \valid(stream);
     requires \separated(stream, name);
     assigns log_fs \from log_fs, name;
+    assigns \result \from log_fs, name;
     assigns *stream \from log_fs, name;
 
     behavior success:

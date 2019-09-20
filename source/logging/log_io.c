@@ -55,12 +55,24 @@ void Prepare_Transmit_Buffer(secure_log_entry the_entry,       // in
 
 Log_FS_Result Log_IO_Initialize()
 {
+    Log_FS_Result r;
+
     log_system_debug_printf("unpadded: %zu", unpadded_log_entry_length);
     log_system_debug_printf("  padded: %zu", padded_log_entry_length);
     log_system_debug_printf("  spaces: %zu", bytes_of_padding_required);
 
     osd_Log_Net_Initialize();
-    return Log_FS_Initialize();
+
+    /*@ assert Log_Net_Initialized; */
+    
+    r = Log_FS_Initialize();
+
+    /*@ assert Log_Net_Initialized &&
+      @        Log_FS_Initialized;
+    */
+
+    /*@ assert Log_IO_Initialized; */
+    return r;
 }
 
 Log_FS_Result Log_IO_Create_New(Log_Handle *stream, const char *name,
