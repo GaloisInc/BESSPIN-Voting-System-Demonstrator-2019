@@ -265,8 +265,85 @@ otherwise interacting with the voter.
      In the latter case, the voter is sent back to the PBS; go to step
      6.  For all other cases, an EA will assist the voter.
 
+### Post-Election Protocols
+
+There are three different-but-interacting protocols used to conclude and 
+audit an election.  
+
+One part of concluding an election is closing the polls and collecting all
+cast and spoiled ballots for tabulation and auditing.  The evidence generated
+during an election is also collected for post-election processing.  That
+evidence in our protocol is the cryptographic aggregation of all secure
+logs from all devices, and the data therein includes a CVR and ballot image
+for every cast or cryptographically spoiled ballot.
+
 ### Post-Election Subprotocol: Concluding an Election
+
+Election officials main focus in concluding an election is first, tabulating the
+cast ballots and, second, auditing the election and its evidence.  
+
+The *Tabulation Device* consumes the CVRs and ballot images and produces a
+tabulation, which is reported by the Electoral Commission as a *Provisional 
+Result*.  A wise Electoral Commission will use several independently developed
+tabulator concurrently to confirm results.
+
+Next, election officials export *Evidence* from the *Evidence Server*. They use
+that evidence to both (a) perform one or more *cryptographic verifications* of 
+the evidence and (b) conduct a Risk-Limiting Audit.  
+
+If both these verifications and RLA confirm the Provisional Result,
+and officials' audits of other election artifacts show that the election was 
+well-run and sound, then the Electoral Commission declares a *Certified
+Result* that agrees with the Provisional Result.  
+
+If the RLA fails, then either:
+ - a forensic examination of the evidence and voting devices is necessary in the
+   case of evidence of fraud, a security event, or otherwise, or
+ - a manual hand-count is necessary because the election is too close to call
+   with the evidence on-hand and electoral statue dictates how provisional and
+   certified results are arrived at.
 
 ### Post-Election Subprotocol: Third Party Verification
 
+Third parties, such as arbitrary members of the public, representatives from
+participating political parties, the media, NGOs, etc. can perform independent
+cryptographic verifications.  Third parties can download *evidence* from the
+*Evidence Server* and check that evidence with an *Election Verifier*.
+
+An *Election Verifier* consumes evidence and produces a report about that 
+evidence.  A report either confirms that the evidence is cryptographically
+well-formed, or reports on warnings and errors about the evidence.
+
+Third parties can also use one or more independent *Tabulator*s to consume
+evidence and produce their own *Third-Party Result*.
+
+If any third party's verification fails or tabulation does not match the
+Provisional Result reported by the Electoral Commission, they notify the
+authorities and an investigation ensues.
+
+@todo kiniry An unspecified protocol will be used by third parties to share 
+their evaluation of the evidence, including their independent tabulations.
+
 ### Post-Election Subprotocol: Voter Verification
+
+Each voter that participated in the election, or any other member of the public
+who is given evidence artifacts from voters, can conduct a *voter verification*
+as well.  Voter verification focuses on the cryptographic evaluation of cast
+and spoiled ballot receipts.  Voters or their proxies interact with the 
+Evidence Server in order to look up their receipt information.
+
+Any of the following circumstances has a voter report to the Electoral 
+Authorities a voter verification failure:
+ - a spoiled ballot receipt is not verifiable
+ - a spoiled ballot is not found in the evidence
+ - a spoiled ballot's contents do not match the decrypted ballot information
+   that is found in the evidence
+ - a cast ballot's receipt is not verifiable
+
+@todo kiniry If all of a voter's receipts are verifiable and their spoiled 
+ballots contents match the evidence, then the use an unspecified protocol to 
+report to the public their evalution of the evidence.
+
+Voters can, of course, use the previous subprotocol and perform their own
+independent cryptographic verification of the entire election's evidence and
+perform their own tabulation.
