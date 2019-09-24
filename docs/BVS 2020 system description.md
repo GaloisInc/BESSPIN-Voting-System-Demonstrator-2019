@@ -52,6 +52,19 @@ The BVS 2020 *System Description* is made up of:
    - its top-level system description
    - its domain model
 
+## Project Plan
+
+The BVS 2020 Project Plan is located in an OmniPlan plan called the
+`BVS 2020 Project Plan`.
+
+@todo kiniry Add the project plan and/or its export to this repo.
+
+The main components of this plan to summarize here are system and
+subsystems *owners*, the project *milestone schedule*, and the project
+*release plan*.
+
+@todo kiniry Write up these components.
+
 ## Subsystems Description
 
 The BVS consists of the following subsystems:
@@ -195,3 +208,43 @@ are as follows:
    must be compiled with the GFE's LLVM or a TA-1 team's fork thereof.
  - *[CASCADES]* The CASCADES platform must run the SBB subsystem.
  
+ # Contributors
+
+The BESSPIN Voting System project has the following contributors:
+ - Joseph Kiniry, Galois Principal Scientist, BESSPIN Principal Investigator, 
+   Free & Fair CEO and Chief Scientist, and the main inventor of the system.
+ - Daniel Zimmerman, Galois Principal Researcher, BESSPIN co-Principal
+   Investigator, Free & Fair Computer Scientist
+ - Joey Dodds, Galois Principal Researcher, ElectionGuard Scientific Lead,
+   Free & Fair Computer Scientist
+ - Noah Rich
+ - Jason Graalum
+ - Reuben Broadfoot
+ - Rod Chapman
+ - Alexander Bakst
+ - Dragan Stosic
+ - Michal Podhradsky
+ - Kenny Foner
+ - Giuliano Losa
+ - Steven Osborn
+ - Annie Cherkaev
+ - Luke Myers
+ - John Sebes
+ - Dan Wallach
+ - Shpatar Morina
+ - Parker Southwick
+ - Haneef Mubarak
+
+@todo kiniry Add and update contributor list as we work this year.  The above list
+is a dump from GitLab's reported contributors in no particular order.
+
+# Funding
+
+This project is funded by DARPA under the Galois BESSPIN project.
+The BVS 2020 cryptographic protocol and implementation are based upon
+the Microsoft ElectionGuard SDK, funded by Microsoft and designed and
+developed by Galois and Free & Fair.
+
+@todo kiniry Add appropriate verbiage here for DARPA attribution.
+
+
