@@ -110,6 +110,7 @@ use the following abbreviations.  These are included in a State Key
 in our "BVS 2020 Dataflow Models" (Polling Place and Post-Election),
 found in Drive.
 
+```
 B    := Ballot
 BI   := Ballot Image
 BMD  := Ballot Marking Device
@@ -139,6 +140,7 @@ VA   := Voter Authenticator
 VPII := Voter V’s PII
 VVD  := Voter Verification Device
 XB   := Challenged Ballot
+```
 
 Each protocol description is a set of sequences of labeled steps.
 Several different subprotocols exist: one for the pre-election key
