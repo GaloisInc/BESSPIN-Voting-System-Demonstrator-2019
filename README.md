@@ -1,7 +1,8 @@
 [![pipeline status](https://gitlab-ext.galois.com/ssith/voting-system/badges/master/pipeline.svg)](https://gitlab-ext.galois.com/ssith/voting-system/commits/master)
 
 # The BESSPIN Voting System
-## Galois and Free & Fair, May-August 2019
+
+## Galois and Free & Fair, May-September 2019
 
 # Overview
 
@@ -29,27 +30,29 @@ used to develop the 2019 release of the BVS. The intent is to provide
 the most open possible approach to testing, enabling testers to obtain
 the full build environment for the BVS, to build it from original
 sources, assess its strengths and weaknessess, and plan and develop
-possible exploits to compromise the BVS.  However, not every tester
-will wish to start with this “Build First” approach. Others may wish
-to begin with the “Attacker Quickstart” information in order to learn
-and use the tools and reference exploits provided for testers. Still
-others may wish to learn about the BVS with a more manageable “short
-list” of documentation and information, rather than exploring the full
-repository.
+possible exploits to compromise the BVS.  
+
+However, not every tester will wish to start with this “Build First”
+approach. Others may wish to begin with the “Attacker Quickstart”
+information in order to learn and use the tools and reference exploits
+provided for testers. Still others may wish to learn about the BVS
+with a more manageable “short list” of documentation and information,
+rather than exploring the full repository.
 
 # For All Testers
 
-All testers should begin by reading the `Overview of BESSPIN Voting
-System` document at the top level of this repository. This document
-provides essential information about the current BVS release, the 2019
-goals, and limits on testing including the threat model and win
-conditions.
+All testers should begin by reading the [Overview of BESSPIN Voting
+System](Overview-of-BESSPIN-Voting-System.pdf) document at the top
+level of this repository. This document provides essential information
+about the current BVS release, the 2019 goals, and limits on testing
+including the threat model and win conditions.
 
 # Attacker Quickstart
 
-The top-level directory `Attacker-Quickstart` provides the next level
-of information after the `Overview of BESSPIN Voting System` document
-document, specfically about the facilities provided for exploit
+The top-level directory [Attacker-Quickstart](Attacker-Quickstart)
+provides the next level of information after the [Overview of BESSPIN
+Voting System](Overview-of-BESSPIN-Voting-System.pdf) document
+document, specifically about the facilities provided for exploit
 development.
 
 # Documentation on BVS
@@ -58,6 +61,12 @@ The top-level directory `BVS-Documents` provides the next level of
 information after the `Overview of BESSPIN Voting System` document,
 about the BVS system’s design and functions.
 
+System design documentation is found in the documentation directory
+(`docs`).  In particular, that directory contains:
+ - the [BVS 2020 System Specification](docs/BVS 2020 system specification.md)
+ - the [BVS 2020 Protocol Specification](docs/protocol.md)
+ - the [Smart Ballot Box Specification](docs/sbb.md)
+  
 # Support for System Build
 
 The remainder of this repository provides the ability to build the BVS
@@ -229,3 +238,17 @@ Works](https://voting.works/). Thanks especially to Ben Adida.
 
 Our fork of Voting Works's BMD for our DEF CON 2019 demonstration is
 found on GitHub: https://github.com/GaloisInc/BESSPIN-BMD-2019
+
+# Glossary
+
+For a glossary of voting system terminology, see Free & Fair's
+[Election Glossary project at
+GitHub](https://github.com/FreeAndFair/ElectionGlossary).  That
+glossary is, at the moment, a transliteration of the NIST VVSG
+glossary with terms added according to our project needs.  
+
+We also have an informal domain model specified in BON, found in
+the [Specifications project at
+GitHub](https://github.com/FreeAndFair/Specifications). That domain
+model will be updated during BVS 2020 development.
+
