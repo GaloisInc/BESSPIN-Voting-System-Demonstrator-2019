@@ -149,6 +149,10 @@ otherwise interacting with the voter.
 
 ### Pre-Election Key Ceremony
 
+We intend to use the ElectionGuard pre-election key ceremony.  We intend to
+use COTS HSMs (such as Yubikeys or Titan keys) in order to generate and store 
+keys as a part of the Shamir election setup subprotocol.
+
 ### Election Day
 
 1. *VoterCheckIn* A voter V arrives at a polling place PP to check in
