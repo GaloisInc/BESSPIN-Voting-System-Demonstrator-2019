@@ -161,6 +161,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     size_t written = Log_FS_Write(stream, &Transmit_Buffer[0], total);
     write_ok = (written == total);
     #else
+    (void)stream;
     write_ok = true;
     #endif
 
@@ -172,6 +173,8 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     {
         Log_Net_Send(stream->remote_file_name, Transmit_Buffer, total_log_entry_length);
     }
+    #else
+    (void)stream;
     #endif
 
     if (write_ok)
