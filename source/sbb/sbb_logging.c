@@ -7,12 +7,12 @@
 #include "sbb_invariants.h"
 #include "sbb_logging.h"
 
-#ifdef SBB_NO_HTTP_ENDPOINT
+#ifdef NETWORK_LOGS
+#define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_App_Log
+#define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_Sys_Log
+#else
 #define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_None
 #define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_None
-#else
-#define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_Sys_Log
-#define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_App_Log
 #endif
 
 extern const log_name system_log_file_name;

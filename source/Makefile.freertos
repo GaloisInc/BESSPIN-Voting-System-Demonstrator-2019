@@ -1,3 +1,7 @@
+# Set defaults
+NETWORK_LOGS ?= yes
+FS_LOGS      ?= yes
+
 # Voting System Definitions
 include Makefile.common
 

@@ -1,3 +1,8 @@
+# Set defaults
+NETWORK_LOGS ?= no
+FS_LOGS      ?= yes
+
+# Run common includes
 include Makefile.common
 
 # All binaries necessary to run rules.
@@ -12,10 +17,6 @@ export CFLAGS += -DHARDCODE_CURRENT_TIME \
                  -DCURRENT_DAY=20 \
                  -DCURRENT_HOUR=11 \
                  -DCURRENT_MINUTE=18
-
-ifeq ($(NETWORK_LOGS),yes)
-	export CFLAGS += -DNETWORK_LOGS
-endif
 
 ifeq (${HOST},Linux)
 	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link

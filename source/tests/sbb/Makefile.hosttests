@@ -37,8 +37,9 @@ sbb_hosttest4:
 	$(SBB_DIR)/sbb_crypto.c
 
 sbb_hosttest5:
-	$(CC) $(CFLAGS) $(HOSTTEST_CFLAGS) -DSBB_NO_HTTP_ENDPOINT -DVOTING_SYSTEM_DEBUG -DFILESYSTEM_DUPLICATES \
-        -o hosttest5 hosttest5.c $(SBB_DIR)/sbb_logging.c $(SBB_DIR)/sbb_strings.c \
+	$(CC) $(CFLAGS) $(HOSTTEST_CFLAGS) \
+    -DVOTING_SYSTEM_DEBUG -DFILESYSTEM_DUPLICATES \
+    -o hosttest5 hosttest5.c $(SBB_DIR)/sbb_logging.c $(SBB_DIR)/sbb_strings.c \
 	$(CRYPTO_SRC) $(LOGGING_SRC) $(OSD_SRC)
 
 sbb_hosttest6:

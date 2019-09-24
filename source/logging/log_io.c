@@ -61,11 +61,17 @@ Log_FS_Result Log_IO_Initialize()
     log_system_debug_printf("  padded: %zu", padded_log_entry_length);
     log_system_debug_printf("  spaces: %zu", bytes_of_padding_required);
 
+#ifdef NETWORK_LOGS
     osd_Log_Net_Initialize();
+#endif
 
     /*@ assert Log_Net_Initialized; */
-    
+
+#ifdef FS_LOGS
     r = Log_FS_Initialize();
+#else
+    r = LOG_FS_OK;
+#endif
 
     /*@ assert Log_Net_Initialized &&
       @        Log_FS_Initialized;
@@ -78,7 +84,11 @@ Log_FS_Result Log_IO_Initialize()
 Log_FS_Result Log_IO_Create_New(Log_Handle *stream, const char *name,
                                 const http_endpoint endpoint)
 {
+#ifdef FS_LOGS
     Log_FS_Result result = Log_FS_Create_New(stream, name);
+#else
+    Log_FS_Result result = LOG_FS_OK;
+#endif
     stream->endpoint = endpoint;
     log_system_debug_printf("Setting remote file name to %s\n", name);
     stream->remote_file_name = (char *)name;
@@ -89,7 +99,11 @@ Log_FS_Result Log_IO_Open(Log_Handle *stream,           // OUT
                           const char *name,             // IN
                           const http_endpoint endpoint) // IN
 {
+#ifdef FS_LOGS
     Log_FS_Result result = Log_FS_Open(stream, name);
+#else
+    Log_FS_Result result = LOG_FS_OK;
+#endif
 
     log_system_debug_printf("Setting open remote file name to %s\n", name);
     stream->remote_file_name = (char *)name;
@@ -99,15 +113,33 @@ Log_FS_Result Log_IO_Open(Log_Handle *stream,           // OUT
 
 Log_FS_Result Log_IO_Close(Log_Handle *stream) // IN
 {
+#ifdef FS_LOGS
     return Log_FS_Close(stream);
+#else
+    (void)stream;
+    return LOG_FS_OK;
+#endif
 }
 
 Log_FS_Result Log_IO_Sync(Log_Handle *stream) // IN
 {
+#ifdef FS_LOGS
     return Log_FS_Sync(stream);
+#else
+    (void)stream;
+    return LOG_FS_OK;
+#endif
 }
 
-bool Log_IO_File_Exists(const char *name) { return Log_FS_File_Exists(name); }
+bool Log_IO_File_Exists(const char *name)
+{
+#ifdef FS_LOGS
+    return Log_FS_File_Exists(name);
+#else
+    (void)name;
+    return false;
+#endif
+}
 
 Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
                                         secure_log_entry the_entry)
@@ -116,6 +148,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     // message to send to disk and network
     uint8_t Transmit_Buffer[total_log_entry_length];
     size_t total = 0;
+    bool write_ok = false;
 
     // Step 2 - Prepare data to be sent
     Prepare_Transmit_Buffer(the_entry, Transmit_Buffer, &total);
@@ -124,8 +157,14 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     osd_assert( total == total_log_entry_length );
 
     // Step 3 - Write (data # spaces # base64_hash # space # mac # \r\n) to file
+    #ifdef FS_LOGS
     size_t written = Log_FS_Write(stream, &Transmit_Buffer[0], total);
+    write_ok = (written == total);
+    #else
+    write_ok = true;
+    #endif
 
+    #ifdef NETWORK_LOGS
     // Step 4 - Write HTTP header plus same data over
     // network to the Reporting System if
     // requested by the client when this log file was initialized.
@@ -133,8 +172,9 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
     {
         Log_Net_Send(stream->remote_file_name, Transmit_Buffer, total_log_entry_length);
     }
+    #endif
 
-    if (written == total)
+    if (write_ok)
     {
         return LOG_FS_OK;
     }
@@ -148,6 +188,11 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
 secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                           size_t n)           // IN
 {
+#ifndef LOG_FS
+    (void)stream;
+    (void)n;
+    osd_assert(0);
+#else
     secure_log_entry secure_log_entry_result;
     uint8_t dummy_char;
     size_t olen;
@@ -247,10 +292,15 @@ secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
     // File Reads failed, so...
     log_system_debug_printf("Log_IO_Read_Base64_Entry - reading file failed");
     return null_secure_log_entry;
+#endif // FS_LOGS
 }
 
 size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
 {
+#ifndef FS_LOGS
+    (void)stream;
+    osd_assert(0);
+#else
     size_t file_size;
     file_size = Log_FS_Size(stream);
 
@@ -268,11 +318,16 @@ size_t Log_IO_Num_Base64_Entries(Log_Handle *stream)
         // the file is corrupt and return 0.
         return 0;
     }
+#endif // FS_LOGS
 }
 
 #pragma GCC diagnostic ignored "-Waggregate-return"
 secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
 {
+#ifndef FS_LOGS
+    (void)stream;
+    osd_assert(0);
+#else
     size_t N;
     N = Log_IO_Num_Base64_Entries(stream);
 
@@ -285,6 +340,7 @@ secure_log_entry Log_IO_Read_Last_Base64_Entry(Log_Handle *stream)
     {
         return null_secure_log_entry;
     }
+#endif
 }
 
 ///////////////////////////

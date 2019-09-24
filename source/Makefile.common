@@ -1,3 +1,16 @@
+### Global Configuration (for all builds)
+ifeq ($(NETWORK_LOGS),yes)
+	export CFLAGS += -DNETWORK_LOGS
+endif
+
+ifeq ($(FS_LOGS),yes)
+	export CFLAGS += -DFS_LOGS
+endif
+
+$(info NETWORK_LOGS=$(NETWORK_LOGS))
+$(info SD_CARD_LOGS=$(FS_LOGS))
+
+### OS-independent source files
 export CRYPTO_SRC = $(CRYPTO_DIR)/base64.c \
 					$(CRYPTO_DIR)/crypto_t.c \
 					$(CRYPTO_DIR)/crypto.c \
