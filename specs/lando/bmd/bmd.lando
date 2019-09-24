@@ -3,9 +3,9 @@ The Ballot Marking Deviced used for the BVS.  Our BMD is based upon
 Voting Works's open source BMD.
 
 indexing
-  owner: Luke Myers <lmyers@galois.com>
-  contributors: Dragan Stosic <dragan.stosic@freeandfair.us>
-                Haneef Mubarak <hmubarak@galois.com>
+  owner: Haneef Mubarak <haneef@galois.com>
+  contributors: Luke Myers <lmyers@galois.com>
+                Dragan Stosic <dragan.stosic@freeandfair.us>
   project_url: https://gitlab-ext.galois.com/ssith/bmd-defcon-2019
          
 component Power Button
