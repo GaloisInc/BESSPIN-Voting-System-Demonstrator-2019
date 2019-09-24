@@ -164,5 +164,34 @@ about the election via the Evidence Server.
     verifiable paper in accordance with the BVS Protocol, discussed
     in `protocol.md`.
 
+# Top-level System Requirements
 
+The BVS 2020 system's requirements is driven by two main external sources: (1) our SOW
+with Galois and hence DARPA, and (2) the draft VVSG 2.0 federal requirements on
+voting systems (currently only in the form of principles via "Voluntary Voting 
+System Guidelines 2.0: Principles and Guidelines").  
 
+Thus, BVS 2020's mandatory requirements are derived from (1), and our supplementary
+requirements are derived from (2).  The full text for (1) is located in the file
+`SOW.md`.  The full text of (2) is located in the file `VVSG_2.0.md`.
+
+@todo kiniry `SOW.md` will be added once the contract is signed with Galois.
+
+@todo kiniry `VVSG_2.0.md` will come from [the VVSG website at the EAC](https://www.eac.gov/voting-equipment/voluntary-voting-system-guidelines/).
+
+Additional mandatory system requirements that are not derived from these sources
+are as follows:
+ - *[SBB_Platform]* The SBB platform is any of the GFE P1s running the GFE FreeRTOS
+   and using the CASCADIO I/O board or its successor to interface with SBB-specific
+   I/O and storage devices.
+ - *[SSITH_Platform]* All subsystems that target a SSITH platform must run on
+   a GFE P2 or P3 (in the case of the *Evidence Server*).
+ - *[COTS_Platform]* All subsystems that do not target a SSITH platform must run
+   on an easily procurable COTS platform running a commonly available Linux
+   distribution which also supports RISC-V.
+ - *[BVS_PL]* All BVS implementations and their C-based dependencies, within reason, 
+   must be written in verifiable C that can be successfully compiled with the GFE's LLVM.
+ - *[LLVM_Compilation]* All implementations and their dependencies, within reason,
+   must be compiled with the GFE's LLVM or a TA-1 team's fork thereof.
+ - *[CASCADES]* The CASCADES platform must run the SBB subsystem.
+ 
