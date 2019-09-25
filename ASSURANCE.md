@@ -5,7 +5,7 @@ specification languages and tools that we use to satisfy requirements
 and specify subsystem components, data types, runtime verification and
 correctness properties.
 
-# Current Status
+# BVS 2019 Current Status
 
 Based on the requirements that every secure component in BVS must have
 cryptographic integrity and that all cryptographic operations used by
@@ -21,7 +21,9 @@ for the C language, to assure that our implementations conform to a
 contract design written in ACSL and to provide an algebraic
 specification either by extracting Cryptol specifications to C or by
 formally describing some mission critical parts of the system in a
-top-to-bottom style. This work is partially complete.
+top-to-bottom style. This work is partially complete.  A full 
+characterization of its status is ongoing as of September 2019 and 
+will be a part of the final BVS 2019 release.
 
 In this first phase of development [BVS
 2019](https://gitlab-ext.galois.com/ssith/voting-system/-/milestones/19),
@@ -38,9 +40,11 @@ both types: regular and malicious tests for all submodules. The reason
 for the additional testing effort is that unit testing is
 well-established in the software quality dynamic assurance process of
 safety critical systems. Various tests can be seen in the `logging`,
-`sbb` and `protocols` submodules.
+`sbb` and `protocols` submodules.  These tests can be run on a hosted
+POSIX development platform, in software simulation of the CPU via
+Verilator, or directly on the GFE in FPGA emulation.
 
-# Future Work
+# BVS 2019 Future Work
 
 In the future we plan to finish the following specifications and
 formally verify their implementations:
@@ -49,4 +53,9 @@ formally verify their implementations:
 - extended contracts for the AES-specific C functions (see `AES.cry` and
   related Cryptol specs)
 - global and typed invariants based on algebraic specification
+- provide a full tabular and compositional summary of Frama-C analyses
+- provide a full analysis of code coverage via runtime verification
 
+# BVS 2020 Assurance Plan
+
+@todo kiniry Write plan for full assurance case for BVS 2020.
