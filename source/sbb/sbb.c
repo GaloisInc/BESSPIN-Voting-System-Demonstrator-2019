@@ -47,7 +47,11 @@ bool initialize(void)
     the_state.button_illumination = 0;
     __assume_strings_OK();
     barcode_length = 0;
+#ifdef SBB_DO_LOGGING
     return (LOG_FS_OK == Log_IO_Initialize());
+#else
+    return true;
+#endif
 }
 
 /* global invariant Button_lighting_conditions_power_on:

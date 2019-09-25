@@ -1,14 +1,20 @@
 ### Global Configuration (for all builds)
 ifeq ($(NETWORK_LOGS),yes)
 	export CFLAGS += -DNETWORK_LOGS
+  INCLUDE_LOGS  := yes
 endif
 
 ifeq ($(FS_LOGS),yes)
 	export CFLAGS += -DFS_LOGS
+  INCLUDE_LOGS  := yes
 endif
 
+ifeq ($(INCLUDE_LOGS),yes)
+	export CFLAGS += -DSBB_DO_LOGGING
+endif
+$(info INCLUDE_LOGS=$(INCLUDE_LOGS))
 $(info NETWORK_LOGS=$(NETWORK_LOGS))
-$(info SD_CARD_LOGS=$(FS_LOGS))
+$(info FS_LOGS=$(FS_LOGS))
 
 ### OS-independent source files
 export CRYPTO_SRC = $(CRYPTO_DIR)/base64.c \
@@ -19,12 +25,19 @@ export CRYPTO_SRC = $(CRYPTO_DIR)/base64.c \
 					$(CRYPTO_DIR)/cbc.c \
 					$(CRYPTO_DIR)/mode_wrappers.c
 
-export LOGGING_SRC = $(LOG_DIR)/log_t.c \
-					 $(LOG_DIR)/log.c \
-					 $(LOG_DIR)/secure_log_t.c \
-					 $(LOG_DIR)/secure_log.c \
-					 $(LOG_DIR)/log_io.c \
-					 $(LOG_DIR)/log_net.c
+ifeq ($(INCLUDE_LOGS),yes)
+  $(info Pulling in logging subsystem)
+  export LOGGING_SRC = $(LOG_DIR)/log_t.c \
+                       $(LOG_DIR)/log.c \
+                       $(LOG_DIR)/log_io.c \
+                       $(LOG_DIR)/secure_log_t.c \
+                       $(LOG_DIR)/secure_log.c
+endif
+
+ifeq ($(NETWORK_LOGS),yes)
+  $(info Pulling in network logging subsystem)
+  export LOGGING_SRC += $(LOG_DIR)/log_net.c
+endif
 
 export SBB_SRC = $(SBB_DIR)/sbb.c \
 				 $(SBB_DIR)/sbb_machine.c \
