@@ -191,7 +191,7 @@ Log_FS_Result Log_IO_Write_Base64_Entry(Log_Handle *stream,
 secure_log_entry Log_IO_Read_Base64_Entry(Log_Handle *stream, // IN
                                           size_t n)           // IN
 {
-#ifndef LOG_FS
+#ifndef FS_LOGS
     (void)stream;
     (void)n;
     osd_assert(0);

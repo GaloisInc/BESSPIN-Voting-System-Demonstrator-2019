@@ -12,6 +12,7 @@ endif
 ifeq ($(INCLUDE_LOGS),yes)
 	export CFLAGS += -DSBB_DO_LOGGING
 endif
+
 $(info INCLUDE_LOGS=$(INCLUDE_LOGS))
 $(info NETWORK_LOGS=$(NETWORK_LOGS))
 $(info FS_LOGS=$(FS_LOGS))

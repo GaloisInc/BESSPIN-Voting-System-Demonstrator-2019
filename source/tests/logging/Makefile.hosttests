@@ -1,7 +1,7 @@
 # Makefile for Building the logging subsystem "host" tests - e.g. tests that run on Linux or MacOS
 
 HOSTTEST_CFLAGS += -I $(INCLUDE_DIR)/crypto \
-                   -I $(INCLUDE_DIR)/logging
+                   -I $(INCLUDE_DIR)/logging \
 
 OSD_SRC = $(OS_DIR)/debug_io.c \
           $(OS_DIR)/log_fs.c \
@@ -13,8 +13,6 @@ logging_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 l
 	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport log_hosttest_remotetest11 log_hosttest_test1net
 
 
-# LSOURCES = log_t.c secure_log_t.c log.c secure_log.c log_io.c \
-           $(OS_DIR)/log_fs.c $(OS_DIR)/debug_io.c $(OS_DIR)/log_net.c
 LSOURCES = $(LOGGING_SRC) $(OSD_SRC)
 CSOURCES = $(CRYPTO_SRC) #../crypto/crypto_t.c ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c ../crypto/base64.c
 
