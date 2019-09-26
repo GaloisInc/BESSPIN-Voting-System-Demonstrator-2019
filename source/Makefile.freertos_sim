@@ -14,4 +14,8 @@ CFLAGS += -DSIMULATION \
 		-DCURRENT_DAY=31 \
 		-DCURRENT_HOUR=22 \
 		-DCURRENT_MINUTE=$(DEFAULT_CURRENT_MINUTE)
+
+# Set defaults
+NETWORK_LOGS ?= no
+FS_LOGS      ?= no
 include Makefile.freertos

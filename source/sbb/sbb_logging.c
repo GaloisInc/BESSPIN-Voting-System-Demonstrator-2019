@@ -7,12 +7,12 @@
 #include "sbb_invariants.h"
 #include "sbb_logging.h"
 
-#ifdef SBB_NO_HTTP_ENDPOINT
+#ifdef NETWORK_LOGS
+#define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_App_Log
+#define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_Sys_Log
+#else
 #define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_None
 #define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_None
-#else
-#define HTTP_ENDPOINT_APP_LOG HTTP_Endpoint_Sys_Log
-#define HTTP_ENDPOINT_SYS_LOG HTTP_Endpoint_App_Log
 #endif
 
 extern const log_name system_log_file_name;
@@ -33,19 +33,21 @@ const uint8_t app_event_entries[] = { 'C', 'S' };
 bool import_and_verify(log_file the_file) {
     bool b_success = false;
 
+#ifdef SBB_DO_LOGGING
     if ( import_log(the_file) ) {
         b_success = verify_log_well_formedness(the_file);
     }
-
+#else
+    (void)the_file;
+#endif
     return b_success;
 }
 
 bool load_or_create(log_file the_file,
                     const log_name the_name,
                     const http_endpoint endpoint) {
-    // @todo There is no API for opening a file for write, so we will overwrite for now
     bool b_success = true;
-
+#ifdef SBB_DO_LOGGING
     if ( Log_IO_File_Exists(the_name) &&
          LOG_FS_OK == Log_IO_Open(the_file, the_name, endpoint) ) {
         b_success = import_and_verify(the_file);
@@ -54,7 +56,11 @@ bool load_or_create(log_file the_file,
     } else {
         b_success = false;
     }
-
+#else
+    (void)the_file;
+    (void)the_name;
+    (void)endpoint;
+#endif
     return b_success;
 }
 
@@ -81,11 +87,17 @@ bool log_system_message(const char *new_entry, int length) {
     #ifdef SIMULATION
     debug_printf("System LOG: %s", new_entry);
     #endif /* SIMULATION */
+#ifdef SBB_DO_LOGGING
     log_entry event_entry;
     memset(&event_entry[0], 0x20, sizeof(log_entry));
     memcpy(&event_entry[0], new_entry, length);
     Log_FS_Result res = write_entry(&system_log_handle, event_entry);
     return (res == LOG_FS_OK);
+#else
+    (void)new_entry;
+    (void)length;
+    return true;
+#endif /* SBB_DO_LOGGING */
 }
 
 void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length) {
@@ -100,9 +112,14 @@ void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length)
 
 void log_sys_record_error(SBB_state *the_local_state, const char *the_entry, int length) {
     debug_printf((char *)the_entry);
+#ifdef SBB_DO_LOGGING
     if (!log_system_message(the_entry, length)) {
        the_local_state->FS = LOG_FAILURE;
     }
+#else
+    (void)the_local_state;
+    (void)length;
+#endif /* SBB_DO_LOGGING */
 }
 
 // @design abakst I think this is going to change as the logging implementation is fleshed out
@@ -151,10 +168,14 @@ bool log_app_event(app_event event,
         }
         printf("\r\n");
 #endif
+#ifdef SBB_DO_LOGGING
         //@ assert Log_IO_Initialized;
         Log_FS_Result res = write_entry(&app_log_handle, event_entry);
         //@ assert Log_IO_Initialized;
         return (res == LOG_FS_OK);
+#else
+        return true;
+#endif
     } else {
         return false;
     }
