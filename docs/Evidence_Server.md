@@ -88,7 +88,7 @@ requirements are as follows:
 - The recorded-as-cast verification is provided by the publication of a list of all the encrypted votes that have been submitted. 
 - Every honest voter who receives a valid receipt is assured that her vote will be published on the evidence server and included in the election tally. 
   A voter is able to check himself using the tracking number that his vote is included.
-- Evidence server provide cryptographically strong evidence that a voter’s receipt corresponds to a ballot, on the bulletin board.
+- The evidence server provide cryptographically strong evidence that a voter’s receipt corresponds to a ballot, on the bulletin board.
 
 
 
