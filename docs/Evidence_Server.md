@@ -66,10 +66,13 @@ Evidence Server,
 The evidence server’s requirements are derived from the overall BVS 2020 system
 goal of implementing an end-to-end verifiable election. Thus, the mandatory
 requirements are as follows:
-
+- [Stability] Only items that have been posted can appear on the Bulletin Board.
+- [Confirmability] Any item with a valid receipt must appear on the Bulletin Board.
+- [Soundness] No clashing items must both appear on the Bulletin Board.
+- [Unremovability] Once published, no items can be removed from the Bulletin Board.
 - [Persistence] Data should be immutable and persistent.
-- [Challenge] Using the evidence server, voters can use the election server to verify that their challenged ballots are correctly recorded
-- [CollectedAsCast] Using the evidence server, voters can independently verify that the representation of their vote is correctly collected in the tally 
+- [Challenge] Using the evidence server, voters can use the election server to verify that their challenged ballots are correctly recorded.
+- [CollectedAsCast] Using the evidence server, voters can independently verify that the representation of their vote is correctly collected in the tally. 
 - [TalliedAsCollected] Using the evidence server, anyone can verify that every well-formed,collected vote is correctly included in the tally.
 - [VoterConfidentiality] Personally identifiable information should not be exposed, in particular there should be no evidence about how and given person voted.
 - [Compliance] Exposed data is subject to relevant privacy laws.
@@ -81,6 +84,13 @@ requirements are as follows:
 @todo manifest of documentation for the subsystem
 
 ## Validation and Verification Methodology
+
+- The recorded-as-cast verification is provided by the publication of a list of all the encrypted votes that have been submitted. 
+- Every honest voter who receives a valid receipt is assured that her vote will be published on the Evidence Server and included in the election tally. 
+  A voter is able to check himself using the tracking number that his vote is included.
+- Evidence server provide cryptographically strong evidence that a voter’s receipt corresponds to a ballot, on the bulletin board.
+
+
 
 Our overall approach to system assurance is summarized in
 [ASSURANCE.md](../ASSURANCE.md).
