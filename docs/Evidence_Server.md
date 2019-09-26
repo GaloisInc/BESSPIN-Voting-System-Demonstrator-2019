@@ -23,7 +23,7 @@ encryption performed by the PBS was, in fact, accurate.
 
 ## Overview
 
-The election server is responsible for collecting, and subsequently making
+The evidence server is responsible for collecting, and subsequently making
 available, all of the evidence generated during the election. This includes:
 
 - Election metadata (date, time, the officials at each polling place, and so on)
@@ -86,7 +86,7 @@ requirements are as follows:
 ## Validation and Verification Methodology
 
 - The recorded-as-cast verification is provided by the publication of a list of all the encrypted votes that have been submitted. 
-- Every honest voter who receives a valid receipt is assured that her vote will be published on the Evidence Server and included in the election tally. 
+- Every honest voter who receives a valid receipt is assured that her vote will be published on the evidence server and included in the election tally. 
   A voter is able to check himself using the tracking number that his vote is included.
 - Evidence server provide cryptographically strong evidence that a voter’s receipt corresponds to a ballot, on the bulletin board.
 
