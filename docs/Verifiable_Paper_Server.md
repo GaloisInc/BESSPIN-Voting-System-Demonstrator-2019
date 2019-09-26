@@ -29,15 +29,15 @@ associated with each dielet.
 
 ## Manifest
 
-@todo hmubarak An itemized list or table indicating where to find more information
+@todo hmubarak: an itemized list or table indicating where to find more information
 
 ## Glossary
 
-@todo hmubarak point to the BVS 2020 and Free & Fair glossaries
+@todo hmubarak: point to the BVS 2020 and Free & Fair glossaries
 
 ## Requirements
 
-@todo hmubarak/kiniry cite SOW requirements as appropriate
+@todo hmubarak, kiniry: cite SOW requirements as appropriate
 
 ### Mandatory
 
@@ -52,19 +52,19 @@ associated with each dielet.
 
 ## Documentation
 
-@todo hmubark/kiniry manifest of documentation for the subsystem
+@todo hmubarak, kiniry: manifest of documentation for the subsystem
 
 ## Validation and Verification Methodology
 
 Our overall approach to system assurance is summarized in
 [ASSURANCE.md](../ASSURANCE.md).
 
-@todo hmubarak/kiniry summary of our approach for this particular subsystem, including
+@todo hmubarak, kiniry: summary of our approach for this particular subsystem, including
 a manifest of related artifacts.
 
 ## Contributors
 
-@todo hmubarak Who worked on this particular subsystem.
+@todo hmubarak: who worked on this particular subsystem.
 
 ## Funders
 
@@ -72,5 +72,5 @@ This project is funded by DARPA, via DARPA's SSITH and SHIELD programs,
 under the Galois BESSPIN project. The Verifiable Paper Server is
 designed and developed by Free & Fair in cooperation with Galois.
 
-@todo kiniry Add appropriate verbiage here for DARPA attribution and other
+@todo kiniry: add appropriate verbiage here for DARPA attribution and other
 SHIELD participants.
