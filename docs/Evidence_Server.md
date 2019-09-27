@@ -47,6 +47,8 @@ available, all of the evidence generated during the election. This includes:
 
 ## Manifest
 
+[Code repository](https://gitlab-ext.galois.com/ssith/voting-system) for the BVS 2020.
+
 The main artifacts to read to better understand what the background is on the
 Evidence Server,
 
@@ -59,7 +61,7 @@ Evidence Server,
 
 ## Glossary
 
-@todo point to the BVS 2020 and Free & Fair glossaries
+https://github.com/FreeAndFair/ElectionGlossary/blob/master/Glossary.md
 
 ## Requirements
 
