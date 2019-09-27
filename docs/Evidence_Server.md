@@ -78,7 +78,7 @@ requirements are as follows:
 - [Compliance] Exposed data is subject to relevant privacy laws.
 - [Availability] The election server should remain available under heavy load.
 - [Timing] All evidence should include a timestamp indicating when the evidence was generated.
-- [Availability] The cryptographic evidence of an election published on the Evidence Server must be available to an election verifier
+- [Accessibility] The cryptographic evidence of an election published on the Evidence Server must be available to an election verifier
   which serves to determine whether or not that evidence is well-formed.
 
 ## Documentation
