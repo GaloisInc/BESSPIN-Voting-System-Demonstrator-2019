@@ -57,27 +57,29 @@ validate that they are satisfied (e.g., system tests, code review, etc.).
 * Must be able to authenticate a voter 
 * Must identify the correct ballot type for the voter
 * Must be able to provide evidence of registration and ballot style
-* Must prevent a voter from registering to vote more than once
+* Must prevent a voter from checking in to vote more than once
 * Must have an interactive user interface for authentication
 * Must support process to supply provisional ballot
 * Must be able to print out the current voter list at any point of the election
+* Must have the ability to export check in data to the Evidence Server
 
 ### Optional
 
-* Must be able to authenticate and register voters at multiple machines 
+* Must be able to authenticate and check in voters at multiple machines 
 simultaneously in various venues across the jurisdiction
 * Must be able to log process or data inconsistencies
+* Assist lost voter to find their precinct 
 
 #### Usability:
 
 * The user interface must be trivial to use for non-technical users (election 
 representatives).
-* The voter should be able to register at any table at the voting venue.
+* The voter should be able to check in at any table at the voting venue.
 
 #### Persistence:
 
 * The system will exhibit no data loss from an arbitrary failure (e.g., a 
-typical system failure like a Windows crash) of any system in the *BVS 2020* 
+typical system failure like a OS crash) of any system in the *BVS 2020* 
 network.
 * The system will exhibit no data loss in the event of a network failure.
 
@@ -99,10 +101,6 @@ prior to an election and afterwards.
 
 #### Analysis:
 
-* The system should be able to provide an analysis of the turnout, both 
-nationally and for specific turnout results.
-* The system should have a public API for the media or any citizen to access 
-(after the election).
 * The system should be able to visualize the turnout results.
 * The system should be able to print the list of eligible voters.
 
