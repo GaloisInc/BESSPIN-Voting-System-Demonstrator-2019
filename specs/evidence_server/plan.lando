@@ -1,0 +1,8 @@
+Evidence Server Plan
+indexing
+  owner: TBD
+  contributors: Dragan Stosic, Alexander Bakst
+  effort: TBD
+  complexity: low
+  risk: low
+  dependencies: Logging, Database
