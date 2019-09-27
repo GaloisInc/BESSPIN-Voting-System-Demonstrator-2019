@@ -1,39 +1,39 @@
 requirements SBB
 
-Reject invalid ballots.
+Reject_invalid_ballots
 All ballots with invalid or non-existent barcode are rejected.
 
-Recognize valid ballots.
+Recognize_valid_ballots
 All ballots with a valid barcode are recognized, and the user is allowed
 to decide whether to cast or spoil the given ballot
 
-User can accept a valid ballot.
+User_can_accept_a_valid_ballot
 The user can decide to accept a valid ballot. In such case, the ballot
 is deposited into the ballot box.
 
-User can spoil a valid ballot.
+User_can_spoil_a_valid_ballot
 The user can decide to spoil a valid ballot. In such case, the ballot
 is rejected and returned to the user, and is subsequently considered 
 invalid.
 
-Barcodes have limited information density.
+Barcodes_have_limited_information_density
 The maximum length of a barcode is 16 bytes, which is 128 bits.
 
-Button lighting conditions: ballot.
+Button_lighting_conditions:_ballot
 Cast and spoil buttons are only lit when a ballot is present.
 
-Button lighting conditions: jointness.
+Button_lighting_conditions:_jointness
 Cast and spoil buttons are either both lit, or are both dark.
 
-Button lighting conditions: power on.
+Button_lighting_conditions:_power_on
 Cast and spoil buttons are both dark after a power on/reset.
 
-Paper ejected on power on.
+Paper_ejected_on_power_on
 After SBB is powered on and initalized, if there is paper present in
 the paper feeder, it is ejected.
 
-Motor initial state.
+Motor_initial_state
 After the SBB is powered on and initialized, its motor is off.
 
-Motor enabled condition.
+Motor_enabled_condition
 The motor is only enabled when paper is present and detected.

@@ -2,10 +2,15 @@ subsystem Elections
 Concepts in the domain of elections that need to be concretized in the
 BVS.  Note that several concepts are already embodied in the design
 and implementation of VotingWorks’s BMD.
-  // @todo owner Extract all elections concepts concretized in code from the BMD.
-  // @note kiniry We are reusing the entire NIST VVSG 2.0 draft glossary.  An earlier version of
-  // that glossary was encoded in EBON during the U.S. Vote Foundation project and is
-  // found in that project’s repository and as an appendix to the report.
+
+  // @todo owner Extract all elections concepts concretized in code
+  // from the BMD.
+
+  // @note kiniry We are reusing the entire NIST VVSG 2.0 draft
+  // glossary.  An earlier version of that glossary was encoded in
+  // EBON during the U.S. Vote Foundation project and is found in that
+  // project’s repository and as an appendix to the report.
+  
 indexing
   owner: Luke Myers <lmyers@galois.com>
   

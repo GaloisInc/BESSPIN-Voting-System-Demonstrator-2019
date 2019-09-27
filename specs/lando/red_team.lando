@@ -1,10 +1,16 @@
 subsystem Red Team
-  indexing
-    owner: John Sebes <jsebes@osetfoundation.org>
-    contributors: Joe Kiniry <kiniry@freeandfair.us>
-                  Dan Zimmerman <dmz@freeandfair.us>
-                  Joey Dodds <jdodds@freeandfair.us>
-    possible future contributors: Joe Fitzgerald
-                                  Joe Grand
-                                  Bunnie Huang
-                                  OSU - Prof. Yeongjin Jang - EECS
+The group of individuals that have contributed to internal red teaming
+of the BVS.
+
+indexing
+  owner: John Sebes <jsebes@osetfoundation.org>
+  contributors: Joe Kiniry <kiniry@freeandfair.us>
+                Dan Zimmerman <dmz@freeandfair.us>
+                Joey Dodds <jdodds@freeandfair.us>
+                Nes Cohen <ncohen@galois.com>
+                Niki Carroll <ncarroll@galois.com>
+                Annie Cherkaev <anniecherk@galois.com>
+  possible future contributors: Joe Fitzgerald
+                                Joe Grand
+                                Bunnie Huang
+                                OSU - Prof. Yeongjin Jang - EECS

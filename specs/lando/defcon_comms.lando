@@ -1,13 +1,23 @@
 subsystem DEF CON Communications
-  indexing
-    owner: Jason Graalum <jasongraalum@galois.com>
+Physical and digital communications artifacts produced for DEF CON.
+
+indexing
+  creator: Jason Graalum <jasongraalum@galois.com>
+  owner: Reuben Broadfoot <rbroadfoot@galois.com>
+  contributors: Shpat Morina <smorina@galois.com>
+                Joe Kiniry <kiniry@freeandfair.us>
+                Dan Zimmerman <dmz@freeandfair.us>
+                John Sebes <john@sebes.com>
+                Noah Rich <nrich@freeandfair.us>
     
 component Team Summary
   What are the slides summarizing this team’s SSITH R&D?
 component Issues Summary
   What are the git issues describing successful system attacks?
   What are the git issues describing failing system attacks?
-  What are the git issues describing known system status, knowledge and/or errors?
+  What are the git issues describing known system status,
+  knowledge and/or errors?
 component SSITH Summary
-  What are the slides summarizing the DARAP SSITH Program?
+  What are the slides summarizing the DARPA SSITH Program?
+  What is the poster that summarizes the SSITH Program?
   

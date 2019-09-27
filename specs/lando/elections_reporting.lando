@@ -1,6 +1,6 @@
 subsystem Election Reporting
-  indexing
-    owner: Jason Graalum <jasongraalum@galois.com>
+indexing
+  owner: Kenny Foner <kwf@galois.com>
     
 component Election Status
   How many votes have been cast?
@@ -11,7 +11,7 @@ component Hacking Status
   How many attacks have been detected and thwarted?
 
 scenarios
-  Report vote tally
-    Display results!
-    Pull results!
+  ReportVoteTally
+  Display the current results of the running election.
+
     

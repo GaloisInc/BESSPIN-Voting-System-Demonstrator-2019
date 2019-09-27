@@ -1,4 +1,6 @@
 subsystem Logging
+A subsystem that supports the persistent logging of structured
+information.
 
 // @note kiniry A static architecture is described via three core
 // relations: containment, subtyping, and client.  Note that subtyping

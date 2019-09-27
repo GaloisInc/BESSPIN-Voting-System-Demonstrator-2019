@@ -1,49 +1,49 @@
 requirements Logging
 
-all_hardware_events_logged.
+all_hardware_events_logged
 Every hardware event that triggers a state change is logged to the
 system secure log.
 
-voting_events_logged.
+voting_events_logged
 Every voting system event that triggers a state change is logged to
 the application secure log.
 
-secure_log_integrity.
+secure_log_integrity
 Every secure log must have cryptographic integrity in order to
 guarantee that undetectable tampering is impossible.
 
-secure_log_provenance.
+secure_log_provenance
 Every secure log must have cryptographic provenance in order to
 guarantee that the only principle that could have initialized that
 secure log is the measured (via secure boot) running system.
 
-secure_log_count.
+secure_log_count
 Multiple, concurrent secure logs on the same device must be supported.
 
-secure_logs_on_boot.
+secure_logs_on_boot
 On system boot or reset, secure logs cryptographic properties must be
 checked prior to any use.
 
-secure_log_crypto_assurance_dependencies.
+secure_log_crypto_assurance_dependencies
 All cryptographic operations used by secure logging must have formal
 assurance available, or assumptions stated, for correctness and
 information leakage.
 
-secure_log_crypto_hardware.
+secure_log_crypto_hardware
 If a cryptographic operation is available in hardware, it must be used.
 
-secure_log_crypto_keys.
+secure_log_crypto_keys
 If a cryptographic key is ever accessible via software, its
 information leakage specification must be formally stated for secure
 CPU designers to understand and protect.
 
-secure_log_AES_reuse.
+secure_log_AES_reuse
 If we use AES for both encryption (e.g., of voter choices) and HMAC
 (e.g., for provenance), we must use two different keys.
 
-all_log_entries_are_timestamped.
+all_log_entries_are_timestamped
 Every log entry is prefixed by a timestamp.
 
-secure_log_security_properties.
+secure_log_security_properties
 All SBB secure logs must be hashchained using SHA2-256 and
 authenticated using AES-CBC.

@@ -8,99 +8,99 @@ scenarios Logging
 
 // The shortest possible path to a final state that does not create a
 // non-empty log.
-Empty log smoketest.
+Empty_log_smoketest.
 Create a new, empty log, validate it, and export it to a device.
 
-Import/export empty log.
+Import/export_empty_log.
 Create a new, empty log, validate it, and export it to a device, import
 it from the device, validate it, and ensure that the two logs are equal.
 
-Non-empty log smoketest.
+Non-empty_log_smoketest.
 Create a new, empty log, fill it with some log entries, validate it, and
 export it to a device.
 
-Import/export non-empty log.
+Import/export_non-empty_log.
 Create a new, empty log, fill it with some log entries, export it to a
 device, import it from the device, validate it, and ensure that the
 two logs are equal.
 
 // initialization
 
-Initialize a secure log. // NORMAL
+Initialize a_secure_log // NORMAL
 Create a new, empty secure log.
 
 // @refines Initialize a secure log.
-Initialize a secure system log. // NORMAL
+Initialize_a_secure_system_log // NORMAL
 Create a new, empty system log file in the SD card filesystem.
 
 // @refines Initialize a secure log.
-Initialize a secure application log. // NORMAL
+Initialize_a_secure_application_log // NORMAL
 Create a new, empty application log file in the SD card filesystem.
 
 // writes
 
 // @refines Write log entry.
-Append a secure system event. // NORMAL
+Append_a_secure_system_event // NORMAL
 Log a system event into a system log file.
 
-Append a secure application event. // NORMAL
+Append_a_secure_application_event // NORMAL
 Log an application event into an application log file.
 
 // correctness
 
 // @refines Validate log.
-Verify the well-formedness of a secure log file. // NORMAL
+Verify_the_well-formedness_of_a_secure_log_file // NORMAL
 Verify that a secure log file L is well-formed wrt correctness
 properties P in its specification.
 
 // @refines Verify the well-formedness of a secure log file.
-Verify the well-formedness of a secure system log file. // NORMAL
+Verify_the_well-formedness_of_a_secure_system_log_file // NORMAL
 Verify that a system log file is well-formed wrt the SBB's correctness
 properties.
 
 // @refines Verify the well-formedness of a secure log file.
-Verify the well-formedness of a secure  application log file. // NORMAL
+Verify_the_well-formedness_of_a_secure__application_log_file // NORMAL
 Verify that an application log file is well-formed wrt the SBB's
 correctness properties.
 
 // security
 
-Verify the security of a secure log file. // NORMAL
+Verify_the_security_of_a_secure_log_file // NORMAL
 Verify that a secure log file L is secure wrt the security properties
 P in its configuration.
 
 // @refines Verify the security of a secure log file.
-Verify the security of a secure system log file. // NORMAL
+Verify_the_security_of_a_secure_system_log_file // NORMAL
 Verify that a secure system log file is secure wrt the SBB's security
 properties.
 
-Verify the security of a secure application log file. // NORMAL
+Verify_the_security_of_a_secure_application_log_file // NORMAL
 Verify that a secure application log file is secure wrt the SBB's
 security properties.
 
 // I/O
 
 // @refines Export log.
-Export a secure log file.
+Export_a_secure_log_file
 Export a secure system log file L to a device D.
 
 // @refines Export a secure log file.
-Export a secure system log file.
+Export_a_secure_system_log_file
 Export a secure system log file L to the Reporting component.
 
 // @refines Export a secure log file.
-Export a secure application log file.
+Export_a_secure_application_log_file
 Export a secure application log file L to the Reporting component.
 
 // @refines Import log.
-Import a secure log file L.
+Import_a_secure_log_file_L
 Import a secure log file L from device D.
 
 // @refines Import a secure log file L.
-Import a secure system log file.
+Import_a_secure_system_log_file
 Import a secure system log file L from the SD card filesystem.
 
 // @refines Import a secure log file L.
-Import a secure application log file.
+Import_a_secure_application_log_file
 Import a secure application log file L from the SD card filesystem.
 
