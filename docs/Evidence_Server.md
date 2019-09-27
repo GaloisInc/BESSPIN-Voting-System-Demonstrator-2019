@@ -68,20 +68,26 @@ https://github.com/FreeAndFair/ElectionGlossary/blob/master/Glossary.md
 The Evidence Server’s requirements are derived from the overall BVS 2020 system
 goal of implementing an end-to-end verifiable election. Thus, the mandatory
 requirements are as follows:
-- [Stability] Only items that have been posted can appear on the Bulletin Board.
-- [Confirmability] Any item with a valid receipt must appear on the Bulletin Board.
-- [Soundness] No clashing items must both appear on the Bulletin Board.
-- [Unremovability] Once published, no items can be removed from the Bulletin Board.
+
+### Mandatory
+
+- [EvidenceBounds] If evidence appears on the server, then it is signed and verifiable evidence for the election.
+- [Confirmability] Any unit of evidence with a valid receipt must appear on the Bulletin Board.
+- [Unremovability] Once published, no unit of evidence can be removed from the Bulletin Board.
 - [Persistence] Data should be immutable and persistent.
-- [Challenge] Using the Evidence Server, voters can use the election server to verify that their challenged ballots are correctly recorded.
-- [CollectedAsCast] Using the Evidence Server, voters can independently verify that the representation of their vote is correctly collected in the tally. 
-- [TalliedAsCollected] Using the Evidence Server, anyone can verify that every well-formed,collected vote is correctly included in the tally.
-- [VoterConfidentiality] Personally identifiable information should not be exposed, in particular there should be no evidence about how and given person voted.
+- [Challenge] Using the Evidence Server, voters can verify challenged ballots.
+- [CollectedAsCast] Using the Evidence Server, voters can independently verify that their receipt appears in the list of collected ballots. 
+- [TalliedAsCollected] Using the Evidence Server, anyone can download the encrypted cast ballots and tabulate them.
+- [VoterConfidentiality] Secret information about voters should not be exposed.
 - [Compliance] Exposed data is subject to relevant privacy laws.
+- [VerifyElection] Using the Evidence Server, an election verifier can download the election evidence in order to verify the election.
+
+
+### Optional 
+
 - [Availability] The election server should remain available under heavy load.
-- [Timing] All evidence should include a timestamp indicating when the evidence was generated.
-- [Accessibility] The cryptographic evidence of an election published on the Evidence Server must be available to an election verifier
-  which serves to determine whether or not that evidence is well-formed.
+
+@todo abakst gajaka: [Soundness] No clashing items must both appear on the Bulletin Board.
 
 ## Documentation
 
