@@ -1,0 +1,9 @@
+Ballot Printer System Plan
+indexing
+  owner: Joe Kiniry
+  contributors: 
+  effort: low
+  complexity: low
+  risk: low
+  dependencies: BMD, PDF
+

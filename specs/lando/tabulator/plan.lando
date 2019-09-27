@@ -1,0 +1,8 @@
+Tabulator Plan
+indexing
+  owner: Joe Kiniry
+  contributors: Joey Dodds, Daniel Wagner
+  effort: low
+  complexity: high
+  risk: low
+  dependencies: ElectionGuard
