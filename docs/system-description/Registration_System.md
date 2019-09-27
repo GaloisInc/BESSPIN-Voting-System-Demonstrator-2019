@@ -54,37 +54,39 @@ validate that they are satisfied (e.g., system tests, code review, etc.).
 
 ### Mandatory
 
-* Must be able to generate voter cards from a given set of eligible voters
-* Must be able to authenticate a voter based on a voter card number
-* Must be able to record when a voter has been given a ballot and securely store
-this information for posting voting history
-* Must prevent a voter from being issued more than one ballot
-* Must be able to authenticate and register voters at multiple machines 
-simultaneously in various venues across the jurisdiction
-* Must have an interactive user interface for authentication and registration
+* Must be able to authenticate a voter 
+* Must identify the correct ballot type for the voter
+* Must be able to provide evidence of registration and ballot style
+* Must prevent a voter from registering to vote more than once
+* Must have an interactive user interface for authentication
+* Must support process to supply provisional ballot
 * Must be able to print out the current voter list at any point of the election
 
 ### Optional
 
-####Usability:
+* Must be able to authenticate and register voters at multiple machines 
+simultaneously in various venues across the jurisdiction
+* Must be able to log process or data inconsistencies
+
+#### Usability:
 
 * The user interface must be trivial to use for non-technical users (election 
 representatives).
 * The voter should be able to register at any table at the voting venue.
 
-####Persistence:
+#### Persistence:
 
 * The system will exhibit no data loss from an arbitrary failure (e.g., a 
 typical system failure like a Windows crash) of any system in the *BVS 2020* 
 network.
 * The system will exhibit no data loss in the event of a network failure.
 
-####Scalability:
+#### Scalability:
 
 * The system should be able to handle a large number of voters (approximately 
 30,000 voters in a single voting venue with 10 machines running the *BVS 2020*).
 
-####Security:
+#### Security:
 
 * The system should use proper security measures and cryptography to establish 
 confidence that the system is secure.
@@ -95,7 +97,7 @@ detection of suspicious voters and fraud.
 * The system should be able to provide a status report on the digital voter list
 prior to an election and afterwards.
 
-####Analysis:
+#### Analysis:
 
 * The system should be able to provide an analysis of the turnout, both 
 nationally and for specific turnout results.
