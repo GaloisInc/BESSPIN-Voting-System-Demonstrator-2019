@@ -99,7 +99,7 @@ Our overall approach to system assurance is summarized in
 
 ## Contributors
 
-Dragan Stosic, Joe Kiniry, Alexander Bakst
+Joe Kiniry, Alexander Bakst, Dragan Stosic
 
 ## Funders
 
