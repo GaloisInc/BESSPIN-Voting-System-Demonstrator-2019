@@ -1,0 +1,8 @@
+Registration System Plan
+indexing
+ owner: TBD
+ contributors: Joe Kiniry
+ effort: TBD in OmniPlan
+ complexity: medium
+ risk: low
+ dependencies: Registration, UI, DB
