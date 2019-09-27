@@ -23,7 +23,7 @@ encryption performed by the PBS was, in fact, accurate.
 
 ## Overview
 
-The evidence server is responsible for collecting, and subsequently making
+The Evidence Server is responsible for collecting, and subsequently making
 available, all of the evidence generated during the election. This includes:
 
 - Election metadata (date, time, the officials at each polling place, and so on)
@@ -63,7 +63,7 @@ Evidence Server,
 
 ## Requirements
 
-The evidence server’s requirements are derived from the overall BVS 2020 system
+The Evidence Server’s requirements are derived from the overall BVS 2020 system
 goal of implementing an end-to-end verifiable election. Thus, the mandatory
 requirements are as follows:
 - [Stability] Only items that have been posted can appear on the Bulletin Board.
@@ -71,9 +71,9 @@ requirements are as follows:
 - [Soundness] No clashing items must both appear on the Bulletin Board.
 - [Unremovability] Once published, no items can be removed from the Bulletin Board.
 - [Persistence] Data should be immutable and persistent.
-- [Challenge] Using the evidence server, voters can use the election server to verify that their challenged ballots are correctly recorded.
-- [CollectedAsCast] Using the evidence server, voters can independently verify that the representation of their vote is correctly collected in the tally. 
-- [TalliedAsCollected] Using the evidence server, anyone can verify that every well-formed,collected vote is correctly included in the tally.
+- [Challenge] Using the Evidence Server, voters can use the election server to verify that their challenged ballots are correctly recorded.
+- [CollectedAsCast] Using the Evidence Server, voters can independently verify that the representation of their vote is correctly collected in the tally. 
+- [TalliedAsCollected] Using the Evidence Server, anyone can verify that every well-formed,collected vote is correctly included in the tally.
 - [VoterConfidentiality] Personally identifiable information should not be exposed, in particular there should be no evidence about how and given person voted.
 - [Compliance] Exposed data is subject to relevant privacy laws.
 - [Availability] The election server should remain available under heavy load.
@@ -88,9 +88,9 @@ requirements are as follows:
 ## Validation and Verification Methodology
 
 - The recorded-as-cast verification is provided by the publication of a list of all the encrypted votes that have been submitted. 
-- Every honest voter who receives a valid receipt is assured that her vote will be published on the evidence server and included in the election tally. 
+- Every honest voter who receives a valid receipt is assured that her vote will be published on the Evidence Server and included in the election tally. 
   A voter is able to check himself using the tracking number that his vote is included.
-- The evidence server provide cryptographically strong evidence that a voter’s receipt corresponds to a ballot, on the bulletin board.
+- The Evidence Server provide cryptographically strong evidence that a voter’s receipt corresponds to a ballot, on the bulletin board.
 
 
 
