@@ -231,6 +231,13 @@ keys as a part of the Shamir election setup subprotocol.
      random, voter-chosen *Ballot Scanning Device* (a *Paper Ballot
      Scanner*, PBS<sub>k</sub>) to cast or challenge their vote. Go to
      step 6.
+     @design dmz I think this step is redundant if the BMD and the PBS
+     end up being the same device. It would make more sense for the device
+     to simply generate a CVR at the time of marking the ballot and use
+     that, rather than scanning the ballot it just printed to generate
+     the same CVR more slowly, with more potential for error, and requiring
+     a separate verification step... which I see has been left out of the
+     "ballot scanning device" step below.
 
 5. *Controller Device* V spoils their ballot and starts over.
 
@@ -245,6 +252,22 @@ keys as a part of the Shamir election setup subprotocol.
    into a CVR, the PBS commits to that interpretation and emits a
    receipt R, and the voter V is asked if he or she wishes to *cast*
    or *challenge* the device.
+   @design dmz I think there is a verification step missing here, in the
+   case of a hand marked paper ballot being scanned. In order for the PBS
+   to commit to an interpretation of a hand marked ballot, the voter should
+   in some way acknowledge that the interpretation matches their choices.
+   Otherwise, a subsequent voter challenge of the ballot will be
+   significantly less useful, because an _honest_ machine that simply
+   interpreted a mark incorrectly (because of either a scan error or a
+   marking error) will be indistinguishable from a _dishonest_ machine;
+   contrast with the BMD-only scenario with direct generation of CVRs,
+   where a mismatch on a challenged, voter-verified ballot actually means
+   that the the machine _knowingly encrypted the wrong thing_ (because it
+   had direct access to the voter's choices at input time). I suppose
+   that this inability to distinguish between incompetence and malice is
+   also the case with current risk-limiting audits, assuming that all
+   ballots are voter-verified, because voters don't get to see the CVR
+   generation stage... but it seems to me that we can do better.
    @design dmz I don't believe that it is reasonable, from a security
    perception point of view, to have the ballot scanning device be the
    same device that decides whether a ballot is cast or challenged. It is
