@@ -39,9 +39,19 @@ A verifier processing evidence has two possible outcomes:
 
 ## Manifest
 
+This subsystem's artifacts are found in the following locations:
+ - *documentation*: TBD
+ - *specification*: TBD
+ - *source code*: TBD
+
 @todo kiniry Where are the docs, specs, and code for this subsystem?
 
-@todo kiniry Which issues track this subsystem?
+The following issues track the design and development of this
+subsystem:
+ - *development plan*: #187
+ - *system description*: #190
+ - *threat model*: #193
+ - *domain model*: #191
 
 ## Glossary
 
@@ -64,29 +74,38 @@ unavailability of the Rust toolchain upstream on RISC-V.
   evidence provided by the Evidence Server.
 - *[LOG_VERIFICATION]* All system logs aggregated into the evidence
   must be verified by the Verifier.
-- *[SEMI-FORMAL_SPEC]* TBD
-- *[FORMAL_CORRECTNESS_SPEC]* TBD
+- *[SEMI-FORMAL_SPEC]* The verification algorithm must have a
+  semi-formal specification.
+- *[FORMAL_CORRECTNESS_SPEC]* The verification algorithm must have a
+  formal correctness specification.
 
 ### Optional
 
-- *[FORMAL_SECURITY_SPEC]* TBD
-- *[VERIFIER_SOUNDNESS]* TBD
-- *[VERIFIER_COMPLETENESS]* TBD
+- *[FORMAL_SECURITY_SPEC]* The verification algorithm should have a
+  formal specification of the security properties that it checks and
+  the formal meaning of the implication of said properties being
+  valid.
+- *[VERIFIER_SOUNDNESS]* The verifier should state that the evidence is
+  verified if and only if it has all of the properties entailed by
+  the verification definition.
+- *[VERIFIER_COMPLETENESS]* The verifier should be able to check every
+  property entailed by the verification definition.
+- *[VERIFIER_ASSURANCE]* The verifier implementation should have a
+  rigorous assurance case that relates the implementation to the
+  verification algorithm's formal and semi-formal specifications.
 
 ## Documentation
 
 1. The ElectionGuard cryptographic protocol is specified in rigorous
-   natural language in the ElectionGuard specification.
-2. The ElectionGuard cryptographic protocol is formally specified
-   using Cryptol.
+   natural language in the 
+   [ElectionGuard specification](https://github.com/microsoft/ElectionGuard-SDK-Specification).
+2. The [ElectionGuard cryptographic protocol]
+   (https://github.com/microsoft/ElectionGuard-SDK-Specification/tree/master/Formal/cryptol) 
+   is formally specified using [Cryptol](https://cryptol.net/).
 3. The BVS 2020 cryptographic protocol will be specified in rigorous
    natural language in Q4 2019.
 3. The BVS 2020 cryptographic protocol will be formally specified 
    in Cryptol and perhaps other formats in Q4 2019 and into 2020.
-
-@todo kiniry Add links to the above artifacts.
-
-@todo manifest of documentation for the subsystem
 
 ## Validation and Verification Methodology
 
