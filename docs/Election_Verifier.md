@@ -57,7 +57,8 @@ subsystem:
 
 Our system glossary is based upon the 
 [Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
-which is in turn based upon the NIST Election Glossary.
+which is in turn based upon the 
+[NIST Election Glossary](https://pages.nist.gov/ElectionGlossary/).
 
 ## Requirements
 
@@ -72,27 +73,27 @@ unavailability of the Rust toolchain upstream on RISC-V.
 
 ### Mandatory
 
-- *[EVIDENCE_COMPLETENESS]* The Verifier must consume and verify all
+- *[EVIDENCE-COMPLETENESS]* The Verifier must consume and verify all
   evidence provided by the Evidence Server.
-- *[LOG_VERIFICATION]* All system logs aggregated into the evidence
+- *[LOG-VERIFICATION]* All system logs aggregated into the evidence
   must be verified by the Verifier.
-- *[SEMI-FORMAL_SPEC]* The verification algorithm must have a
+- *[SEMI-FORMAL-SPEC]* The verification algorithm must have a
   semi-formal specification.
-- *[FORMAL_CORRECTNESS_SPEC]* The verification algorithm must have a
+- *[FORMAL-CORRECTNESS-SPEC]* The verification algorithm must have a
   formal correctness specification.
 
 ### Optional
 
-- *[FORMAL_SECURITY_SPEC]* The verification algorithm should have a
+- *[FORMAL-SECURITY-SPEC]* The verification algorithm should have a
   formal specification of the security properties that it checks and
   the formal meaning of the implication of said properties being
   valid.
-- *[VERIFIER_SOUNDNESS]* The verifier should state that the evidence is
+- *[VERIFIER-SOUNDNESS]* The verifier should state that the evidence is
   verified if and only if it has all of the properties entailed by
   the verification definition.
-- *[VERIFIER_COMPLETENESS]* The verifier should be able to check every
+- *[VERIFIER-COMPLETENESS]* The verifier should be able to check every
   property entailed by the verification definition.
-- *[VERIFIER_ASSURANCE]* The verifier implementation should have a
+- *[VERIFIER-ASSURANCE]* The verifier implementation should have a
   rigorous assurance case that relates the implementation to the
   verification algorithm's formal and semi-formal specifications.
 

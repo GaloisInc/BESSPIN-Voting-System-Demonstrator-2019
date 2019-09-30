@@ -62,7 +62,8 @@ subsystem:
 
 Our system glossary is based upon the 
 [Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
-which is in turn based upon the NIST Election Glossary.
+which is in turn based upon the 
+[NIST Election Glossary](https://pages.nist.gov/ElectionGlossary/).
 
 ## Requirements
 
@@ -73,17 +74,17 @@ with ElectionGuard.
 
 ### Mandatory
 
-- *[PLAINTEXT_TABUATION]* Description.
-- *[HOMOMORPHIC_TABULATION]* Description.
-- *[PLURALITY_METHOD]* Description.
-- *[TABULATION_CDF]* Description.
+- *[PLAINTEXT-TABUATION]* Description.
+- *[HOMOMORPHIC-TABULATION]* Description.
+- *[PLURALITY-METHOD]* Description.
+- *[TABULATION-CDF]* Description.
 - *[WRITE-INS]* Description.
 - *[]* Description.
 - *[]* Description.
 
 ### Optional
 
-- *[RCV_METHOD]* Description.
+- *[RCV-METHOD]* Description.
 
 ## Documentation
 
