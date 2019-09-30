@@ -55,7 +55,9 @@ subsystem:
 
 ## Glossary
 
-@todo point to the BVS 2020 and Free & Fair glossaries
+Our system glossary is based upon the 
+[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
+which is in turn based upon the NIST Election Glossary.
 
 ## Requirements
 

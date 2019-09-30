@@ -29,22 +29,40 @@ case that the tabulator is one or more human beings performing a hand-count.
 
 Formally verified tabulators have been created to realize several (often very 
 complex voting) methods.  Many of these tabulators were created by Joe Kiniry's 
-research group when he was a professor.  These include the Netherlands 
-list-based method, Denmark's single-selection method, and Ireland's 
-Proportional-Representation through Single Transferable
-Vote (PR-STV) method.  Free & Fair has created two high-assurance tabulators,
-one for San Francisco's Rank Choice Voting (RCV) method and the other for
-homomorphic tabulation of plurality method ballots in ElectionGuard.
+research group when he was a professor.  These include:
+ - [the Netherlands list-based method](https://github.com/FreeAndFair/KOA/tree/master/TallySystems/Dutch), 
+ - [Denmark's single-selection method](https://github.com/FreeAndFair/DIVS), and 
+ - [Ireland's Proportional-Representation through Single Transferable
+   Vote (PR-STV) method](https://github.com/FreeAndFair/Votail).
 
-@todo kiniry Add links to all of the above projects.
+Free & Fair has created two high-assurance tabulators:
+ - [San Francisco's Rank Choice Voting (RCV) method]
+   (https://github.com/FreeAndFair/formal-rcv), and 
+ - for homomorphic tabulation of plurality method ballots in
+   ElectionGuard, as a part of its 
+   [verifier](https://github.com/microsoft/ElectionGuard-SDK-Reference-Verifier).
 
 ## Manifest
 
-@todo an itemized list or table indicating where to find more information
+This subsystem's artifacts are found in the following locations:
+ - *documentation*: TBD
+ - *specification*: TBD
+ - *source code*: TBD
+
+@todo kiniry Where are the docs, specs, and code for this subsystem?
+
+The following issues track the design and development of this
+subsystem:
+ - *development plan*: #187
+ - *system description*: #190
+ - *threat model*: #193
+ - *domain model*: #191
 
 ## Glossary
 
-@todo point to the BVS 2020 and Free & Fair glossaries
+Our system glossary is based upon the 
+[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
+which is in turn based upon the NIST Election Glossary.
 
 ## Requirements
 

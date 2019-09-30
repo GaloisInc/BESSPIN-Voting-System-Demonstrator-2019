@@ -29,12 +29,19 @@ implementation.
 The BPS artifacts are:
  0. The BPS *development plan*, which is a part of the overall BVS 2020 plan.
  1. The BPS description [this file](Ballot_Printer_System.md)
- 
+
+The following issues track the design and development of this
+subsystem:
+ - *development plan*: #187
+ - *system description*: #190
+ - *threat model*: #193
+ - *domain model*: #191
+
 ## Glossary
 
-Our system glossary is based upon the [Free & Fair Election 
-Glossary](https://github.com/FreeAndFair/ElectionGlossary), which
-is in turn based upon the NIST Election Glossary.
+Our system glossary is based upon the 
+[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
+which is in turn based upon the NIST Election Glossary.
 
 ## Requirements
 
