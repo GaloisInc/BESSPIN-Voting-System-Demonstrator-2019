@@ -46,6 +46,12 @@ before_script:
     - git submodule init
     - git submodule update
 
+    ##
+    ## Cleanup any old artifacts
+    ##
+    - make clean_all
+    
+
 #-----------------------------------------------------------------------------#
 #
 # Top level tests

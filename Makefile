@@ -203,7 +203,8 @@ export CC := clang
 export HOSTTEST_CFLAGS = \
 	-g -m64 -Werror -Wall -DVOTING_PLATFORM_POSIX -DNO_MEMSET_S \
 	-DVOTING_SYSTEM_DEBUG -DLOG_SYSTEM_DEBUG \
-	-Wno-macro-redefined -I$(INCLUDE_DIR)
+	-Wno-macro-redefined -I$(INCLUDE_DIR) \
+        -fsanitize=address,undefined
 
 crypto_hosttest_all:
 	cd $(SOURCE_DIR); \
