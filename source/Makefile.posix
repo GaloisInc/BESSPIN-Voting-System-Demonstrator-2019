@@ -7,7 +7,7 @@ include Makefile.common
 
 # All binaries necessary to run rules.
 # Assume clang is on PATH, but llvm-link needs special handing on Linux
-export CLANG := clang
+export CLANG := clang -fsanitize=address,undefined
 export HOST	 := $(shell uname -s)
 export OS_DIR = $(SOURCE_DIR)/os/posix
 export CFLAGS += -DVOTING_PLATFORM_POSIX -U_FORTIFY_SOURCE -DSIMULATION -DVOTING_SYSTEM_DEBUG
