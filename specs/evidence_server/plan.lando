@@ -6,9 +6,13 @@ indexing
                 Joe Kiniry <kiniry@freeandfair.us>
 
   effort: estimates for documentation, design, implementation, assurance work, testbench setup, CI/CV setup and architecture management.
-     design:  ES documentation 3w, ES domain modeling 1w, ES threat modeling 3d, ES protocol design 4w, ES testbench setup 2w, ES CI/CV setup 1w, ES architecture management 2w 
-     implementation: ES API 1w, ES development - alpha release 8w, ES alpha release packaging 3d, ES development - beta release 4w, ES beta release packaging 3d 
-     assurance: including ES specification, ES BISL specification 6 w
-  complexity: medium
-  risk: low
+     documentation: 3 weeks
+     design: 7 weeks and 3 days
+     architecture management: 2 weeks 
+     implementation: 16 weeks and 6 days 
+     assurance:  6 weeks
+  complexity estimates (low, medium, high)
+      medium
+  risk (low, medium, high)
+      low
   dependencies: Logging, Database
