@@ -239,6 +239,15 @@ keys as a part of the Shamir election setup subprotocol.
      a separate verification step... which I see has been left out of the
      "ballot scanning device" step below.
 
+     @design kiniry The entire Voter Verification Device protocol step
+     is entirely optional with regards to the BVS 2020.
+
+     @design kiniry If we merge the BMD and PBS, then the cryptographic
+     cast and the physical cast are merged and this transition becomes
+     redundant.  Likewise, if we eliminate the PBS entirely from the
+     polling place protocol and only use it in the post-election
+     protocol, then this step also is elided.
+
 5. *Controller Device* V spoils their ballot and starts over.
 
    Voter V interacts with Supervisor S responsible for the Polling
@@ -252,6 +261,7 @@ keys as a part of the Shamir election setup subprotocol.
    into a CVR, the PBS commits to that interpretation and emits a
    receipt R, and the voter V is asked if he or she wishes to *cast*
    or *challenge* the device.
+
    @design dmz I think there is a verification step missing here, in the
    case of a hand marked paper ballot being scanned. In order for the PBS
    to commit to an interpretation of a hand marked ballot, the voter should
@@ -268,6 +278,12 @@ keys as a part of the Shamir election setup subprotocol.
    also the case with current risk-limiting audits, assuming that all
    ballots are voter-verified, because voters don't get to see the CVR
    generation stage... but it seems to me that we can do better.
+
+   @design kiniry If the PBS does not present a proposed
+   interpretation of the paper ballot to the voter, then I agree with
+   your assessment.  If we permit the PBS to present its proposed CVR
+   to the voter, then we can differentiate the two cases.
+
    @design dmz I don't believe that it is reasonable, from a security
    perception point of view, to have the ballot scanning device be the
    same device that decides whether a ballot is cast or challenged. It is
@@ -281,6 +297,21 @@ keys as a part of the Shamir election setup subprotocol.
    challenge or cast, or (2) as in STAR-Vote, cast by putting the ballot
    in the smart ballot box or challenge by going to an EO who marks the
    the ballot as challenged at the controller.
+
+   @design kiniry What is a security *perception* point of view?
+   We have a design decision to make.  Which device(s): (a) capture a
+   ballot image, (b) interpret a ballot image into a CVR, (c) provide
+   feedback to the voter about improperly filled-out HMPBs, (d) permit
+   the voter to cryptographically cast or challenge a ballot, and (e)
+   physically capture a cast ballot.  Given the workflow necessary for
+   an E2E-V system, there are only a few orderings of these steps that
+   make sense.  And given the number of features, we can have
+   something between one and five devices that fulfill these
+   features. At the protocol level, I'd prefer to specify them
+   separately so that we can have a simpler model for reasoning about
+   security properties. At the physical implementation level, I'd
+   prefer to have as few devices as reasonable to build, and I'd
+   prefer to have the P1 and the P2 in two different devices.
 
 6.a. *Challenge* If V challenges the PBS, then B is cryptographically
      spoiled and returned to the voter and they are told to return to
