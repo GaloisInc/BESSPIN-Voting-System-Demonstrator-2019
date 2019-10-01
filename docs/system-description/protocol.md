@@ -284,6 +284,13 @@ keys as a part of the Shamir election setup subprotocol.
    your assessment.  If we permit the PBS to present its proposed CVR
    to the voter, then we can differentiate the two cases.
 
+   @design dmz First, doing this in files committed to the repo rather
+   than in the comments of the merge request strikes me as overly
+   complicated. Second, yes, that was exactly my point - the description
+   above does not admit the possibility of the PBS presenting its proposed
+   CVR to the voter, because of the way it's written, and I believe that
+   step is a necessary one.
+
    @design dmz I don't believe that it is reasonable, from a security
    perception point of view, to have the ballot scanning device be the
    same device that decides whether a ballot is cast or challenged. It is
@@ -312,6 +319,23 @@ keys as a part of the Shamir election setup subprotocol.
    security properties. At the physical implementation level, I'd
    prefer to have as few devices as reasonable to build, and I'd
    prefer to have the P1 and the P2 in two different devices.
+
+   @design dmz A security perception point of view - admittedly not the
+   best wording - admits the reality that, no matter how secure the system
+   _is_, if it _appears_ to have a security problem, people will _believe_
+   it has a security problem. In this case, there is a direct analogue to
+   the "permission to cheat" problem with BMDs. We can argue until we're
+   blue in the face that there is no cryptographic security problem because
+   the device has already committed to the ballot - but people will say
+   "but, you're letting the same machine do the spoiling as made the ballot
+   in the first place, that ain't right".  Given that current smart ballot
+   box prototypes still have cast and spoil buttons on them, avoiding this
+   _apparent_ security problem should be easy. Also, as should perhaps be
+   obvious from the above, I think you've missed a critical step in your
+   list of what devices do - the step I pointed out as missing above,
+   "allow the voter to examine the machine's interpretation of their
+   ballot" (this happens in the review screen for the BMD, and must happen 
+   somewhere for hand-marked ballots too).
 
 6.a. *Challenge* If V challenges the PBS, then B is cryptographically
      spoiled and returned to the voter and they are told to return to
