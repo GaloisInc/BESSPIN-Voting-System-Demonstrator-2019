@@ -1,0 +1,16 @@
+subsystem EvidenceServer
+The service that organizes and exposes the evidence logged by other components of the BVS 2020.
+
+component EvidenceServer
+  component PrivateServerAPI
+    The interface between post-election officials and the server.
+    Import log!
+
+  component PublicServerAPI
+    The interface between the evidence and the public.
+    What is the decryption of my challenged ballot?
+    What is the evidence evidence?
+    What are the collected encrypted ballots?
+
+PrivateServerAPI client Logging
+PublicServerAPI  client Network
