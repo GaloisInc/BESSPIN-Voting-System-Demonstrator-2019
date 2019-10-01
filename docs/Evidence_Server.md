@@ -59,7 +59,7 @@ Evidence Server,
 
 ## Glossary
 
-https://github.com/FreeAndFair/ElectionGlossary/blob/master/Glossary.md
+[Glossary](https://github.com/FreeAndFair/ElectionGlossary/blob/master/Glossary.md)
 
 ## Requirements
 
@@ -97,7 +97,7 @@ requirements are as follows:
 
 This document is currently the only documentation for the Evidence Server. The
 overall description of the BESSPIN Voting System 2020 is found in its [parent
-description](./BVS 2020 system description.md).
+description](./"BVS 2020 system description.md").
 
 ## Validation and Verification Methodology
 
