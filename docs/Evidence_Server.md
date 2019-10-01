@@ -28,22 +28,20 @@ available, all of the evidence generated during the election. This includes:
 
 - Election metadata (date, time, the officials at each polling place, and so on)
 - Records of certification of voter registration containing: (from Registration System)
-  - The voter authenticator
-  - The registration system
-  - The polling place
-  - The voter
+    - The voter authenticator
+    - The registration system
+    - The polling place
+    - The voter
 - Records linking voters to their ballot style (from Ballot Printing System)
 - Marked ballot images (from Ballot Scanning Device)
 - Ballot receipts (from Ballot Scanning Device)
 - Ballot outcome records:
-- Spoiled ballots (from Controller System, Verifiable Paper System)
-- Cast ballots (from Ballot Scanning Device)
-- Records of challenged ballots (from Ballot Scanning Device)
+    - Spoiled ballots (from Controller System, Verifiable Paper System)
+    - Cast ballots (from Ballot Scanning Device)
+    - Records of challenged ballots (from Ballot Scanning Device)
 - SBB Logs documenting cast ballots
 - Tabulation Logs (from the Tabulation Device)
 - Decrypted challenged and spoiled ballots (available only after the election)
-
-@design abakst gajaka : how is evidence represented to the user (raw records of the above? Some standard or uniform format?)
 
 ## Manifest
 
@@ -71,19 +69,25 @@ requirements are as follows:
 
 ### Mandatory
 
-- [EvidenceBounds] If evidence appears on the server, then it is signed and verifiable evidence for the election.
-- [Confirmability] Any unit of evidence with a valid receipt must appear on the Bulletin Board.
-- [Unremovability] Once published, no unit of evidence can be removed from the Bulletin Board.
+- [EvidenceBounds] If evidence appears on the server, then it is signed and
+  verifiable evidence for the election.
+- [Confirmability] Any unit of evidence with a valid receipt must appear on the
+  Bulletin Board.
+- [Permanence] Once published, no unit of evidence can be removed from the
+  Bulletin Board.
 - [Persistence] Data should be immutable and persistent.
 - [Challenge] Using the Evidence Server, voters can verify challenged ballots.
-- [CollectedAsCast] Using the Evidence Server, voters can independently verify that their receipt appears in the list of collected ballots. 
-- [TalliedAsCollected] Using the Evidence Server, anyone can download the encrypted cast ballots and tabulate them.
+- [CollectedAsCast] Using the Evidence Server, voters can independently verify
+  that their receipt appears in the list of collected ballots.
+- [TalliedAsCollected] Using the Evidence Server, anyone can download the
+  encrypted cast ballots and tabulate them.
 - [VoterConfidentiality] Secret information about voters should not be exposed.
 - [Compliance] Exposed data is subject to relevant privacy laws.
-- [VerifyElection] Using the Evidence Server, an election verifier can download the election evidence in order to verify the election.
+- [VerifyElection] Using the Evidence Server, an election verifier can download
+  the election evidence in order to verify the election.
 
 
-### Optional 
+### Optional
 
 - [Availability] The election server should remain available under heavy load.
 
@@ -91,16 +95,20 @@ requirements are as follows:
 
 ## Documentation
 
-@todo manifest of documentation for the subsystem
+This document is currently the only documentation for the Evidence Server. The
+overall description of the BESSPIN Voting System 2020 is found in its [parent
+description](./BVS 2020 system description.md).
 
 ## Validation and Verification Methodology
 
-- The recorded-as-cast verification is provided by the publication of a list of all the encrypted votes that have been submitted. 
-- Every honest voter who receives a valid receipt is assured that her vote will be published on the Evidence Server and included in the election tally. 
-  A voter is able to check himself using the tracking number that his vote is included.
-- The Evidence Server provide cryptographically strong evidence that a voter’s receipt corresponds to a ballot, on the bulletin board.
-
-
+- The recorded-as-cast verification is provided by the publication of a list of
+  all the encrypted votes that have been submitted.
+- Every honest voter who receives a valid receipt is assured that her vote will
+  be published on the Evidence Server and included in the election tally. A
+  voter is able to check himself using the tracking number that his vote is
+  included.
+- The Evidence Server provide cryptographically strong evidence that a voter’s
+  receipt corresponds to a ballot, on the bulletin board.
 
 Our overall approach to system assurance is summarized in
 [ASSURANCE.md](../ASSURANCE.md).
