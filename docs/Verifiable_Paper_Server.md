@@ -48,7 +48,15 @@ which is in turn based upon the [NIST Election Glossary][].
 
 ## Requirements
 
-@todo hmubarak, kiniry: cite SOW requirements as appropriate
+**BESSPIN Voting System (Subsystems Description):**
+
+ > 11. In order to support the use of SHIELD-based Verifiable Paper
+ > (VP) in the BVS 2020 system, we must develop a SHIELD VP Server
+ > (VPS), capable of managing and authenticating dielets affixed to
+ > verifiable paper in accordance with the BVS Protocol, discussed
+ > below.
+ 
+ _editor's note: there is no further discussion of the VPS in SOW_
 
 ### Mandatory
 
