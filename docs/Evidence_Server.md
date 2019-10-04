@@ -111,7 +111,7 @@ overall description of the BESSPIN Voting System 2020 is found in its
 Our overall approach to system assurance is summarized in
 [ASSURANCE.md](../ASSURANCE.md).
 
-@design abakst gajaka need to discuss a realistic approach to validation verification
+@design abakst, gajaka: need to discuss a realistic approach to validation verification
 
 ## Contributors
 
