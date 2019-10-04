@@ -5,46 +5,29 @@ FS_LOGS      ?= yes
 # Voting System Definitions
 include Makefile.common
 
-# All binaries necessary to run rules.
-# Assume clang is on PATH, but llvm-link needs special handing on Linux
-export CLANG := clang
-export HOST	 := $(shell uname -s)
 export OS_DIR  = $(SOURCE_DIR)/os/freertos
 export CFLAGS += -DVOTING_PLATFORM_FREERTOS
 
-ifeq (${HOST},Linux)
-	export LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-	export PLATFORM_INCLUDES :=
-else
-	# Assumed to be Host = Darwin
-	export LLVM_LINK := llvm-link
-	export PLATFORM_INCLUDES = -I/usr/include
-endif
-
-RISCV_XLEN ?= 32
-RISCV_LIB  ?= elf
-CCPATH =
 ARCH		= -march=rv32im
 ABI			= -mabi=ilp32
 
-ARCHTARGET=$(CCPATH)riscv${RISCV_XLEN}-unknown-${RISCV_LIB}
+ARCHTARGET=riscv64-unknown-elf
 
 # Default to GCC
 USE_CLANG ?= no
 
-# Decide which compiler to use
-ifeq ($(USE_CLANG),yes)
-GCC_SYSROOT_PATH=$(shell which riscv32-unknown-elf-gdb)
-export C_INCLUDE_PATH= $(dir $(GCC_SYSROOT_PATH))../riscv32-unknown-elf/include
-$(info C_INCLUDE_PATH=$(C_INCLUDE_PATH))
-export CC		= clang --target=riscv32
-# LLVM doesn't support linking RISC-V files yet,
-# so we have to use GCC linker to do so
 USE_LED_BLINK_TASK ?= 0
 
+# Decide which compiler to use
+ifeq ($(USE_CLANG),yes)
+export CC		= clang --target=riscv32
+# LLVM doesn't support linking RISC-V files yet,
+# so we have to use GCC linker to do so	
 export GCC		= $(ARCHTARGET)-gcc
 export OBJCOPY	= llvm-objcopy
-export OBJDUMP	= llvm-objdump
+# LLVM doesn't uderstand debug symbols created by GCC linker
+# using GCC objdump for the time being (instead of llvm-objdump)
+export OBJDUMP	= $(ARCHTARGET)-objdump
 export AR		= llvm-ar
 export RANLIB	= llvm-ranlib
 else
@@ -210,7 +193,7 @@ export FREERTOS_PEEKPOKE_SRC = \
 
 export ARFLAGS=crsv
 
-export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib
+export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib $(ARCH) $(ABI)
 export LIBS	 =	-lc -lgcc
 
 OS_SRC = $(OS_DIR)/time.c \

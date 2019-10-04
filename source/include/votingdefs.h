@@ -34,7 +34,7 @@ extern firmware_state the_firmware_state;
 #elif defined(VOTING_PLATFORM_POSIX)
 #include "os/posix/votingdefs.h"
 #elif defined(VOTING_PLATFORM_FREERTOS)
-#include "os/freertos/votingdefs.h"
+#include "os/freertos/votingdefs_freertos.h"
 #else
 #error "VOTING_PLATFORM is not set"
 #endif

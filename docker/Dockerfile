@@ -1,50 +1,54 @@
-# Stage 1: build base image with nix-shell
-FROM ubuntu:18.04 AS master-image
+# Reuse besspin:base
+FROM galoisinc/besspin:gfe
 
-RUN apt-get update && apt-get install -y wget git curl
+# Install needed packages
+#RUN apt-get update && apt-get install -y wget git curl make opam unzip lsb-release \
+#    autoconf libgmp3-dev m4 software-properties-common
 
-# Enable HTTPS support in wget and set nsswitch.conf to make resolution work within containers
-RUN apt-get install -y openssl ca-certificates \
-  && echo hosts: dns files > /etc/nsswitch.conf
+# Install Cryptol
+RUN apt-get install libtinfo5
+RUN wget https://github.com/GaloisInc/cryptol/releases/download/2.8.0/cryptol-2.8.0-Ubuntu14.04-64.tar.gz
+RUN tar xvzf cryptol-2.8.0-Ubuntu14.04-64.tar.gz
+RUN cp -r cryptol-2.8.0-Ubuntu14.04-64/bin/* /usr/local/bin/
+RUN cp -r cryptol-2.8.0-Ubuntu14.04-64/share/* /usr/local/share
+RUN rm cryptol-2.8.0-Ubuntu14.04-64.tar.gz
 
-# Download Nix and install it into the system.
-RUN wget https://nixos.org/releases/nix/nix-2.2.1/nix-2.2.1-x86_64-linux.tar.bz2 \
-  && echo "e229e28f250cad684c278c9007b07a24eb4ead239280c237ed2245871eca79e0  nix-2.2.1-x86_64-linux.tar.bz2" | sha256sum -c \
-  && tar xjf nix-*-x86_64-linux.tar.bz2 \
-  && addgroup --gid 30000 nixbld \
-  && for i in $(seq 1 30); do adduser --disabled-password --gecos --no-create-home --uid $((30000 + i)) nixbld$i; usermod -a -G nixbld nixbld$i ; done \
-  && mkdir -m 0755 /etc/nix \
-  && echo 'sandbox = false' > /etc/nix/nix.conf \
-  && mkdir -m 0755 /nix && USER=root sh nix-*-x86_64-linux/install \
-  && ln -s /nix/var/nix/profiles/default/etc/profile.d/nix.sh /etc/profile.d/ \
-  && rm -r /nix-*-x86_64-linux* \
-  && rm -rf /var/cache/apk/* \
-  && /nix/var/nix/profiles/default/bin/nix-collect-garbage --delete-old \
-  && /nix/var/nix/profiles/default/bin/nix-store --optimise \
-  && /nix/var/nix/profiles/default/bin/nix-store --verify --check-contents
-
-ENV \
-    ENV=/etc/profile \
-    USER=root \
-    PATH=/nix/var/nix/profiles/default/bin:/nix/var/nix/profiles/default/sbin:/bin:/sbin:/usr/bin:/usr/sbin \
-    GIT_SSL_CAINFO=/nix/var/nix/profiles/default/etc/ssl/certs/ca-bundle.crt \
-    NIX_PATH=/nix/var/nix/profiles/per-user/root/channels \
-    NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
-    SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt \
-    GIT_SSL_CAINFO=/etc/ssl/certs/ca-certificates.crt
+# Install Z3 solver
+RUN apt-get install -y unzip
+RUN wget https://github.com/Z3Prover/z3/releases/download/Z3-4.8.5/z3-4.8.5-x64-ubuntu-16.04.zip
+RUN unzip z3-4.8.5-x64-ubuntu-16.04.zip
+RUN cp -r z3-4.8.5-x64-ubuntu-16.04/bin/* /usr/local/bin/
+RUN cp -r z3-4.8.5-x64-ubuntu-16.04/include/* /usr/local/include/
+RUN rm z3-4.8.5-x64-ubuntu-16.04.zip
 
 # Set the working directory
-WORKDIR /tool-suite
+WORKDIR /voting-system
 
-# NOTE: just temporary
-# Allow building broken packages (needed for cryptol)
-RUN mkdir -p /root/.config/nixpkgs/
-RUN echo "{ allowBroken = true; }" > /root/.config/nixpkgs/config.nix
+# Additional tools
+RUN apt-get install -y bash-completion emacs xxd clang-format clang-tidy
 
-# make sure your domain is accepted
-RUN mkdir -p /root/.ssh/ && touch /root/.ssh/known_hosts
-RUN ssh-keyscan gitlab-ext.galois.com >> /root/.ssh/known_hosts
-RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+#  Opam
+RUN apt-get update
+RUN apt-get install -y opam
+RUN apt-get install -y zlib1g-dev libgmp-dev libgtksourceview2.0-dev libgnomecanvas2-dev autoconf
+RUN apt-get install -y graphviz
+RUN opam init -y --disable-sandboxing --auto-setup
+RUN opam update
+RUN opam install depext -y
+RUN opam depext zarith lablgtk conf-gtksourceview conf-gnomecanvas -y
+RUN opam install -y zarith lablgtk conf-gtksourceview conf-gnomecanvas
+RUN opam install yojson -y
+RUN opam install coq -y
+RUN opam install why why3 -y
+RUN opam config env
 
-# Install clang and make
-RUN apt-get update && apt-get install -y clang make
+# Frama-C install
+RUN mkdir -p /tools
+RUN wget https://github.com/Frama-C/Frama-C-snapshot/wiki/downloads/frama-c-19.0-Potassium.tar.gz -P /tools
+RUN cd /tools && tar -xf frama-c-19.0-Potassium.tar.gz
+RUN rm /tools/frama-c-19.0-Potassium.tar.gz
+RUN opam depext frama-c
+RUN opam install --deps-only frama-c
+RUN opam pin add --kind=path frama-c /tools/frama-c-19.0-Potassium -y
+
+ENV PATH="/root/.opam/default/bin:${PATH}"
