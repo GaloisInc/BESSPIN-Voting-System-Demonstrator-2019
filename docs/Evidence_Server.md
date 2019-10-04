@@ -55,7 +55,7 @@ Evidence Server,
 - "Public Evidence from Secret Ballots" by Bernhard,
 - "End-to-end verifiability" by Benaloh.
 
-@todo an itemized list or table indicating where to find more information
+@todo abakst an itemized list or table indicating where to find more information
 
 ## Glossary
 
@@ -91,8 +91,6 @@ requirements are as follows:
 
 - [Availability] The election server should remain available under heavy load.
 
-@todo abakst gajaka: [Soundness] No clashing items must both appear on the Bulletin Board.
-
 ## Documentation
 
 This document is currently the only documentation for the Evidence Server. The
@@ -121,5 +119,5 @@ Joe Kiniry, Alexander Bakst, Dragan Stosic
 
 ## Funders
 
-@todo indicate DARPA's support and indicate if any other agencies
+@todo abakst indicate DARPA's support and indicate if any other agencies
 contributed resources
