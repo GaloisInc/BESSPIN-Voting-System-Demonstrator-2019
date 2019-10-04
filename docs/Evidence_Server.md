@@ -115,7 +115,9 @@ Our overall approach to system assurance is summarized in
 
 ## Contributors
 
-Joe Kiniry, Alexander Bakst, Dragan Stosic
+ - Alexander Bakst worked on this subsystem description.
+ - Dragan Stosic worked on this subsystem description.
+ - Joe Kiniry worked on this subsystem description.
 
 ## Funders
 
