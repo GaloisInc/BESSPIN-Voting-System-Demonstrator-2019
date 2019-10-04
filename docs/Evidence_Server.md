@@ -55,7 +55,7 @@ Evidence Server,
 - "Public Evidence from Secret Ballots" by Bernhard,
 - "End-to-end verifiability" by Benaloh.
 
-@todo abakst an itemized list or table indicating where to find more information
+@todo abakst: an itemized list or table indicating where to find more information
 
 ## Glossary
 
