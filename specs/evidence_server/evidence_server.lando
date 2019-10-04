@@ -9,8 +9,8 @@ component EvidenceServer
   component PublicServerAPI
     The interface between the evidence and the public.
     What is the decryption of my challenged ballot?
-    What is the evidence evidence?
     What are the collected encrypted ballots?
+    What is the election evidence?
 
 PrivateServerAPI client Logging
 PublicServerAPI  client Network
