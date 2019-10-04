@@ -75,7 +75,7 @@ requirements are as follows:
   Bulletin Board.
 - [Permanence] Once published, no unit of evidence can be removed from the
   Bulletin Board.
-- [Persistence] Data should be immutable and persistent.
+- [Immutability] Imported evidence is immutable.
 - [Challenge] Using the Evidence Server, voters can verify challenged ballots.
 - [CollectedAsCast] Using the Evidence Server, voters can independently verify
   that their receipt appears in the list of collected ballots.
