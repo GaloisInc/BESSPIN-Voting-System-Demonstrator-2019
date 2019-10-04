@@ -94,8 +94,8 @@ requirements are as follows:
 ## Documentation
 
 This document is currently the only documentation for the Evidence Server. The
-overall description of the BESSPIN Voting System 2020 is found in its [parent
-description](./BVS_2020_system_description.md).
+overall description of the BESSPIN Voting System 2020 is found in its
+[parent description](./BVS_2020_system_description.md).
 
 ## Validation and Verification Methodology
 
