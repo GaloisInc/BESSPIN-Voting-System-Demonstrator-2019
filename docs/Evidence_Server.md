@@ -55,7 +55,13 @@ Evidence Server,
 - "Public Evidence from Secret Ballots" by Bernhard,
 - "End-to-end verifiability" by Benaloh.
 
-@todo abakst: an itemized list or table indicating where to find more information
+The Evidence Server artifacts are:
+
+- This description.
+- The development [plan](../specs/evidence_server/plan.lando).
+
+@todo abakst: update with domain model
+@todo abakst: update with pointer to sources
 
 ## Glossary
 
@@ -98,15 +104,6 @@ overall description of the BESSPIN Voting System 2020 is found in its
 [parent description](./BVS_2020_system_description.md).
 
 ## Validation and Verification Methodology
-
-- The recorded-as-cast verification is provided by the publication of a list of
-  all the encrypted votes that have been submitted.
-- Every honest voter who receives a valid receipt is assured that her vote will
-  be published on the Evidence Server and included in the election tally. A
-  voter is able to check himself using the tracking number that his vote is
-  included.
-- The Evidence Server provide cryptographically strong evidence that a voter’s
-  receipt corresponds to a ballot, on the bulletin board.
 
 Our overall approach to system assurance is summarized in
 [ASSURANCE.md](../ASSURANCE.md).
