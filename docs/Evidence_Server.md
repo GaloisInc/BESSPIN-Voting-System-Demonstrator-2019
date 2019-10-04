@@ -119,5 +119,5 @@ Joe Kiniry, Alexander Bakst, Dragan Stosic
 
 ## Funders
 
-@todo abakst indicate DARPA's support and indicate if any other agencies
+@todo abakst: indicate DARPA's support and indicate if any other agencies
 contributed resources
