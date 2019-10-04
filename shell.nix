@@ -1,1 +1,0 @@
-tool-suite/nix/dev/voting-system-public.nix

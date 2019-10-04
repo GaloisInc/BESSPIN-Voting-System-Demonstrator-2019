@@ -8,7 +8,7 @@
 # where x86_64-081978aa  is a suitable tag for your architecture (and date)
 # then we have to re-tag the image:
 # sudo docker tag gitlab/gitlab-runner-helper:x86_64-081978aa gitlab-runner-helper:11.2.0
-image: galoisinc/besspin:besspin_base_image
+image: galoisinc/besspin:voting_system
 
 
 before_script:
@@ -46,11 +46,8 @@ before_script:
     - git submodule init
     - git submodule update
 
-    ##
-    ## Cleanup any old artifacts
-    ##
+    ## Clean any remaining artifacts
     - make clean_all
-    
 
 #-----------------------------------------------------------------------------#
 #
@@ -60,52 +57,53 @@ before_script:
 SbbFpga_LLVM:
   script:
     - export USE_CLANG=yes
-    - nix-shell --run 'make fpga'
+    - export C_INCLUDE_PATH=$RISCV_C_INCLUDE_PATH
+    - make fpga
   tags: ["voting-system"]
 
 SbbSim_LLVM:
   script:
     - export USE_CLANG=yes
-    - nix-shell --run 'make sim'
+    - export C_INCLUDE_PATH=$RISCV_C_INCLUDE_PATH
+    - make sim
   tags: ["voting-system"]
 
 
 SbbFpga_GCC:
   script:
-    - nix-shell --run 'make fpga'
+    - make fpga
   tags: ["voting-system"]
 
 SbbSim_GCC:
   script:
-    - nix-shell --run 'make sim'
+    - make sim
   tags: ["voting-system"]
 
 Bottom:
   script:
     - export TARGET=bottom
-    - nix-shell --run 'make bottom_all'
+    - make bottom_all
   tags: ["voting-system"]
 
 Typecheck:
   script:
     - export TARGET=verification
-    - nix-shell --run 'make typecheck_all'
+    - make typecheck_all
   tags: ["voting-system"]
 
 Verify:
   script:
     - export TARGET=verification
-    - nix-shell --run 'make verify_all'
+    - make verify_all
   tags: ["voting-system"]
 
 FreeRTOS:
   script:
     - export TARGET=freertos
-    - nix-shell --run 'make freertos_all'
+    - make freertos_all
   tags: ["voting-system"]
 
 HostTests:
-# Host tests shouldn't need tools from nix-shell 
   script:
     - export TARGET=hosttests
     - make hosttest_all
@@ -129,5 +127,6 @@ Posix_Network_Logs:
 Simulator:
   script:
     - export TARGET=sim
-    - nix-shell --run 'make sim_all'
+    - make sim_all
   tags: ["voting-system"]
+
