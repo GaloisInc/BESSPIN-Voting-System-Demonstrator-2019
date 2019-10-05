@@ -45,53 +45,77 @@ available, all of the evidence generated during the election. This includes:
 
 ## Manifest
 
-[Code repository](https://gitlab-ext.galois.com/ssith/voting-system) for the BVS 2020.
+This subsystem's artifacts are found in the following locations:
 
-The main artifacts to read to better understand what the background is on the
-Evidence Server,
+- [Development Plan](../specs/evidence_server/plan.lando).
+- _Documentation_: TBD
+- _Specification_: TBD
+- _Source Code_: TBD
 
-- The original STAR-Vote paper "STAR-Vote: A Secure, Transparent, Auditable, and
-  Reliable Voting System" by Bell,
-- "Public Evidence from Secret Ballots" by Bernhard,
-- "End-to-end verifiability" by Benaloh.
+The following issues track the design and development of this
+subsystem:
 
-The Evidence Server artifacts are:
+- _Development Plan_: #176
+- _System Description_: #177
+- _Threat Model_: #179
+- _Domain Model_: #178
 
-- This description.
-- The development [plan](../specs/evidence_server/plan.lando).
+The following is a list of background reading to give context for the evidence
+server.
 
-@todo abakst: update with domain model
-@todo abakst: update with pointer to sources
+- "STAR-Vote: A Secure, Transparent, Auditable, and Reliable Voting System" by
+  Bell, et al.
+  [PDF](https://www.usenix.org/system/files/conference/evtwote13/jets-0101-bell.pdf)
+- "Public Evidence from Secret Ballots" by Bernhard, et al.
+  [PDF](https://arxiv.org/pdf/1707.08619.pdf)
+- "End-to-end verifiability" by Benaloh, et al.
+  [PDF](https://arxiv.org/ftp/arxiv/papers/1504/1504.03778.pdf)
+
 
 ## Glossary
 
-[Glossary](https://github.com/FreeAndFair/ElectionGlossary/blob/master/Glossary.md) for the BVS 2020.
+Our system glossary is based upon the 
+[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary),
+which is in turn based upon the 
+[NIST Election Glossary](https://pages.nist.gov/ElectionGlossary/).
+
 
 ## Requirements
 
 The Evidence Server’s requirements are derived from the overall BVS 2020 system
 goal of implementing an end-to-end verifiable election. Thus, the mandatory
-requirements are as follows:
+requirements are as follows.
 
 ### Mandatory
 
-- [EvidenceBounds] If evidence appears on the server, then it is signed and
+- [EvidenceBounds] Evidence available from the server is always signed and
   verifiable evidence for the election.
-- [Confirmability] Any unit of evidence with a valid receipt must appear on the
-  Bulletin Board.
-- [Permanence] Once published, no unit of evidence can be removed from the
-  Bulletin Board.
-- [Immutability] Imported evidence is immutable.
-- [Challenge] Using the Evidence Server, voters can verify challenged ballots.
-- [CollectedAsCast] Using the Evidence Server, voters can independently verify
-  that their receipt appears in the list of collected ballots.
-- [TalliedAsCollected] Using the Evidence Server, anyone can download the
-  encrypted cast ballots and tabulate them.
-- [VoterConfidentiality] Secret information about voters should not be exposed.
-- [Compliance] Exposed data is subject to relevant privacy laws.
-- [VerifyElection] Using the Evidence Server, an election verifier can download
-  the election evidence in order to verify the election.
 
+- [Confirmability] Any unit of evidence with a valid receipt must be available
+  from the evidence server.
+
+- [Permanence] Once published, a unit of evidence must not be removed from the
+  evidence server.
+
+- [Immutability] Evidence stored on the evidence server must be immutable.
+
+- [Challenge] The evidence server's interface must enable users to verify
+  challenged ballots.
+
+- [CollectedAsCast] The evidence server's interface must enable users to
+  verify that a given receipt appears in the list of collected ballots.
+
+- [TalliedAsCollected] The evidence server's interface must enable users to
+  download the collection of encrypted, cast ballots.
+
+- [VoterConfidentiality] The evidence server's interface must not allow users to
+  to learn secret information about voters.
+
+- [VerifyElection] The evidence server's interface must allow users to download
+  the complete evidence for the election.
+
+- [Compliance] The evidence server's interface must expose information only in
+  accordance with relevant privacy laws.
 
 ### Optional
 
