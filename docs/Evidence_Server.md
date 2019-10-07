@@ -47,6 +47,8 @@ available, all of the evidence generated during the election. This includes:
 
 This subsystem's artifacts are found in the following locations:
 
+@todo abakst: fill in TBDs for Documentation, Specification, and Source Code
+
 - [Development Plan](../specs/evidence_server/plan.lando).
 - _Documentation_: TBD
 - _Specification_: TBD
