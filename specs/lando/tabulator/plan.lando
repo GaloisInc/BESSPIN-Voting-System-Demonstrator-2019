@@ -1,7 +1,8 @@
 Tabulator Plan
 indexing
-  owner: Joe Kiniry
-  contributors: Joey Dodds, Daniel Wagner
+  owner: Joe Kiniry <kiniry@freeandfair.us>
+  contributors: Joey Dodds <jdodds@galois.com>
+                Daniel Wagner <dmwit@galois.com>
   effort: low
   complexity: high
   risk: low
