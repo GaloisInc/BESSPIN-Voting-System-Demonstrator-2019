@@ -1,11 +1,9 @@
 Evidence Server Plan
-Evidence Server submodule design, implementation and assurance.
 indexing
   owner: Dragan Stosic <dragan.stosic@freeandfair.us>
-  contributors: Aleksander Bakst <abakst@galois.com>; 
+  contributors: Aleksander Bakst <abakst@galois.com>
                 Joe Kiniry <kiniry@freeandfair.us>
-
-  effort:
+  effort: estimates for the following:
      documentation: 3 weeks
      design: 7 weeks and 3 days
      architecture management: 2 weeks 
