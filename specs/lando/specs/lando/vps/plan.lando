@@ -2,7 +2,7 @@ Verifiable Paper Server Plan
 indexing
   owner: Haneef Mubarak
   contributors:
-  effort: high
+  effort: medium
   complexity: high
   risk: medium
   dependencies: SHIELD, Receipt Printer
