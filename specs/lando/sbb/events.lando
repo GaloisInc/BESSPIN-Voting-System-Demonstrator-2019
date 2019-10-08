@@ -1,7 +1,12 @@
 events SBB
 
 Standby
-Initial state wherein the ballot box is ready and waiting for a paper to be inserted.
+Initial state wherein the ballot box is ready and waiting for a paper to be
+inserted.
+
+Abort
+State in which the ballot box has detected an error from which it can not
+recover.
 
 MotorForward
 Move motor forward, to feed paper inside the ballot box.
@@ -13,8 +18,8 @@ MotorBackward
 Move motor backward, to feed paper out of the ballot box.
 
 PaperDetected
-The paper sensor does not detect any paper then a sheet of paper is inserted into
-the paper feeder and is detected by the paper sensor.
+The paper sensor does not detect any paper then a sheet of paper is inserted
+into the paper feeder and is detected by the paper sensor.
 
 PaperInserted
 The paper sensor detects some paper.
@@ -26,12 +31,6 @@ the paper is deposited inside the ballot box.
 PaperReturned
 The paper sensor detects some paper, then does not, thus
 paper has been removed from the feeder tray.
-
-PaperSensorTrigger
-The paper sensor detects paper.
-
-EarlyPaperSensorIsReleased
-The paper sensor detects no paper.
 
 DisplaySomeText
 Some text is diplayed on the LCD display.
@@ -62,3 +61,18 @@ The spoil light is turned off.
 
 BarcodeScanned
 A barcode is scanned.
+
+CastSpoilTimerStart
+A countdown begins after asking the user to make a decision.
+
+CastSpoilTimeout
+The timer expires while waiting for a user to make a decision.
+
+LogSystemEvent
+The ballot box records a system event.
+
+LogCastBallot
+The ballot box records a cast ballot.
+
+LogSpoiledBallot
+The ballot box records a spoiled ballot.
