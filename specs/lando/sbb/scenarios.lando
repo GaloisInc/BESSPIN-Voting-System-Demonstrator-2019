@@ -14,12 +14,38 @@ whether they want to accept or spoil the ballot; they choose to spoil
 it; the ballot is spoiled from the paper feeder; then the ballot box
 returns to the standby state.
 
-Spoil_invalid_ballot // NORMAL
+Eject_invalid_ballot // NORMAL
 Startup the system, and wait for an inserted paper; a ballot with
-invalid barcode is inserted; the ballot is scanned, and becasue the
-barcode is not valid, the ballot is spoiled from the paper feeder; the
-ballot box prints Ballot spoiled message; then the ballot box returns
+invalid barcode is inserted; the ballot is scanned, and because the
+barcode is not valid, the ballot is ejected from the paper feeder; the
+ballot box prints Ballot invalid message; then the ballot box returns
 to the standby state.
+
+Eject_old_cast_ballot // NORMAL
+Startup the system, and wait for an inserted paper; a ballot with a valid
+barcode is inserted; the ballot is scanned, the barcode is read; ask the user
+whether they want to accept or spoil the ballot; they choose to cast it; the
+ballot is fed into the ballot box; the ballot box returns to the standby state;
+the user inserts a ballot with the same barcode, the ballot is scanned, the
+barcode is read; the ballot box ejects the ballot; then the ballot box returns
+to the standby state.
+
+Eject_old_spoiled_ballot // NORMAL
+Startup the system, and wait for an inserted paper; a ballot with
+a valid barcode is inserted; the ballot is scanned, the barcode is read;
+ask the user whether they want to accept or spoil the ballot; they
+choose to spoil it; the ballot is ejected from the paper feeder;
+the ballot box returns to the standby state; the user inserts
+the same ballot, the ballot is scanned, the barcode is read; the
+ballot box ejects the ballot; then the ballot box returns to the
+standby state.
+
+Eject_expired_ballot // NORMAL
+Startup the system, and wait for an inserted paper; a ballot with a valid but
+expired barcode is inserted; the ballot is scanned, the barcode is read; because
+the ballot has expired, the ballot is ejected from the paper feeder; the ballot
+box prints expired ballot message; then the ballot box returns to the standby
+state.
 
 Ballot_with_no_barcode // NORMAL
 Startup the system, and wait for an inserted paper; a ballot with no
@@ -27,3 +53,24 @@ barcode is inserted; the ballot is scanned, and because the barcode
 cannot be found, the ballot is spoiled from the paper feeder; the
 ballot box prints a ballot spoiled message; then the ballot box
 returns to the standby state.
+
+User_indecision // NORMAL
+Startup the system, and wait for an inserted paper; a valid ballot is
+inserted; the ballot is scanned, the barcode is read; ask the user
+whether they want to accept or spoil the ballot; the system times out
+waiting for the user to decide; the ballot box ejects the ballot;
+then the ballot returns to the standby state.
+
+Fail to create logs // ERROR
+Startup the system; the system does not contain existing log files and attempts
+to create them; the logging system fails to create log files; the ballot box
+aborts.
+
+Fail to import logs // ERROR
+Startup the system; the system contains existing log files; the ballot box
+attempts to import them; the logging system fails to import log files; the
+ballot box aborts.
+
+Log failure // ERROR
+Startup the system; the system attempts to log messages during execution;
+the logging system fails to record an event; the ballot box aborts.
