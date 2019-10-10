@@ -32,27 +32,29 @@ review. The development workflow is as follows:
    Remove the "WIP:" prefix and add the `ready for review` label. Before it can
    be merged, you will generally have to `rebase` your branch on to the `master`
    branch in order to preserve a clean commit history. You can do this with
-   commands in your branch: `git fetch`, then `git rebase origin/master`
+   commands in your branch: `git fetch`, then
+   `git rebase --exec 'git commit --amend --no-edit -n -S' origin/master`
    (addressing any merge conflicts if necessary), and finally
    `git push --force-with-lease origin <yourbranch>`. **Do _NOT_ use the GitLab
    "Rebase" button (in the MR), because it will generate unsigned commits.**
-7. Note that *force-pushes can be dangerous*, so make sure that you know that no
+6. Note that *force-pushes can be dangerous*, so make sure that you know that no
    one else has pushed changes to the branch that aren't in the history of your
    local branch.  If others on the team are pulling and testing it locally, they
    will need to fix up their local branches with `git checkout <yourbranch>`,
    `git fetch`, and `git reset --hard origin/<yourbranch>`. For more details,
    please see [The Dark Side of the Force Push] and
    [--force considered harmful; understanding git's --force-with-lease].
-8. Typically, at least one _other_ person must review any changes to the
+7. Typically, at least one _other_ person must review any changes to the
    `master` branch and approve it using the GitLab MR interface. A _reviewer_
    should check that all necessary comments are addressed.
-9. Once it has been approved, and (if necessary because of intervening merges
-   to master) rebased, a _reviewer_ with merge permissions can merge the MR
-   using the GitLab "Merge" button, with the "Delete source branch" checkbox
-   _checked_ and the "Squash commits" checkbox _not checked_. This will
-   introduce an _unsigned_ merge commit, but preserve the signatures, if any, on
-   the actual branch's commits, and will delete the branch once it is merged.
-10. If, for some reason, the "Delete source branch" checkbox was not checked,
+8. Once it has been approved, a _reviewer_ with merge permissions should 
+   sign the tip commit `git commit -S --amend --no-edit -n`, push (force with
+   lease), and then merge the MR using the GitLab "Merge" button, with the
+   "Delete source branch" checkbox _checked_ and the "Squash commits" checkbox
+   _not checked_. This will introduce an _unsigned_ merge commit, but preserve
+   the signatures, if any, on the actual branch's commits, and will delete the
+   branch once it is merged.
+9. If, for some reason, the "Delete source branch" checkbox was not checked,
    the reviewer that merges the branch should manually delete the branch
    after the merge.
 
