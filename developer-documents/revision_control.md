@@ -42,8 +42,8 @@ review. The development workflow is as follows:
    local branch.  If others on the team are pulling and testing it locally, they
    will need to fix up their local branches with `git checkout <yourbranch>`,
    `git fetch`, and `git reset --hard origin/<yourbranch>`. For more details,
-   please see [The Dark Side of the Force Push] and
-   [--force considered harmful; understanding git's --force-with-lease].
+   please see [The Dark Side of the Force Push][] and
+   [--force considered harmful; understanding git's --force-with-lease][].
 7. Typically, at least one _other_ person must review any changes to the
    `master` branch and approve it using the GitLab MR interface. A _reviewer_
    should check that all necessary comments are addressed.
@@ -69,14 +69,14 @@ review. The development workflow is as follows:
   excessive small commits; the development history of topic branches should be
   preserved as much as is reasonable. Use your judgement.
 - Write short, useful commit messages with a consistent style. Follow these
-  [seven rules], with the amendment that on this project, we have adopted the
+  [seven rules][], with the amendment that on this project, we have adopted the
   convention of ending the subject line with a period.
 - Keep your topic branches small to facilitate review.
 - Before merging someone else's MR, make sure other reviewers' comments are
   resolved, and that the MR author considers the MR ready to merge.
 - For security-sensitive code, ensure your changes have received an in-depth
   review, preferably from multiple reviewers.
-- Configure Git so that your commits are [signed].
+- Configure Git so that your commits are [signed][].
 - Whenever possible, use automation to avoid committing errors or noise (e.g.
   extraneous whitespace). Use linters, automatic code formatters, test runners,
   and other static analysis tools. Configure your editor to use them, and when
