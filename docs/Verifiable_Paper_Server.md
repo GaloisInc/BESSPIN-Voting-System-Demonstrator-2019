@@ -9,13 +9,13 @@ the BVS Protocol, discussed in [protocol.md](protocol.md).
 
 ## Overview
 
-The Verifiable Paper Server is a secure database that associates and
-authenticates physical election artifact paper reciepts with SHIELD
-dielets embedded in them against cryptographically committed digital
-interpretations of marked paper ballots. These links are be used to
-prove that voters' selections were correctly interpreted and committed
-to by the machine in the explicit and sole opinion of each voter in
-question.
+The Verifiable Paper Server is a secure, publicly-accessible server
+that associates and authenticates physical election artifact paper
+reciepts with SHIELD dielets embedded in them against cryptographically
+committed digital interpretations of marked paper ballots. These links
+are be used to prove that voters' selections were correctly interpreted
+and committed to by the machine in the explicit and sole opinion of
+each voter in question.
 
 While in operation at a *Polling Place*, the VPS records in an
 append-only fashion associations between cryptographic commitments
@@ -37,6 +37,17 @@ The VPS subsystem thus far has the following artifacts:
 
 1. The VPS *development plan*, which is a part of the overall BVS 2020 plan.
 2. This VPS [description itself](#verifiable-paper-server).
+
+The VPS subsystems is heavily dependent upon technology developed as
+part of the DARPA SHIELD (Supply Chain Hardware Integrity for
+Electronics Defense) program; more information about that program is
+available as follows:
+
+1. DARPA MTO [Program Information](https://www.darpa.mil/program/supply-chain-hardware-integrity-for-electronics-defense)
+2. Software and Supply Chain Assurance Winter Forum 2018 [Presentation](https://csrc.nist.gov/CSRC/media/Projects/cyber-supply-chain-risk-management/documents/SSCA/Winter_2018/TuePM2.1-SHIELD.pdf)
+3. Galois [Press Release](https://galois.com/news/galois-awarded-darpa-subcontract-to-strengthen-supply-chain-protection-of-electronic-components/)
+4. SRI International [Press Release](https://www.sri.com/newsroom/press-releases/sri-international-selected-darpa-develop-artificial-intelligence-system)
+5. [Secure and Efficient Initialization and Authentication Protocols for SHIELD](https://eprint.iacr.org/2015/210.pdf)
 
 ## Glossary
 
@@ -60,15 +71,29 @@ which is in turn based upon the [NIST Election Glossary][].
 
 ### Mandatory
 
- - *[BVS\_VPS\_Log]* The VPS must securely log persistent data in an immutable, append-only manner.
- - *[BVS\_VPS\_Record]* The VPS must record associations between cryptographic commitments to digital interpretations of a ballot and SHIELD dielets embedded in paper receipts stating such commitments.
- - *[BVS\_VPS\_Evidence]* The VPS must send associations between commitments and dielets to the *Evidence Server*.
- - *[BVS\_VPS\_ChallengeResponse]* The VPS must issue challenges to and authenticate responses from SHIELD dielets.
+ - *[BVS-VPS-Log]* The VPS must securely log persistent data in an immutable,
+   append-only manner.
+ - *[BVS-VPS-Record]* The VPS must record associations between cryptographic
+   commitments to digital interpretations of a ballot and SHIELD dielets
+   embedded in paper receipts stating such commitments.
+ - *[BVS-VPS-Evidence]* The VPS must send associations between commitments and
+   dielets to the *Evidence Server*.
+ - *[BVS-VPS-ChallengeResponse]* The VPS must issue challenges to and
+   authenticate responses from SHIELD dielets.
+ - *[BVS-VPS-Authentication]* The VPS must securely authenticate bidirectionally
+   with both the *Evidence Server* and the *Ballot Scanning Device* prior to
+   transmitting or receiving any non-authentication data.
+ - *[BVS-VPS-Communication]* The VPS must ensure that all communications between
+   itself and both the *Evidence Server* and *Ballot Scanning Device* are
+   secure.
 
 ### Optional
 
-- *[BVS\_VPS\_Compare]* The VPS should be able to accept a log of associations from an *Evidence Server* and compare them against its internal records, flagging any and all discrepancies for review by the *Electoral Commission*.
-- *[BVS\_VPS\_ReuseWork]* The VPS should be implemented in a manner based off of the reference SHIELD server with a consideration towards reusing code if useful.
+- *[BVS-VPS-Compare]* The VPS should be able to accept a log of associations
+  from an *Evidence Server* and compare them against its internal records,
+  flagging any and all discrepancies for review by the *Electoral Commission*.
+- *[BVS-VPS-ReuseWork]* The implementation of the VPS should reuse work from the
+  reference SHIELD serves as much as is useful.
 
 ## Documentation
 
