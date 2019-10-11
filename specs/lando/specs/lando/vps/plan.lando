@@ -1,0 +1,8 @@
+Verifiable Paper Server Plan
+indexing
+  owner: Haneef Mubarak <haneef@galois.com>
+  contributors:
+  effort: medium
+  complexity: high
+  risk: medium
+  dependencies: SHIELD, Receipt Printer
