@@ -93,7 +93,7 @@ which is in turn based upon the [NIST Election Glossary][].
   from an *Evidence Server* and compare them against its internal records,
   flagging any and all discrepancies for review by the *Electoral Commission*.
 - *[BVS-VPS-ReuseWork]* The implementation of the VPS should reuse work from the
-  reference SHIELD serves as much as is useful.
+  reference SHIELD server as much as is useful.
 
 ## Documentation
 
