@@ -1,11 +1,12 @@
 # Static and Runtime Assurance based on Formal Verification of the BESSPIN Voting System
 
-The assurance case for the BESSPIN Voting System spans multiple
-specification languages and tools that we use to satisfy requirements
-and specify subsystem components, data types, runtime verification and
-correctness properties.
+The assurance case for the BESSPIN Voting System spans multiple specification
+languages and tools that we use to satisfy requirements and specify subsystem
+components, data types, runtime verification and correctness properties.
 
 # BVS 2019 Current Status
+
+## Cryptol Specifications
 
 Based on the requirements that every secure component in BVS must have
 cryptographic integrity and that all cryptographic operations used by
@@ -16,33 +17,25 @@ mathematical solvers to find counterexamples when program code does not
 agree with its specification. The Cryptol work can be found in the
 `cryptol` folder.
 
-For static assurance we use Frama-C, a modular static analysis framework
-for the C language, to assure that our implementations conform to a
-contract design written in ACSL and to provide an algebraic
-specification either by extracting Cryptol specifications to C or by
-formally describing some mission critical parts of the system in a
-top-to-bottom style. This work is partially complete.  A full 
-characterization of its status is ongoing as of September 2019 and 
-will be a part of the final BVS 2019 release.
+## Static Assurance 
 
-In this first phase of development [BVS
-2019](https://gitlab-ext.galois.com/ssith/voting-system/-/milestones/19),
-we have covered all methods with preconditions and postconditions
-seamlessly refactoring code to be much more compliant with the Frama-C
-EVA plugin. We put effort into algebraic specification, trying to
-describe the crypto submodule in order to find equivalence relations
-induced by the cryptographic properties. This is still an work in
-progress.
+We have provided algebraic specifications, derived from specifications written
+in Cryptol and Lando, for the crypto, logging, and controller (sbb) components.
+These specifications are written in ACSL.
 
-In parallel to this formal verification activity, unit tests have been
-derived from the specifications by using a slicing technique providing
-both types: regular and malicious tests for all submodules. The reason
-for the additional testing effort is that unit testing is
-well-established in the software quality dynamic assurance process of
-safety critical systems. Various tests can be seen in the `logging`,
-`sbb` and `protocols` submodules.  These tests can be run on a hosted
-POSIX development platform, in software simulation of the CPU via
-Verilator, or directly on the GFE in FPGA emulation.
+We then use these algebraic specifications to specify contracts (pre- and
+postconditions, again in ACSL) for the C implementations of these components. We
+use Frama-C/WP with runtime error annotation generation to check that each
+procedure satisfies its contract.
+
+The static assurance case is partially complete. Currently, the tool does not
+produce verify that each procedure meets its specification. Often this is due to
+completeness issues, but it is possible some contracts are not correct.
+
+## Dynamic Assurance
+
+In addition to ACSL specifications, each submodule includes a suite of unit
+tests (both positive and negative cases). These tests live in the [tests](source/tests) subdirectory.
 
 # BVS 2019 Future Work
 
