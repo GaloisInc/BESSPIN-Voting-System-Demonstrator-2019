@@ -22,9 +22,14 @@ Questions:
 
 ### During Election 
 
-- Delivery of forged evidence via:
-    - SD card (election official or malicious third party with physical access).
-    - Compromised local network connection to server.
+- Loading server with forged evidence via
+    - SD card
+        - Election official (i.e. party with correct credentials).
+        - Malicious third party with ability to compromise authentication &
+          authorization on physical server
+    - Network
+        - By spoofing identity of BSD or Tabulation device
+        - Tampering with dataflow over network
 
 ### Post-Election
 
