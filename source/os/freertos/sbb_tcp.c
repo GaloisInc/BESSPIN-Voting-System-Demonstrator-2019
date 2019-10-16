@@ -182,10 +182,12 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t eNetworkEvent)
         FreeRTOS_inet_ntoa(ulDNSServerAddress, cBuffer);
         FreeRTOS_printf(("DNS Server Address: %s\r\n\r\n\r\n", cBuffer));
 
-        /* 
-		 * Creates a task for the "peek/poke" embedded web server.
-		 */
+#ifdef PEEK_POKE_SERVER
+        /*
+         * Creates a task for the "peek/poke" embedded web server.
+         */
         peekPokeServerTaskCreate();
+#endif
     }
     else
     {

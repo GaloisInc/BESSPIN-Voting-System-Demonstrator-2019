@@ -57,8 +57,10 @@
 #include "sbb.h"
 #include "sbb_freertos.h"
 
+#ifdef PEEK_POKE_SERVER
 /* "Peek/poke" embedded web server */
 #include "peekpoke.h"
+#endif
 
 extern const uint16_t sbb_log_port_number;
 
@@ -175,11 +177,13 @@ int main(void)
 	xTaskCreate(vTestLED, "LED Test", 1000, NULL, 0, NULL);
 #endif
 
-    /* 
+#ifdef PEEK_POKE_SERVER
+  /*
 	 * Tells the peekPokeServer what its priority will be. The task won't
 	 * launch until peekPokeServerTaskCreate() is called.
 	 */
     peekPokeServerTaskPriority(SBB_PEEKPOKE_TASK_PRIORITY);
+#endif
 
     /* If all is well, the scheduler will now be running, and the following
        line will never be reached.  If the following line does execute, then
