@@ -1,6 +1,6 @@
 # Static Assurance
 
-## Completness
+## Completeness
 
 Currently, there exist contracts that Frama-c/WP can not prove automatically,
 due to compleness issues with Alt-Ergo.
