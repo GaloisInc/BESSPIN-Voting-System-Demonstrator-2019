@@ -28,8 +28,8 @@ postconditions, again in ACSL) for the C implementations of these components. We
 use Frama-C/WP with runtime error annotation generation to check that each
 procedure satisfies its contract.
 
-The static assurance case is partially complete. Currently, the tool does not
-produce verify that each procedure meets its specification. Often this is due to
+The static assurance case is partially complete. Currently, the tool is not able to
+verify that every procedure meets its specification. Often this is due to
 completeness issues, but it is possible some contracts are not correct.
 
 ## Dynamic Assurance
