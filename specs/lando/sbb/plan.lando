@@ -1,0 +1,14 @@
+Smart Ballot Box Plan
+indexing
+  owner: Steven Osborn <steven@freeandfair.us>
+  contributors: Michal Podhradsky <mpodhradsky@galois.com>
+                Haneef Mubarak <hmubarak@galois.com>
+                Parker Southwick <psouthwick@galois.com>
+                Steven Osborn <steven@freeandfair.us>
+                Alexander Bakst <abakst@galois.com>
+                Daniel Zimmerman <dmz@freeandfair.us>
+                Joey Dodds <jdodds@freeandfair.us>
+  effort: high
+  complexity: medium
+  risk: medium
+  dependencies: Logging, Crypto, Controller
