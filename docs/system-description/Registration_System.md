@@ -42,7 +42,20 @@ of several events may occur:
 
 ## Manifest
 
+This subsystem's artifacts are found in the following locations:
+
+- [Development Plan](../specs/lando/registration_system/plan.lando)
+- _Documentation_: No documentation beyond this file exists at the moment.
+- [Specification](../specs/lando/registration_system)
+- _Source Code_: No source code exists at the moment.
 - [Code repository for the BVS 2020](https://gitlab-ext.galois.com/ssith/voting-system)
+
+The following issues track the design and development of this subsystem:
+
+- _Development Plan_: #181
+- _System Description_: #182
+- _Threat Model_: #185
+- _Domain Model_: #183
 
 ## Glossary
 
@@ -170,9 +183,9 @@ analysis about dataflow may be of use.
 
 ## Contributors
 
- - Reuben Broadfoot and Noah Rich wrote the first draft of this
+ - Reuben Broadfoot, Noah Rich wrote the first draft of this
    description.
- - Joe Kiniry edited that first draft.
+ - Joe Kiniry and Alexander Bakst edited that first draft.
 
 ## Funders
 
