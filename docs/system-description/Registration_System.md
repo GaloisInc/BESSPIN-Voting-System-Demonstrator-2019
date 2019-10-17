@@ -71,10 +71,19 @@ Our top-level requirements are as follows.
  * *[AUTHENTICATE_VOTER]* Must be able to authenticate a voter.
  * *[VOTER_STYLE]* Must identify the correct ballot style for the
    voter.
- * *[UNKNOWN-UNDER-DISCUSSION]* Must be able to provide evidence of
-   registration and ballot style.
- * *[CHECK-IN-ONCE]* Must prevent a voter from checking-in to vote
-   more than once.
+ * *[LOG-CHECK-IN]* Must log every voter check-in.
+ * *[LOG-CHECK-IN-OK]* Must log, for each checked-in voter who is permitted to
+   vote, a record including the voter and the voter's ballot style.
+ * *[LOG-CHECK-IN-WRONG-PP]* Must log, for each voter who is permitted to vote
+   but not at the current polling place, a record including the voter and the
+   voter's designated polling place.
+ * *[LOG-CHECK-IN-NOT-PERMITTED]* Must log, for each voter who attempts to
+   check-in but is not permitted to vote, a record including the voter.
+ * *[LOG-CHECK-IN-TOKEN]* Upon check-in, must give a ballot style token to every
+   voter who is permitted to vote in the current election.
+ * *[LOG-EVIDENCE-SERVER]* Must send logs to the evidence server.
+ * *[CHECK-IN-ONCE]* Must prevent a voter from checking-in to vote more than
+   once.
  * *[REGISTRATION-TEXTUAL-UI]* Must have an textual interactive user
    interface for voter authentication.
  * *[REGISTRATION-EVIDENCE-EXPORT]* Must have the ability to export
