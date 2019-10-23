@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2019-05-27T20:58:35Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.4.1"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 0.64,
+        "LayerNumber": 4,
+        "Name": {
+            "ProjectId": "sbb-shield"
+        },
+        "Owner": "Steven Osborn <steven@lolsborn.com>",
+        "Size": {
+            "X": 68.58,
+            "Y": 53.34
+        }
+    }
+}
