@@ -83,8 +83,9 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
     {
         // assuming that we successfully formatted the string,
         // we can print it in a platform-appropriate way
-        f_printf(&the_io_stream->the_file, "%8s", buffer);
-        f_sync(&the_io_stream->the_file);
+        // TODO: comment out for now
+        //f_printf(&the_io_stream->the_file, "%8s", buffer);
+        //f_sync(&the_io_stream->the_file);
     }
     #else // not in debug mode
     int result = 0;
