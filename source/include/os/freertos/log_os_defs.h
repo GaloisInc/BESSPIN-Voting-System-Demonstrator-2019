@@ -3,18 +3,9 @@
 
 #include <stdint.h>
 
-#ifdef TARGET_FS_LittleFS
+#include "SDLib.h"
 
-#error "TARGET_FS_LittleFS not yet implemented"
+typedef size_t    file_offset;
+typedef char*     osd_file_stream;
 
-#else
-
-// Assume Target Filesystem is FatFS
-
-#include "ff.h"
-
-typedef FSIZE_t file_offset;
-typedef FIL     osd_file_stream;
-
-#endif // TARGET_FS_LittleFS
 #endif // __LOG_FS_FREERTOS_DEFS__H__
