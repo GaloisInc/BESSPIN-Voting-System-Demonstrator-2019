@@ -36,9 +36,9 @@ FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 
 FREERTOS_INCLUDES = \
-    -I. \
-  -I $(INCLUDE_DIR) \
-  -I $(INCLUDE_DIR)/crypto \
+	-I. \
+	-I $(INCLUDE_DIR) \
+	-I $(INCLUDE_DIR)/crypto \
 	-I$(FREERTOS_DEMO_DIR) \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
