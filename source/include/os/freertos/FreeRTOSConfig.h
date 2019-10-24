@@ -115,6 +115,9 @@
 #define INCLUDE_uxTaskGetStackHighWaterMark USE_STATS
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
 
+// See http://www.nadler.com/embedded/newlibAndFreeRTOS.html
+#define configUSE_NEWLIB_REENTRANT 1 // Required for thread-safety of newlib sprintf and friends
+
 /* Runtime stats definitions */
 // TODO: use only for debugging
 #define configUSE_STATS_FORMATTING_FUNCTIONS 1
