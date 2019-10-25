@@ -11,14 +11,14 @@ Log_FS_Result Log_FS_Initialize(void)
     }
 }
 
-// NOTE: not supported now
+// NOTE: new files are created automatically upon opening
 Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
                                 const char *name)   // IN
 {
     return LOG_FS_OK;
 }
 
-// NOTE: not supported now
+// NOTE: opening is automatic
 Log_FS_Result Log_FS_Open(Log_Handle *stream, const char *name)
 {
     return LOG_FS_OK;
@@ -27,18 +27,19 @@ Log_FS_Result Log_FS_Open(Log_Handle *stream, const char *name)
 // NOTE: not supported now
 bool Log_FS_File_Exists(const char *name)
 {
-    return false;
+    return sdlib_file_exists(name);
 }
 
-// NOTE: we close automatically
 Log_FS_Result Log_FS_Close(Log_Handle *stream)
 {
+    sdlib_close(stream->remote_file_name);
     return LOG_FS_OK;
 }
 
-// NOTE: we sync automatically
+// NOTE: we sync automatically and also upon closing the file
 Log_FS_Result Log_FS_Sync(Log_Handle *stream)
 {
+    sdlib_sync(stream->remote_file_name);
     return LOG_FS_OK;
 }
 
@@ -57,27 +58,26 @@ size_t Log_FS_Write(Log_Handle *stream, const uint8_t *data, size_t length)
     }
 }
 
-// NOTE: not supported now
 size_t Log_FS_Read(Log_Handle *stream, uint8_t *data, size_t bytes_to_read)
 {
-    return 0;
+    printf("Log_FS_Read: filename = %s\r\n",stream->remote_file_name);
+    size_t r = sdlib_read_from_file(stream->remote_file_name, data, bytes_to_read);
+    return r;
 }
 
-// NOTE: not supported now
 size_t Log_FS_Size(Log_Handle *stream)
 {
-    return 0;
+    return sdlib_size(stream->remote_file_name);
 }
 
 // NOTE: not supported now
 file_offset Log_FS_Tell(Log_Handle *stream)
 {
-    return 0;
+    return sdlib_tell(stream->remote_file_name);
 }
 
 // NOTE: not supported now
 void Log_FS_Seek(Log_Handle *stream, file_offset new_offset)
 {
-    (void)stream;
-    (void)new_offset;
+    sdlib_seek(stream->remote_file_name, new_offset);
 }
