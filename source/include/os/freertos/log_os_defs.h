@@ -6,7 +6,7 @@
 
 #if TARGET_FS_FAT
 #include "SDLib.h"
-typedef size_t    file_offset;
+typedef uint32_t    file_offset;
 typedef char*     osd_file_stream;
 #elif TARGET_FS_BLACK_SESAME
 #error "TARGET_FS_LittleFS not yet implemented"
