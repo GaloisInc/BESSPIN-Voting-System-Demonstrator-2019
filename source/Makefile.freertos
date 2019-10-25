@@ -23,7 +23,9 @@ USE_LED_BLINK_TASK ?= 0
 # Decide which compiler to use
 ifeq ($(USE_CLANG),yes)
 export CC		= clang --target=riscv32
-export CPP		= clang --target=riscv32
+# FIXME: clang doesn't support C++ compilation at the moment
+#export CPP		= clang --target=riscv32
+export CPP		= $(ARCHTARGET)-g++
 # LLVM doesn't support linking RISC-V files yet,
 # so we have to use GCC linker to do so	
 export GCC		= $(ARCHTARGET)-gcc
