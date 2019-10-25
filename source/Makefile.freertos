@@ -1,6 +1,7 @@
 # Set defaults
 NETWORK_LOGS     ?= yes
 FS_LOGS          ?= yes
+FS_TYPE			 ?= FAT
 PEEK_POKE_SERVER ?= yes
 USE_RTC_CLOCK ?= 1
 
@@ -193,19 +194,9 @@ export FREERTOS_PEEKPOKE_SRC = \
 
 export ARFLAGS=crsv
 
-export CFLAGS += $(WARNINGS) $(C_WARNINGS) $(INCLUDES) -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK)
+export CFLAGS += $(WARNINGS) $(C_WARNINGS) $(INCLUDES)
 # Disable warnings for C++ for now
-export CPPFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) $(INCLUDES) -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK)
-
-export CPP_SRC += $(FREERTOS_DEMO_DIR)/SD/src/SD.cpp \
-	$(FREERTOS_DEMO_DIR)/SD/src/File.cpp \
-	$(FREERTOS_DEMO_DIR)/SD/src/utility/Sd2Card.cpp \
-	$(FREERTOS_DEMO_DIR)/SD/src/utility/SdFile.cpp \
-	$(FREERTOS_DEMO_DIR)/SD/src/utility/SdVolume.cpp \
-	$(FREERTOS_DEMO_DIR)/SD/src/SDLib.cpp
-
-export INCLUDES += -I$(FREERTOS_DEMO_DIR)/SD/src
-
+export CPPFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) $(INCLUDES)
 
 export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib $(ARCH) $(ABI)
 export LIBS	 =	-lc -lgcc
@@ -221,7 +212,25 @@ ifeq ($(NETWORK_LOGS),yes)
 endif
 
 ifeq ($(FS_LOGS),yes)
-  export OS_SRC += $(OS_DIR)/log_fs.c
+ifeq ($(FS_TYPE),FAT)
+  export OS_SRC += $(OS_DIR)/log_fs_fat.c
+  export INCLUDES += -I$(FREERTOS_DEMO_DIR)/SD/src
+  export CFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK) -DTARGET_FS_FAT=1
+  export CPPFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK) -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK)
+  export CPP_SRC += $(FREERTOS_DEMO_DIR)/SD/src/SD.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/File.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/utility/Sd2Card.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/utility/SdFile.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/utility/SdVolume.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/SDLib.cpp
+else
+ifeq ($(FS_TYPE),BLACK_SESAME)
+	export OS_SRC += $(OS_DIR)/log_fs_black_sesame.c
+	export CFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK) -DTARGET_FS_BLACK_SESAME=1
+else
+$(error unknown FS_TYPE: $(FS_TYPE))
+endif
+endif
 endif
 
 DEMO_SRC = $(OS_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)

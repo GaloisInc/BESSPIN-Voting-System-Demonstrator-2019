@@ -17,6 +17,6 @@ CFLAGS += -DSIMULATION \
 
 # Set defaults
 NETWORK_LOGS     ?= no
-FS_LOGS          ?= yes
+FS_LOGS          ?= no
 PEEK_POKE_SERVER ?= no
 include Makefile.freertos
