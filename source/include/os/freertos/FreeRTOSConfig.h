@@ -122,6 +122,12 @@ extern uint32_t port_get_current_mtime(void);
 #define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
 #define portGET_RUN_TIME_COUNTER_VALUE() port_get_current_mtime()
 
+/* Make newlib reentrant */
+// See http://www.nadler.com/embedded/newlibAndFreeRTOS.html
+// Required for thread-safety of newlib sprintf and friends
+// NOTE: this feature is optional
+#define configUSE_NEWLIB_REENTRANT 0
+
 /* Co-routine definitions. */
 #define configUSE_CO_ROUTINES 0
 #define configMAX_CO_ROUTINE_PRIORITIES (2)
