@@ -1,5 +1,5 @@
 subsystem EvidenceServer
-The service that organizes and exposes the evidence logged by other components of the BVS 2020.
+The service that organizes and exposes to system auditors the evidence logged by other components of the BVS 2020.
 
 component Evidence extends Log
   Evidence is a record that the evidence server understands.          
@@ -28,8 +28,7 @@ component SmartBallotBoxRecord extends Evidence
   Records from the smart ballot box documenting the deposit of cast ballots.
 
 component TabulationRecord extends Evidence
-  @todo abakst what does this actually look like?
-  Record of the tabulation computation: the set of ballots plus their tabulation.          
+  Record of the election results.
 
 @todo abakst review the above with respect to the outcome of debate as to whether or not ballots are spoiled at SBB or BSD
 
