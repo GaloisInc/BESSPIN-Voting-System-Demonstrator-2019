@@ -15,16 +15,50 @@ compose f g x = f (g x)
     (b, v) = f a
     c      = g v b
 
-parameter
-  type RealWorld      : *
-  type TickTypeSize   : #
-  type constraint (fin TickTypeSize, TickTypeSize >= 16)
-  assertFalse         : {a} () -> a
-  getBarcode          : {l} RealWorld -> String l
-  getBarcodeLength    : RealWorld -> BarcodeLength
-  realWorldBool       : RealWorld -> (RealWorld, Bool)
-  ballotDetectTimeout : RealWorld -> (RealWorld, [TickTypeSize])
-  osdGetTicks         : RealWorld -> (RealWorld, [TickTypeSize])
+// You may change `TickTypeSize`, but it should satisfy the constraint
+// type constraint (fin TickTypeSize, TickTypeSize >= 16)
+type TickTypeSize = 32
+
+assertFalse : {a} a
+assertFalse = assertFalse
+
+type RealWorld =
+  // getBarcode is an infinite sequence of strings, each string being an
+  // infinite sequence of characters.  The concrete string ough to be the
+  // prefix of length last obtained via `getBarcodeLength`.
+  // This is done because there is no nice way of encoding the dependent type of
+  // a string of a given length using records.
+  { ballotDetectTimeout : [inf][TickTypeSize]
+  , osdGetTicks         : [inf][TickTypeSize]
+  , getBarcode          : [inf][inf]Char
+  , getBarcodeLength    : [inf]BarcodeLength
+  , realWorldBool       : [inf]Bool
+  }
+
+ballotDetectTimeout : StateTransformerReturning [TickTypeSize]
+ballotDetectTimeout s = (updateWorldState (\ w -> { w | ballotDetectTimeout -> tail l }) s, head l)
+  where
+    l = s.worldState.ballotDetectTimeout
+
+osdGetTicks : StateTransformerReturning [TickTypeSize]
+osdGetTicks s = (updateWorldState (\ w -> { w | osdGetTicks -> tail l }) s, head l)
+  where
+    l = s.worldState.osdGetTicks
+
+getBarcode : StateTransformerReturning ([inf]Char)
+getBarcode s = (updateWorldState (\ w -> { w | getBarcode -> tail l }) s, head l)
+  where
+    l = s.worldState.getBarcode
+
+getBarcodeLength : StateTransformerReturning BarcodeLength
+getBarcodeLength s = (updateWorldState (\ w -> { w | getBarcodeLength -> tail l }) s, head l)
+  where
+    l = s.worldState.getBarcodeLength
+
+realWorldBool : StateTransformerReturning Bool
+realWorldBool s = (updateWorldState (\ w -> { w | realWorldBool -> tail l }) s, head l)
+  where
+    l = s.worldState.realWorldBool
 
 /**************************************** votingdefs.h ****************************************/
 
@@ -63,11 +97,6 @@ updateGlobalState f s = { s | globalState -> f globalState }
 
 updateSBBState : (SBBState -> SBBState) -> StateTransformer
 updateSBBState f s = { s | sbbState -> f sbbState }
-
-wrapRealWorldBool : StateTransformerReturning Bool
-wrapRealWorldBool s = (setWorldState w s, b)
-  where
-    (w, b) = realWorldBool s.worldState
 
 type SDCardState   = { SDCardState : [8] }
 UnknownSDCardState = { SDCardState = 0x00 }
@@ -258,36 +287,32 @@ goToStandby =
   )
 
 ballotDetectTimeoutReset : StateTransformer
-ballotDetectTimeoutReset s =
-  { s | worldState = w
-      , globalState -> { globalState | ballotDetectTimeout = timeout }
-  }
+ballotDetectTimeoutReset =
+  osdGetTicks >>= (\ ticks ->
+    updateGlobalState (\ g -> { g | ballotDetectTimeout = ticks + timeout })
+  )
   where
-    (w, ticks) = osdGetTicks w
-    timeout    = ticks + osdMSecToTicks ballotDetectTimeoutMS
+    timeout = osdMSecToTicks ballotDetectTimeoutMS
 
 ballotDetectTimeoutExpired : StateTransformerReturning Bool
-ballotDetectTimeoutExpired s = (setWorldState w s, b)
-  where
-    (w, ticks) = osdGetTicks s.worldState
-    timeout    = s.globalState.ballotDetectTimeout
-    b = ticks > timeout
+ballotDetectTimeoutExpired =
+  osdGetTicks >>= (\ ticks s ->
+    (s, ticks > s.globalState.ballotDetectTimeout)
+  )
 
 castOrSpoilTimeoutReset : StateTransformer
-castOrSpoilTimeoutReset s =
-  { s | worldState = w
-      , globalState -> { globalState | castOrSpoilTimeout = timeout }
-  }
+castOrSpoilTimeoutReset =
+  osdGetTicks >>= (\ ticks ->
+    updateGlobalState (\ g -> { g | castOrSpoilTimeout = ticks + timeout })
+  )
   where
-    (w, ticks) = osdGetTicks w
-    timeout    = ticks + osdMSecToTicks castOrSpoilTimeoutMS
+    timeout = osdMSecToTicks castOrSpoilTimeoutMS
 
 castOrSpoilTimeoutExpired : StateTransformerReturning Bool
-castOrSpoilTimeoutExpired s = (setWorldState w s, b)
-  where
-    (w, ticks) = osdGetTicks s.worldState
-    timeout    = s.globalState.castOrSpoilTimeout
-    b = ticks > timeout
+castOrSpoilTimeoutExpired =
+  osdGetTicks >>= (\ ticks s ->
+    (s, ticks > s.globalState.castOrSpoilTimeout)
+  )
 
 /**************************************** sbb_machine.c ****************************************/
 
@@ -333,7 +358,7 @@ updateBarcodeState barcodeScanned s =
   if s.sbbState.BS == BarcodeNotPresent
   then if barcodeScanned
        then (
-         wrapRealWorldBool >>= (\ barcodeReceived ->
+         realWorldBool >>= (\ barcodeReceived ->
            if barcodeReceived
            then updateSBBState (\ sbb -> { sbb | BS = BarcodePresentAndRecorded })
            else id
@@ -355,18 +380,18 @@ flushBarcodes =
 updateSensorState : StateTransformer
 updateSensorState =
   (
-    wrapRealWorldBool >>= (\ b1 ->
-      wrapRealWorldBool >>= (\ b2 ->
+    realWorldBool >>= (\ b1 ->
+      realWorldBool >>= (\ b2 ->
         updatePaperState b1 b2
       )
     )
   )
   >>
   (
-    wrapRealWorldBool >>= (\ b1 ->
-      wrapRealWorldBool >>= (\ b2 ->
-        wrapRealWorldBool >>= (\ b3 ->
-          wrapRealWorldBool >>= (\ b4 ->
+    realWorldBool >>= (\ b1 ->
+      realWorldBool >>= (\ b2 ->
+        realWorldBool >>= (\ b3 ->
+          realWorldBool >>= (\ b4 ->
             updateButtonState b1 b2 b3 b4
           )
         )
@@ -375,7 +400,7 @@ updateSensorState =
   )
   >>
   (
-    wrapRealWorldBool >>= (\ b ->
+    realWorldBool >>= (\ b ->
       updateBarcodeState b
     )
   )
@@ -396,81 +421,82 @@ runCast : StateTransformer
 runCast = castBallot >> updateSBBState (\ sbb -> { sbb | L = Standby })
 
 runWaitForDecision : StateTransformer
-runWaitForDecision s =
-  (
-    castOrSpoilTimeoutExpired >>= (\ b ->
-      if b
-      then (
-        spoilButtonLightOff
-        >>
-        castButtonLightOff
-        >>
-        updateSBBState (\ sbb -> { sbb | L = Eject })
-      )
-      else
-      if isCastButtonPressed s.sbbState
-      then (
-        wrapRealWorldBool >>= (\ b1 ->
-          if ~ b1
-          then updateSBBState (\ sbb -> { sbb | L = Abort })
-          else updateSBBState (\ sbb -> { sbb | L = Cast })
+runWaitForDecision =
+  getBarcodeLength >>= (\ barcode_length ->
+    getBarcode >>= (\ barcode ->
+      castOrSpoilTimeoutExpired >>= (\ b ->
+        if b
+        then (
+          spoilButtonLightOff
+          >>
+          castButtonLightOff
+          >>
+          updateSBBState (\ sbb -> { sbb | L = Eject })
         )
-        >>
-        spoilButtonLightOff
-        >>
-        castButtonLightOff
-      )
-      else
-      if isSpoilButtonPressed s.sbbState
-      then (
-        wrapRealWorldBool >>= (\ b1 ->
-          if ~ b1
-          then updateSBBState (\ sbb -> { sbb | L = Abort })
-          else updateSBBState (\ sbb -> { sbb | L = Spoil })
+        else (\ s ->
+          (
+            if isCastButtonPressed s.sbbState
+            then (
+              realWorldBool >>= (\ b1 ->
+                if ~ b1
+                then updateSBBState (\ sbb -> { sbb | L = Abort })
+                else updateSBBState (\ sbb -> { sbb | L = Cast })
+              )
+              >>
+              spoilButtonLightOff
+              >>
+              castButtonLightOff
+            )
+            else
+            if isSpoilButtonPressed s.sbbState
+            then (
+              realWorldBool >>= (\ b1 ->
+                if ~ b1
+                then updateSBBState (\ sbb -> { sbb | L = Abort })
+                else updateSBBState (\ sbb -> { sbb | L = Spoil })
+              )
+              >>
+              spoilButtonLightOff
+              >>
+              castButtonLightOff
+            )
+            else id
+          ) s
         )
-        >>
-        spoilButtonLightOff
-        >>
-        castButtonLightOff
       )
-      else id
     )
-  ) s
-  where
-    barcode_length = getBarcodeLength s.worldState
-    barcode        = getBarcode s.worldState
+  )
 
 barcodeCastOrSpoiled :
   { barcodeLength }
   String barcodeLength ->
   BarcodeLength ->
   StateTransformerReturning Bool
-barcodeCastOrSpoiled barcode barcode_length = wrapRealWorldBool
+barcodeCastOrSpoiled barcode barcode_length = realWorldBool
 
 runBarcodeDetected : StateTransformer
-runBarcodeDetected s =
-  (
-    barcodeCastOrSpoiled barcode barcode_length >>= (\ b ->
-      if b
-      then updateSBBState (\ sbb -> { sbb | L = Eject })
-      else
-      if validity == BarcodeValid
-      then (
-        castButtonLightOn
-        >> spoilButtonLightOn
-        >> castOrSpoilTimeoutReset
-        >> updateSBBState (\ sbb -> { sbb | L = WaitForDecision })
+runBarcodeDetected =
+  getBarcodeLength >>= (\ barcode_length ->
+    getBarcode >>= (\ barcode ->
+      barcodeCastOrSpoiled barcode barcode_length >>= (\ b ->
+        if b
+        then updateSBBState (\ sbb -> { sbb | L = Eject })
+        else (\ validity ->
+          if validity == BarcodeValid
+          then (
+            castButtonLightOn
+            >> spoilButtonLightOn
+            >> castOrSpoilTimeoutReset
+            >> updateSBBState (\ sbb -> { sbb | L = WaitForDecision })
+          )
+          else
+          if validity == BarcodeInvalidTimestamp
+          then updateSBBState (\ sbb -> { sbb | L = Eject })
+          else updateSBBState (\ sbb -> { sbb | L = Eject })
+        ) (isBarcodeValid barcode barcode_length)
       )
-      else
-      if validity == BarcodeInvalidTimestamp
-      then updateSBBState (\ sbb -> { sbb | L = Eject })
-      else updateSBBState (\ sbb -> { sbb | L = Eject })
     )
-  ) s
-  where
-    barcode_length = getBarcodeLength s.worldState
-    barcode        = getBarcode s.worldState
-    validity       = isBarcodeValid barcode barcode_length
+  )
 
 runFeedBallot : StateTransformer
 runFeedBallot =
@@ -495,7 +521,7 @@ runWaitForBallot =
   >> updateSBBState (\ s -> { s | L = FeedBallot })
 
 loadOrCreateLogs : StateTransformerReturning Bool
-loadOrCreateLogs = wrapRealWorldBool
+loadOrCreateLogs = realWorldBool
 
 runInitialize : StateTransformer
 runInitialize =
