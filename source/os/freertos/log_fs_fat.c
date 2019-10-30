@@ -47,7 +47,6 @@ Log_FS_Result Log_FS_Sync(Log_Handle *stream)
 
 size_t Log_FS_Write(Log_Handle *stream, const uint8_t *data, size_t length)
 {
-    printf("Log_FS_Write: filename = %s\r\n",stream->remote_file_name);
     size_t r = sdlib_write_to_file(stream->remote_file_name, data, length);
 
     if (r == length)
@@ -62,7 +61,6 @@ size_t Log_FS_Write(Log_Handle *stream, const uint8_t *data, size_t length)
 
 size_t Log_FS_Read(Log_Handle *stream, uint8_t *data, size_t bytes_to_read)
 {
-    printf("Log_FS_Read: filename = %s\r\n",stream->remote_file_name);
     size_t r = sdlib_read_from_file(stream->remote_file_name, data, bytes_to_read);
     return r;
 }
