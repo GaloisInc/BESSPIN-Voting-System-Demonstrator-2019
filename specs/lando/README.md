@@ -1,38 +1,17 @@
 # The Lando specification of the BESSPIN Voting System
 
-## Scenario from 5/20
-*Print a ballot from BMD, and cast it at SBB*
+The top level of the system specification is found in the Lando
+specification file `besspin_voting_system.lando`.  
 
-### BMD
-*NUC #1*
-* Print the ballot 
-  * VotingWorks 2D barcode
-  * TODO: how many bits?
-  * Barcode contains: Timestamp + encoded ballot
+The specification found in `specification_requirements.md` enumerates
+the requirements that apply to our specifications as a part of the
+SNFM methodology.  It is a characterization of what constitutes a
+rich and complete specification.
 
-### SBB HW
-*SSITH CPU*
-* (internal) is paper present?
-* (internal) feed paper!
-* (internal) stop feeding paper!
-* was barcode scanned?
-* deposit ballot!
-* what is the barcode?
+Each subsystem is specified in its own subdirectory.  Development
+plans are summarized in Lando files with the name
+`development_plan.lando` and have a regular format.  Their contents
+map directly to our OmniPlan plan, which is not included in this
+repository at the moment.
 
-### SBB
-*SSITH CPU*
-* Perform Tally!
-* Is barcode valid?
 
-### Logging
-*SSITH CPU*
-* Log scanned barcode!
-* Log validity check!
-* Log tally!
-* Log boot status!
-* Log ballot deposited!
-* Publish Log!
-
-### Reporting
-*NUC #2*
-* Display the results!
