@@ -15,6 +15,8 @@ Log_FS_Result Log_FS_Initialize(void)
 Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
                                 const char *name)   // IN
 {
+    (void)stream;
+    (void)name;
     return LOG_FS_OK;
 }
 
@@ -27,7 +29,7 @@ Log_FS_Result Log_FS_Open(Log_Handle *stream, const char *name)
 // NOTE: not supported now
 bool Log_FS_File_Exists(const char *name)
 {
-    return sdlib_file_exists(name);
+    return sdlib_exists(name);
 }
 
 Log_FS_Result Log_FS_Close(Log_Handle *stream)

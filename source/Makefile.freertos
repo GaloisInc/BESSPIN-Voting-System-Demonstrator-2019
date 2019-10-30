@@ -1,5 +1,5 @@
 # Set defaults
-NETWORK_LOGS     ?= yes
+NETWORK_LOGS     ?= no
 FS_LOGS          ?= yes
 FS_TYPE			 ?= FAT
 PEEK_POKE_SERVER ?= yes
