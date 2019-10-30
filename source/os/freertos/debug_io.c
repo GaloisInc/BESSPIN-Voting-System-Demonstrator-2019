@@ -5,6 +5,7 @@
 
 #include "logging/debug_io.h"
 #include "logging/log_io.h"
+#include "logging/log_fs.h"
 
 #ifdef VOTING_SYSTEM_DEBUG
 // only declare this constant in debug mode, to avoid unused constant warnings
@@ -58,7 +59,6 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
     char buffer[BUFFER_SIZE];
     
     // format the string
-    
     va_list args;
     va_start(args, the_format);
     int result = vsnprintf(buffer, BUFFER_SIZE, the_format, args);
@@ -83,9 +83,9 @@ int debug_log_printf(log_io_stream the_io_stream, const char *the_format, ...)
     {
         // assuming that we successfully formatted the string,
         // we can print it in a platform-appropriate way
-        // FIXME: replace with proper function calls
-        //f_printf(&the_io_stream->the_file, "%8s", buffer);
-        //f_sync(&the_io_stream->the_file);
+        printf("Calling debug IO\r\n");
+        Log_FS_Write(the_io_stream, (uint8_t*)buffer, strlen(buffer));
+        Log_FS_Sync(the_io_stream);
         
     }
     #else // not in debug mode
