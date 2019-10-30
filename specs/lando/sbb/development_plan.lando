@@ -1,19 +1,19 @@
-subsystem SBB
+subsystem Smart Ballot Box (SBB)
 The Smart Ballot Box (SBB) for the BESSPIN Voting System (BVS) 2020.
 
 indexing
-    owner: Joseph Kiniry <kiniry@freeandfair.us>
+  owner: Joseph Kiniry <kiniry@freeandfair.us>
   contributors: Michal Podhradsky <mpodhradsky@galois.com>
                 Haneef Mubarak <haneef@galois.com>
                 Parker Southwick <psouthwick@galois.com>
                 Steven Osborn <steven@freeandfair.us>
-                  Alexander Bakst <abakst@galois.com>
-                  Daniel Zimmerman <dmz@freeandfair.us>
-                  Joey Dodds <jdodds@freeandfair.us>
-    design: 11 weeks
-    implementation: 3 weeks
-    assurance: 3 weeks
-    complexity estimate: high
+                Alexander Bakst <abakst@galois.com>
+                Daniel Zimmerman <dmz@freeandfair.us>
+                Joey Dodds <jdodds@freeandfair.us>
+  design: 11 weeks
+  implementation: 3 weeks
+  assurance: 3 weeks
+  complexity estimate: high
   risk level: medium
-    mandatory dependencies: crypto logging security cascasdes
-    issues: #152, #162-#170
+  mandatory dependencies: crypto logging security cascasdes
+  issues: #152, #162-#170

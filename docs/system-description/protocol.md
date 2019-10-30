@@ -248,10 +248,10 @@ keys as a part of the Shamir election setup subprotocol.
      polling place protocol and only use it in the post-election
      protocol, then this step also is elided.
 
-5. *Controller Device* V spoils their ballot and starts over.
+5. *Controller System* V spoils their ballot and starts over.
 
    Voter V interacts with Supervisor S responsible for the Polling
-   Place Controller Server CS.  S spoils voter V's ballot B, and keeps
+   Place Controller System CS.  S spoils voter V's ballot B, and keeps
    the spoiled ballot SB for auditing purposes.  S gives V a new BS
    Token and V returns to the BPS.  Go to step 2.
 
