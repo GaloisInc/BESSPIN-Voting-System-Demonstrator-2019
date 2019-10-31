@@ -23,10 +23,11 @@ Log_FS_Result Log_FS_Create_New(Log_Handle *stream, // OUT
 // NOTE: opening is automatic
 Log_FS_Result Log_FS_Open(Log_Handle *stream, const char *name)
 {
+    (void) stream;
+    (void) name;
     return LOG_FS_OK;
 }
 
-// NOTE: not supported now
 bool Log_FS_File_Exists(const char *name)
 {
     return sdlib_exists(name);

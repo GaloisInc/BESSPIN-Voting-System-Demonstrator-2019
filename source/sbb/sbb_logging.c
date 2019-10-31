@@ -102,12 +102,9 @@ bool log_system_message(const char *new_entry, int length) {
 
 void log_or_abort(SBB_state *the_local_state, const char *the_entry, int length) {
     debug_printf((char *)the_entry);
-    //if (!log_system_message(the_entry, length)) {
-    //    the_local_state->L = ABORT;
-    //}
-    (void)the_local_state;
-    (void)the_entry;
-    (void)length;
+    if (!log_system_message(the_entry, length)) {
+        the_local_state->L = ABORT;
+    }
 }
 
 void log_sys_record_error(SBB_state *the_local_state, const char *the_entry, int length) {
@@ -167,7 +164,7 @@ bool log_app_event(app_event event,
             printf("%c", this_barcode[i]);
         }
         printf("\r\n");
-#endif
+#endif /* SIMULATION */
 #ifdef SBB_DO_LOGGING
         //@ assert Log_IO_Initialized;
         Log_FS_Result res = write_entry(&app_log_handle, event_entry);

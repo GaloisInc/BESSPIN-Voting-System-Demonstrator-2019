@@ -90,14 +90,14 @@ static void vTestLED(void *pvParameters);
 
 /*-----------------------------------------------------------*/
 /* Sample barcodes */
-#ifdef SIMULATION
+#if defined(SIMULATION) || defined(USE_CLI_TASK)
 static char *valid_barcode_1 =
     "2019+07+31+22+22:1bk5cBJeyseBExT54lsVpS6Qk0hN_c3uuX4feV6D_-k=";
 static char *valid_barcode_2 =
     "2019+07+31+22+22:vlj364nx6CD7wCTA0MCZkZNl4UCdrI_tHMJtcra8eAE=";
 static char *valid_barcode_3 =
     "2019+07+31+22+20:vqj3MRalpCh5tCeiT7aq3frv9MXlY19-BOPIQEsGGtI=";
-#endif // SIMULATION
+#endif // SIMULATION || USE_CLI_TASK
 /*-----------------------------------------------------------*/
 
 /*-----------------------------------------------------------*/
@@ -537,9 +537,6 @@ void prvStartupTask(void *pvParameters)
 void prvInputTask(void *pvParameters)
 {
     (void)pvParameters;
-#ifdef SIMULATION_UART
-    sim_uart_main_loop();
-#else // SIMULATION_UART
     EventBits_t uxReturned;
     TickType_t paper_in_timestamp = 0;
 
@@ -641,11 +638,10 @@ void prvInputTask(void *pvParameters)
 
         vTaskDelay(GPIO_READ_DELAY_MS);
     }
-#endif // SIMULATION_UART
 }
 
 /*-----------------------------------------------------------*/
-#ifdef SIMULATION
+#if defined(SIMULATION) || defined(USE_CLI_TASK)
 void sim_paper_sensor_in_pressed(void)
 {
     printf("SIM: bPAPER_SENSOR_IN_PRESSED\r\n");
@@ -713,7 +709,6 @@ void sim_spoil_button_pressed(void)
     xEventGroupClearBits(xSBBEventGroup, ebSPOIL_BUTTON_PRESSED);
 }
 
-#ifdef SIMULATION_UART
 #pragma message "UART Simulator Enabled"
 #define MALWARE_LENGTH 4096 * 4
 // malware buffer must hold 4096 * 4 Base64-encoded bytes
@@ -742,7 +737,6 @@ static size_t malware (void) {
 // of 4352 NOPs, with a bunch of NOPs and function frame setup on
 // either side
 static const uint8_t *malware_region_start = ((uint8_t *) &malware) + 128 * 4;
-//static const uint8_t *malware_region_end = ((uint8_t *) &malware) + (128 + 4096) * 4;
 
 void sim_uart_main_loop(void)
 {
@@ -756,6 +750,9 @@ void sim_uart_main_loop(void)
     5 - scan and send Barcode\r\n \
     6 - inject malware\r\n \
     7 - run malware\r\n \
+    8 - inject demo barcode 1\r\n \
+    9 - inject demo barcode 2\r\n \
+    0 - inject demo barcode 3\r\n \
     \r\n";
     
     printf("Starting simulation UART input\r\n");
@@ -792,6 +789,15 @@ void sim_uart_main_loop(void)
                     break;
                 case '7':
                     printf("malware return value: %d\r\n", malware());
+                    break;
+                case '8':
+                    sim_valid_barcode_scanned(1);
+                    break;
+                case '9':
+                    sim_valid_barcode_scanned(2);
+                    break;
+                case '0':
+                    sim_valid_barcode_scanned(3);
                     break;
                 case 'h':
                 case '?':
@@ -909,8 +915,7 @@ void sim_malware_inject()
     // zero out the malware buffer
     memset(malware_buffer, 0, MALWARE_BASE64_BUFFER_LENGTH);
 }
-#endif // SIMULATION_UART
-#endif // SIMULATION
+#endif // SIMULATION || USE_CLI_TASK
 /*-----------------------------------------------------------*/
 
 
@@ -961,3 +966,15 @@ void vTestLED(void *pvParameters)
     }
 }
 #endif /* USE_LED_BLINK_TASK */
+
+#if defined(SIMULATION) || defined(USE_CLI_TASK)
+void prvCliTask(void *pvParameters)
+{
+    (void)pvParameters;
+
+    printf("prvCliTask starting\r\n");
+
+    sim_uart_main_loop();
+    
+}
+#endif /* SIMULATION || USE_CLI_TASK */
