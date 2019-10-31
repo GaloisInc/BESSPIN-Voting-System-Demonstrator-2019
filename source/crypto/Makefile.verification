@@ -36,10 +36,10 @@ FREERTOS_PLUS_SOURCE_DIR = ../../FreeRTOS-mirror/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 
 FREERTOS_INCLUDES = \
-    -I. \
-  -I $(INCLUDE_DIR) \
-  -I $(INCLUDE_DIR)/crypto \
-	-I$(FREERTOS_DEMO_DIR) \
+	-I. \
+	-I$(INCLUDE_DIR) \
+	-I$(INCLUDE_DIR)/crypto \
+	-I$(INCLUDE_DIR)/os/freertos \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx \
 	-I$(FREERTOS_DEMO_DIR)/bsp/xilinx/common \
@@ -53,7 +53,8 @@ FREERTOS_INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)../Common/include \
 	-I$(FREERTOS_SOURCE_DIR)/portable/GCC/RISC-V \
 	-I$(FREERTOS_DEMO_DIR)/demo \
-	-I$(FREERTOS_DEMO_DIR)/devices
+	-I$(FREERTOS_DEMO_DIR)/devices \
+	-I$(FREERTOS_DEMO_DIR)/SD/src
 
 FRAMA_C_INCLUDES=-cpp-extra-args="-I.. -I../bsp -I../devices -I../../../Source/include -I../../../Source/portable/GCC/RISC-V $(FREERTOS_INCLUDES) $(PLATFORM_INCLUDES) -D__riscv_xlen=32 -DVOTING_PLATFORM_FREERTOS"
 

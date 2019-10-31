@@ -3,18 +3,16 @@
 
 #include <stdint.h>
 
-#ifdef TARGET_FS_LittleFS
 
-#error "TARGET_FS_LittleFS not yet implemented"
-
+#if TARGET_FS_FAT
+#include "SDLib.h"
+typedef uint32_t    file_offset;
+typedef char*     osd_file_stream;
+#elif TARGET_FS_BLACK_SESAME
+#error "TARGET_FS_BLACK_SESAME not yet implemented"
 #else
-
-// Assume Target Filesystem is FatFS
-
-#include "ff.h"
-
-typedef FSIZE_t file_offset;
-typedef FIL     osd_file_stream;
-
-#endif // TARGET_FS_LittleFS
+// Provide dummy types
+typedef size_t    file_offset;
+typedef char*     osd_file_stream;
+#endif
 #endif // __LOG_FS_FREERTOS_DEFS__H__

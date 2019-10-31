@@ -1,13 +1,20 @@
 # Set defaults
-NETWORK_LOGS     ?= yes
+NETWORK_LOGS     ?= no
 FS_LOGS          ?= yes
+FS_TYPE			 ?= FAT
 PEEK_POKE_SERVER ?= yes
+USE_RTC_CLOCK ?= 1
+VOTING_SYSTEM_DEBUG ?= yes
+USE_CLI_TASK ?= yes
+AXI_DEBUG_PRINT ?= no
+NETWORK_LOG_DEBUG ?= no
+DISABLE_NETWORK ?= no
 
 # Voting System Definitions
 include Makefile.common
 
 export OS_DIR  = $(SOURCE_DIR)/os/freertos
-export CFLAGS += -DVOTING_PLATFORM_FREERTOS
+CFLAGS += -DVOTING_PLATFORM_FREERTOS
 
 ARCH		= -march=rv32im
 ABI			= -mabi=ilp32
@@ -22,6 +29,9 @@ USE_LED_BLINK_TASK ?= 0
 # Decide which compiler to use
 ifeq ($(USE_CLANG),yes)
 export CC		= clang --target=riscv32
+# FIXME: clang doesn't support C++ compilation at the moment
+#export CPP		= clang --target=riscv32
+export CPP		= $(ARCHTARGET)-g++
 # LLVM doesn't support linking RISC-V files yet,
 # so we have to use GCC linker to do so	
 export GCC		= $(ARCHTARGET)-gcc
@@ -33,6 +43,7 @@ export AR		= llvm-ar
 export RANLIB	= llvm-ranlib
 else
 export CC		= $(ARCHTARGET)-gcc
+export CPP		= $(ARCHTARGET)-g++
 export GCC		= $(CC)
 export OBJCOPY	= $(ARCHTARGET)-objcopy
 export OBJDUMP	= $(ARCHTARGET)-objdump
@@ -40,7 +51,7 @@ export AR		= $(ARCHTARGET)-ar
 export RANLIB	= $(ARCHTARGET)-ranlib
 export COMPILER_FLAGS = -mcmodel=medany
 # TODO: Use -Werror only for GCC now
-export WERROR = -Werror
+#export WERROR = -Werror
 endif
 
 SOURCE_BASE_DIR = $(SOURCE_DIR)
@@ -62,8 +73,10 @@ FREERTOS_PLUS_SOURCE_DIR = $(FREERTOS_BASE_DIR)/FreeRTOS-Plus/Source
 FREERTOS_TCP_SOURCE_DIR = $(FREERTOS_PLUS_SOURCE_DIR)/FreeRTOS-Plus-TCP
 export FREERTOS_PROTOCOLS_DIR = $(SOURCE_BASE_DIR)/protocols
 
-export WARNINGS= $(WERROR) -Wall -Wextra -Wshadow -Wpointer-arith -Wbad-function-cast -Wcast-align -Wsign-compare \
-		-Waggregate-return -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wunused
+WARNINGS = $(WERROR) -Wall -Wextra -Wshadow -Wpointer-arith -Wcast-align -Wsign-compare \
+		-Waggregate-return -Wmissing-declarations -Wunused
+ 
+C_WARNINGS = -Wbad-function-cast -Wmissing-prototypes -Wstrict-prototypes
 
 export FREERTOS_SRC = \
 	$(FREERTOS_SOURCE_DIR)/croutine.c \
@@ -106,8 +119,7 @@ export INCLUDES = \
 	-I$(LOG_INCLUDE_DIR) \
 	-I$(CRYPTO_INCLUDE_DIR)
 
-export CFLAGS += $(WARNINGS) $(INCLUDES)
-export CFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) \
+CFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) \
 	-DTARGET_OS_FreeRTOS -DNO_MEMSET_S \
 	-DUSE_LED_BLINK_TASK=$(USE_LED_BLINK_TASK)
 
@@ -160,10 +172,6 @@ export APP_SRC = \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_io.c \
 	$(FREERTOS_DEMO_DIR)/bsp/xilinx/common/xil_assert.c \
 	$(FREERTOS_DEMO_DIR)/devices/serLcd.c \
-	$(FREERTOS_DEMO_DIR)/devices/sdmm.c \
-	$(FREERTOS_DEMO_DIR)/devices/ff.c \
-	$(FREERTOS_DEMO_DIR)/devices/ffsystem.c \
-	$(FREERTOS_DEMO_DIR)/devices/ffunicode.c \
 	$(FREERTOS_DEMO_DIR)/devices/ds1338rtc.c
 
 export ASFLAGS	+= -g $(ARCH) $(ABI)  -Wa,-Ilegacy \
@@ -193,6 +201,10 @@ export FREERTOS_PEEKPOKE_SRC = \
 
 export ARFLAGS=crsv
 
+export CFLAGS += $(WARNINGS) $(C_WARNINGS) $(INCLUDES)
+# Disable warnings for C++ for now
+export CPPFLAGS += -O0 -g3 $(ARCH) $(ABI) $(COMPILER_FLAGS) $(INCLUDES)
+
 export LDFLAGS	 = -T $(FREERTOS_DEMO_DIR)/link.ld -nostartfiles -nostdlib $(ARCH) $(ABI)
 export LIBS	 =	-lc -lgcc
 
@@ -207,7 +219,25 @@ ifeq ($(NETWORK_LOGS),yes)
 endif
 
 ifeq ($(FS_LOGS),yes)
-  export OS_SRC += $(OS_DIR)/log_fs.c
+ifeq ($(FS_TYPE),FAT)
+  export OS_SRC += $(OS_DIR)/log_fs_fat.c
+  export INCLUDES += -I$(FREERTOS_DEMO_DIR)/SD/src
+  export CFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK) -DTARGET_FS_FAT=1
+  export CPPFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK)
+  export CPP_SRC += $(FREERTOS_DEMO_DIR)/SD/src/SD.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/File.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/utility/Sd2Card.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/utility/SdFile.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/utility/SdVolume.cpp \
+	$(FREERTOS_DEMO_DIR)/SD/src/SDLib.cpp
+else
+ifeq ($(FS_TYPE),BLACK_SESAME)
+	export OS_SRC += $(OS_DIR)/log_fs_black_sesame.c
+	export CFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK) -DTARGET_FS_BLACK_SESAME=1
+else
+$(error unknown FS_TYPE: $(FS_TYPE))
+endif
+endif
 endif
 
 DEMO_SRC = $(OS_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)
@@ -222,13 +252,33 @@ $(info Pulling in peek-poke server)
 FREERTOS_SRC += $(FREERTOS_PEEKPOKE_SRC)
 endif
 
+ifeq ($(VOTING_SYSTEM_DEBUG),yes)
+	CFLAGS += -DVOTING_SYSTEM_DEBUG=1
+endif
+
+ifeq ($(USE_CLI_TASK),yes)
+	CFLAGS += -DUSE_CLI_TASK=1
+endif
+
+ifeq ($(USE_CLI_TASK),yes)
+	CFLAGS += -DUSE_CLI_TASK=1
+endif
+
+ifeq ($(AXI_DEBUG_PRINT),yes)
+	CFLAGS += -DAXI_DEBUG_PRINT=1
+endif
+
+ifeq ($(NETWORK_LOG_DEBUG),yes)
+	CFLAGS += -DNETWORK_LOG_DEBUG=1
+endif
+
+ifeq ($(DISABLE_NETWORK),yes)
+	CFLAGS += -DDISABLE_NETWORK=1
+endif
+
 CFLAGS += \
 	$(FREERTOS_IP_INCLUDE) \
-	-I$(FREERTOS_PROTOCOLS_DIR)/include \
-	-DVOTING_SYSTEM_DEBUG #\
-	-DNETWORK_LOGS \
-	-DAXI_DEBUG_PRINT=1 \
-	-DNETWORK_LOG_DEBUG=1
+	-I$(FREERTOS_PROTOCOLS_DIR)/include
 
 DEFAULT_PROG ?= default_ballot_box
 BOX1_PROG ?= ballot_box_1
@@ -260,9 +310,10 @@ RTOS_TCP_OBJ = $(FREERTOS_TCP_SRC:.c=.o)
 APP_OBJ	 = $(APP_SRC:.c=.o)
 PORT_OBJ = $(PORT_SRC:.c=.o)
 DEMO_OBJ = $(DEMO_SRC:.c=.o)
+CPP_OBJ = $(CPP_SRC:.cpp=.o)
 PORT_ASM_OBJ = $(PORT_ASM:.S=.o)
 CRT0_OBJ = $(CRT0:.S=.o)
-OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(RTOS_TCP_OBJ) $(DEMO_OBJ) $(APP_OBJ)
+OBJS = $(CRT0_OBJ) $(PORT_ASM_OBJ) $(PORT_OBJ) $(RTOS_OBJ) $(RTOS_TCP_OBJ) $(DEMO_OBJ) $(APP_OBJ) $(CPP_OBJ)
 OBJS_DEFAULT = $(OBJS) $(DEFAULT_SRC:.c=.o)
 OBJS_BOX1 = $(OBJS) $(BOX1_SRC:.c=.o)
 OBJS_BOX2 = $(OBJS) $(BOX2_SRC:.c=.o)
@@ -284,6 +335,10 @@ $(info GCC=$(GCC))
 %.o: %.S
 	@echo "	   CC $<"
 	@$(CC) $(ASFLAGS) -c $(CFLAGS) -o $@ $<
+
+%.o: %.cpp
+	@echo "    C++ $<"
+	@$(CPP) -c $(CPPFLAGS) -o $@ $<
 
 default: $(DEFAULT_PROG).elf
 

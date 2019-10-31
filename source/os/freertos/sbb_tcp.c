@@ -130,6 +130,10 @@ void createTasks(void)
 #endif // SIMULATION
     xTaskCreate(prvInputTask, "InputTask", SBB_INPUT_TASK_STACK_SIZE,
                 NULL, SBB_INPUT_TASK_PRIORITY, NULL);
+#if defined(SIMULATION) || defined(USE_CLI_TASK)
+    xTaskCreate(prvCliTask, "CliTask", SBB_CLI_TASK_STACK_SIZE,
+                NULL, SBB_CLI_TASK_PRIORITY, NULL);
+#endif // SIMULATION || USE_CLI_TASK
 #ifndef DISABLE_NETWORK
 #ifdef NETWORK_LOGS
 #pragma message "Including Network Logs"

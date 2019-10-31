@@ -22,8 +22,8 @@
 #define sbbIP_ADDR3		2
 
 const char *sbb_name = "DEFAULT";
-const log_name system_log_file_name = "default_system.log";
-const log_name app_log_file_name = "default_application.log";
+const log_name system_log_file_name = "def_sys.log";
+const log_name app_log_file_name = "def_app.log";
 
 const uint8_t sbb_mac_address[6] = { sbb_realMAC_ADDR0, sbb_realMAC_ADDR1, sbb_realMAC_ADDR2, sbb_realMAC_ADDR3, sbb_realMAC_ADDR4, sbb_realMAC_ADDR5 };
 const uint8_t sbb_default_ip_address[4] = { sbbIP_ADDR0, sbbIP_ADDR1, sbbIP_ADDR2, sbbIP_ADDR3 };

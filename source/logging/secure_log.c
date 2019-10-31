@@ -61,29 +61,29 @@ Log_FS_Result create_secure_log(Log_Handle *new_secure_log,
 
     if (create_result == LOG_FS_OK) 
       {
-	// 2. call initial_log_entry above to create the first block
-	initial_entry = initial_log_entry(a_log_entry_type);
-	
-	// keep the first hash
-	copy_sha256_digest (&new_secure_log->previous_hash[0],
-			    &initial_entry.the_digest[0]);
-	
-	// 3. Write that new block to the file.
-	write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
-	
-	// 4. sync the file.
-	sync_result = Log_IO_Sync(new_secure_log);
+        // 2. call initial_log_entry above to create the first block
+        initial_entry = initial_log_entry(a_log_entry_type);
 
-	// TBDs - what about error cases?
-	//   What if the file already exists? Perhaps a pre-condition here that it doesn't
-	//    already exist, so up to the caller to spot that and do the right thing...
-	//    We may have to implement an f_exists() API (and ACSL logic function) to support
-	//    that if not directly supported by ff.h
-	//   What if the file create fails?
-	//   What is the file write fails?
-	(void)sync_result;
-	(void)write_result;
-	return LOG_FS_OK;
+        // keep the first hash
+        copy_sha256_digest (&new_secure_log->previous_hash[0],
+                &initial_entry.the_digest[0]);
+
+        // 3. Write that new block to the file.
+        write_result = Log_IO_Write_Base64_Entry(new_secure_log, initial_entry);
+
+        // 4. sync the file.
+        sync_result = Log_IO_Sync(new_secure_log);
+
+        // TBDs - what about error cases?
+        //   What if the file already exists? Perhaps a pre-condition here that it doesn't
+        //    already exist, so up to the caller to spot that and do the right thing...
+        //    We may have to implement an f_exists() API (and ACSL logic function) to support
+        //    that if not directly supported by ff.h
+        //   What if the file create fails?
+        //   What is the file write fails?
+        (void)sync_result;
+        (void)write_result;
+        return LOG_FS_OK;
       }
     else
       {
