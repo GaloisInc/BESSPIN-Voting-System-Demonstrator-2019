@@ -19,9 +19,6 @@ compose f g x = f (g x)
 // type constraint (fin TickTypeSize, TickTypeSize >= 16)
 type TickTypeSize = 32
 
-assertFalse : {a} a
-assertFalse = assertFalse
-
 type RealWorld =
   // getBarcode is an infinite sequence of strings, each string being an
   // infinite sequence of characters.  The concrete string ough to be the
@@ -553,6 +550,9 @@ runStandby =
 runAbort : StateTransformer
 runAbort = id
 
+// assertFalse : {a} a
+// assertFalse = assertFalse
+
 takeStep : StateTransformer
 takeStep s =
   if s.sbbState.L == Standby
@@ -583,7 +583,8 @@ takeStep s =
   then runAwaitRemoval s
   else
   if s.sbbState.L == Abort
-  then (\ _ -> assertFalse ()) (runAbort s)
+  then runAbort s
+  // then (\ _ -> assertFalse) (runAbort s)
   else s
 
 /**********************************************************************/
