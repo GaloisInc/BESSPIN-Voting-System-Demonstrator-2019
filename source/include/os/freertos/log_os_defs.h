@@ -9,7 +9,7 @@
 typedef uint32_t    file_offset;
 typedef char*     osd_file_stream;
 #elif TARGET_FS_BLACK_SESAME
-#error "TARGET_FS_LittleFS not yet implemented"
+#error "TARGET_FS_BLACK_SESAME not yet implemented"
 #else
 // Provide dummy types
 typedef size_t    file_offset;

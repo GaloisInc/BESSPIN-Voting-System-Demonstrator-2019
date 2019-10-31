@@ -223,7 +223,7 @@ ifeq ($(FS_TYPE),FAT)
   export OS_SRC += $(OS_DIR)/log_fs_fat.c
   export INCLUDES += -I$(FREERTOS_DEMO_DIR)/SD/src
   export CFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK) -DTARGET_FS_FAT=1
-  export CPPFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK) -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK)
+  export CPPFLAGS += -DUSE_RTC_CLOCK=$(USE_RTC_CLOCK)
   export CPP_SRC += $(FREERTOS_DEMO_DIR)/SD/src/SD.cpp \
 	$(FREERTOS_DEMO_DIR)/SD/src/File.cpp \
 	$(FREERTOS_DEMO_DIR)/SD/src/utility/Sd2Card.cpp \
