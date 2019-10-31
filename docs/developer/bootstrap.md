@@ -14,13 +14,13 @@
    by Chudnov et al.
 
 3. We gave a background talk on modern applied formal methods entitled
-   "[Formal Methods need not be Black Magic](/BVS-Documents/onboarding/Formal_Methods_Need_Not_Be_Black_Magic__2018_RISC-V_Summit_.pdf)" 
+   "[Formal Methods Need Not Be Black Magic](/BVS-Documents/onboarding/Formal_Methods_Need_Not_Be_Black_Magic__2018_RISC-V_Summit_.pdf)" 
    at the RISC-V Summit in 2018.
    
 ## Our Process and Methodology
 
 4. A short summary of our approachable verification-centric
-   development process and methodology is found in our Formal Method
+   development process and methodology is found in our Formal Methods
    2009 research paper 
   "[Secret Ninja Formal Methods](/BVS-Documents/onboarding/Secret_Ninja_Formal_Methods.pdf)."
    This paper and development method were advocated for by a NIST
