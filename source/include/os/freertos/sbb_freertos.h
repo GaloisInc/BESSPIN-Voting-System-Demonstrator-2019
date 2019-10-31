@@ -41,12 +41,16 @@ extern TaskHandle_t prvStartupTaskHandle;
 #define SBB_STARTUP_TASK_PRIORITY tskIDLE_PRIORITY
 #define SBB_PEEKPOKE_TASK_PRIORITY tskIDLE_PRIORITY + 2
 #define SBB_STATS_TASK_PRIORITY tskIDLE_PRIORITY + 1
+#define SBB_CLI_TASK_PRIORITY tskIDLE_PRIORITY + 2
+
 
 #define SBB_MAIN_TASK_STACK_SIZE configMINIMAL_STACK_SIZE * 10U
 #define SBB_SCANNER_TASK_STACK_SIZE configMINIMAL_STACK_SIZE * 10U
 #define SBB_INPUT_TASK_STACK_SIZE configMINIMAL_STACK_SIZE * 10U
 #define SBB_NET_LOG_TASK_STACK_SIZE configMINIMAL_STACK_SIZE * 10U
 #define SBB_STARTUP_TASK_STACK_SIZE configMINIMAL_STACK_SIZE * 10U
+#define SBB_CLI_TASK_STACK_SIZE configMINIMAL_STACK_SIZE * 10U
+
 
 #define sbLOG_BUFFER_SIZE 2048
 #define sbLOG_BUFFER_TRIGGER_LEVEL 331
@@ -77,7 +81,8 @@ extern TaskHandle_t prvStartupTaskHandle;
  */
 void prvSRand(UBaseType_t ulSeed);
 
-#ifdef SIMULATION
+#if defined(SIMULATION) || defined(USE_CLI_TASK)
+void prvCliTask(void *pvParameters);
 /*
  * Functions broadcasting various events 
  */
@@ -87,7 +92,6 @@ void sim_valid_barcode_scanned(uint8_t id);
 void sim_cast_button_pressed(void);
 void sim_spoil_button_pressed(void);
 
-#ifdef SIMULATION_UART
 #define SIM_COMMAND_BUFFER_LENGTH 17
 #define SIM_BARCODE_BUFFER_LENGTH 384
 /*
@@ -96,7 +100,6 @@ void sim_spoil_button_pressed(void);
 void sim_uart_main_loop(void);
 void sim_barcode_input(void);
 void sim_malware_inject(void);
-#endif // SIMULATION_UART
-#endif // SIMULATION
+#endif // SIMULATION || USE_CLI_TASK
 
 #endif /* __SBB_FREERTOS_H__ */

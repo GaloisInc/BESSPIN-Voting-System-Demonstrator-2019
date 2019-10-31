@@ -19,11 +19,11 @@
 
 bool timestamp_after_now(const uint8_t *barcode_time)
 {
-#ifdef SIMULATION_UART
-    // no time validation in the UART simulation, always return true
+#ifdef SIMULATION
+    // no time validation in SIMULATION, always return true
     (void) barcode_time;
     return true;
-#else // SIMULATION_UART
+#else // SIMULATION
     uint32_t year, year_now;
     uint16_t month, day, hour, minute;
     uint16_t month_now, day_now, hour_now, minute_now;
@@ -62,7 +62,7 @@ bool timestamp_after_now(const uint8_t *barcode_time)
     }
 
     return b_valid;
-#endif // SIMULATION_UART
+#endif // SIMULATION
 }
 
 barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
@@ -93,9 +93,7 @@ barcode_validity crypto_check_barcode_valid(barcode_t the_barcode,
 
         if (r == 0 && BASE64_DECODED_BYTES == olen)
         {
-#ifndef SIMULATION_UART
             debug_printf("crypto_check_barcode_valid: checking timestamp\r\n");
-#endif // SIMULATION_UART
             // 2. a
             // Check the timestamp to make sure it's not from the future
 

@@ -4,6 +4,11 @@ FS_LOGS          ?= yes
 FS_TYPE			 ?= FAT
 PEEK_POKE_SERVER ?= yes
 USE_RTC_CLOCK ?= 1
+VOTING_SYSTEM_DEBUG ?= yes
+USE_CLI_TASK ?= yes
+AXI_DEBUG_PRINT ?= no
+NETWORK_LOG_DEBUG ?= no
+DISABLE_NETWORK ?= no
 
 # Voting System Definitions
 include Makefile.common
@@ -247,13 +252,33 @@ $(info Pulling in peek-poke server)
 FREERTOS_SRC += $(FREERTOS_PEEKPOKE_SRC)
 endif
 
+ifeq ($(VOTING_SYSTEM_DEBUG),yes)
+	CFLAGS += -DVOTING_SYSTEM_DEBUG=1
+endif
+
+ifeq ($(USE_CLI_TASK),yes)
+	CFLAGS += -DUSE_CLI_TASK=1
+endif
+
+ifeq ($(USE_CLI_TASK),yes)
+	CFLAGS += -DUSE_CLI_TASK=1
+endif
+
+ifeq ($(AXI_DEBUG_PRINT),yes)
+	CFLAGS += -DAXI_DEBUG_PRINT=1
+endif
+
+ifeq ($(NETWORK_LOG_DEBUG),yes)
+	CFLAGS += -DNETWORK_LOG_DEBUG=1
+endif
+
+ifeq ($(DISABLE_NETWORK),yes)
+	CFLAGS += -DDISABLE_NETWORK=1
+endif
+
 CFLAGS += \
 	$(FREERTOS_IP_INCLUDE) \
-	-I$(FREERTOS_PROTOCOLS_DIR)/include \
-	-DVOTING_SYSTEM_DEBUG #\
-	-DNETWORK_LOGS \
-	-DAXI_DEBUG_PRINT=1 \
-	-DNETWORK_LOG_DEBUG=1
+	-I$(FREERTOS_PROTOCOLS_DIR)/include
 
 DEFAULT_PROG ?= default_ballot_box
 BOX1_PROG ?= ballot_box_1
