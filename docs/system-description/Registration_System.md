@@ -73,7 +73,8 @@ properties of the system's specification and implementation and
 traceability from the requirements to artifacts that validate their
 satisfaction (e.g., system tests, code review, etc.).
 
-Our requirements language loosely follows [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt). Mandatory requirements 
+Our requirements language loosely follows 
+[RFC 2119](https://www.ietf.org/rfc/rfc2119.txt). Mandatory requirements 
 use the modal verb _must_; requirements that are strongly recommended 
 use the modal verb _should_; truly optional requirements use the modal 
 verb _may_. 
@@ -196,5 +197,7 @@ This project is funded by the Defense Advanced Research Projects Agency
 Any opinions, findings, and conclusions or recommendations expressed herein
 are those of the contributors and do not necessarily reflect the views of DARPA.
 
-The BVS 2020 cryptographic protocol and implementation are based upon the Microsoft ElectionGuard SDK, funded by Microsoft and designed and developed by Galois and Free & Fair.
+The BVS 2020 cryptographic protocol and implementation are based upon the
+Microsoft ElectionGuard SDK, funded by Microsoft and designed and developed by
+Galois and Free & Fair.
 
