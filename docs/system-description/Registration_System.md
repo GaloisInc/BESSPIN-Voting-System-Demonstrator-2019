@@ -73,8 +73,10 @@ properties of the system's specification and implementation and
 traceability from the requirements to artifacts that validate their
 satisfaction (e.g., system tests, code review, etc.).
 
-Mandatory requirements use the modal verb _must_; optional
-requirements use the modal verb _shall_ or _should_.
+Our requirements language loosely follows [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt). Mandatory requirements 
+use the modal verb _must_; requirements that are strongly recommended 
+use the modal verb _should_; truly optional requirements use the modal 
+verb _may_. 
 
 The top-level requirements are as follows.
 
