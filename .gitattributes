@@ -44,3 +44,9 @@
 *.7z filter=lfs diff=lfs merge=lfs -text
 *.tbz2 filter=lfs diff=lfs merge=lfs -text
 *.bin filter=lfs diff=lfs merge=lfs -text
+*.exe filter=lfs diff=lfs merge=lfs -text
+*.elf filter=lfs diff=lfs merge=lfs -text
+*.out filter=lfs diff=lfs merge=lfs -text
+*.coff filter=lfs diff=lfs merge=lfs -text
+*.pe filter=lfs diff=lfs merge=lfs -text
+*.jar filter=lfs diff=lfs merge=lfs -text
