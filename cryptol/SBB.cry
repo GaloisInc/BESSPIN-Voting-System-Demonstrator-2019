@@ -76,9 +76,9 @@ type GlobalState =
   }
 
 type State =
-  { worldState  : RealWorld
-  , globalState : GlobalState
+  { globalState : GlobalState
   , sbbState    : SBBState
+  , worldState  : RealWorld
   }
 
 type StateTransformer = State -> State
@@ -365,15 +365,23 @@ updateBarcodeState barcodeScanned s =
        else s
   else s
 
+// The following does not type-check in Coq, because the recursion cannot be
+// proven safe.
+
+doWhile : {a} (a -> a) -> (a -> Bool) -> a -> a
+doWhile loop cond start =
+  if cond step
+  then step
+  else doWhile loop cond step
+  where
+    step = loop start
+
 flushBarcodes : StateTransformer
-flushBarcodes =
-  updateSBBState (\ sbb -> { sbb | BS = BarcodeNotPresent })
-  >> updateSensorState
-  >> (\ s ->
-     if s.sbbState.BS == BarcodePresentAndRecorded
-     then flushBarcodes s
-     else s
-  )
+flushBarcodes = doWhile do while
+  where
+    do      = updateSBBState (\ sbb -> { sbb | BS = BarcodeNotPresent })
+              >> updateSensorState
+    while s = s.sbbState.BS == BarcodePresentAndRecorded
 
 updateSensorState : StateTransformer
 updateSensorState =
@@ -587,6 +595,16 @@ takeStep s =
   then runAbort s
   // then (\ _ -> assertFalse) (runAbort s)
   else s
+
+ballotBoxMainLoop : State -> [inf] State
+ballotBoxMainLoop =
+  updateSBBState (\ sbb -> { sbb | L = Initialize })
+  >> runInitialize
+  >> iterate loop
+  where
+    loop =
+      takeStep
+      >> (\ s -> if s.sbbState.L != Abort then updateSensorState s else s)
 
 /**********************************************************************/
 
