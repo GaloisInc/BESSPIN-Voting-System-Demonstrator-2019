@@ -1,8 +1,11 @@
-# Frequently Asked Questions about the BESSPIN Voting System, funded by the DARPA SSITH program in order to demonstrate and red team secure RISC-V CPUs
+# BESSPIN Voting System FAQ (August 2019)
 
-By Joe Kiniry, Dan Zimmerman, and others \ Galois
+By Joe Kiniry, Dan Zimmerman, and others at Galois
 ([https://galois.com/](http://galois.com/)) and Free & Fair
-([https://freeandfair.us/](https://freeandfair.us/)) \ August 2019
+([https://freeandfair.us/](https://freeandfair.us/))
+
+Funded by the DARPA SSITH program in order to demonstrate and red
+team secure RISC-V CPUs.
 
 **Q. What is SSITH?**
 
@@ -533,5 +536,3 @@ baseline processors.  We were able to sit down with interested DEF CON
 attendees and walk them through our malware writing tutorials, load
 existing exploits on devices, and begin writing new exploits with
 them.
-
-
