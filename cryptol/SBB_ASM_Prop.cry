@@ -1,0 +1,32 @@
+module SBB_ASM_Prop where
+
+import SBB
+
+acceptedBarcode : SBBState -> Bool
+acceptedBarcode s = elem s.L [ WaitForDecision, Cast, Spoil ]
+
+// propOnlyValidBarcode : SBBState -> Barcode -> Bool
+// propOnlyValidBarcode = acceptedBarcode s ==>
+
+initializeInv : SBBState -> Bool
+initializeInv s =
+  (s.M == MotorsOff)
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+standbyInv : SBBState -> Bool
+standbyInv s =
+  (s.M == MotorsOff)
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+waitForBallotInv : SBBState -> Bool
+waitForBallotInv s =
+  (s.M == MotorsOff)
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+feedBallotInv : SBBState -> Bool
+feedBallotInv s =
+  (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))

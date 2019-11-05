@@ -224,6 +224,15 @@ castButtonMask = 1 << 0
 spoilButtonMask : [2]
 spoilButtonMask = 1 << 1
 
+castButtonLit : SBBState -> Bool
+castButtonLit sbb = 0 != (sbb.ButtonIllumination && castButtonMask)
+
+spoilButtonLit : SBBState -> Bool
+spoilButtonLit sbb = 0 != (sbb.ButtonIllumination && spoilButtonMask)
+
+noButtonsLit : SBBState -> Bool
+noButtonsLit s = ~ (castButtonLit s || spoilButtonLit s)
+
 spoilButtonLightOn : StateTransformer
 spoilButtonLightOn = updateSBBState (\ sbb ->
     { sbb | ButtonIllumination -> ButtonIllumination || spoilButtonMask }
