@@ -25,37 +25,38 @@ type RealWorld =
   // prefix of length last obtained via `getBarcodeLength`.
   // This is done because there is no nice way of encoding the dependent type of
   // a string of a given length using records.
-  { ballotDetectTimeout : [inf][TickTypeSize]
-  , osdGetTicks         : [inf][TickTypeSize]
-  , getBarcode          : [inf][inf]Char
-  , getBarcodeLength    : [inf]BarcodeLength
-  , realWorldBool       : [inf]Bool
+  // NOTE: underscores to shut up the shadowing warnings
+  { _ballotDetectTimeout : [inf][TickTypeSize]
+  , _osdGetTicks         : [inf][TickTypeSize]
+  , _getBarcode          : [inf][inf]Char
+  , _getBarcodeLength    : [inf]BarcodeLength
+  , _realWorldBool       : [inf]Bool
   }
 
 ballotDetectTimeout : StateTransformerReturning [TickTypeSize]
-ballotDetectTimeout s = (updateWorldState (\ w -> { w | ballotDetectTimeout -> tail l }) s, head l)
+ballotDetectTimeout s = (updateWorldState (\ w -> { w | _ballotDetectTimeout -> tail l }) s, head l)
   where
-    l = s.worldState.ballotDetectTimeout
+    l = s.worldState._ballotDetectTimeout
 
 osdGetTicks : StateTransformerReturning [TickTypeSize]
-osdGetTicks s = (updateWorldState (\ w -> { w | osdGetTicks -> tail l }) s, head l)
+osdGetTicks s = (updateWorldState (\ w -> { w | _osdGetTicks -> tail l }) s, head l)
   where
-    l = s.worldState.osdGetTicks
+    l = s.worldState._osdGetTicks
 
 getBarcode : StateTransformerReturning ([inf]Char)
-getBarcode s = (updateWorldState (\ w -> { w | getBarcode -> tail l }) s, head l)
+getBarcode s = (updateWorldState (\ w -> { w | _getBarcode -> tail l }) s, head l)
   where
-    l = s.worldState.getBarcode
+    l = s.worldState._getBarcode
 
 getBarcodeLength : StateTransformerReturning BarcodeLength
-getBarcodeLength s = (updateWorldState (\ w -> { w | getBarcodeLength -> tail l }) s, head l)
+getBarcodeLength s = (updateWorldState (\ w -> { w | _getBarcodeLength -> tail l }) s, head l)
   where
-    l = s.worldState.getBarcodeLength
+    l = s.worldState._getBarcodeLength
 
 realWorldBool : StateTransformerReturning Bool
-realWorldBool s = (updateWorldState (\ w -> { w | realWorldBool -> tail l }) s, head l)
+realWorldBool s = (updateWorldState (\ w -> { w | _realWorldBool -> tail l }) s, head l)
   where
-    l = s.worldState.realWorldBool
+    l = s.worldState._realWorldBool
 
 /**************************************** votingdefs.h ****************************************/
 
