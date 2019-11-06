@@ -1,0 +1,59 @@
+system BESSPIN Voting System (BVS)
+indexing
+  owner: Joe Kiniry <kiniry@freeandfair.us>
+  contributors: Free & Fair
+                Galois
+  copyright: (C) 2019 Free & Fair
+  license: GPLv3
+
+// @note kiniry A subsystem mentioned at the top-level in a Lando
+// system specification is a direct child of the system.
+
+// underlying infrastructure
+subsystem Foundations
+subsystem Crypto
+subsystem ElectionGuard
+subsystem Government Furnished Equipment (GFE)
+subsystem Hardware Foundations
+subsystem Logging
+subsystem Receipt Printer
+subsystem Security
+subsystem Software Foundations
+subsystem Smart Ballot Box Hardware
+
+// @note kiniry Subsystem containment is specified using the
+// `contains` relation and must be hierarchical and the top
+// of the hierarchy must be the system itself.
+
+Crypto contains ElectionGuard
+Foundations contains Logging
+Foundations contains Hardware Foundations
+Foundations contains Software Foundations
+Software Foundations contains Crypto Software
+Hardware Foundations contains Hardware Crypto
+Hardware Foundations contains Receipt Printer
+Hardware Foundations contains Smart Ballot Box Hardware
+Hardware Foundations contains GFE
+
+// principal subsystems of polling place
+subsystem Ballot Marking Device (BMD)
+subsystem Evidence Server (ES)
+subsystem Paper Ballot Scanner (PBS)
+subsystem Polling Place Controller (PPC)
+subsystem Registration System (RS)
+subsystem Smart Ballot Box (SBB)
+subsystem Verifiable Paper Server (VPS)
+
+// principal subsystems of overall BVS
+subsystem Ballot Printer System (BPS)
+subsystem Election Verifier (EV)
+subsystem Tabulation Device (TD)
+
+// other subsystems relevant to DEF CON and the University Road Show
+subsystem DEF CON
+subsystem DEF CON Communications
+subsystem Election Reporting
+subsystem Red Team
+
+// background domain theory
+subsystem Elections
