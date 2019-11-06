@@ -1,0 +1,3 @@
+module VotingDefs where
+
+type GPIOMem = [8]

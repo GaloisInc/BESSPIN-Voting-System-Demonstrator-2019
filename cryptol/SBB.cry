@@ -1,19 +1,8 @@
 module SBB where
 
-id : {a} a -> a
-id x = x
+import Extra
 
-compose : {a, b, c} (b -> c) -> (a -> b) -> (a -> c)
-compose f g x = f (g x)
-
-(>>) : {a, b, c} (a -> b) -> (b -> c) -> (a -> c)
-(>>) f g x = g (f x)
-
-(>>=) : {a, b, c, v} (a -> (b, v)) -> (v -> b -> c) -> (a -> c)
-(>>=) f g a = c
-  where
-    (b, v) = f a
-    c      = g v b
+barcodeMaxLength = 254
 
 // You may change `TickTypeSize`, but it should satisfy the constraint
 // type constraint (fin TickTypeSize, TickTypeSize >= 16)
@@ -64,14 +53,15 @@ osdMSecToTicks x = x
 
 /**************************************** sbb_t.h ****************************************/
 
-type BarcodeLength = [8] // TODO: check this
+type BarcodeLength = [8]       // TODO: check this
+type Barcode       = [inf]Char // sadly, no first-class dependent types
 
 type TickType = [TickTypeSize]
 
 type GlobalState =
   { ballotDetectTimeout : TickType
+  , barcode             : [inf]Char
   , barcodeLength       : BarcodeLength
-  // can't store barcode here, so it's a primitive instead
   , castOrSpoilTimeout  : TickType
   }
 
@@ -266,13 +256,13 @@ ballotDetected : SBBState -> Bool
 ballotDetected s = s.P == PaperDetected
 
 ejectBallot : StateTransformer
-ejectBallot = moveMotorBackward >> stopMotor
+ejectBallot = moveMotorBackward >>- stopMotor
 
 spoilBallot : StateTransformer
-spoilBallot = spoilButtonLightOff >> castButtonLightOff >> ejectBallot
+spoilBallot = spoilButtonLightOff >>- castButtonLightOff >>- ejectBallot
 
 castBallot : StateTransformer
-castBallot = moveMotorForward >> stopMotor
+castBallot = moveMotorForward >>- stopMotor
 
 goToStandby : StateTransformer
 goToStandby =
@@ -281,9 +271,9 @@ goToStandby =
      then s
      else stopMotor s
   )
-  >> castButtonLightOff
-  >> spoilButtonLightOff
-  >> updateSBBState (\ sbb ->
+  >>- castButtonLightOff
+  >>- spoilButtonLightOff
+  >>- updateSBBState (\ sbb ->
      { sbb | D  = ShowingText
            , P  = NoPaperDetected
            , BS = BarcodeNotPresent
@@ -389,7 +379,7 @@ flushBarcodes : StateTransformer
 flushBarcodes = doWhile do while
   where
     do      = updateSBBState (\ sbb -> { sbb | BS = BarcodeNotPresent })
-              >> updateSensorState
+              >>- updateSensorState
     while s = s.sbbState.BS == BarcodePresentAndRecorded
 
 updateSensorState : StateTransformer
@@ -401,7 +391,7 @@ updateSensorState =
       )
     )
   )
-  >>
+  >>-
   (
     realWorldBool >>= (\ b1 ->
       realWorldBool >>= (\ b2 ->
@@ -413,7 +403,7 @@ updateSensorState =
       )
     )
   )
-  >>
+  >>-
   (
     realWorldBool >>= (\ b ->
       updateBarcodeState b
@@ -427,13 +417,13 @@ runAwaitRemoval s =
   else s
 
 runEject : StateTransformer
-runEject = ejectBallot >> updateSBBState (\ sbb -> { sbb | L = AwaitRemoval })
+runEject = ejectBallot >>- updateSBBState (\ sbb -> { sbb | L = AwaitRemoval })
 
 runSpoil : StateTransformer
-runSpoil = spoilBallot >> updateSBBState (\ sbb -> { sbb | L = AwaitRemoval })
+runSpoil = spoilBallot >>- updateSBBState (\ sbb -> { sbb | L = AwaitRemoval })
 
 runCast : StateTransformer
-runCast = castBallot >> updateSBBState (\ sbb -> { sbb | L = Standby })
+runCast = castBallot >>- updateSBBState (\ sbb -> { sbb | L = Standby })
 
 runWaitForDecision : StateTransformer
 runWaitForDecision =
@@ -443,9 +433,9 @@ runWaitForDecision =
         if b
         then (
           spoilButtonLightOff
-          >>
+          >>-
           castButtonLightOff
-          >>
+          >>-
           updateSBBState (\ sbb -> { sbb | L = Eject })
         )
         else (\ s ->
@@ -457,9 +447,9 @@ runWaitForDecision =
                 then updateSBBState (\ sbb -> { sbb | L = Abort })
                 else updateSBBState (\ sbb -> { sbb | L = Cast })
               )
-              >>
+              >>-
               spoilButtonLightOff
-              >>
+              >>-
               castButtonLightOff
             )
             else
@@ -470,9 +460,9 @@ runWaitForDecision =
                 then updateSBBState (\ sbb -> { sbb | L = Abort })
                 else updateSBBState (\ sbb -> { sbb | L = Spoil })
               )
-              >>
+              >>-
               spoilButtonLightOff
-              >>
+              >>-
               castButtonLightOff
             )
             else id
@@ -500,9 +490,9 @@ runBarcodeDetected =
           if validity == BarcodeValid
           then (
             castButtonLightOn
-            >> spoilButtonLightOn
-            >> castOrSpoilTimeoutReset
-            >> updateSBBState (\ sbb -> { sbb | L = WaitForDecision })
+            >>- spoilButtonLightOn
+            >>- castOrSpoilTimeoutReset
+            >>- updateSBBState (\ sbb -> { sbb | L = WaitForDecision })
           )
           else
           if validity == BarcodeInvalidTimestamp
@@ -519,7 +509,7 @@ runFeedBallot =
     if (~ ballotDetected s.sbbState) || timeout
     then (
       stopMotor
-      >>
+      >>-
       (\ s1 ->
         if hasABarcode s1.sbbState
         then updateSBBState (\ sbb -> { sbb | L = BarcodeDetected }) s1
@@ -532,8 +522,8 @@ runFeedBallot =
 runWaitForBallot : StateTransformer
 runWaitForBallot =
   ballotDetectTimeoutReset
-  >> moveMotorForward
-  >> updateSBBState (\ s -> { s | L = FeedBallot })
+  >>- moveMotorForward
+  >>- updateSBBState (\ s -> { s | L = FeedBallot })
 
 loadOrCreateLogs : StateTransformerReturning Bool
 loadOrCreateLogs = realWorldBool
@@ -547,7 +537,7 @@ runInitialize =
         if logCreated
         then (
           updateSensorState
-          >> (\ s ->
+          >>- (\ s ->
             if ballotDetected s.sbbState
             then updateSBBState (\ sbb -> { sbb | L = Eject }) s
             else updateSBBState (\ sbb -> { sbb | L = Standby }) s
@@ -562,8 +552,8 @@ runInitialize =
 runStandby : StateTransformer
 runStandby =
   flushBarcodes
-  >> goToStandby
-  >> updateSBBState (\ sbb -> { sbb | L = WaitForBallot })
+  >>- goToStandby
+  >>- updateSBBState (\ sbb -> { sbb | L = WaitForBallot })
 
 runAbort : StateTransformer
 runAbort = id
@@ -608,12 +598,12 @@ takeStep s =
 ballotBoxMainLoop : State -> [inf] State
 ballotBoxMainLoop =
   updateSBBState (\ sbb -> { sbb | L = Initialize })
-  >> runInitialize
-  >> iterate loop
+  >>- runInitialize
+  >>- iterate loop
   where
     loop =
       takeStep
-      >> (\ s -> if s.sbbState.L != Abort then updateSensorState s else s)
+      >>- (\ s -> if s.sbbState.L != Abort then updateSensorState s else s)
 
 /**********************************************************************/
 

@@ -1,0 +1,53 @@
+module SBB_Invariants where
+
+import Extra
+import VotingDefs
+import SBB
+import SBB_ASM_Prop
+import SBB_Hardware
+import SBB_IO_Constants
+
+sbbMachineInvariant : State -> GPIOMem -> Bool
+sbbMachineInvariant s gpioMem = sbbInvariant s gpioMem && sbbStatesInvariant s.sbbState
+
+gpioMemButtonLights : SBBState -> GPIOMem -> Bool
+gpioMemButtonLights s gpioMem =
+     (((gpioMem ! buttonCastLED)  == True) <==> castButtonLit  s)
+  && (((gpioMem ! buttonSpoilLED) == True) <==> spoilButtonLit s)
+
+gpioMemMotors : SBBState -> GPIOMem -> Bool
+gpioMemMotors s gpioMem =
+     ((((gpioMem ! motor0)  == False) && ((gpioMem ! motor1) == True))  <==> (s.M == MotorsTurningForward))
+  && ((((gpioMem ! motor0)  == True)  && ((gpioMem ! motor1) == False)) <==> (s.M == MotorsTurningBackward))
+  && ((((gpioMem ! motor0)  == False) && ((gpioMem ! motor1) == False)) <==> (s.M == MotorsOff))
+
+barcodeState : State -> Bool
+barcodeState s =
+  (0 <= gs.barcodeLength)
+  && (gs.barcodeLength <= barcodeMaxLength)
+  && (
+     (elem sbb.L [ Cast, Spoil, WaitForDecision ])
+     ==>
+     (barcodeValid gs.barcode gs.barcodeLength)
+  )
+  && (
+     (barcodePresent sbb)
+     ==>
+     (gs.barcodeLength > 0)
+  )
+  where
+    sbb = s.sbbState
+    gs  = s.globalState
+
+logIOInitialized : Bool
+logIOInitialized = True // TODO: check that we don't care about this
+
+sbbInvariant : State -> GPIOMem -> Bool
+sbbInvariant s gpioMem =
+  logIOInitialized
+  && gpioMemButtonLights sbb gpioMem
+  && gpioMemMotors sbb gpioMem
+  && barcodeState s
+  && validASMStates sbb // is the_state in specs, but might be error there
+  where
+    sbb = s.sbbState
