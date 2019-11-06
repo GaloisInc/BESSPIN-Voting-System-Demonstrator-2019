@@ -26,11 +26,22 @@ These specifications are written in ACSL.
 We then use these algebraic specifications to specify contracts (pre- and
 postconditions, again in ACSL) for the C implementations of these components. We
 use Frama-C/WP with runtime error annotation generation to check that each
-procedure satisfies its contract.
+function satisfies its contract and is type-safe.
 
 The static assurance case is partially complete. Currently, the tool is not able to
-verify that every procedure meets its specification. Often this is due to
+verify that every function meets its specification. Often this is due to
 completeness issues, but it is possible some contracts are not correct.
+
+A summary of the Verification Conditions (VCs) generated and automatically discharged for each component is as follows:
+
+|Component|VCs generated|VCs discharged|
+|---------|------------:|-------------:|
+|Crypto   |117          |97            |
+|---------|-------------|--------------|
+|SBB      |905          |780           |
+|---------|-------------|--------------|
+|Logging  |747          |747           |
+
 
 ## Dynamic Assurance
 
