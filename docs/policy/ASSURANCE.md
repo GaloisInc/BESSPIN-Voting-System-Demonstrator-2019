@@ -37,9 +37,9 @@ A summary of the Verification Conditions (VCs) generated and automatically disch
 |Component|VCs generated|VCs discharged|
 |---------|------------:|-------------:|
 |Crypto   |117          |97            |
-|---------|-------------|--------------|
+|---------+-------------+--------------|
 |SBB      |905          |780           |
-|---------|-------------|--------------|
+|---------+-------------+--------------|
 |Logging  |747          |747           |
 
 
