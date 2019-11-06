@@ -1,0 +1,48 @@
+subsystem EvidenceServer
+The service that organizes and exposes to system auditors the evidence logged by other components of the BVS 2020.
+
+component Evidence extends Log
+  Evidence is a record that the evidence server understands.          
+
+component ElectionMetadata extends Evidence
+  Record of all relevant election metadata: date, time, officials, location.
+
+@todo abakst Do we need this, since it's defined in our glossary?
+component CastVoteRecord extends Evidence
+  Tabulatable record of all votes produced by a single voter for a given ballot. 
+
+component RegisteredVoter extends Evidence
+  Record of certification of voter registration containing the authenticator, registration system, polling place, and voter.
+
+component BallotStyle extends Evidence
+  Record associating voters with their ballot style.
+
+component MarkedBallotImage extends Evidence
+  Marked ballot image scanned by the ballot scanning device.
+
+
+component BallotOutcomeRecord extends Evidence
+  A record of the choice made a voter with respect to a given marked ballot, documenting if the ballot is spoiled, cast, or challenged.
+
+component SmartBallotBoxRecord extends Evidence
+  Records from the smart ballot box documenting the deposit of cast ballots.
+
+component TabulationRecord extends Evidence
+  Record of the election results.
+
+@todo abakst review the above with respect to the outcome of debate as to whether or not ballots are spoiled at SBB or BSD
+
+component EvidenceServer
+  component PrivateServerAPI
+    The interface between post-election officials and the server.
+    Import this evidence!
+    Publish evidence!
+
+  component PublicServerAPI
+    The interface between the evidence and the public.
+    What is the decryption of my challenged ballot?
+    What are the collected encrypted ballots?
+    What is the election evidence?
+
+PrivateServerAPI client Logging, Evidence
+PublicServerAPI  client Network, Evidence
