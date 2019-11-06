@@ -40,6 +40,10 @@ A summary of the Verification Conditions (VCs) generated and automatically disch
 |SBB      |905          |780           |
 |Logging  |747          |747           |
 
+These results were generated using:
+* GIT Branch: master
+* GIT Commit: c02dc4a76a94b7b5177ca9938a721c2b5c451342
+* Toolset: Frama-C 19.0
 
 ## Dynamic Assurance
 
