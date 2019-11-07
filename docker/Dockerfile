@@ -51,4 +51,10 @@ RUN opam depext frama-c
 RUN opam install --deps-only frama-c
 RUN opam pin add --kind=path frama-c /tools/frama-c-19.0-Potassium -y
 
+# cmake install
+RUN apt-get install -y libgmp3-dev
+RUN cd /tools && tar -xf cmake-3.16.0-rc3.tar.gz && cd cmake-3.16.0-rc3
+RUN ./bootstrap -- -DCMAKE_USE_OPENSSL=OFF 
+RUN make && make install
+
 ENV PATH="/root/.opam/default/bin:${PATH}"
