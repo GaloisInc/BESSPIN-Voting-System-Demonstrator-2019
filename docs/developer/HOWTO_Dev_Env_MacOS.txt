@@ -1,57 +1,75 @@
-Starting Point
---------------
+macOS as a Development Platform for the BESSPIN Voting System
 
-1. I Started with clean install of MacOS 10.14.5, running in a VM under Parallels.
+Operating System Foundation
+---------------------------
 
-BASICS
-------
+1. We support macOS 10.14 (Mojave) or 10.15 (Catalina) as a
+   development platform.
 
-2. Install Homebrew (https://brew.sh/) and install a variety of missing packages
+Software Foundations
+--------------------
 
+2. Install Homebrew (https://brew.sh/) and install a variety of
+   missing packages.
+```
    brew install pkg-config gtksourceview libgnomecanvas libxml2 autoconf
-   setenv PKG_CONFIG_PATH `echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'`
+```
 
-   (pkg-config doesn't know, by default, to look for all these 'opt'
-   packages; the environment variable fixes this. This command is for
-   csh/tcsh; do something equivalent for bash)
+    Set `PKG_CONFIG_PATH` to point to the right location.  E.g.,
+```
+    setenv PKG_CONFIG_PATH `echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'
+```
+    or
+    export PKG_CONFIG_PATH=`echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'
+```
+   `pkg-config` does not know, by default, where to find all these
+   `opt`-based packages; this environment variable fixes this. Use
+   the appropriate command based upon your shell.
 
 OPAM
 ----
 
-3a. Install and initalize opam
+3. Install and initialize `opam`, a some of the system's dependencies
+   are installed via `opam`.
 
-
+```
    brew install opam
    opam init  (respond 'y' and 'y' to two questions)
+```
 
 Frama-C
 -------
 
-4. Install Frama-C using opam
+4. Install Frama-C using `opam`
+```
+  opam install frama-c --unlock-base
+```
+   OPAM's OCaml is newer than Frama-C needs/uses.  The use of the
+   `--unlock-base` switch permits OPAM to install an older,
+   appropriate version of OCaml.
 
-  opam install frama-c --unlock-base (because OCaml is newer than Frama-C?
-				      This installs an older version of OCaml)
+5. Check what version of Frama-C is installed and working.
 
-5. Check Frama-C realy is version 18.0 (Argon)
+  We have used Frama-C version 18.0 (Argon) and 19.0 (Potassium) for
+  the development of BVS 2019.
 
-  (By default, the instructions above seem to get you Frama-C version 19,
-  which *seems* to be just fine.)
-
+  `frama-c --version`
 
 LLVM (including clang)
 ----------------------
 
-6. We install llvm/clang using HomeBrew, since it includes llvm-link which is
-   needed for SAW. This overrides Apple's default install of clang.
+6. We install llvm/clang using Homebrew, since it includes `llvm-link`
+   which is needed for SAW.  Doing so overrides Apple's default
+   install of clang.
 
-   6.1  brew install llvm
+   6.1  Install Homebrew LLVM via Homebrew: `brew install llvm`
 
-   6.2  Add /usr/local/opt/llvm/bin to the FRONT of your PATH.
+   6.2  Add `/usr/local/opt/llvm/bin` to the front of your shell's `PATH`.
 
-       (This is important so that HomeBrew's LLVM and tools are found before
-         Apple's installation which is in /usr/local/bin)
+        This is important so that Hombre's LLVM and tools are found before
+        Apple's installation, which is in `/usr/local/bin`.
 
-   6.3  Install standard C headers..
+   6.3  Install the standard C headers.
 
        open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
        Follow the installation instructions
@@ -59,120 +77,104 @@ LLVM (including clang)
 Clang-Format
 ------------
 
-7. brew install clang-format
+Install Clang-Format.
 
-MILESTONE 1
------------
+7. `brew install clang-format`
+
+SHAVE Smoketest
+---------------
 
 This set of tools should be enough to reproduce the Frama-C analyses
-of the SHAVE application software.
+of the SSITH seedling SHAVE application software (if you have access
+to that repository).
 
 COQ
 ---
 
-Even if not usign Coq for formal proofs, it is needed to build the BESSPIN Book.
+Even if you are not using Coq for formal proofs, it is needed to build
+the *BESSPIN Book*.
 
-9. opam install coq
-   opam install coqide
+9. `opam install coq`
+   `opam install coqide`
 
-Apparently this will recompile Frama-C.
+Doing so will sometimes recompile Frama-C.
 
-Z3 4.7.1
---------
+Cryptol
+-------
 
-Z3 (precisely version 4.7.1) is a pre-requisite for Cryptol.
+As of November 2019, one can install the latest release of Cryptol and
+its default SMT solver, Z3 from Microsoft, by using Homebrew: `brew
+install cryptol`.  The resulting installation has Cryptol 2.8.0 and Z3
+version 4.8.6.
 
-Download the package for x64-osx-10.11.6 from https://github.com/Z3Prover/z3/releases
-(or really, https://github.com/Z3Prover/z3/releases/tag/z3-4.7.1)
+If one needs an older version of Cryptol, see the [Cryptol releases
+page at GitHub](https://github.com/GaloisInc/cryptol/releases/).
 
-Extract the ZIP file and move the extracted directory to $HOME/tools
+Z3
+--
 
-Edit $HOME/.bash_profile to add $HOME/tools/z3*/bin to your PATH
+If the aforementioned Homebrew install of Cryptol properly installed
+Z3 as a dependency, then no further action is necessary.  If you have
+any problem, see the following.
 
-(dwallach notes: running 'brew install cryptol' installed Z3 version 4.8.5
-automatically, so maybe this whole Z3 step is unnecessary?)
+A recent version of Z3 is a pre-requisite for Cryptol and other tools
+we use.  Sometimes particular release break functionality.  Our
+currently suggested known good version of Z3 is version 4.7.1 or
+4.8.6.  The 4.8 series of Z3 releases introduced some performance
+regressions.
 
-Yices 2.6.1
------------
+In order to install specific releases of Z3, directly download them
+from `https://github.com/Z3Prover/z3/releases` and extract the Zip
+archive and move the extracted directory to somewhere in your `PATH`.
 
-Another pre-requisute for Cryptol
+Yices
+-----
 
-Relase 2.6.1 is required, but is available on HomeBrew, so:
+Another solver that Cryptol can use is the Yices SMT solver from SRI.
 
- brew install SRI-CSL/sri-csl/yices2
+Release 2.6.1 is required, but is available on Homebrew, so:
 
-
-Cryptol 2.7.0
--------------
-
-Grab the tarball of Cryptol 2.7.0 for OSX-64 from https://github.com/GaloisInc/cryptol/releases/tag/2.7.0
-
-Decompress the untar the tarball, and move the resulting directory to $HOME/tools
-
-Edit $HOME/.bash_profile to add $HOME/tools/cryptol*/bin to your PATH
-
-(dwallach notes: running 'brew install cryptol' gets version 2.7.0)
-
+ `brew install SRI-CSL/sri-csl/yices2`
 
 SAW
 ---
 
-The current version to use is
-  saw-0.3-OSX-64.tar.gz
-from https://github.com/GaloisInc/saw-script/releases
+Much of the work on the BVS and its dependencies used SAW version 0.3
+and development versions before SAW 0.4 was released.
 
-Download, decompress and untar that file.
-Move the resulting directory to $HOME/tools
+One can obtain SAW releases from the [SAW release webpage at
+GitHub](https://github.com/GaloisInc/saw-script/releases).
 
-Add $HOME/tools/saw-0.3-OSX-64/bin to your PATH
-
-GIT SUBMODULES
+Git Submodules
 --------------
 
+Make sure to update all submodules of this project.  At this time, the
+only submodule is our version of FreeRTOS.
+
+```
 git submodule update --init
+```
 
-(Brings in FreeRTOS dependencies and toolsuite)
-
-
-NIX
+Nix
 ---
 
+We use [Nix](http://nixos.org/) to manage some of our underlying
+technology.
+
+```
 curl https://nixos.org/nix/install | sh
 . $HOME/.nix-profile/etc/profile.d/nix.sh
+```
 
 GFE and BESSPIN Tooling
 -----------------------
 
-THIS IS CURRENTLY BROKEN as of 31/5/2019 ... see below.
-
-Building the GFE toolset needs to happen on a native filesystem,
-so we need to clone the GFE repo locally first.
-
-cd $HOME
-mkdir BESSPIN
-cd BESSPIN
-git clone git@gitlab-ext.galois.com:ssith/gfe.git
-cd gfe
-./init_submodules.sh
-
-# Switch to the "develop" branch of the GFE repo
-git checkout develop
-git submodule update --init tool-suite
-cd tool-suite
-git checkout develop
-
-# MODIFY nix config here to allow broken and allow unsupported packages
-Create a file $HOME/.config/nixpkgs/config.nix containinf the following 2 lines
-
-{ allowBroken = true;
-  allowUnsupportedSystem = true; }
-
-# then
-
-nix-shell
-
-# Warning - this takes about 3 hours to build and install the first time you
-# run it...and that's on a quad-core MacBook Pro...
-
-# This fails in the build of csmith-2.4.0 for some unknown reason.
-# Resolution of these problems is TBD.
+The Government Furnished Equipment (GFE) on which the Voting System
+runs to demonstrate SSITH secure CPUs is a Xilinx FPGA platform (a VCU
+118 with a variety of attached peripherals).  The supported platform
+our the development environment for the GFE, as well as the custom EDA
+tooling we have built for DARPA, is Linux.  As such, at this time we
+do not suggest one should try to use any of that tooling on macOS.
+Perhaps in the future we will support some of that tooling on macOS,
+and at the moment we experimentally use some of it via `docker` on
+macOS.
