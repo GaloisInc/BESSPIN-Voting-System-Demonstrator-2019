@@ -3,19 +3,19 @@ macOS as a Development Platform for the BESSPIN Voting System
 Operating System Foundation
 ---------------------------
 
-1. We support macOS 10.14 (Mojave) or 10.15 (Catalina) as a
-   development platform.
+1. We support macOS 10.14 (Mojave) and 10.15 (Catalina) as
+   development platforms.
 
 Software Foundations
 --------------------
 
-2. Install Homebrew (https://brew.sh/) and install a variety of
+2. Install Homebrew (https://brew.sh/), then install a few
    missing packages.
 ```
    brew install pkg-config gtksourceview libgnomecanvas libxml2 autoconf
 ```
 
-    Set `PKG_CONFIG_PATH` to point to the right location.  E.g.,
+    Set `PKG_CONFIG_PATH` to point to the right location:
 ```
     setenv PKG_CONFIG_PATH `echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'
 ```
@@ -29,7 +29,7 @@ Software Foundations
 OPAM
 ----
 
-3. Install and initialize `opam`, a some of the system's dependencies
+3. Install and initialize `opam`, as some of the system's dependencies
    are installed via `opam`.
 
 ```
@@ -58,20 +58,23 @@ Frama-C
 LLVM (including clang)
 ----------------------
 
-6. We install llvm/clang using Homebrew, since it includes `llvm-link`
-   which is needed for SAW.  Doing so overrides Apple's default
-   install of clang.
+6. Install llvm/clang using Homebrew. Unlike Apple's LLVM distribution,
+   it includes the `llvm-link` tool needed for SAW.
 
    6.1  Install Homebrew LLVM via Homebrew: `brew install llvm`
 
-   6.2  Add `/usr/local/opt/llvm/bin` to the front of your shell's `PATH`.
+   6.2  To override Apple's version of LLVM globally, add
+        `/usr/local/opt/llvm/bin` to the front of your shell's `PATH`
+        by modifying your shell startup.
+        This will cause Hombrew's LLVM and tools to be found before
+        Apple's installation, which is in `/usr/local/bin`. If you 
+        do not want to override Apple's version of LLVM globally,
+        you can manually add `/usr/local/opt/llvm/bin` to your path
+        only in shells you are using to build this project.
 
-        This is important so that Hombre's LLVM and tools are found before
-        Apple's installation, which is in `/usr/local/bin`.
+   6.3  Install the standard C headers into `/usr/include`.
 
-   6.3  Install the standard C headers.
-
-       open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg
+       `open /Library/Developer/CommandLineTools/Packages/macOS_SDK_headers_for_macOS_10.14.pkg`
        Follow the installation instructions
 
 Clang-Format
@@ -88,51 +91,46 @@ This set of tools should be enough to reproduce the Frama-C analyses
 of the SSITH seedling SHAVE application software (if you have access
 to that repository).
 
-COQ
+Coq
 ---
 
-Even if you are not using Coq for formal proofs, it is needed to build
+Even if you are not using Coq for formal proofs, it is required to build
 the *BESSPIN Book*.
 
 9. `opam install coq`
    `opam install coqide`
 
-Doing so will sometimes recompile Frama-C.
+Installing Coq will sometimes recompile Frama-C.
 
 Cryptol
 -------
 
-As of November 2019, one can install the latest release of Cryptol and
-its default SMT solver, Z3 from Microsoft, by using Homebrew: `brew
-install cryptol`.  The resulting installation has Cryptol 2.8.0 and Z3
-version 4.8.6.
+Install the latest release of Cryptol and its default SMT solver, Z3 from 
+Microsoft, using Homebrew: `brew install cryptol`. 
+The resulting installation has Cryptol 2.8.0 and Z3 version 4.8.6.
 
-If one needs an older version of Cryptol, see the [Cryptol releases
+If you need an older version of Cryptol, see the [Cryptol releases
 page at GitHub](https://github.com/GaloisInc/cryptol/releases/).
 
 Z3
 --
 
 If the aforementioned Homebrew install of Cryptol properly installed
-Z3 as a dependency, then no further action is necessary.  If you have
-any problem, see the following.
-
-A recent version of Z3 is a pre-requisite for Cryptol and other tools
-we use.  Sometimes particular release break functionality.  Our
-currently suggested known good version of Z3 is version 4.7.1 or
-4.8.6.  The 4.8 series of Z3 releases introduced some performance
-regressions.
+Z3 as a dependency, no further action is necessary.  If you have
+any problem, install release version 4.7.1 or 4.8.6 of Z3. 
+Do not use any other releases; sometimes new releases break 
+functionality upon which Cryptol depends. 
 
 In order to install specific releases of Z3, directly download them
-from `https://github.com/Z3Prover/z3/releases` and extract the Zip
-archive and move the extracted directory to somewhere in your `PATH`.
+from `https://github.com/Z3Prover/z3/releases`, extract the Zip
+archive, and move the extracted directory to somewhere in your `PATH`.
 
 Yices
 -----
 
 Another solver that Cryptol can use is the Yices SMT solver from SRI.
 
-Release 2.6.1 is required, but is available on Homebrew, so:
+Release 2.6.1 is required, and is available on Homebrew, so:
 
  `brew install SRI-CSL/sri-csl/yices2`
 
@@ -155,26 +153,17 @@ only submodule is our version of FreeRTOS.
 git submodule update --init
 ```
 
-Nix
----
-
-We use [Nix](http://nixos.org/) to manage some of our underlying
-technology.
-
-```
-curl https://nixos.org/nix/install | sh
-. $HOME/.nix-profile/etc/profile.d/nix.sh
-```
 
 GFE and BESSPIN Tooling
 -----------------------
 
 The Government Furnished Equipment (GFE) on which the Voting System
-runs to demonstrate SSITH secure CPUs is a Xilinx FPGA platform (a VCU
-118 with a variety of attached peripherals).  The supported platform
-our the development environment for the GFE, as well as the custom EDA
+runs to demonstrate SSITH secure CPUs is a Xilinx FPGA platform (a
+VCU118 with a variety of attached peripherals).  The supported 
+development environment for the GFE, as well as for the custom EDA
 tooling we have built for DARPA, is Linux.  As such, at this time we
-do not suggest one should try to use any of that tooling on macOS.
-Perhaps in the future we will support some of that tooling on macOS,
-and at the moment we experimentally use some of it via `docker` on
-macOS.
+do not suggest trying to use any of that tooling on macOS directly.
+We currently have experimental Docker support for running on macOS
+(and other Docker-capable platforms), but we make no guarantees 
+about its functionality.
+
