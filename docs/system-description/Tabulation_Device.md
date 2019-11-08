@@ -24,22 +24,22 @@ contests.
 Election statutes and sometimes rules dictate how one tabulates a set of
 ballots, often by explaining how one tabulates votes in a single race.
 Thus, a tabulator is a computational algorithmic translation of those
-statutes and rules into code or processes.  Tabulation is a process in the 
+statutes and rules into code or processes.  Tabulation is a process in the
 case that the tabulator is one or more human beings performing a hand-count.
 
-Formally verified tabulators have been created to realize several (often very 
-complex voting) methods.  Many of these tabulators were created by Joe Kiniry's 
+Formally verified tabulators have been created to realize several (often very
+complex voting) methods.  Many of these tabulators were created by Joe Kiniry's
 research group when he was a professor.  These include:
- - [the Netherlands list-based method](https://github.com/FreeAndFair/KOA/tree/master/TallySystems/Dutch), 
- - [Denmark's single-selection method](https://github.com/FreeAndFair/DIVS), and 
+ - [the Netherlands list-based method](https://github.com/FreeAndFair/KOA/tree/master/TallySystems/Dutch),
+ - [Denmark's single-selection method](https://github.com/FreeAndFair/DIVS), and
  - [Ireland's Proportional-Representation through Single Transferable
    Vote (PR-STV) method](https://github.com/FreeAndFair/Votail).
 
 Free & Fair has created two high-assurance tabulators:
  - [San Francisco's Rank Choice Voting (RCV) method]
-   (https://github.com/FreeAndFair/formal-rcv), and 
+   (https://github.com/FreeAndFair/formal-rcv), and
  - for homomorphic tabulation of plurality method ballots in
-   ElectionGuard, as a part of its 
+   ElectionGuard, as a part of its
    [verifier](https://github.com/microsoft/ElectionGuard-SDK-Reference-Verifier).
 
 ## Manifest
@@ -60,14 +60,14 @@ subsystem:
 
 ## Glossary
 
-Our system glossary is based upon the 
-[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
-which is in turn based upon the 
+Our system glossary is based upon the
+[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary),
+which is in turn based upon the
 [NIST Election Glossary](https://pages.nist.gov/ElectionGlossary/).
 
 ## Requirements
 
-Given that we are implementing a traditional and an E2E-V voting system in 
+Given that we are implementing a traditional and an E2E-V voting system in
 BVS 2020, we need two tabulators: one that can tabulate plaintext CVRs, and
 one that can homomorphically tabulate enciphered CVRs.  The latter is included
 with ElectionGuard.

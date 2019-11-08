@@ -47,7 +47,7 @@ review. The development workflow is as follows:
 7. Typically, at least one _other_ person must review any changes to the
    `master` branch and approve it using the GitLab MR interface. A _reviewer_
    should check that all necessary comments are addressed.
-8. Once it has been approved, a _reviewer_ with merge permissions should 
+8. Once it has been approved, a _reviewer_ with merge permissions should
    sign the tip commit `git commit -S --amend --no-edit -n`, push (force with
    lease), and then merge the MR using the GitLab "Merge" button, with the
    "Delete source branch" checkbox _checked_ and the "Squash commits" checkbox

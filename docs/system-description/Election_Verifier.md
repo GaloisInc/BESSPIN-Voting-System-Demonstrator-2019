@@ -10,7 +10,7 @@ not that evidence is well-formed.
 
 Any end-to-end verifiable cryptographic protocol creates cryptographic
 evidence.  This evidence can/should be verified by a cryptographic
-*Election Verifier* (or just "Verifier", for short).  
+*Election Verifier* (or just "Verifier", for short).
 
 A verifier checks a set of formally specified properties in the
 evidence; correctness and security properties that are meant to
@@ -55,9 +55,9 @@ subsystem:
 
 ## Glossary
 
-Our system glossary is based upon the 
-[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
-which is in turn based upon the 
+Our system glossary is based upon the
+[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary),
+which is in turn based upon the
 [NIST Election Glossary](https://pages.nist.gov/ElectionGlossary/).
 
 ## Requirements
@@ -100,14 +100,14 @@ unavailability of the Rust toolchain upstream on RISC-V.
 ## Documentation
 
 1. The ElectionGuard cryptographic protocol is specified in rigorous
-   natural language in the 
+   natural language in the
    [ElectionGuard specification](https://github.com/microsoft/ElectionGuard-SDK-Specification).
 2. The [ElectionGuard cryptographic protocol]
-   (https://github.com/microsoft/ElectionGuard-SDK-Specification/tree/master/Formal/cryptol) 
+   (https://github.com/microsoft/ElectionGuard-SDK-Specification/tree/master/Formal/cryptol)
    is formally specified using [Cryptol](https://cryptol.net/).
 3. The BVS 2020 cryptographic protocol will be specified in rigorous
    natural language in Q4 2019.
-3. The BVS 2020 cryptographic protocol will be formally specified 
+3. The BVS 2020 cryptographic protocol will be formally specified
    in Cryptol and perhaps other formats in Q4 2019 and into 2020.
 
 ## Validation and Verification Methodology

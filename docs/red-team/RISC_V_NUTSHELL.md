@@ -178,7 +178,7 @@ And, here's the result of running `riscv32-unknown-elf-gcc -S -O dumb.c` with an
 
 ```assembly
 print_int:
-    addi  sp,sp,-16             ; move the stack pointer down 
+    addi  sp,sp,-16             ; move the stack pointer down
     sw    ra,12(sp)             ; save our return address on the stack
     mv    a1,a0                 ; set the second argument for printf from our parameter
     lui   a0,%hi(.LC0)          ; load high bits of address for the format string

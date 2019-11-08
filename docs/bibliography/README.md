@@ -10,7 +10,7 @@ process and methodology.
      systems we create.  A (ten year old) background paper about formal methods
      in industry is _[Formal Methods: Practice and Experience]_ by our
      colleagues Woodcock, Larsen, Bicarregui, and Fitzgerald.
-     
+
   2. A more recent taste about what applied formal methods looks like in the
      21st century is found in our paper
      _[Continuous Formal Verification of Amazon s2n]_ by Chudnov et al.

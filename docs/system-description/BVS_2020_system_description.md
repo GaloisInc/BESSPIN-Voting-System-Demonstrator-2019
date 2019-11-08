@@ -79,10 +79,10 @@ The BVS consists of the following subsystems:
    logged for the authorities.  Voters are only permitted to vote once
    in an election.
 
-2. (*IR&D*) A *Ballot Printer System* relates a ballot style to an 
-   Unmarked Paper Ballot.  The unmarked paper ballot acts as the activation 
+2. (*IR&D*) A *Ballot Printer System* relates a ballot style to an
+   Unmarked Paper Ballot.  The unmarked paper ballot acts as the activation
    token for a BMD.
-   
+
 3. (*Core*) A *Voting Terminal* (also known as a Ballot Marking Device, or BMD
    for short), which facilitates voters with disabilities to
    independently completely mark to their satisfaction in an accurate,
@@ -90,7 +90,7 @@ The BVS consists of the following subsystems:
    choose to complete their ballot by hand create what is known as a
    Hand-Marked Paper Ballot (HMPB) and do not use the BMD.  The BMD
    does not store any information about voters or their choices.
-   
+
 4. (*IR&D*) A *Voter Verification Device*, which facilitates voters of all kinds
    to verify that the ballot that they have completed (either by-hand
    or using the BMD) does, in fact, represent their wishes.  Voters
@@ -107,7 +107,7 @@ The BVS consists of the following subsystems:
    challenge discussed later—this system also facilitates the issuance
    of new ballot style tokens so that a voter can start over and
    obtain a new unmarked paper ballot (step 2 above).
-   
+
 6. (*Core*) A *Ballot Scanning Device* (also known as a *Paper Ballot Scanner*,
    or *PBS* for short), which converts a paper ballot into a Cast Vote
    Record—a digital representation of the paper ballot’s contents (the
@@ -122,7 +122,7 @@ PNG files).  One can do so for each and every ballot observed (if at
 step 6) or cast (if done post-election when SBB’s are emptied),
 depending upon the kind of evidence one wishes to preserve and share
 about the election via the Evidence Server.
-   
+
    In the case of an E2E-V PBS, the PBS prints an E2E-V Ballot Receipt
    (aka a Vote Tracker, in ElectionGuard lingo).  Only after the
    tracker is in the voter’s hands does the PBS permit the voter to
@@ -130,13 +130,13 @@ about the election via the Evidence Server.
    case, the voter returns to the Controller System to obtain a new
    unmarked paper ballot.  In the former case, the voter takes their
    digitally cast ballot to the Smart Ballot Box.
-   
+
 7. (*Core*) A *Smart Ballot Box* (SBB), which permits a voter to
    securely store a legal, marked paper ballot. The main function of
-   the SBB is to accept and store a legal ballot for the current 
+   the SBB is to accept and store a legal ballot for the current
    election and reject ballots that are not part of the current
    election.
-   
+
 8. (*Core*) An *Evidence Server* (ES) (also known as a Bulletin Board in the
    E2E-V literature) shares all evidence of an election to the public
    using open common data, machine readable, formats.
@@ -147,7 +147,7 @@ about the election via the Evidence Server.
    of the ballot styles of the election, example blank ballot images
    for every style, total number of voters checked in, total number of
    ballots cast and counted, under/overcounts per contest, etc.
-   
+
    For an E2E-V voting system, the ES also publishes the cryptographic
    evidence of the election so that independent third parties can both
    double-check the announced results of the election (via independent
@@ -155,7 +155,7 @@ about the election via the Evidence Server.
    verification).  The ES also facilitates the lookup of a ballot
    receipt in an election’s evidence, so as to prove to a voter that
    the encryption performed by the PBS was, in fact, accurate.
-   
+
 9. (*Supplemental*) A *Tabulation Device*, which computes the outcome(s) of an election
    from the Cast Vote Records component of an election’s evidence.
    For a traditional election, such a tabulation is performed on
@@ -165,7 +165,7 @@ about the election via the Evidence Server.
    accomplished either via a decryption step (in the case of many
    mixnet-based systems) or via homomorphic tabulation (as is the case
    with ElectionGuard).
-   
+
 10. (*Supplemental*) In the case of an E2E-V Voting System, at least one *Verifier*,
     which consumes the cryptographic evidence of an election published
     on the ES and determine whether or not that evidence is
@@ -181,8 +181,8 @@ about the election via the Evidence Server.
 
 The BVS 2020 system's requirements is driven by two main external sources: (1) our SOW
 with Galois and hence DARPA, and (2) the draft VVSG 2.0 federal requirements on
-voting systems (currently only in the form of principles via "Voluntary Voting 
-System Guidelines 2.0: Principles and Guidelines").  
+voting systems (currently only in the form of principles via "Voluntary Voting
+System Guidelines 2.0: Principles and Guidelines").
 
 Thus, BVS 2020's mandatory requirements are derived from (1), and our supplementary
 requirements are derived from (2).  The full text for (1) is located in the file
@@ -202,16 +202,16 @@ are as follows:
  - *[COTS_Platform]* All subsystems that do not target a SSITH platform must run
    on an easily procurable COTS platform running a commonly available Linux
    distribution which also supports RISC-V.
- - *[BVS_PL]* All BVS implementations and their C-based dependencies, within reason, 
+ - *[BVS_PL]* All BVS implementations and their C-based dependencies, within reason,
    must be written in verifiable C that can be successfully compiled with the GFE's LLVM.
  - *[LLVM_Compilation]* All implementations and their dependencies, within reason,
    must be compiled with the GFE's LLVM or a TA-1 team's fork thereof.
  - *[CASCADES]* The CASCADES platform must run the SBB subsystem.
- 
+
  # Contributors
 
 The BESSPIN Voting System project has the following contributors:
- - Joseph Kiniry, Galois Principal Scientist, BESSPIN Principal Investigator, 
+ - Joseph Kiniry, Galois Principal Scientist, BESSPIN Principal Investigator,
    Free & Fair CEO and Chief Scientist, and the main inventor of the system.
  - Daniel Zimmerman, Galois Principal Researcher, BESSPIN co-Principal
    Investigator, Free & Fair Computer Scientist

@@ -119,7 +119,7 @@ further testing.
 
 The BVS test exercise is intended to be completely open, a crystal-box
 rather than black-box process. As a result, this repo contains all the
-information needed to build an SBB, starting with the 
+information needed to build an SBB, starting with the
 [smart ballot box (SBB) source code](../source) for the SBB software
 that runs on the reference system and the target systems.
 

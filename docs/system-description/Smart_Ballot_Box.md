@@ -28,11 +28,11 @@ the logging subsystem and an error message displayed to the voter.
 If a local network error, controller error, or time window expires,
 resulting in an unexpected condition the SBB will eject the
 ballot. The SBB will then report the error to the logging subsystem
-and display a message to the voter.  Once connectivity to the 
+and display a message to the voter.  Once connectivity to the
 controller is restored the ballot may be recast as long as the ballot
 has not expired.
 
-If the ballot is determined by the controller to be correct and 
+If the ballot is determined by the controller to be correct and
 countable for the current election, the voter will be prompted via
 the SBB UI to either cast or spoil their ballot.
 
@@ -69,9 +69,9 @@ SBB artifacts:
 
 ## Glossary
 
-Our system glossary is based upon the 
-[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary), 
-which is in turn based upon the 
+Our system glossary is based upon the
+[Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary),
+which is in turn based upon the
 [NIST Election Glossary](https://pages.nist.gov/ElectionGlossary/).
 
 ## Requirements

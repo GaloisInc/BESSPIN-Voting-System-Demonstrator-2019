@@ -9,7 +9,7 @@ team secure RISC-V CPUs.
 
 **Q. What is SSITH?**
 
-A: 
+A:
 
 *   System Security Integration Through Hardware & Firmware
 *   A DARPA funded program that aims to protect systems against
@@ -297,9 +297,9 @@ secure hardware demonstrator?**
 A: It depends upon which demonstrator you are focusing on.  In
 general, red team participants are welcome to:
 
-(a) interact with the demonstrator over two communication channels: 
+(a) interact with the demonstrator over two communication channels:
 
-    (1) the simulated serial interface (UART) via the supplied USB cable, and 	
+    (1) the simulated serial interface (UART) via the supplied USB cable, and
 
     (2) the supplied Ethernet cable, and
 
@@ -471,8 +471,8 @@ I/O devices of the Smart Ballot Box were designed by Galois.
 The softcore processors that run on that FPGA are based upon existing
 open source cores.  For our demonstration at DEF CON 2019, we showed
 off two baseline open source cores—one based upon Rocket from Berkeley
-and one based upon Piccolo from Bluespec—as well as one SSITH 
-securitized core from the SRI/Cambridge team and one anonymous core 
+and one based upon Piccolo from Bluespec—as well as one SSITH
+securitized core from the SRI/Cambridge team and one anonymous core
 from another performer on the program.
 
 **Q: Does the microprocessor itself count as open source, or does that
@@ -481,7 +481,7 @@ term only apply to software?**
 A: Many, but not all, of the processors under development funded by
 the SSITH program are open source.  This means that the code that
 describes the processor’s behavior—written in Hardware Design
-Languages such as Chisel, Bluespec SystemVerilog, and SystemVerilog—are 
+Languages such as Chisel, Bluespec SystemVerilog, and SystemVerilog—are
 released to the world under a standard open source
 license.  Anyone can then read and learn from that code, and can even
 run it themselves in simulation (in software or on an FPGA, like we
@@ -494,9 +494,9 @@ and others.  See https://riscv.org/risc-v-cores/ for more information.
 
 For our demonstration this weekend at DEF CON, we showed off two
 baseline open source cores—one based upon Rocket from Berkeley and one
-based upon Piccolo from Bluespec—as well as one SSITH securitized core 
-from the SRI/Cambridge team and one anonymous core from another 
-performer on the program.  Performers in the program have undoubtedly 
+based upon Piccolo from Bluespec—as well as one SSITH securitized core
+from the SRI/Cambridge team and one anonymous core from another
+performer on the program.  Performers in the program have undoubtedly
 already released many hundreds of thousands of lines of secure processor
 designs to the world.
 
@@ -526,7 +526,7 @@ software-based vulnerabilities.
 days 1 and 2 of DEF CON 2019?**
 
 The SSITH-funded "pre-alpha" CPUs were really not ready for
-demonstration.  For example, we were receiving new CPUs from one 
+demonstration.  For example, we were receiving new CPUs from one
 team every few hours while at DEF CON.
 
 By Sunday, we had four demonstrators up and running: the two SSITH

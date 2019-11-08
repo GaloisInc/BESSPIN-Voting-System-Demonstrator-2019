@@ -58,7 +58,7 @@ The *network principals* in the BVS 2020 protocol are as follows:
    communications may not be permitted. Likewise, STAR-Vote's RFP
    mandated only the use of Ethernet for network communications,
    primarily to address transparency-related concerns.
-   
+
 2. Several computational principals (enumerated below) must be air
    gapped and thus are not on any network at all. Preferably, these
    systems in a certified deployment would not even have the physical
@@ -71,7 +71,7 @@ description.md`. *Core* principals are mandatory and are the focus of
 red team activities, according to our SOW with Galois and thus DARPA.
 *Supplemental* principals are necessary to create the BVS 2020, but
 are not subject to SSITH-centric red teaming and will run on COTS
-systems.  *IR&D* principals are 
+systems.  *IR&D* principals are
 
 ### Core Principals
 
@@ -152,7 +152,7 @@ otherwise interacting with the voter.
 ### Pre-Election Key Ceremony
 
 We intend to use the ElectionGuard pre-election key ceremony.  We intend to
-use COTS HSMs (such as Yubikeys or Titan keys) in order to generate and store 
+use COTS HSMs (such as Yubikeys or Titan keys) in order to generate and store
 keys as a part of the Shamir election setup subprotocol.
 
 ### Election Day
@@ -184,7 +184,7 @@ keys as a part of the Shamir election setup subprotocol.
 
 2. *Ballot Printing* The BPS, on consuming the anonymous BS Token,
    produces an unmarked paper Ballot B which V takes.
-   
+
 2.a. Ballots can either be printed on-demand (what is called a
      Ballot-on-Demand system) or, with a sufficiently small set of
      BSs, we can pre-print ballots.
@@ -273,8 +273,8 @@ keys as a part of the Shamir election setup subprotocol.
 
 ### Post-Election Protocols
 
-There are three different-but-interacting protocols used to conclude and 
-audit an election.  
+There are three different-but-interacting protocols used to conclude and
+audit an election.
 
 One part of concluding an election is closing the polls and collecting all
 cast and spoiled ballots for tabulation and auditing.  The evidence generated
@@ -286,21 +286,21 @@ for every cast or cryptographically spoiled ballot.
 ### Post-Election Subprotocol: Concluding an Election
 
 Election officials main focus in concluding an election is first, tabulating the
-cast ballots and, second, auditing the election and its evidence.  
+cast ballots and, second, auditing the election and its evidence.
 
 The *Tabulation Device* consumes the CVRs and ballot images and produces a
-tabulation, which is reported by the Electoral Commission as a *Provisional 
+tabulation, which is reported by the Electoral Commission as a *Provisional
 Result*.  A wise Electoral Commission will use several independently developed
 tabulator concurrently to confirm results.
 
 Next, election officials export *Evidence* from the *Evidence Server*. They use
-that evidence to both (a) perform one or more *cryptographic verifications* of 
-the evidence and (b) conduct a Risk-Limiting Audit.  
+that evidence to both (a) perform one or more *cryptographic verifications* of
+the evidence and (b) conduct a Risk-Limiting Audit.
 
 If both these verifications and RLA confirm the Provisional Result,
-and officials' audits of other election artifacts show that the election was 
+and officials' audits of other election artifacts show that the election was
 well-run and sound, then the Electoral Commission declares a *Certified
-Result* that agrees with the Provisional Result.  
+Result* that agrees with the Provisional Result.
 
 If the RLA fails, then either:
  - a forensic examination of the evidence and voting devices is necessary in the
@@ -316,7 +316,7 @@ participating political parties, the media, NGOs, etc. can perform independent
 cryptographic verifications.  Third parties can download *evidence* from the
 *Evidence Server* and check that evidence with an *Election Verifier*.
 
-An *Election Verifier* consumes evidence and produces a report about that 
+An *Election Verifier* consumes evidence and produces a report about that
 evidence.  A report either confirms that the evidence is cryptographically
 well-formed, or reports on warnings and errors about the evidence.
 
@@ -327,7 +327,7 @@ If any third party's verification fails or tabulation does not match the
 Provisional Result reported by the Electoral Commission, they notify the
 authorities and an investigation ensues.
 
-@todo kiniry An unspecified protocol will be used by third parties to share 
+@todo kiniry An unspecified protocol will be used by third parties to share
 their evaluation of the evidence, including their independent tabulations.
 
 ### Post-Election Subprotocol: Voter Verification
@@ -335,10 +335,10 @@ their evaluation of the evidence, including their independent tabulations.
 Each voter that participated in the election, or any other member of the public
 who is given evidence artifacts from voters, can conduct a *voter verification*
 as well.  Voter verification focuses on the cryptographic evaluation of cast
-and spoiled ballot receipts.  Voters or their proxies interact with the 
+and spoiled ballot receipts.  Voters or their proxies interact with the
 Evidence Server in order to look up their receipt information.
 
-Any of the following circumstances has a voter report to the Electoral 
+Any of the following circumstances has a voter report to the Electoral
 Authorities a voter verification failure:
  - a spoiled ballot receipt is not verifiable
  - a spoiled ballot is not found in the evidence
@@ -346,8 +346,8 @@ Authorities a voter verification failure:
    that is found in the evidence
  - a cast ballot's receipt is not verifiable
 
-@todo kiniry If all of a voter's receipts are verifiable and their spoiled 
-ballots contents match the evidence, then the use an unspecified protocol to 
+@todo kiniry If all of a voter's receipts are verifiable and their spoiled
+ballots contents match the evidence, then the use an unspecified protocol to
 report to the public their evalution of the evidence.
 
 Voters can, of course, use the previous subprotocol and perform their own

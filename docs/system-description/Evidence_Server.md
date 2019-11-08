@@ -76,9 +76,9 @@ server.
 
 ## Glossary
 
-Our system glossary is based upon the 
+Our system glossary is based upon the
 [Free & Fair Election Glossary](https://github.com/FreeAndFair/ElectionGlossary),
-which is in turn based upon the 
+which is in turn based upon the
 [NIST Election Glossary](https://pages.nist.gov/ElectionGlossary/).
 
 

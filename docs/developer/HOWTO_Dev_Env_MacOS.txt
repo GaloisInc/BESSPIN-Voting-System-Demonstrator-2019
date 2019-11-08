@@ -30,13 +30,13 @@ Frama-C
 4. Install Frama-C using opam
 
   opam install frama-c --unlock-base (because OCaml is newer than Frama-C?
-				      This installs an older version of OCaml) 
-  
+				      This installs an older version of OCaml)
+
 5. Check Frama-C realy is version 18.0 (Argon)
 
   (By default, the instructions above seem to get you Frama-C version 19,
   which *seems* to be just fine.)
-  
+
 
 LLVM (including clang)
 ----------------------

@@ -17,7 +17,7 @@ mathematical solvers to find counterexamples when program code does not
 agree with its specification. The Cryptol work can be found in the
 `cryptol` folder.
 
-## Static Assurance 
+## Static Assurance
 
 We have provided algebraic specifications, derived from specifications written
 in Cryptol and Lando, for the crypto, logging, and controller (sbb) components.

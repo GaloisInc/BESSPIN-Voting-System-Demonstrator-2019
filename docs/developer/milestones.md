@@ -37,7 +37,7 @@ September 2019 by Joe Kiniry):
 
  - system description: plan, description, domain model — 5 November 2019
  - system requirements: threat model, requirements, scenarios — 8 November 2019
- - system design: events, static and dynamic models, API, BISL spec, Cryptol specs — 
+ - system design: events, static and dynamic models, API, BISL spec, Cryptol specs —
    6 December 2019
  - assurance infrastructure: testbench, build system, CI/CV — 18 December 2019
 

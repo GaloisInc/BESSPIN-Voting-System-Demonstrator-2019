@@ -66,7 +66,7 @@ which is in turn based upon the [NIST Election Glossary][].
  > (VPS), capable of managing and authenticating dielets affixed to
  > verifiable paper in accordance with the BVS Protocol, discussed
  > below.
- 
+
  _editor's note: there is no further discussion of the VPS in SOW_
 
 ### Mandatory
