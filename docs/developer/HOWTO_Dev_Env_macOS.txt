@@ -12,7 +12,7 @@ Software Foundations
 2. Install Homebrew (https://brew.sh/), then install a few
    missing packages.
 ```
-   brew install pkg-config gtksourceview libgnomecanvas libxml2 autoconf
+   brew install pkg-config gtksourceview gtksourceview3 libgnomecanvas libxml2 autoconf
 ```
 
     Set `PKG_CONFIG_PATH` to point to the right location:
@@ -142,6 +142,11 @@ and development versions before SAW 0.4 was released.
 
 One can obtain SAW releases from the [SAW release webpage at
 GitHub](https://github.com/GaloisInc/saw-script/releases).
+On macOS Catalina, which is stricter about app notarization and
+quarantine than Mojave, you must "un-quarantine" the SAW binary by
+running:
+
+ `xattr -d com.apple.quarantine /path/to/saw-0.4-OSX-64/bin/saw`
 
 Git Submodules
 --------------
