@@ -17,10 +17,10 @@ Software Foundations
 
     Set `PKG_CONFIG_PATH` to point to the right location:
 ```
-    setenv PKG_CONFIG_PATH `echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'
+    setenv PKG_CONFIG_PATH `echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'`
 ```
     or
-    export PKG_CONFIG_PATH=`echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'
+    export PKG_CONFIG_PATH=`echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'`
 ```
    `pkg-config` does not know, by default, where to find all these
    `opt`-based packages; this environment variable fixes this. Use
