@@ -13,6 +13,12 @@ export LOGGING_TEST_DIR = $(SOURCE_DIR)/tests/logging
 export SBB_TEST_DIR = $(SOURCE_DIR)/tests/sbb
 export INCLUDE_DIR = $(SOURCE_DIR)/include
 
+# Set correct C header location for macOS 10.14+ hosts
+UNAME := $(shell uname)
+ifeq ($(UNAME),Darwin)
+    export CPATH = $(shell xcrun --show-sdk-path)/usr/include
+endif
+
 # Expected GFE repo location (for flash scripts)
 CURRENT_PATH=$(shell pwd)
 GFE_DIR ?= $(CURRENT_PATH)/../gfe
