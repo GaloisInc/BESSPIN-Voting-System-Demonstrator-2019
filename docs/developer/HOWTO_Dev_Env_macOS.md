@@ -9,9 +9,9 @@ Operating System Foundation
 Software Foundations
 --------------------
 
-2. Install Xcode from the App Store. After installing Xcode and launching it
-once to install required additional components, install its commmand line
-tools.
+2. Install Xcode from the App Store. After installing Xcode and
+launching it once to install required additional components, install
+its commmand line tools.
 ```
    xcode-select --install
 ```
@@ -27,6 +27,7 @@ tools.
     setenv PKG_CONFIG_PATH `echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'`
 ```
     or
+```
     export PKG_CONFIG_PATH=`echo /usr/local/opt/*/lib/pkgconfig | sed -e 's/ /:/g'`
 ```
    `pkg-config` does not know, by default, where to find all these
@@ -70,7 +71,7 @@ LLVM (including clang)
 
    7.1.  Install Homebrew LLVM via Homebrew: `brew install llvm`
 
-   7.2.  To override Apple's version of LLVM globally, add
+   7.2.  If you wish to override Apple's version of LLVM globally, add
          `/usr/local/opt/llvm/bin` to the front of your shell's `PATH`
          by modifying your shell startup.
          This will cause Hombrew's LLVM and tools to be found before
@@ -78,6 +79,8 @@ LLVM (including clang)
          do not want to override Apple's version of LLVM globally,
          you can manually add `/usr/local/opt/llvm/bin` to your path
          only in shells you are using to build this project.
+         Neither action is necessary for the BVS build system to work
+         properly.
 
 Clang-Format
 ------------

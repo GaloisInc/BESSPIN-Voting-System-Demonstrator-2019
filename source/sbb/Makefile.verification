@@ -22,11 +22,11 @@ CLANG := clang
 HOST  := $(shell uname -s)
 ifeq (${HOST},Linux)
     LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    PLATFORM_INCLUDES = 
+    PLATFORM_INCLUDES := 
 else
     # Assumed to be Host = Darwin
-    LLVM_LINK := llvm-link
-    PLATFORM_INCLUDES = -I/usr/include
+    LLVM_LINK := /usr/local/opt/llvm/bin/llvm-link
+    PLATFORM_INCLUDES := 
 endif
 
 FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1
