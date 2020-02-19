@@ -17,7 +17,7 @@ export OS_DIR  = $(SOURCE_DIR)/os/freertos
 CFLAGS += -DVOTING_PLATFORM_FREERTOS
 
 ARCH		= -march=rv32im
-ABI			= -mabi=ilp32
+ABI		= -mabi=ilp32
 
 ARCHTARGET=riscv64-unknown-elf
 
