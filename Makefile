@@ -4,14 +4,14 @@ TARGET ?= freertos
 $(info TARGET=$(TARGET))
 
 # List all substems directories
-export SOURCE_DIR = $(PWD)/source
-export SBB_DIR = $(SOURCE_DIR)/sbb
-export LOG_DIR = $(SOURCE_DIR)/logging
-export CRYPTO_DIR = $(SOURCE_DIR)/crypto
-export CRYPTO_TEST_DIR = $(SOURCE_DIR)/tests/crypto
+export SOURCE_DIR       = $(PWD)/source
+export SBB_DIR          = $(SOURCE_DIR)/sbb
+export LOG_DIR          = $(SOURCE_DIR)/logging
+export CRYPTO_DIR       = $(SOURCE_DIR)/crypto
+export CRYPTO_TEST_DIR  = $(SOURCE_DIR)/tests/crypto
 export LOGGING_TEST_DIR = $(SOURCE_DIR)/tests/logging
-export SBB_TEST_DIR = $(SOURCE_DIR)/tests/sbb
-export INCLUDE_DIR = $(SOURCE_DIR)/include
+export SBB_TEST_DIR     = $(SOURCE_DIR)/tests/sbb
+export INCLUDE_DIR      = $(SOURCE_DIR)/include
 
 # Set correct C header location for macOS 10.14+ hosts
 UNAME := $(shell uname)
@@ -20,17 +20,33 @@ ifeq ($(UNAME),Darwin)
 endif
 
 # Expected GFE repo location (for flash scripts)
-CURRENT_PATH=$(shell pwd)
-GFE_DIR ?= $(CURRENT_PATH)/../gfe
+CURRENT_PATH       = $(shell pwd)
+GFE_DIR           ?= $(CURRENT_PATH)/../gfe
 P1_BITSTREAM_PATH ?= $(GFE_DIR)/bitstreams/soc_chisel_p1.bit
 
 # To enable the running lights task
 export USE_LED_BLINK_TASK=1
+
+.PHONY: all posix_all bottom_all freertos_all typecheck_all verify_all
+.PHONY: sim fpga
+.PHONY: clean clean_all clean_crypto clean_log clean_sbb
+.PHONY: hosttest_all crypto_hosttest_clean logging_hosttest_clean sbb_hosttest_clean
+.PHONY: sim_all sim_crypto sim_log sim_sbb
+.PHONY: all_boxes upload_binary_box1 upload_binary_box2 upload_binary_box3 upload_binary_box4
+.PHONY: upload_binary_sim upload_binary_and_bitstream_sim upload_binary_fpga upload_binary_and_bitstream_sim
+.PHONY: posix_crypto posix_log posix_sbb
+.PHONY: freertos_crypto freertos_log freertos_sbb
+.PHONY: typecheck_crypto typecheck_log typecheck_sbb
+.PHONY: verify_crypto verify_log verify_sbb
+.PHONY: crypto_hosttest_all logging_hosttest_all sbb_hosttest_all
+
 #####################################
 #
-#		SBB Target
+#		SBB targets
 #
 #####################################
+all: sim fpga
+
 fpga:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos default
@@ -66,8 +82,8 @@ include $(SBB_DIR)/Makefile.bottom
 include $(CRYPTO_DIR)/Makefile.bottom
 include $(LOG_DIR)/Makefile.bottom
 
-bottom_all: crypto_bottom log_bottom sbb_bottom
-clean: crypto_bottom_clean log_bottom_clean sbb_bottom_clean
+bottom_all: crypto_bottom logging_bottom sbb_bottom
+clean: crypto_bottom_clean logging_bottom_clean sbb_bottom_clean
 
 else
 #####################################
@@ -77,17 +93,17 @@ else
 #####################################
 ifeq ($(TARGET),posix)
 
-posix_all: posix_crypto posix_logging posix_sbb
+posix_all: posix_crypto posix_log posix_sbb
 
-clean: clean_crypto clean_logging clean_sbb
+clean: clean_crypto clean_log clean_sbb
 
 posix_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.posix crypto
 
-posix_logging:
+posix_log:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.posix logging
+	$(MAKE) -f Makefile.posix log
 
 posix_sbb:
 	cd $(SOURCE_DIR) ; \
@@ -97,9 +113,9 @@ clean_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.posix clean_crypto
 
-clean_logging:
+clean_log:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.posix clean_logging
+	$(MAKE) -f Makefile.posix clean_log
 
 clean_sbb:
 	cd $(SOURCE_DIR) ; \
@@ -113,17 +129,17 @@ else
 #####################################
 ifeq ($(TARGET),freertos)
 
-freertos_all: freertos_crypto freertos_logging freertos_sbb
+freertos_all: freertos_crypto freertos_log freertos_sbb
 
-clean: clean_sbb clean_crypto clean_logging
+clean: clean_sbb clean_crypto clean_log
 
 freertos_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos crypto
 
-freertos_logging:
+freertos_log:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.freertos logging
+	$(MAKE) -f Makefile.freertos log
 
 freertos_sbb:
 	cd $(SOURCE_DIR) ; \
@@ -133,7 +149,7 @@ clean_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
 
-clean_logging:
+clean_log:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
 
@@ -167,7 +183,6 @@ verify_crypto:
 clean_crypto:
 	cd $(CRYPTO_DIR) ; \
 	$(MAKE) -f Makefile.verification clean
-
 
 typecheck_sbb:
 	cd $(SBB_DIR) ; \
@@ -263,11 +278,11 @@ clean_crypto:
 
 sim_log:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim logging
+	$(MAKE) -f Makefile.freertos_sim log
 
 clean_log:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim clean_logging
+	$(MAKE) -f Makefile.freertos_sim clean_log
 
 sim_sbb:
 	cd $(SOURCE_DIR) ; \

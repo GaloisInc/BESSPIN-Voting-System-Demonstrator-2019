@@ -8,3 +8,7 @@
 *.gdb
 #source/logging/test*
 source/logging/log_main
+hosttest?
+test?
+cflag-emacs.txt
+posix_sbb

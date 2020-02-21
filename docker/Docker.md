@@ -279,8 +279,8 @@ docker run username/repository:tag                  # Run image from a registry
 6. In Docker do:
 
     ```
-    #cd /voting-system
-    #make fpga
+    # cd /voting-system
+    # make fpga
     ```
 
 7. If everything went well, you will see FreeRTOS FPGA target
@@ -311,7 +311,7 @@ sudo docker run -v $PATH_TO_YOUR_VOTING_SYSTEM_REPO:/voting-system -it galoisinc
 ### Code Deployment and Debugging
 
 We will need one container running the `openocd` server, and a second
-container running the `gdb` instance. Indeed you need a properly
+container running the `gdb` instance. You also need a properly
 connected FPGA, and your host needs to have all the Xilinx drivers
 installed as well.
 
@@ -324,16 +324,22 @@ for more info.
 We also have to connect the container to host network, so we can
 communicate between the two containers. Use `--network host` for that.
 
+Note that one cannot use Docker on macOS for FPGA control and
+debugging unless one is willing to [setup a VirtualBox-based Docker
+installation](http://gw.tnode.com/docker/docker-machine-with-usb-support-on-windows-macos/),
+rather than the native HyperKit hypervisor.
+
 Now, the actual instructions.
 
 1. Start up `galoisinc/besspin:gfe` container that will run `openocd` 
-   server. Note, you will need the 
-   [gfe](https://gitlab-ext.galois.com/ssith/gfe) repository.
+   server. Note, you will need access to the 
+   [gfe](https://gitlab-ext.galois.com/ssith/gfe) repository.  We
+   suggest mounting it as follows.
 ```
 sudo docker run --privileged --hostname="gfe" -p 3333:3333 --network host -it -v $PATH_TO_GFE:/gfe galoisinc/besspin:gfe
 ```
 
-2. Start `openocd`:
+2. Configure and start `openocd`.
     ```
     root@gfe:/gfe# openocd -f testing/targets/ssith_gfe.cfg
     ```
@@ -372,15 +378,14 @@ sudo docker run --privileged --hostname="voting-system" --network host -it -v $P
 ``` 
 Compile your code and start `gdb`: 
 ```
-# make clean_all 
-# make sim 
+# make clean_all all
 # 
-# riscv64-unknown-elf-gdb -x startup.gdb default_ballot_box_sim.elf 
+# riscv64-unknown-elf-gdb -x startup.gdb default_ballot_box.elf 
 ``` 
 You should see: 
 ```
     # riscv64-unknown-elf-gdb -x startup.gdb
-    default_ballot_box_sim.elf GNU gdb (GDB) 8.3.0.20190516-git
+    default_ballot_box.elf GNU gdb (GDB) 8.3.0.20190516-git
     Copyright (C) 2019 Free Software Foundation, Inc.  License GPLv3+:
     GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html> This
     is free software: you are free to change and redistribute it.
@@ -395,7 +400,7 @@ You should see:
 
     For help, type "help".
     Type "apropos word" to search for commands related to "word"...
-    Reading symbols from default_ballot_box_sim.elf...
+    Reading symbols from default_ballot_box.elf...
     boot () at ../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/bsp/boot.S:76
     76	    li t6, 0x1800
     $1 = "Reseting the CPU"

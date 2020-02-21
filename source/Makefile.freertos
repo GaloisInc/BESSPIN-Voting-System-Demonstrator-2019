@@ -1,14 +1,14 @@
 # Set defaults
-NETWORK_LOGS     ?= no
-FS_LOGS          ?= yes
-FS_TYPE			 ?= FAT
-PEEK_POKE_SERVER ?= yes
-USE_RTC_CLOCK ?= 1
-VOTING_SYSTEM_DEBUG ?= yes
-USE_CLI_TASK ?= yes
-AXI_DEBUG_PRINT ?= no
-NETWORK_LOG_DEBUG ?= no
-DISABLE_NETWORK ?= no
+NETWORK_LOGS        ?= no
+FS_LOGS             ?= yes
+FS_TYPE             ?= FAT
+PEEK_POKE_SERVER    ?= no
+USE_RTC_CLOCK       ?= yes
+VOTING_SYSTEM_DEBUG ?= no
+USE_CLI_TASK        ?= no
+AXI_DEBUG_PRINT     ?= no
+NETWORK_LOG_DEBUG   ?= no
+DISABLE_NETWORK     ?= yes
 
 # Voting System Definitions
 include Makefile.common
