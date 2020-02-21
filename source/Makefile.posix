@@ -8,7 +8,7 @@ include Makefile.common
 # All binaries necessary to run rules.
 # Assume clang is on PATH, but llvm-link needs special handing on Linux
 export CLANG := clang -fsanitize=address,undefined
-export HOST	 := $(shell uname -s)
+export HOST  := $(shell uname -s)
 export OS_DIR = $(SOURCE_DIR)/os/posix
 export CFLAGS += -DVOTING_PLATFORM_POSIX -U_FORTIFY_SOURCE -DSIMULATION -DVOTING_SYSTEM_DEBUG
 export CFLAGS += -DHARDCODE_CURRENT_TIME \
@@ -23,8 +23,8 @@ ifeq (${HOST},Linux)
 	export PLATFORM_INCLUDES :=
 else
 	# Assumed to be Host = Darwin
-	export LLVM_LINK := llvm-link
-	export PLATFORM_INCLUDES = -I/usr/include
+	export LLVM_LINK := /usr/local/opt/llvm/bin/llvm-link
+	export PLATFORM_INCLUDES :=
 endif
 
 # Default to GCC

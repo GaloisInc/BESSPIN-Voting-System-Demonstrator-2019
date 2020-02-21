@@ -26,8 +26,8 @@ ifeq (${HOST},Linux)
     PLATFORM_INCLUDES := -I/usr/include -I/usr/include/x86_64-linux-gnu
 else
     # Assumed to be Host = Darwin
-    LLVM_LINK := llvm-link
-    PLATFORM_INCLUDES = -I/usr/include
+    LLVM_LINK := /usr/local/opt/llvm/bin/llvm-link
+    PLATFORM_INCLUDES :=
 endif
 
 FREERTOS_DEMO_DIR = ../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1

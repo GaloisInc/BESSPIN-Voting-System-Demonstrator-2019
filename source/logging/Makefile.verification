@@ -22,11 +22,11 @@ CLANG := clang
 HOST  := $(shell uname -s)
 ifeq (${HOST},Linux)
     LLVM_LINK := /usr/lib/llvm-7/bin/llvm-link
-    PLATFORM_INCLUDES = 
+    PLATFORM_INCLUDES := 
 else
     # Assumed to be Host = Darwin
-    LLVM_LINK := llvm-link
-    PLATFORM_INCLUDES = -I/usr/include
+    LLVM_LINK := /usr/local/opt/llvm/bin/llvm-link
+    PLATFORM_INCLUDES :=
 endif
 
 
@@ -45,7 +45,7 @@ INCLUDES = \
 	-I$(FREERTOS_DEMO_DIR)/bsp \
 	-I$(FREERTOS_DEMO_DIR)/devices
 
-FRAMA_C_INCLUDES=-cpp-extra-args="$(INCLUDES) -D__riscv_xlen=32 -DVOTING_PLATFORM_POSIX"
+FRAMA_C_INCLUDES=-cpp-extra-args="$(INCLUDES) -D__riscv_xlen=32 -DVOTING_PLATFORM_POSIX -DFS_LOGS"
 
 # These lists will grow as the software is developed and modules are added.
 SOFTWARE_SPECS := log.h secure_log.h debug_io.h log_io.h
