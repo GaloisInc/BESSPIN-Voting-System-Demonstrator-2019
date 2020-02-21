@@ -2,8 +2,8 @@
 FROM galoisinc/besspin:gfe
 
 # Install needed packages
-#RUN apt-get update && apt-get install -y wget git curl make opam unzip lsb-release \
-#    autoconf libgmp3-dev m4 software-properties-common
+RUN apt-get update && apt-get install -y wget git curl make opam unzip lsb-release \
+    autoconf libgmp3-dev m4 software-properties-common
 
 # Install Cryptol
 RUN apt-get install libtinfo5
@@ -25,36 +25,39 @@ RUN rm z3-4.8.5-x64-ubuntu-16.04.zip
 WORKDIR /voting-system
 
 # Additional tools
-RUN apt-get install -y bash-completion emacs xxd clang-format clang-tidy
+RUN apt-get install -y bash-completion emacs xxd
+#         clang-format clang-tidy
 
-#  Opam
+# #  Opam
 RUN apt-get update
-RUN apt-get install -y opam
-RUN apt-get install -y zlib1g-dev libgmp-dev libgtksourceview2.0-dev libgnomecanvas2-dev autoconf
-RUN apt-get install -y graphviz
-RUN opam init -y --disable-sandboxing --auto-setup
-RUN opam update
-RUN opam install depext -y
-RUN opam depext zarith lablgtk conf-gtksourceview conf-gnomecanvas -y
-RUN opam install -y zarith lablgtk conf-gtksourceview conf-gnomecanvas
-RUN opam install yojson -y
-RUN opam install coq -y
-RUN opam install why why3 -y
-RUN opam config env
+# RUN apt-get install -y opam
+# RUN apt-get install -y zlib1g-dev libgmp-dev libgtksourceview2.0-dev libgnomecanvas2-dev autoconf
+# RUN apt-get install -y graphviz
+# RUN opam init -y --disable-sandboxing --auto-setup
+# RUN opam update
+# RUN opam install depext -y
+# RUN opam depext zarith lablgtk conf-gtksourceview conf-gnomecanvas -y
+# RUN opam install -y zarith lablgtk conf-gtksourceview conf-gnomecanvas
+# RUN opam install yojson -y
+# RUN opam install coq -y
+# RUN opam install why why3 -y
+# RUN opam config env
 
-# Frama-C install
+# # Frama-C install
 RUN mkdir -p /tools
-RUN wget https://github.com/Frama-C/Frama-C-snapshot/wiki/downloads/frama-c-19.0-Potassium.tar.gz -P /tools
-RUN cd /tools && tar -xf frama-c-19.0-Potassium.tar.gz
-RUN rm /tools/frama-c-19.0-Potassium.tar.gz
-RUN opam depext frama-c
-RUN opam install --deps-only frama-c
-RUN opam pin add --kind=path frama-c /tools/frama-c-19.0-Potassium -y
+# RUN wget https://github.com/Frama-C/Frama-C-snapshot/wiki/downloads/frama-c-19.0-Potassium.tar.gz -P /tools
+# RUN cd /tools && tar -xf frama-c-19.0-Potassium.tar.gz
+# RUN rm /tools/frama-c-19.0-Potassium.tar.gz
+# RUN opam depext frama-c
+# RUN opam install --deps-only frama-c
+# RUN opam pin add --kind=path frama-c /tools/frama-c-19.0-Potassium -y
 
+# cmake is used for ElectionGuard builds. The apt version of cmake is
+# a bit too old.
 # cmake install
 RUN apt-get install -y libgmp3-dev
-RUN cd /tools && tar -xf cmake-3.16.0-rc3.tar.gz && cd cmake-3.16.0-rc3
+RUN cd /tools && wget https://github.com/Kitware/CMake/releases/download/v3.16.4/cmake-3.16.4.tar.gz && tar -xf cmake-3.16.4.tar.gz && cd cmake-3.16.4
 RUN ./bootstrap -- -DCMAKE_USE_OPENSSL=OFF 
 RUN make && make install
 
-ENV PATH="/root/.opam/default/bin:${PATH}"
+ENV PATH="/root/.opam/default/bin:/opt/riscv/bin:${PATH}"
