@@ -231,11 +231,27 @@ keys as a part of the Shamir election setup subprotocol.
      random, voter-chosen *Ballot Scanning Device* (a *Paper Ballot
      Scanner*, PBS<sub>k</sub>) to cast or challenge their vote. Go to
      step 6.
+     @design dmz I think this step is redundant if the BMD and the PBS
+     end up being the same device. It would make more sense for the device
+     to simply generate a CVR at the time of marking the ballot and use
+     that, rather than scanning the ballot it just printed to generate
+     the same CVR more slowly, with more potential for error, and requiring
+     a separate verification step... which I see has been left out of the
+     "ballot scanning device" step below.
 
-5. *Controller Device* V spoils their ballot and starts over.
+     @design kiniry The entire Voter Verification Device protocol step
+     is entirely optional with regards to the BVS 2020.
+
+     @design kiniry If we merge the BMD and PBS, then the cryptographic
+     cast and the physical cast are merged and this transition becomes
+     redundant.  Likewise, if we eliminate the PBS entirely from the
+     polling place protocol and only use it in the post-election
+     protocol, then this step also is elided.
+
+5. *Controller System* V spoils their ballot and starts over.
 
    Voter V interacts with Supervisor S responsible for the Polling
-   Place Controller Server CS.  S spoils voter V's ballot B, and keeps
+   Place Controller System CS.  S spoils voter V's ballot B, and keeps
    the spoiled ballot SB for auditing purposes.  S gives V a new BS
    Token and V returns to the BPS.  Go to step 2.
 
@@ -245,6 +261,81 @@ keys as a part of the Shamir election setup subprotocol.
    into a CVR, the PBS commits to that interpretation and emits a
    receipt R, and the voter V is asked if he or she wishes to *cast*
    or *challenge* the device.
+
+   @design dmz I think there is a verification step missing here, in the
+   case of a hand marked paper ballot being scanned. In order for the PBS
+   to commit to an interpretation of a hand marked ballot, the voter should
+   in some way acknowledge that the interpretation matches their choices.
+   Otherwise, a subsequent voter challenge of the ballot will be
+   significantly less useful, because an _honest_ machine that simply
+   interpreted a mark incorrectly (because of either a scan error or a
+   marking error) will be indistinguishable from a _dishonest_ machine;
+   contrast with the BMD-only scenario with direct generation of CVRs,
+   where a mismatch on a challenged, voter-verified ballot actually means
+   that the the machine _knowingly encrypted the wrong thing_ (because it
+   had direct access to the voter's choices at input time). I suppose
+   that this inability to distinguish between incompetence and malice is
+   also the case with current risk-limiting audits, assuming that all
+   ballots are voter-verified, because voters don't get to see the CVR
+   generation stage... but it seems to me that we can do better.
+
+   @design kiniry If the PBS does not present a proposed
+   interpretation of the paper ballot to the voter, then I agree with
+   your assessment.  If we permit the PBS to present its proposed CVR
+   to the voter, then we can differentiate the two cases.
+
+   @design dmz First, doing this in files committed to the repo rather
+   than in the comments of the merge request strikes me as overly
+   complicated. Second, yes, that was exactly my point - the description
+   above does not admit the possibility of the PBS presenting its proposed
+   CVR to the voter, because of the way it's written, and I believe that
+   step is a necessary one.
+
+   @design dmz I don't believe that it is reasonable, from a security
+   perception point of view, to have the ballot scanning device be the
+   same device that decides whether a ballot is cast or challenged. It is
+   true that it cryptographically commits to the ballot before getting that
+   input from the user... but one could imagine it not notifying the rest of
+   the network about that commitment until after the user has decided to
+   challenge or cast, and that could potentially cause problems. It's also
+   unseemly - much like having combination printer/scanner/ballot boxes
+   that use the same paper path for the printer and the scanner. Instead,
+   the voter should either (1) decide at the smart ballot box whether to
+   challenge or cast, or (2) as in STAR-Vote, cast by putting the ballot
+   in the smart ballot box or challenge by going to an EO who marks the
+   the ballot as challenged at the controller.
+
+   @design kiniry What is a security *perception* point of view?
+   We have a design decision to make.  Which device(s): (a) capture a
+   ballot image, (b) interpret a ballot image into a CVR, (c) provide
+   feedback to the voter about improperly filled-out HMPBs, (d) permit
+   the voter to cryptographically cast or challenge a ballot, and (e)
+   physically capture a cast ballot.  Given the workflow necessary for
+   an E2E-V system, there are only a few orderings of these steps that
+   make sense.  And given the number of features, we can have
+   something between one and five devices that fulfill these
+   features. At the protocol level, I'd prefer to specify them
+   separately so that we can have a simpler model for reasoning about
+   security properties. At the physical implementation level, I'd
+   prefer to have as few devices as reasonable to build, and I'd
+   prefer to have the P1 and the P2 in two different devices.
+
+   @design dmz A security perception point of view - admittedly not the
+   best wording - admits the reality that, no matter how secure the system
+   _is_, if it _appears_ to have a security problem, people will _believe_
+   it has a security problem. In this case, there is a direct analogue to
+   the "permission to cheat" problem with BMDs. We can argue until we're
+   blue in the face that there is no cryptographic security problem because
+   the device has already committed to the ballot - but people will say
+   "but, you're letting the same machine do the spoiling as made the ballot
+   in the first place, that ain't right".  Given that current smart ballot
+   box prototypes still have cast and spoil buttons on them, avoiding this
+   _apparent_ security problem should be easy. Also, as should perhaps be
+   obvious from the above, I think you've missed a critical step in your
+   list of what devices do - the step I pointed out as missing above,
+   "allow the voter to examine the machine's interpretation of their
+   ballot" (this happens in the review screen for the BMD, and must happen 
+   somewhere for hand-marked ballots too).
 
 6.a. *Challenge* If V challenges the PBS, then B is cryptographically
      spoiled and returned to the voter and they are told to return to
