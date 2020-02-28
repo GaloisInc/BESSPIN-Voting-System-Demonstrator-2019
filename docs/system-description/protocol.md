@@ -245,6 +245,19 @@ keys as a part of the Shamir election setup subprotocol.
    into a CVR, the PBS commits to that interpretation and emits a
    receipt R, and the voter V is asked if he or she wishes to *cast*
    or *challenge* the device.
+   @design dmz I don't believe that it is reasonable, from a security
+   perception point of view, to have the ballot scanning device be the
+   same device that decides whether a ballot is cast or challenged. It is
+   true that it cryptographically commits to the ballot before getting that
+   input from the user... but one could imagine it not notifying the rest of
+   the network about that commitment until after the user has decided to
+   challenge or cast, and that could potentially cause problems. It's also
+   unseemly - much like having combination printer/scanner/ballot boxes
+   that use the same paper path for the printer and the scanner. Instead,
+   the voter should either (1) decide at the smart ballot box whether to
+   challenge or cast, or (2) as in STAR-Vote, cast by putting the ballot
+   in the smart ballot box or challenge by going to an EO who marks the
+   the ballot as challenged at the controller.
 
 6.a. *Challenge* If V challenges the PBS, then B is cryptographically
      spoiled and returned to the voter and they are told to return to
