@@ -37,7 +37,8 @@ endif
 
 ifeq ($(NETWORK_LOGS),yes)
   $(info Pulling in network logging subsystem)
-  export LOGGING_SRC += $(LOG_DIR)/log_net.c
+  export LOGGING_SRC += $(LOG_DIR)/log_net.c \
+                        $(LOG_DIR)/log_election_reporting.c
 endif
 
 export SBB_SRC = $(SBB_DIR)/sbb.c \

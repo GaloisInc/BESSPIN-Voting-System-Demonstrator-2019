@@ -7,13 +7,13 @@ INCLUDES = -I. \
 	-I../../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/devices
 
 BOTTOM_SOURCE = log_main.c \
-	              log_bottom.c \
-	              secure_log_bottom.c \
-	              log_t.c \
-	              secure_log_t.c \
+                log_bottom.c \
+                secure_log_bottom.c \
+                log_t.c \
+                secure_log_t.c \
                 log_io.c \
                 log_net.c \
-	              log_election_reporting_bottom.c \
+                log_election_reporting_bottom.c \
                 $(OS_DIR)/log_fs.c \
                 $(OS_DIR)/log_net_osd.c \
                 $(OS_DIR)/debug_io.c \
