@@ -15,11 +15,11 @@ RUN rm cryptol-2.8.0-Ubuntu14.04-64.tar.gz
 
 # Install Z3 solver
 RUN apt-get install -y unzip
-RUN wget https://github.com/Z3Prover/z3/releases/download/Z3-4.8.5/z3-4.8.5-x64-ubuntu-16.04.zip
-RUN unzip z3-4.8.5-x64-ubuntu-16.04.zip
-RUN cp -r z3-4.8.5-x64-ubuntu-16.04/bin/* /usr/local/bin/
-RUN cp -r z3-4.8.5-x64-ubuntu-16.04/include/* /usr/local/include/
-RUN rm z3-4.8.5-x64-ubuntu-16.04.zip
+RUN wget https://github.com/Z3Prover/z3/releases/download/z3-4.7.1/z3-4.7.1-x64-ubuntu-16.04.zip
+RUN unzip z3-4.7.1-x64-ubuntu-16.04.zip
+RUN cp -r z3-4.7.1-x64-ubuntu-16.04/bin/* /usr/local/bin/
+RUN cp -r z3-4.7.1-x64-ubuntu-16.04/include/* /usr/local/include/
+RUN rm z3-4.7.1-x64-ubuntu-16.04.zip
 
 # Set the working directory
 WORKDIR /voting-system

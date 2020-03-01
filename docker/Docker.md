@@ -1,47 +1,54 @@
+# BESSPIN Voting System Docker Images
+
+Docker is used to provide a standard development environment for the
+BESSPIN Voting System.  The Docker images here depend upon other
+project Docker images, such as the SSITH GFE Docker image.
+
 # Docker Tutorial
-Docker is an open-source project that automates the deployment of software applications 
-inside containers by providing an additional layer of abstraction and automation of OS-level 
-virtualization on Linux. This document provides basic docker commands.
-For more information please see the [Docker overview](<https://docs.docker.com/engine/docker-overview/> "Docker overview") official site.  
 
-## Docker keywords:
+Docker is an open-source project that automates the deployment of
+software applications inside containers by providing an additional
+layer of abstraction and automation of OS-level virtualization on
+Linux. This document provides basic Docker commands.
+For more information please see the 
+[Docker overview](<https://docs.docker.com/engine/docker-overview/> "Docker overview") 
+official site.
 
-1. `Docker images` are read-only binary templates that serve for creating containers.
+## Docker Concepts
 
-2. `Containers`  are instances of images that are created by combining the `base` image and the layers on top of it.
+1. `Docker images` are read-only binary templates that serve for
+   creating containers.
 
-3. `Registries` are holders for Docker images. Public registry is called `Docker Hub`.
+2. `Containers` are instances of images that are created by combining
+   the `base` image and the layers on top of it.
 
-4. 	`Repository` is a collection of images tracked by GUIDs. Different version of an image can be managed by multiple tags, saved 
-	with different GUIDs.
+3. `Registries` are holders for Docker images. Public registry is
+   called `Docker Hub`.
 
+4. 	`Repository` is a collection of images tracked by GUIDs. Different
+	version of an image can be managed by multiple tags, saved with
+	different GUIDs.
 
-# Docker commands:
+# Docker Commands
 
-For finding help with docker commands on Linux-based systems, you can use the `man` command.
-Here are some examples.
+For finding help with Docker commands on Linux-based systems, you can
+use the `man` command.  Here are some examples.
 
 - `man docker`
-
 - `man docker ps`
-
 - `man docker exec`
 
-## Docker daemon commands for Linux:
+## Docker Daemon Commands
 
-The default Docker daemon configuration file is located at `/etc/sysconfig/docker`, which is used while starting the daemon. 
+The default Docker daemon configuration file is located (in Linux) at
+`/etc/sysconfig/docker`, which is used while starting the daemon.
 Here are some basic operations:
 
 - enable service: `systemctl enable docker`
-
 - start daeamon: `systemctl start docker`
-
 - stop daeamon: `systemctl stop docker`
-
 - restart daeamon: `systemctl restart docker`
-
-- docker info: `docker info` 
-
+- Docker info: `docker info` 
 - version : `docker version`
 
 For macOS:
@@ -58,11 +65,13 @@ For macOS:
 
   example: `docker search --filter=stars=300 --automated ubuntu` 
 
-- Image tags group images of the same type - pull tagged image: `docker pull NAME[:TAG]`
+- Image tags group images of the same type - pull tagged image:
+  `docker pull NAME[:TAG]`
 
   example: `docker pull galoisinc/besspin:voting_system`
 
-- list images of local registry available on the system: `docker images`
+- list images of local registry available on the system: `docker
+  images`
 
   example:
 
@@ -71,13 +80,14 @@ For macOS:
   REPOSITORY          TAG                  IMAGE ID            CREATED             SIZE
   galoisinc/besspin   voting_system   48a07c86a2a4        2 days ago          12.5GB 
   ```
+
 - remove image: `docker rmi IMAGE[:TAG]`
 
   example pull then remove: 
-
   ```
   $ docker pull darksheer/ubuntu; docker rmi darksheer/ubuntu
   ```
+
 ## Docker Containers
 
 - list containers
@@ -125,7 +135,8 @@ For macOS:
   $ docker run -it -v <abs path to>/voting-system:/voting-system  --name="besspin_base" --hostname="besspin_base" galoisinc/besspin:voting_system
   root@besspin_base:/tool-suite# 
   ```
-  If you type the `exit` command, container will be stopped. (see above how to start container)
+  If you type the `exit` command, container will be stopped. 
+  (see above how to start container)
   ```
   $ docker ps -a
   CONTAINER ID        IMAGE                                  COMMAND             CREATED             STATUS                     PORTS               NAMES
@@ -153,7 +164,8 @@ For macOS:
   CONTAINER ID        IMAGE                                  COMMAND             CREATED             STATUS              PORTS               NAMES
   be995b4b4baa        galoisinc/besspin:voting_system   "/bin/bash"         6 minutes ago       Up 6 minutes                            besspin_base 
   ```
-  It should be noted that starting container in the background mode returns `container ID`. Therefore, we can attach container latter on.
+  It should be noted that starting container in the background mode 
+  returns `container ID`. Therefore, we can attach container latter on.
 
   ```
   $ ID=$(docker run -t -d -P -v <abs path to>/voting-system:/voting-system  --name="besspin_base" --hostname="besspin_base" galoisinc/besspin:voting_system)
@@ -162,14 +174,13 @@ For macOS:
   root@besspin_base:/tool-suite# 
   ``` 
 
-
-- remove-force docker container:
+- remove-force Docker container:
 
   example: 
 
   `docker rm -f besspin_base`
 
-- execute command outside of the docker container
+- execute command outside of the Docker container
 
   example:
 
@@ -223,7 +234,8 @@ For macOS:
    $ docker load --input besspin_base.tar
    ```
 
-## List of frequently used Docker commands for daily work
+## Frequently Used Docker Commands for Daily Work
+
 ```
 docker build -t Dockerfile .                        # Create image using this directory's Dockerfile
 docker build -f <docker file name> .                # Create image using this directory's <docker file name>
@@ -242,9 +254,10 @@ docker push username/repository:tag                 # Upload tagged image to reg
 docker run username/repository:tag                  # Run image from a registry
 ```
 
-## Test the galoisinc/besspin:voting_system
+## Test the galoisinc/besspin:voting_system Docker Image
 
-1.	[Install](<https://docs.docker.com/install/linux/docker-ce/ubuntu/>) docker on your machine.
+1.	[Install](<https://docs.docker.com/install/linux/docker-ce/ubuntu/>) 
+    Docker on your machine.
 2.  `sudo docker pull galoisinc/besspin:voting_system`
 3.  Make sure you have the docker branch of the voting system repo.
 4.  Make sure you have the right image downloaded:
@@ -255,52 +268,78 @@ docker run username/repository:tag                  # Run image from a registry
 	  galoisinc/besspin   voting_system   48a07c86a2a4        3 days ago          12.5GB
     ```
 
-5. Run it using `IMAGE_ID` or `REPOSITORY:TAG` and instead of `$PATH_TO_YOUR_VOTING_SYSTEM_REPO` put the absolute path to your voting system repo:
+5. Run it using `IMAGE_ID` or `REPOSITORY:TAG` and instead of
+   `$PATH_TO_YOUR_VOTING_SYSTEM_REPO` put the absolute path to your
+   voting system repo:
 
     ```
     sudo docker run  --name="besspin_base" --hostname="besspin_base" -v $PATH_TO_YOUR_VOTING_SYSTEM_REPO:/voting-system -it galoisinc/besspin:voting_system
     ```
     
-6. In docker do:
+6. In Docker do:
 
     ```
-    #cd /voting-system
-    #make fpga
+    # cd /voting-system
+    # make fpga
     ```
-7. If everything went well, you will see FreeRTOS FPGA target building.
+
+7. If everything went well, you will see FreeRTOS FPGA target
+   building.
 
 8. Type `exit` to get out of the container
 
-
-## Development with docker image
+## Development with Docker
 
 ### Code compilation
+
 A good development workflow is following:
 
-1. Open the `voting-system` code in your editor of choice
-2. In new terminal, run the docker container interactively. 
+1. Open the `voting-system` code in your editor of choice.
+
+2. In new terminal, run the Docker container interactively. 
  
-    ```
-    sudo docker run -v $PATH_TO_YOUR_VOTING_SYSTEM_REPO:/voting-system -it galoisinc/besspin:voting_system
-    ```
+```
+sudo docker run -v $PATH_TO_YOUR_VOTING_SYSTEM_REPO:/voting-system -it galoisinc/besspin:voting_system
+```
     Compile / verify the code from within the container.
-3. In another terminal, you can access `voting-system` repo you shared with the docker container. So for example changes in source code can be committed to github etc. while the docker container is still running.
 
-### Code deployment / debugging
-We will need one container running the `openocd` server, and a second container running the `gdb` instance. Indeed you need a properly connected FPGA, and your host needs to have all the Xilinx drivers installed as well.
+3. In another terminal, you can access `voting-system` repo you shared
+   with the Docker container.  So, for example, changes in source code
+   can be committed to GitHub etc. while the Docker container is still
+   running.
 
-To actually upload and debug the code, you need to run the container in `priviledged` mode. That way the container has access to the USB devices on the host. See [Docker Documentation](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities) for more info.
+### Code Deployment and Debugging
 
-We also have to connect the container to host network, so we can communicate between the two containers. Use `--network host` for that.
+We will need one container running the `openocd` server, and a second
+container running the `gdb` instance. You also need a properly
+connected FPGA, and your host needs to have all the Xilinx drivers
+installed as well.
+
+To actually upload and debug the code, you need to run the container
+in `priviledged` mode. That way the container has access to the USB
+devices on the host. See 
+[Docker Documentation](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities)
+for more info.
+
+We also have to connect the container to host network, so we can
+communicate between the two containers. Use `--network host` for that.
+
+Note that one cannot use Docker on macOS for FPGA control and
+debugging unless one is willing to [setup a VirtualBox-based Docker
+installation](http://gw.tnode.com/docker/docker-machine-with-usb-support-on-windows-macos/),
+rather than the native HyperKit hypervisor.
 
 Now, the actual instructions.
 
-1. Start up `galoisinc/besspin:gfe` container that will run `openocd` server. Note, you will need the [gfe](https://gitlab-ext.galois.com/ssith/gfe) repository.
-    ```
-    sudo docker run --privileged --hostname="gfe" -p 3333:3333 --network host -it -v $PATH_TO_GFE:/gfe galoisinc/besspin:gfe
+1. Start up `galoisinc/besspin:gfe` container that will run `openocd` 
+   server. Note, you will need access to the 
+   [gfe](https://gitlab-ext.galois.com/ssith/gfe) repository.  We
+   suggest mounting it as follows.
+```
+sudo docker run --privileged --hostname="gfe" -p 3333:3333 --network host -it -v $PATH_TO_GFE:/gfe galoisinc/besspin:gfe
+```
 
-    ```
-2. Start `openocd`:
+2. Configure and start `openocd`.
     ```
     root@gfe:/gfe# openocd -f testing/targets/ssith_gfe.cfg
     ```
@@ -331,36 +370,37 @@ Now, the actual instructions.
     Info : dropped 'gdb' connection
     Info : accepting 'gdb' connection on tcp/3333
     Info : Disabling abstract command writes to CSRs.
-        ```
-3. Start `galoisinc/besspin:voting_system` container:
-    ```
-    sudo docker run --privileged --hostname="voting-system" --network host -it -v $PATH_TO_VOTING_SYSTEM_REPO:/voting-system galoisinc/besspin:voting_system
-    ```
-    Compile your code and start `gdb`:
-    ```
-    # make clean_all
-    # make sim
-    # # riscv64-unknown-elf-gdb -x startup.gdb default_ballot_box_sim.elf
-    ```
-    You should see:
-    ```
-    # riscv64-unknown-elf-gdb -x startup.gdb default_ballot_box_sim.elf 
-    GNU gdb (GDB) 8.3.0.20190516-git
-    Copyright (C) 2019 Free Software Foundation, Inc.
-    License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
-    This is free software: you are free to change and redistribute it.
-    There is NO WARRANTY, to the extent permitted by law.
-    Type "show copying" and "show warranty" for details.
-    This GDB was configured as "--host=x86_64-pc-linux-gnu --target=riscv64-unknown-elf".
-    Type "show configuration" for configuration details.
-    For bug reporting instructions, please see:
-    <http://www.gnu.org/software/gdb/bugs/>.
-    Find the GDB manual and other documentation resources online at:
-        <http://www.gnu.org/software/gdb/documentation/>.
+```
+
+3. Start `galoisinc/besspin:voting_system` container: 
+```
+sudo docker run --privileged --hostname="voting-system" --network host -it -v $PATH_TO_VOTING_SYSTEM_REPO:/voting-system galoisinc/besspin:voting_system 
+``` 
+Compile your code and start `gdb`: 
+```
+# make clean_all all
+# 
+# riscv64-unknown-elf-gdb -x startup.gdb default_ballot_box.elf 
+``` 
+You should see: 
+```
+    # riscv64-unknown-elf-gdb -x startup.gdb
+    default_ballot_box.elf GNU gdb (GDB) 8.3.0.20190516-git
+    Copyright (C) 2019 Free Software Foundation, Inc.  License GPLv3+:
+    GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html> This
+    is free software: you are free to change and redistribute it.
+    There is NO WARRANTY, to the extent permitted by law.  Type "show
+    copying" and "show warranty" for details.  This GDB was configured
+    as "--host=x86_64-pc-linux-gnu --target=riscv64-unknown-elf".
+    Type "show configuration" for configuration details.  For bug
+    reporting instructions, please see:
+    <http://www.gnu.org/software/gdb/bugs/>.  Find the GDB manual and
+    other documentation resources online at:
+    <http://www.gnu.org/software/gdb/documentation/>.
 
     For help, type "help".
     Type "apropos word" to search for commands related to "word"...
-    Reading symbols from default_ballot_box_sim.elf...
+    Reading symbols from default_ballot_box.elf...
     boot () at ../FreeRTOS-mirror/FreeRTOS/Demo/RISC-V_Galois_P1/bsp/boot.S:76
     76	    li t6, 0x1800
     $1 = "Reseting the CPU"
@@ -374,5 +414,6 @@ Now, the actual instructions.
     Start address 0xc0000000, load size 461628
     Transfer rate: 103 KB/sec, 13988 bytes/write.
     (gdb) 
-    ```
+```
+
 4. Start debugging! 

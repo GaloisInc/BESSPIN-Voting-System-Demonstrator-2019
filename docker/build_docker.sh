@@ -1,6 +1,6 @@
 #!/bin/bash
 CONTAINER_NAME=besspin_voting_system
-IMAGE_NAME=galoisinc/besspin
+IMAGE_NAME=free_and_fair/besspin
 IMAGE_TAG=voting_system
 
 # Linux and OS X ?
@@ -19,7 +19,7 @@ else
 	erase_images=false
 fi
 
-echo [$DATETIME] Start building BESSPIN Voting System Image.
+echo [$DATETIME] Start building BESSPIN Voting System image.
 
 if [ "$erase_images" = true ];
 then

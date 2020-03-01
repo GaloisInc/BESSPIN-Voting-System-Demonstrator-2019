@@ -27,7 +27,7 @@ else
 	export PLATFORM_INCLUDES :=
 endif
 
-# Default to GCC
+# Default to Clang
 USE_CLANG ?= yes
 
 # Decide which compiler to use
