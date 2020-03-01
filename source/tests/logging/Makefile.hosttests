@@ -9,56 +9,61 @@ OSD_SRC = $(OS_DIR)/debug_io.c \
           $(OS_DIR)/fetch_key.c
 
 # Build the bottom target
-logging_hosttest_all: log_hosttest_test1 log_hosttest_test2 log_hosttest_test3 log_hosttest_test4 log_hosttest_test5 log_hosttest_test6 \
-	log_hosttest_test7 log_hosttest_log_main log_hosttest_test8 log_hosttest_testmany log_hosttest_test9 log_hosttest_test10 log_hosttest_testimport log_hosttest_remotetest11 log_hosttest_test1net
+logging_hosttest_all: logging_hosttest_test1 logging_hosttest_test2 \
+  logging_hosttest_test3 logging_hosttest_test4 logging_hosttest_test5 \
+  logging_hosttest_test6 logging_hosttest_test7 \
+  logging_hosttest_logging_main logging_hosttest_test8 \
+  logging_hosttest_testmany logging_hosttest_test9 \
+  logging_hosttest_test10 logging_hosttest_testimport \
+  logging_hosttest_remotetest11 logging_hosttest_test1net
 
 
 LSOURCES = $(LOGGING_SRC) $(OSD_SRC)
 CSOURCES = $(CRYPTO_SRC) #../crypto/crypto_t.c ../crypto/aes.c ../crypto/cbc.c ../crypto/mode_wrappers.c ../crypto/sha2-openbsd.c ../crypto/crypto.c ../crypto/base64.c
 
-log_hosttest_test1:
+logging_hosttest_test1:
 	$(CC) $(HOSTTEST_CFLAGS) -o test1 test1.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test2:
+logging_hosttest_test2:
 	$(CC) $(HOSTTEST_CFLAGS) -o test2 test2.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test3:
+logging_hosttest_test3:
 	$(CC) $(HOSTTEST_CFLAGS) -o test3 test3.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test1net:
+logging_hosttest_test1net:
 	$(CC) $(HOSTTEST_CFLAGS) -o test1net test1net.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test4:
+logging_hosttest_test4:
 	$(CC) $(HOSTTEST_CFLAGS) -o test4 test4.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test5:
+logging_hosttest_test5:
 	$(CC) $(HOSTTEST_CFLAGS) -o test5 test5.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test6:
+logging_hosttest_test6:
 	$(CC) $(HOSTTEST_CFLAGS) -o test6 test6.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test7:
+logging_hosttest_test7:
 	$(CC) $(HOSTTEST_CFLAGS) -o test7 test7.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_log_main:
+logging_hosttest_logging_main:
 	$(CC) $(HOSTTEST_CFLAGS) -o log_main $(LOG_DIR)/log_main.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test8:
+logging_hosttest_test8:
 	$(CC) $(HOSTTEST_CFLAGS) -o test8 test8.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_testmany:
+logging_hosttest_testmany:
 	$(CC) $(HOSTTEST_CFLAGS) -o testmany testmany.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test9:
+logging_hosttest_test9:
 	$(CC) $(HOSTTEST_CFLAGS) -o test9 test9.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_test10:
+logging_hosttest_test10:
 	$(CC) $(HOSTTEST_CFLAGS) -o test10 test10.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_testimport:
+logging_hosttest_testimport:
 	$(CC) $(HOSTTEST_CFLAGS) -o testimport testimport.c $(LSOURCES) $(CSOURCES)
 
-log_hosttest_remotetest11:
+logging_hosttest_remotetest11:
 	$(CC) $(HOSTTEST_CFLAGS) -o remotetest11 remotetest11.c $(LSOURCES) $(CSOURCES)
 
 logging_hosttest_clean:
