@@ -22,11 +22,11 @@ BOTTOM_SOURCE = log_main.c \
                 ../crypto/crypto_bottom.c
 
 # Build the bottom target
-log_bottom:
+logging_bottom:
 	cd $(LOG_DIR) && \
 	$(CC) $(CFLAGS) -D__riscv_xlen=32 $(BOTTOM_SOURCE) -o secure_log_bottom.elf && \
 	rm -f *.o $(OS_DIR)/*.o
 
-log_bottom_clean:
+logging_bottom_clean:
 	cd $(LOG_DIR) && \
 	rm -f secure_log_bottom.elf

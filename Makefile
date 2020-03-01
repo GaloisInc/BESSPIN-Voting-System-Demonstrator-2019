@@ -29,15 +29,15 @@ export USE_LED_BLINK_TASK=1
 
 .PHONY: all posix_all bottom_all freertos_all typecheck_all verify_all
 .PHONY: sim fpga
-.PHONY: clean clean_all clean_crypto clean_log clean_sbb
+.PHONY: clean clean_all clean_crypto clean_logging clean_sbb
 .PHONY: hosttest_all crypto_hosttest_clean logging_hosttest_clean sbb_hosttest_clean
-.PHONY: sim_all sim_crypto sim_log sim_sbb
+.PHONY: sim_all sim_crypto sim_logging sim_sbb
 .PHONY: all_boxes upload_binary_box1 upload_binary_box2 upload_binary_box3 upload_binary_box4
 .PHONY: upload_binary_sim upload_binary_and_bitstream_sim upload_binary_fpga upload_binary_and_bitstream_sim
-.PHONY: posix_crypto posix_log posix_sbb
-.PHONY: freertos_crypto freertos_log freertos_sbb
-.PHONY: typecheck_crypto typecheck_log typecheck_sbb
-.PHONY: verify_crypto verify_log verify_sbb
+.PHONY: posix_crypto posix_logging posix_sbb
+.PHONY: freertos_crypto freertos_logging freertos_sbb
+.PHONY: typecheck_crypto typecheck_logging typecheck_sbb
+.PHONY: verify_crypto verify_logging verify_sbb
 .PHONY: crypto_hosttest_all logging_hosttest_all sbb_hosttest_all
 
 #####################################
@@ -93,15 +93,15 @@ else
 #####################################
 ifeq ($(TARGET),posix)
 
-posix_all: posix_crypto posix_log posix_sbb
+posix_all: posix_crypto posix_logging posix_sbb
 
-clean: clean_crypto clean_log clean_sbb
+clean: clean_crypto clean_logging clean_sbb
 
 posix_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.posix crypto
 
-posix_log:
+posix_logging:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.posix log
 
@@ -113,9 +113,9 @@ clean_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.posix clean_crypto
 
-clean_log:
+clean_logging:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.posix clean_log
+	$(MAKE) -f Makefile.posix clean_logging
 
 clean_sbb:
 	cd $(SOURCE_DIR) ; \
@@ -129,17 +129,17 @@ else
 #####################################
 ifeq ($(TARGET),freertos)
 
-freertos_all: freertos_crypto freertos_log freertos_sbb
+freertos_all: freertos_crypto freertos_logging freertos_sbb
 
-clean: clean_sbb clean_crypto clean_log
+clean: clean_sbb clean_crypto clean_logging
 
 freertos_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos crypto
 
-freertos_log:
+freertos_logging:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.freertos log
+	$(MAKE) -f Makefile.freertos logging
 
 freertos_sbb:
 	cd $(SOURCE_DIR) ; \
@@ -149,7 +149,7 @@ clean_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
 
-clean_log:
+clean_logging:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos clean
 
@@ -166,11 +166,11 @@ else
 ifeq ($(TARGET),verification)
 export OS_DIR = $(SOURCE_DIR)/os/posix
 
-typecheck_all: typecheck_crypto typecheck_sbb typecheck_log
+typecheck_all: typecheck_crypto typecheck_sbb typecheck_logging
 
-verify_all: verify_crypto verify_sbb verify_log
+verify_all: verify_crypto verify_sbb verify_logging
 
-clean: clean_crypto clean_sbb clean_log
+clean: clean_crypto clean_sbb clean_logging
 
 typecheck_crypto:
 	cd $(CRYPTO_DIR) ; \
@@ -196,15 +196,15 @@ clean_sbb:
 	cd $(SBB_DIR) ; \
 	$(MAKE) -f Makefile.verification clean
 
-typecheck_log:
+typecheck_logging:
 	cd $(LOG_DIR) ; \
 	$(MAKE) -f Makefile.verification typecheck
 
-verify_log:
+verify_logging:
 	cd $(LOG_DIR) ; \
 	$(MAKE) -f Makefile.verification verify
 
-clean_log:
+clean_logging:
 	cd $(LOG_DIR) ; \
 	$(MAKE) -f Makefile.verification clean
 
@@ -226,6 +226,10 @@ export HOSTTEST_CFLAGS = \
 	-DVOTING_SYSTEM_DEBUG -DLOG_SYSTEM_DEBUG \
 	-Wno-macro-redefined -I$(INCLUDE_DIR) \
         -fsanitize=address,undefined
+
+hosttest_all: crypto_hosttest_all logging_hosttest_all sbb_hosttest_all
+
+clean: crypto_hosttest_clean logging_hosttest_clean sbb_hosttest_clean
 
 crypto_hosttest_all:
 	cd $(SOURCE_DIR); \
@@ -251,9 +255,6 @@ sbb_hosttest_clean:
 	cd $(SOURCE_DIR); \
 	$(MAKE) -f Makefile.hosttests sbb_hosttest_clean
 
-hosttest_all: crypto_hosttest_all logging_hosttest_all sbb_hosttest_all
-clean: crypto_hosttest_clean logging_hosttest_clean sbb_hosttest_clean
-
 else
 #####################################
 #
@@ -264,9 +265,9 @@ ifeq ($(TARGET),sim)
 export OS_DIR = $(SOURCE_DIR)/os/freertos
 export CFLAGS := -DVOTING_PLATFORM_FREERTOS
 
-sim_all: sim_crypto sim_log sim_sbb
+sim_all: sim_crypto sim_logging sim_sbb
 
-clean: clean_crypto clean_log clean_sbb
+clean: clean_crypto clean_logging clean_sbb
 
 sim_crypto:
 	cd $(SOURCE_DIR) ; \
@@ -276,13 +277,13 @@ clean_crypto:
 	cd $(SOURCE_DIR) ; \
 	$(MAKE) -f Makefile.freertos_sim clean_crypto
 
-sim_log:
+sim_logging:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim log
+	$(MAKE) -f Makefile.freertos_sim logging
 
-clean_log:
+clean_logging:
 	cd $(SOURCE_DIR) ; \
-	$(MAKE) -f Makefile.freertos_sim clean_log
+	$(MAKE) -f Makefile.freertos_sim clean_logging
 
 sim_sbb:
 	cd $(SOURCE_DIR) ; \
