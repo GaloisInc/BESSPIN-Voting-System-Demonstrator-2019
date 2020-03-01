@@ -37,13 +37,14 @@ endif
 
 ifeq ($(NETWORK_LOGS),yes)
   $(info Pulling in network logging subsystem)
-  export LOGGING_SRC += $(LOG_DIR)/log_net.c
+  export LOGGING_SRC += $(LOG_DIR)/log_net.c \
+                        $(LOG_DIR)/log_election_reporting.c
 endif
 
 export SBB_SRC = $(SBB_DIR)/sbb.c \
-				 $(SBB_DIR)/sbb_machine.c \
-				 $(SBB_DIR)/sbb_strings.c \
-				 $(SBB_DIR)/sbb_logging.c \
-				 $(SBB_DIR)/sbb_crypto.c
+				$(SBB_DIR)/sbb_machine.c \
+				$(SBB_DIR)/sbb_strings.c \
+				$(SBB_DIR)/sbb_logging.c \
+				$(SBB_DIR)/sbb_crypto.c
 
 export DEMO_SRC = $(OSD_SRC) $(CRYPTO_SRC) $(LOGGING_SRC) $(SBB_SRC)

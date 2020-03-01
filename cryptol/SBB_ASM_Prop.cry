@@ -1,0 +1,132 @@
+module SBB_ASM_Prop where
+
+import SBB
+
+acceptedBarcode : SBBState -> Bool
+acceptedBarcode s = elem s.L [ WaitForDecision, Cast, Spoil ]
+
+// propOnlyValidBarcode : SBBState -> Barcode -> Bool
+// propOnlyValidBarcode = acceptedBarcode s ==>
+
+validRange : {a} (Cmp a) => a -> a -> a -> Bool
+validRange lo x hi = (lo <= x) && (x <= hi)
+
+mASMValid : SBBState -> Bool
+mASMValid s = validRange MotorsOff s.M MotorsTurningBackward
+
+lASMValid : SBBState -> Bool
+lASMValid s = validRange Initialize s.L Abort
+
+dASMValid : SBBState -> Bool
+dASMValid s = validRange InitializedDisplay s.D ShowingText
+
+bsASMValid : SBBState -> Bool
+bsASMValid s = validRange BarcodeNotPresent s.BS BarcodePresentAndRecorded
+
+pASMValid : SBBState -> Bool
+pASMValid s = validRange NoPaperDetected s.P PaperDetected
+
+fsASMValid : SBBState -> Bool
+fsASMValid s = validRange LogOK s.FS LogFailure
+
+barcodePresent : SBBState -> Bool
+barcodePresent s = s.BS == BarcodePresentAndRecorded
+
+validASMStates : SBBState -> Bool
+validASMStates s =
+      mASMValid s
+  &&  lASMValid s
+  &&  dASMValid s
+  &&  pASMValid s
+  && fsASMValid s
+  && bsASMValid s
+
+initializeInv : SBBState -> Bool
+initializeInv s =
+  (s.M == MotorsOff)
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+standbyInv : SBBState -> Bool
+standbyInv s =
+  (s.M == MotorsOff)
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+waitForBallotInv : SBBState -> Bool
+waitForBallotInv s =
+  (s.M == MotorsOff)
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+feedBallotInv : SBBState -> Bool
+feedBallotInv s =
+  (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+barcodeDetectedInv : SBBState -> Bool
+barcodeDetectedInv s =
+  barcodePresent s
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+waitForDecisionInv : SBBState -> Bool
+waitForDecisionInv s =
+  barcodePresent s
+  && castButtonLit s
+  && spoilButtonLit s
+
+castInv : SBBState -> Bool
+castInv s =
+  barcodePresent s
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+spoilInv : SBBState -> Bool
+spoilInv s =
+  barcodePresent s
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+ejectInv : SBBState -> Bool
+ejectInv s =
+  (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+awaitRemovalInv : SBBState -> Bool
+awaitRemovalInv s =
+  (s.M == MotorsOff)
+  && (~ (castButtonLit s))
+  && (~ (spoilButtonLit s))
+
+abortInv : SBBState -> Bool
+abortInv _ = True
+
+ballotPresent : SBBState -> Bool
+ballotPresent s =
+     (s.L == BarcodeDetected)
+  || (s.L == WaitForDecision)
+  || (s.L == Cast)
+  || (s.L == Eject)
+  || (s.L == Spoil)
+
+paperPresent : SBBState -> Bool
+paperPresent s =
+     (s.P == PaperDetected)
+  || (ballotPresent s)
+  || (s.L == FeedBallot)
+  || (s.L == AwaitRemoval)
+
+sbbStatesInvariant : SBBState -> Bool
+sbbStatesInvariant s =
+     ((s.L == WaitForBallot  ) && (waitForBallotInv   s))
+  || ((s.L == FeedBallot     ) && (feedBallotInv      s))
+  || ((s.L == BarcodeDetected) && (barcodeDetectedInv s))
+  || ((s.L == WaitForDecision) && (waitForDecisionInv s))
+  || ((s.L == Cast           ) && (castInv            s))
+  || ((s.L == Spoil          ) && (spoilInv           s))
+  || ((s.L == Eject          ) && (ejectInv           s))
+  || ((s.L == AwaitRemoval   ) && (awaitRemovalInv    s))
+  || ((s.L == Abort          ) && (abortInv           s))
+  || ((s.L == Standby        ) && (standbyInv         s))
+  || ((s.L == Initialize     ) && (initializeInv      s))

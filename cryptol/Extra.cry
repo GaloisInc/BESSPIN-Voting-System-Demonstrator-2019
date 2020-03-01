@@ -1,0 +1,20 @@
+module Extra where
+
+// Really just boolean equality, but shows the logical intent
+(<==>) : Bool -> Bool -> Bool
+(<==>) = (==)
+
+id : {a} a -> a
+id x = x
+
+compose : {a, b, c} (b -> c) -> (a -> b) -> (a -> c)
+compose f g x = f (g x)
+
+(>>-) : {a, b, c} (a -> b) -> (b -> c) -> (a -> c)
+(>>-) f g x = g (f x)
+
+(>>=) : {a, b, c, v} (a -> (b, v)) -> (v -> b -> c) -> (a -> c)
+(>>=) f g a = c
+  where
+    (b, v) = f a
+    c      = g v b

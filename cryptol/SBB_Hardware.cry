@@ -1,0 +1,38 @@
+module SBB_Hardware where
+
+import Extra
+import SBB
+
+type Button = { Button : [1] }
+Down        = { Button = 0x0 }
+Up          = { Button = 0x1 }
+
+type Light = { Light : [4] }
+Lit        = { Light = 0x0 }
+Dark       = { Light = 0x1 }
+
+type HasBarcode   = { HasBarcode : [2] }
+HasInvalidBarcode = { HasBarcode = 0x0 }
+HasValidBarcode   = { HasBarcode = 0x1 }
+No                = { HasBarcode = 0x2 }
+
+type PaperPresent = { PaperPresent : [1] }
+Present           = { PaperPresent = 0x0 }
+None              = { PaperPresent = 0x1 }
+
+type Motor = { Motor : [2] }
+Forward    = { Motor = 0x0 }
+Backward   = { Motor = 0x1 }
+Off        = { Motor = 0x2 }
+
+type CastButton       = Button
+type SpoilButton      = Button
+type CastButtonLight  = Light
+type SpoilButtonLight = Light
+type PaperFeedMotor   = Motor
+
+lightsOff : CastButtonLight -> SpoilButtonLight -> SBBState -> Bool
+lightsOff cbl sbl s = ((cbl == Dark) && (sbl == Dark)) <==> (noButtonsLit s)
+
+barcodeValid : Barcode -> BarcodeLength -> Bool
+barcodeValid _ _ = True // TODO: check whether we want to do something here

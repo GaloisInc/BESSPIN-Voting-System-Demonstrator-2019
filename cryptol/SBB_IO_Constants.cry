@@ -1,0 +1,25 @@
+module SBB_IO_Constants where
+
+buttonCastLED : [8]
+buttonCastLED = 3
+
+buttonSpoilLED : [8]
+buttonSpoilLED = 1
+
+buttonCastIn : [8]
+buttonCastIn = 2
+
+buttonSpoilIn : [8]
+buttonSpoilIn = 0
+
+paperSensorOut : [8]
+paperSensorOut = 6
+
+paperSensorIn : [8]
+paperSensorIn = 7
+
+motor0 : [8]
+motor0 = 4
+
+motor1 : [8]
+motor1 = 4
