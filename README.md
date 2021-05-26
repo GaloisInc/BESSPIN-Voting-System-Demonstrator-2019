@@ -249,6 +249,10 @@ Works](https://voting.works/). Thanks especially to Ben Adida.
 Our fork of Voting Works's BMD for our DEF CON 2019 demonstration is
 found on GitHub: https://github.com/GaloisInc/BESSPIN-BMD-2019
 
+This material is based upon work supported by the Defense Advanced Research Project Agency (DARPA) under Contract No. HR0011-18-C-0013.  Any opinions, findings, conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of DARPA.
+
+Distribution Statement "A" (Approved for Public Release, Distribution Unlimited)
+
 # Glossary
 
 For a glossary of voting system terminology, see Free & Fair's
